@@ -23,6 +23,11 @@ To apply this configuration to your NixOS system, you can use the following comm
     nixos-rebuild test --flake .
     ```
 
+*   **Running a command in the development environment:**
+    ```bash
+    nix develop . -c -- <command>
+    ```
+
 ## Key Files
 
 *   `flake.nix`: The entry point for the Nix Flake. It defines the dependencies (`nixpkgs`, `home-manager`) and the overall structure of the configuration.
