@@ -191,7 +191,6 @@
     google-chrome       # Google's web browser - https://www.google.com/chrome/
     obsidian            # A powerful knowledge base that works on top of a local folder of plain text Markdown files - https://obsidian.md/
     anki-bin            # A program which makes remembering things easy - https://apps.ankiweb.net/
-    rclone              # A command-line program to manage files on cloud storage - https://rclone.org/
     gimp-with-plugins   # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc                 # A free and open source cross-platform multimedia player and framework - https://www.videolan.org/vlc/
     libreoffice         # A powerful and free office suite - https://www.libreoffice.org/
@@ -203,6 +202,8 @@
     # useseless tools
     cmatrix             # A terminal-based "Matrix" screen saver
   ];
+
+  # Enable Gnome Online Accounts to manage Google Drive
 
   # Enable fish shell
   programs.fish.enable = true;
