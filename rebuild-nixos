@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -e
+
+# Check if the git working tree is clean
+if ! (git diff --quiet && git diff --cached --quiet); then
+  echo "Error: Git working tree is not clean."
+  echo "Please commit or stash your changes before running this script."
+  git status
+  exit 1
+fi
+
+echo "Git working tree is clean. Starting update..."
+
+# Update the flake inputs
+echo "--> Updating flake inputs..."
+nix flake update
+
+# Commit the updated flake.lock file
+echo "--> Committing flake.lock..."
+git add flake.lock
+
+if git diff --staged --quiet; then
+  echo "No changes to flake.lock. Nothing to commit."
+else
+  git commit -m "chore: update flake inputs"
+fi
+
+# Rebuild the system
+echo "--> Rebuilding NixOS system..."
+sudo nixos-rebuild switch --flake .
+
+echo ""
+echo "NixOS system rebuild complete!"
