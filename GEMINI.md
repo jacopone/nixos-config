@@ -44,3 +44,19 @@ To apply this configuration to your NixOS system, you can use the following comm
 *   **Packages:**
     *   System-level packages are listed in the `environment.systemPackages` attribute in `configuration.nix`.
     *   User-specific packages are listed in the `home.packages` attribute in `home.nix`.
+
+## Automated Rebuild Script
+
+This repository includes a script to automate the process of updating, building, and cleaning up the system.
+
+*   **Automated update and rebuild:**
+    ```bash
+    ./rebuild-nixos
+    ```
+
+This script performs the following actions:
+1.  Checks for a clean Git working directory.
+2.  Updates the flake inputs using `nix flake update`.
+3.  Commits the updated `flake.lock` file.
+4.  Rebuilds the system using `sudo nixos-rebuild switch --flake .`.
+5.  Cleans up old system generations, keeping the 3 most recent ones.

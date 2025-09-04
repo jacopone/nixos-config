@@ -29,5 +29,9 @@ fi
 echo "--> Rebuilding NixOS system..."
 sudo nixos-rebuild switch --flake .
 
+# Clean up old generations, keeping the last 3
+echo "--> Cleaning up old system generations..."
+sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +3
+
 echo ""
-echo "NixOS system rebuild complete!"
+echo "NixOS system rebuild and cleanup complete!"
