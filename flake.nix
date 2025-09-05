@@ -26,6 +26,9 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs; }; # Pass inputs to your config
         modules = [
+          # Agenix module for secrets management
+          agenix.nixosModules.default
+
           # Your main configuration file
           ./hosts/nixos
 
@@ -37,9 +40,6 @@
             # The path to your home-manager config, username is set to "guyfawkes"
             home-manager.users.guyfawkes = import ./users/guyfawkes/home.nix;
           }
-
-          # Agenix module for secrets management
-          agenix.nixosModules.default
         ];
       };
     };
