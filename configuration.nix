@@ -177,6 +177,13 @@
     eza                 # A modern replacement for ls - https://eza.rocks/
     peco                # Simplistic interactive filtering tool
     gedit               # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
+    jq                  # JSON processor - essential for development
+    tree                # Directory visualization  
+    htop                # Better system monitoring
+    ripgrep             # Super fast grep (rg command)
+    fd                  # Modern find alternative
+    bat                 # Better cat with syntax highlighting
+    docker
 
 
     # system tools
