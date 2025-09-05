@@ -67,6 +67,10 @@
     '';
   };
 
+  programs.yazi = {
+    enable = true;
+  };
+
   # You can also manage settings for other programs, for example:
   # programs.git = {
   #   enable = true;

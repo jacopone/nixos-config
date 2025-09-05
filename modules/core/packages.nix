@@ -66,5 +66,6 @@
     fzf                 # A command-line fuzzy finder
     ncdu                # NCurses Disk Usage
     yazi                # A modern terminal file manager
+    yaziPlugins.rich-preview # Rich preview for Yazi
   ];
 }
