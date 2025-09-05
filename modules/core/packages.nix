@@ -61,5 +61,10 @@
 
     # useseless tools
     cmatrix             # A terminal-based "Matrix" screen saver
+
+    # file searchers and visualizers
+    fzf                 # A command-line fuzzy finder
+    ncdu                # NCurses Disk Usage
+    broot               # An interactive tree viewer
   ];
 }
