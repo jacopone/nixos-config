@@ -191,6 +191,10 @@
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
     pkg-config          # Package config tool for native module builds
+    
+    # Development environment management (completes AI agent optimization)
+    direnv              # Automatic per-directory environment activation - enables .envrc
+    devenv              # Fast, declarative development environments - instant service commands
 
     # system tools
     fastfetch           # A neofetch-like tool for fetching system information and displaying them in a pretty way
