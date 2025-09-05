@@ -184,7 +184,13 @@
     fd                  # Modern find alternative
     bat                 # Better cat with syntax highlighting
     docker
-
+    
+    # Core development tools (for instant AI agent commands)
+    nodejs_20           # Node.js 20.19.4 with npm - eliminates devenv activation overhead
+    python3             # Python for build scripts and native modules
+    gcc                 # GCC compiler for native dependencies
+    gnumake             # GNU Make for build systems
+    pkg-config          # Package config tool for native module builds
 
     # system tools
     fastfetch           # A neofetch-like tool for fetching system information and displaying them in a pretty way
