@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Check if the git working tree is clean
-if ! (git diff --quiet && git diff --cached --quiet); then
-  echo "Error: Git working tree is not clean."
-  echo "Please commit or stash your changes before running this script."
-  git status
-  exit 1
-fi
+
 
 echo "Git working tree is clean. Starting update..."
 
@@ -15,19 +9,44 @@ echo "Git working tree is clean. Starting update..."
 echo "--> Updating flake inputs..."
 nix flake update
 
-# Commit the updated flake.lock file
-echo "--> Committing flake.lock..."
-git add flake.lock
+# Perform a test build
+echo "--> Performing a test build (without activating)..."
+# Use 'build' instead of 'test' to get the path to the new configuration
+# and avoid the 'Failed to start transient service unit' error if not root
+NEW_CONFIG_PATH=$(nix build --no-link --print-out-paths .#nixosConfigurations."nixos".config.system.build.toplevel)
 
-if git diff --staged --quiet; then
-  echo "No changes to flake.lock. Nothing to commit."
-else
-  git commit -m "chore: update flake inputs"
-fi
+echo "--> Test build successful. New configuration path: $NEW_CONFIG_PATH"
 
-# Rebuild the system
-echo "--> Rebuilding NixOS system..."
+# Activate the new configuration
+echo "--> Activating the new configuration..."
 sudo nixos-rebuild switch --flake .
+
+echo "--> Configuration activated. Please test the changes now."
+read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "--> Changes accepted. Staging for commit..."
+    git add . # Stage all changes
+
+    git status # Show git status before prompting for commit message
+
+    # Ask for a commit message
+    read -p "Enter a commit message for these changes (or leave blank to skip commit): " commit_message
+
+    if [ -n "$commit_message" ]; then
+      echo "--> Committing changes..."
+      git commit -m "$commit_message"
+    else
+      echo "--> No commit message provided. Skipping commit."
+    fi
+else
+    echo "--> Changes rejected. Rolling back to previous configuration..."
+    sudo nixos-rebuild switch --rollback
+    echo "--> Rollback complete. Exiting."
+    exit 0 # Exit successfully after rollback
+fi
 
 # Clean up old generations
 echo "--> Listing system generations..."
