@@ -67,9 +67,25 @@
     '';
   };
 
-  programs.yazi = {
-    enable = true;
-  };
+  
+
+  home.file.".config/yazi/config.toml".text = ''
+    [manager]
+    show_hidden = true
+
+    [preview]
+    preview_script = "${pkgs.yaziPlugins.rich-preview}/bin/rich-preview.yazi"
+
+    [plugin]
+    prepend_previewers = [
+        { name = "*.csv", run = "rich-preview"},
+        { name = "*.md", run = "rich-preview" },
+        { name = "*.rst", run = "rich-preview"},
+        { name = "*.ipynb", run = "rich-preview"},
+        { name = "*.json", run = "rich-preview"},
+    #    { name = "*.lang_type", run = "rich-preview"}
+    ]
+  '';
 
   # You can also manage settings for other programs, for example:
   # programs.git = {

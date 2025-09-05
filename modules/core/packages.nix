@@ -67,5 +67,7 @@
     ncdu                # NCurses Disk Usage
     yazi                # A modern terminal file manager
     yaziPlugins.rich-preview # Rich preview for Yazi
+    python313Packages.rich # Dependency for rich-preview.yazi
+    glow                # Markdown renderer
   ];
 }
