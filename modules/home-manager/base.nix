@@ -15,6 +15,11 @@
   # Let home-manager manage my shell configuration.
   programs.bash.enable = true;
 
+  programs.kitty = {
+    enable = true;
+    shell = "${pkgs.fish}/bin/fish";
+  };
+
   # You can also manage settings for other programs, for example:
   # programs.git = {
   #   enable = true;
