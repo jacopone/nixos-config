@@ -29,9 +29,18 @@ fi
 echo "--> Rebuilding NixOS system..."
 sudo nixos-rebuild switch --flake .
 
-# Clean up old generations, keeping the last 3
-echo "--> Cleaning up old system generations..."
-sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +3
+# Clean up old generations
+echo "--> Listing system generations..."
+sudo nixos-rebuild list-generations
+
+read -p "Enter the generations you want to delete (separated by space): " generations_to_delete
+if [ -n "$generations_to_delete" ]; then
+    echo "--> Deleting generations: $generations_to_delete"
+    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
+    echo "--> Selected generations deleted."
+else
+    echo "--> No generations selected for deletion."
+fi
 
 echo ""
 echo "NixOS system rebuild and cleanup complete!"
