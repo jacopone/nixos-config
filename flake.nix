@@ -21,7 +21,7 @@
         specialArgs = { inherit inputs; }; # Pass inputs to your config
         modules = [
           # Your main configuration file
-          ./configuration.nix
+          ./hosts/nixos
 
           # Home Manager module (optional)
           home-manager.nixosModules.home-manager
@@ -29,7 +29,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             # The path to your home-manager config, username is set to "guyfawkes"
-            home-manager.users.guyfawkes = import ./home.nix;
+            home-manager.users.guyfawkes = import ./users/guyfawkes/home.nix;
           }
         ];
       };
