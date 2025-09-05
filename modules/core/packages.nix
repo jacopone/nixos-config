@@ -65,6 +65,6 @@
     # file searchers and visualizers
     fzf                 # A command-line fuzzy finder
     ncdu                # NCurses Disk Usage
-    broot               # An interactive tree viewer
+    yazi                # A modern terminal file manager
   ];
 }
