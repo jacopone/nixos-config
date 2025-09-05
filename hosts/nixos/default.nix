@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/core/packages.nix
+      ../../profiles/desktop
     ];
 
   # Bootloader.
@@ -63,54 +64,7 @@
     LC_TIME = "it_IT.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-    # Exclude some default applications
-  environment.gnome.excludePackages = with pkgs; [
-    baobab             # disk usage analyzer
-    epiphany           # web browser
-    simple-scan        # document scanner
-    totem              # video player
-    yelp               # help viewer
-    evince             # document viewer
-    file-roller        # archive manager
-    geary              # email client
-    seahorse           # password manager
-    decibels           # audio editor 
-
-    # these should be self explanatory
-    gnome-calculator
-    gnome-calendar
-    gnome-characters
-    gnome-clocks
-    gnome-contacts
-    gnome-font-viewer
-    gnome-logs
-    gnome-maps
-    gnome-music
-    gnome-screenshot
-    gnome-system-monitor
-    gnome-weather
-    gnome-disk-utility
-    gnome-connections
-    gnome-tour
-    gnome-text-editor
-    ];
-
-  # Exclude also Xterm that can not be excluded with the list above
-  services.xserver.excludePackages = [ pkgs.xterm ];
-  services.xserver.desktopManager.xterm.enable = false;
+  
 
   # Exclude Nixos Documentation
   documentation.nixos.enable = false;
@@ -118,24 +72,9 @@
   # Try to change the default Editor of the whole system
   environment.variables.EDITOR = "hx";
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
+  
 
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
+  
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -154,10 +93,7 @@
     # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  fonts.packages = [
-    pkgs.nerd-fonts._0xproto
-    pkgs.nerd-fonts.droid-sans-mono
-  ];
+  
 
   
 
@@ -190,6 +126,13 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  # Agenix for secrets management
+  age.keyFile = "/etc/nixos/age.key";
+  age.secrets.example_secret = {
+    file = ../../secrets.nix;
+    owner = "guyfawkes";
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

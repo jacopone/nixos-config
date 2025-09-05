@@ -10,9 +10,15 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Secrets management
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, agenix, ... }@inputs: {
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"
@@ -31,6 +37,9 @@
             # The path to your home-manager config, username is set to "guyfawkes"
             home-manager.users.guyfawkes = import ./users/guyfawkes/home.nix;
           }
+
+          # Agenix module for secrets management
+          agenix.nixosModules.default
         ];
       };
     };
