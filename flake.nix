@@ -10,15 +10,9 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # Secrets management
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, agenix, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"
@@ -26,9 +20,6 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs; }; # Pass inputs to your config
         modules = [
-          # Agenix module for secrets management
-          agenix.nixosModules.default
-
           # Your main configuration file
           ./hosts/nixos
 
