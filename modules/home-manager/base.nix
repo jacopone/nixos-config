@@ -17,7 +17,6 @@
 
   programs.kitty = {
     enable = true;
-    shell = "${pkgs.fish}/bin/fish";
   };
 
   # You can also manage settings for other programs, for example:
