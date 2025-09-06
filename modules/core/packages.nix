@@ -25,6 +25,12 @@
     ripgrep             # Super fast grep (rg command)
     fd                  # Modern find alternative
     bat                 # Better cat with syntax highlighting
+    
+    # Create fdfind symlink for yazi compatibility
+    (pkgs.runCommand "fdfind" {} ''
+      mkdir -p $out/bin
+      ln -s ${pkgs.fd}/bin/fd $out/bin/fdfind
+    '')
     docker
     
     # Core development tools (for instant AI agent commands)
@@ -52,7 +58,7 @@
     obsidian            # A powerful knowledge base that works on top of a local folder of plain text Markdown files - https://obsidian.md/
     anki-bin            # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins   # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
-    vlc                 # A free and open source cross-platform multimedia player and framework - https://www.videolan.org/vlc/
+    vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
     libreoffice         # A powerful and free office suite - https://www.libreoffice.org/
 
     # fonts
@@ -67,7 +73,9 @@
     ncdu                # NCurses Disk Usage
     yazi                # A modern terminal file manager
     yaziPlugins.rich-preview # Rich preview for Yazi
-    python313Packages.rich # Dependency for rich-preview.yazi
+    rich-cli            # Rich command-line interface for rich preview
     glow                # Markdown renderer
+    ueberzugpp          # Successor to ueberzug for image previews
+    bat                 # A cat clone with wings
   ];
 }
