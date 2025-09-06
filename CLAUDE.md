@@ -28,11 +28,6 @@ The system is configured with:
 *   **Check package availability:** `nix-env -qaP | grep <package-name>`
 *   **Search nixpkgs:** `nix search nixpkgs <package-name>`
 
-### Agent OS Integration
-*   **Install Agent OS in project:** `/home/guyfawkes/nixos-config/.agent-os/setup/project.sh`
-*   **Base installation location:** `/home/guyfawkes/nixos-config/.agent-os/`
-*   **Customize standards:** Edit files in `.agent-os/standards/`
-*   **Configure project types:** Modify `.agent-os/config.yml`
 
 ## Architecture Overview
 
@@ -90,7 +85,6 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - **Yazi File Manager**: Full rich preview functionality working with enhanced file previews for markdown, JSON, CSV, and other formats
 - **Fish Shell**: Set as default user shell with z plugin for directory jumping
 - **Development Environment**: Comprehensive tool setup with multiple editors (Helix, Zed, VSCode, Cursor)
-- **Agent OS**: System-wide installation providing structured context and workflows for AI coding agents
 
 ### Tool Configurations Working
 - **Rich Preview**: Successfully rendering markdown files with syntax highlighting and formatting

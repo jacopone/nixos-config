@@ -15,13 +15,13 @@
   # Let home-manager manage my shell configuration.
   programs.bash.enable = true;
 
-  # Enable and configure Yazi file manager
+  # Enable and configure Yazi file manager (restored from working commit b25a70e)
   programs.yazi = {
     enable = true;
     enableBashIntegration = true;
     enableFishIntegration = true;
     settings = {
-      manager = {
+      mgr = {
         show_hidden = true;
       };
       plugin = {
@@ -31,6 +31,57 @@
           { name = "*.rst"; run = "rich-preview"; }
           { name = "*.ipynb"; run = "rich-preview"; }
           { name = "*.json"; run = "rich-preview"; }
+        ];
+      };
+      opener = {
+        # Markdown files - use glow for opening (but rich-preview for preview)
+        markdown = [
+          { run = "glow -p \"$@\""; desc = "View with Glow (pager)"; }
+          { run = "glow \"$@\""; desc = "View with Glow"; }
+          { run = "helix \"$@\""; desc = "Edit with Helix"; }
+        ];
+        # Images - modern viewers
+        image = [
+          { run = "feh --scale-down --auto-zoom \"$@\""; desc = "View with feh"; block = true; }
+          { run = "sxiv \"$@\""; desc = "Browse with sxiv"; block = true; }
+          { run = "eog \"$@\""; desc = "View with Eye of GNOME"; block = true; }
+        ];
+        # PDFs - modern viewers
+        pdf = [
+          { run = "sioyek \"$@\""; desc = "View with Sioyek (technical docs)"; orphan = true; }
+          { run = "mupdf \"$@\""; desc = "View with MuPDF (fast)"; orphan = true; }
+          { run = "okular \"$@\""; desc = "View with Okular (full-featured)"; orphan = true; }
+        ];
+        # Office documents
+        office = [
+          { run = "libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
+        ];
+      };
+      open = {
+        rules = [
+          # Markdown files
+          { name = "*.md"; use = "markdown"; }
+          { name = "*.markdown"; use = "markdown"; }
+          # Images
+          { name = "*.jpg"; use = "image"; }
+          { name = "*.jpeg"; use = "image"; }
+          { name = "*.png"; use = "image"; }
+          { name = "*.gif"; use = "image"; }
+          { name = "*.bmp"; use = "image"; }
+          { name = "*.svg"; use = "image"; }
+          { name = "*.webp"; use = "image"; }
+          # PDFs
+          { name = "*.pdf"; use = "pdf"; }
+          # Office documents  
+          { name = "*.doc"; use = "office"; }
+          { name = "*.docx"; use = "office"; }
+          { name = "*.xls"; use = "office"; }
+          { name = "*.xlsx"; use = "office"; }
+          { name = "*.ppt"; use = "office"; }
+          { name = "*.pptx"; use = "office"; }
+          { name = "*.odt"; use = "office"; }
+          { name = "*.ods"; use = "office"; }
+          { name = "*.odp"; use = "office"; }
         ];
       };
     };

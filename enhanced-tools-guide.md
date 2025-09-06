@@ -4,31 +4,45 @@ This guide shows you the modern, enhanced alternatives to traditional Unix tools
 
 ## File Viewing & Reading
 
-### `bat` instead of `cat`
-**Purpose**: Syntax-highlighted file viewer with Git integration
+### `glow` for Markdown Files + `bat` for Code
+**Purpose**: Beautiful markdown rendering + syntax-highlighted code viewer
 
-**Basic Usage**:
+**Markdown Files (Auto-detected)**:
+```bash
+# Traditional way
+cat README.md
+
+# Enhanced way (automatic)
+cat README.md                  # Uses glow for beautiful rendering
+md README.md                   # Direct glow usage with options
+md -p README.md               # Pager mode
+md -w 80 README.md            # Set width
+```
+
+**Code Files**:
 ```bash
 # Traditional way
 cat file.py
 
-# Enhanced way
-bat file.py                    # Syntax highlighting + line numbers
+# Enhanced way (automatic)
+cat file.py                    # Uses bat for syntax highlighting
 bat -n file.py                # No line numbers
 bat --style=plain file.py      # No decorations, just highlighting
-bat -A file.py                # Show all characters (including invisible)
 ```
 
 **Common Workflows**:
 ```bash
-# View multiple files with headers
-bat *.py
+# Markdown files (uses glow automatically)
+cat README.md                  # Beautiful rendering
+cat *.md                      # Multiple markdown files
 
-# Search within files while viewing
-bat file.py | grep "function"
+# Code files (uses bat automatically)  
+cat *.py                      # Syntax highlighted code
+cat file.py | grep "function" # Search within files
 
-# Page through large files
-bat large-file.log
+# Direct tool usage
+md -p large-doc.md            # Page through large markdown
+bat large-file.log            # Page through large logs
 
 # Show Git diff with syntax highlighting
 git diff | bat --language=diff
@@ -341,6 +355,7 @@ When **agents/scripts** use them, they get the original versions automatically.
 
 | You Type | You Get | Agents Get | Auto-Switches |
 |----------|---------|------------|---------------|
+| `cat file.md` | `glow file.md` | `cat file.md` | ✅ |
 | `cat file.py` | `bat file.py` | `cat file.py` | ✅ |
 | `ls` | `eza --icons --git` | `ls` | ✅ |
 | `ll` | `eza -la --icons --git --group-directories-first` | `ls -la` | ✅ |
@@ -363,6 +378,8 @@ rgpy     # → rg --type py
 top      # → htop
 gdiff    # → git diff | bat --language=diff
 json     # → jq .
+mdcat    # → glow
+mdp      # → glow -p
 ```
 
 📚 **Full Fish documentation**: `bat fish-smart-commands.md`
@@ -371,7 +388,8 @@ json     # → jq .
 
 | Traditional | Enhanced | Key Benefits | Fish Smart Command |
 |------------|----------|--------------|-------------------|
-| `cat` | `bat` | Syntax highlighting, line numbers, Git integration | ✅ Auto-switches |
+| `cat` (markdown) | `glow` | Beautiful markdown rendering, themes, paging | ✅ Auto-switches |
+| `cat` (code) | `bat` | Syntax highlighting, line numbers, Git integration | ✅ Auto-switches |
 | `ls` | `eza` | Colors, icons, Git status, better formatting | ✅ Auto-switches |
 | `grep` | `ripgrep` | Faster, respects .gitignore, better defaults | ✅ Auto-switches |
 | `find` | `fd` | Simpler syntax, faster, colored output | Manual use |

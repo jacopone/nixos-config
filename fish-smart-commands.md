@@ -27,7 +27,8 @@ The system uses `_is_automated_context` function to detect when commands should 
 
 | Command You Type | Interactive Gets | Agents/Scripts Get | Description |
 |------------------|------------------|-------------------|-------------|
-| `cat file.txt` | `bat file.txt` | `cat file.txt` | Syntax highlighting for you |
+| `cat file.md` | `glow file.md` | `cat file.md` | Beautiful markdown rendering for you |
+| `cat file.py` | `bat file.py` | `cat file.py` | Syntax highlighting for code files |
 | `ls` | `eza --icons --git` | `ls` | Icons and git status for you |
 | `ll` | `eza -la --icons --git --group-directories-first` | `ls -la` | Enhanced long listing |
 | `la` | `eza -A --icons --git --group-directories-first` | `ls -A` | Show all files enhanced |
@@ -79,6 +80,13 @@ json     # → jq . (pretty print JSON)
 jsonc    # → jq -C . (colorized JSON)
 ```
 
+### Markdown Viewing
+```bash
+mdcat    # → glow (view markdown with glow)
+mdp      # → glow -p (pager mode)
+mdw      # → glow -w 80 (80 character width)
+```
+
 ### Quick Operations
 ```bash
 mkd      # → mkdir -p (create directory path)
@@ -101,6 +109,14 @@ search pattern      # Search text in files (uses rg)
 ### Directory Tree
 ```bash
 tree               # Enhanced tree view with eza
+```
+
+### Markdown Viewing
+```bash
+md file.md         # Enhanced markdown viewer with options
+md -p file.md      # Pager mode
+md -w 80 file.md   # Set width to 80 characters
+md -s dark file.md # Use dark theme
 ```
 
 ## 🔧 Override Functions
@@ -237,6 +253,7 @@ Edit `~/.config/fish/config.fish` and comment out the smart function definitions
 ```bash
 show_enhanced_tools     # See what's enhanced
 preview file.txt        # Quick file preview  
+md file.md             # Enhanced markdown viewer
 ff pattern             # Find files
 search pattern         # Search in files
 orig_command           # Force original version

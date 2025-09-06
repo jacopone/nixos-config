@@ -77,5 +77,19 @@
     glow                # Markdown renderer
     ueberzugpp          # Successor to ueberzug for image previews
     bat                 # A cat clone with wings
+    
+    # Essential dependencies for yazi preview functionality
+    file                # File type detection (essential for yazi)
+    ffmpegthumbnailer   # Video thumbnails for yazi
+    poppler_utils       # PDF preview utilities
+    imagemagick         # Image processing for previews
+    
+    # File viewers and openers for yazi
+    feh                 # Fast, keyboard-driven image viewer
+    sxiv                # Simple X Image Viewer with thumbnails
+    sioyek              # Modern PDF viewer for technical documents
+    mupdf               # Fast PDF renderer and viewer
+    kdePackages.okular  # Full-featured PDF viewer with annotations
+    file-roller         # Archive manager for GNOME
   ];
 }

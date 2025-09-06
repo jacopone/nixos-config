@@ -5,7 +5,6 @@
 [![NixOS](https://img.shields.io/badge/NixOS-24.05-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
 [![Flakes](https://img.shields.io/badge/Nix-Flakes-informational.svg?style=flat-square&logo=nixos)](https://nixos.wiki/wiki/Flakes)
 [![Home Manager](https://img.shields.io/badge/Home-Manager-orange.svg?style=flat-square)](https://github.com/nix-community/home-manager)
-[![Agent OS](https://img.shields.io/badge/Agent-OS-purple.svg?style=flat-square)](https://buildermethods.com/agent-os)
 
 ## ✨ Features
 
@@ -33,7 +32,6 @@
 - 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI
 - 📦 **Node.js & Python** pre-installed for instant development
 - 🏗️ **DevEnv & Direnv** for per-project environments
-- 🎯 **Agent OS Integration** for structured AI workflows
 
 ## 📂 Repository Structure
 
@@ -98,7 +96,8 @@ nix flake check                    # Syntax validation
 
 ### Enhanced CLI Tools (Automatic)
 ```bash
-cat file.py          # → bat file.py (syntax highlighted)
+cat README.md        # → glow README.md (beautiful markdown)
+cat file.py          # → bat file.py (syntax highlighted code)
 ls                   # → eza --icons --git (with icons)  
 ll                   # → eza -la --icons --git --group-directories-first
 grep "pattern"       # → rg "pattern" (faster search)
@@ -116,6 +115,7 @@ what_runs cat       # See what command will actually run
 ```bash
 yazi                 # Launch modern file manager
 preview file.txt     # Enhanced file preview
+md file.md          # Enhanced markdown viewer
 ff pattern          # Find files by name (fd)
 search pattern      # Search text in files (rg)
 ```
@@ -130,7 +130,7 @@ search pattern      # Search text in files (rg)
 - **Environment**: DevEnv, Direnv, Cachix
 
 ### CLI Enhancements  
-- **File Viewing**: `bat` (syntax highlighting)
+- **File Viewing**: `glow` (markdown rendering), `bat` (syntax highlighting)
 - **File Listing**: `eza` (icons, git status)
 - **File Finding**: `fd` (fast find), `fzf` (fuzzy finder)
 - **Text Search**: `ripgrep` (fast grep), `peco` (interactive filter)
@@ -150,9 +150,9 @@ search pattern      # Search text in files (rg)
 The Fish shell configuration includes **context-aware command substitutions**:
 
 ### 👤 **For You (Interactive)**
-- Rich syntax highlighting, icons, and git status
-- Enhanced tools automatically selected
-- Abbreviations for quick typing (`tree` → `eza --tree`)
+- Beautiful markdown rendering with `glow`, syntax highlighting with `bat`
+- Rich icons, git status, and enhanced tools automatically selected
+- Abbreviations for quick typing (`tree` → `eza --tree`, `mdcat` → `glow`)
 
 ### 🤖 **For Agents & Scripts**
 - Plain output, no colors or formatting
