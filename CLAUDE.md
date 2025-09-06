@@ -76,23 +76,27 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - Pre-activation testing to prevent broken systems
 - Interactive generation management
 
-## Known Issues & Current Status
+## Current Status & Working Features
 
-### System Package Linking Issue (High Priority)
-**Problem**: Executables from `environment.systemPackages` are not being linked into `/run/current-system/sw/bin/` during `nixos-rebuild switch`, despite successful build completion.
+### Successfully Implemented ✅
+- **Modular Configuration**: Fully migrated to ZaneyOS-inspired structure with `hosts/`, `modules/`, `users/`, and `profiles/` directories
+- **Kitty Terminal**: Properly configured via Home Manager with Catppuccin Mocha theme and Fish shell integration
+- **Yazi File Manager**: Full rich preview functionality working with enhanced file previews for markdown, JSON, CSV, and other formats
+- **Fish Shell**: Set as default user shell with z plugin for directory jumping
+- **Development Environment**: Comprehensive tool setup with multiple editors (Helix, Zed, VSCode, Cursor)
 
-**Symptoms**:
-- `which kitty` returns "no kitty" even though kitty is in `environment.systemPackages`
-- Yazi rich previews fail because `bat` and `glow` are "not found"
-- System appears to build successfully but packages are not available in PATH
+### Tool Configurations Working
+- **Rich Preview**: Successfully rendering markdown files with syntax highlighting and formatting
+- **File Dependencies**: All yazi dependencies resolved including `fdfind` compatibility symlink
+- **System Packages**: Proper linking and availability in PATH
+- **Home Manager Integration**: Seamless integration for user-specific configurations
 
-**Investigation needed**: Why system activation is not correctly creating symlinks for system packages.
-
-### Current Tool Configurations
-- **Kitty**: Configured with Catppuccin Mocha theme and Fish shell integration
-- **Yazi**: Configured with rich-preview plugin for enhanced file previews  
-- **Fish**: Set as default user shell with z plugin for directory jumping
-- **Development tools**: Comprehensive setup including multiple editors (Helix, Zed, VSCode, Cursor)
+### Migration Completed
+The NixOS configuration has been successfully migrated from a monolithic structure to a modular, maintainable system:
+- Host-specific configurations isolated in `hosts/nixos/`
+- Reusable modules organized in `modules/core/` and `modules/home-manager/`
+- User configurations managed through `users/guyfawkes/`
+- Desktop profiles properly structured in `profiles/desktop/`
 
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`

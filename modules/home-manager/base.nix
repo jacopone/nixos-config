@@ -75,6 +75,12 @@
       color14 = "#94e2d5";
       color7 = "#bac2de";
       color15 = "#a6adc8";
+      
+      # Zoom settings - start with one increment above base size
+      font_size = 12.1; # Equivalent to base size (11) + one Ctrl+Plus increment
+      remember_window_size = true;
+      initial_window_width = 120; # columns
+      initial_window_height = 30; # rows
     };
   };
 
