@@ -65,6 +65,54 @@
     dejavu_fonts        # A font family based on the Vera Fonts
     roboto              # Google's signature font family
 
+    # Claude Code performance optimization tools
+    sqlite             # Database for project indexing and analysis
+    hyperfine          # Precise command benchmarking
+    tokei              # Fast code statistics (lines, languages)
+    dust               # Modern disk usage analyzer (faster than du)
+    tmux               # Session persistence and parallel operations
+    parallel           # GNU parallel for concurrent execution
+    procs              # Modern process viewer (better than ps)
+    entr               # File watcher for automated rebuilds/tests
+    watchman           # Facebook's file watching service
+    just               # Modern command runner (better than make)
+    dirstat-rs         # Fast directory statistics
+    bottom             # Modern system monitor (btm command)
+    ast-grep           # Structural search and replace for code
+    semgrep            # Static analysis for pattern matching
+    httpie             # Better HTTP client for API testing
+    xh                 # Fast HTTPie alternative in Rust
+    delta              # Better git diff viewer
+    gitui              # Terminal git UI
+    lazygit            # Simple terminal UI for git
+    duf                # Modern df alternative with color
+    
+    # Additional Claude Code enhancement packages
+    postgresql         # Database operations and schema analysis
+    redis              # In-memory data operations
+    ruff               # Lightning-fast Python linter/formatter
+    uv                 # Ultra-fast Python package manager
+    yarn               # Alternative Node.js package manager
+    pnpm               # Efficient Node.js package manager
+    docker-compose     # Container orchestration
+    k9s                # Kubernetes cluster management
+    podman             # Docker alternative
+    nmap               # Network discovery and security auditing
+    wireshark          # Network protocol analyzer
+    tcpdump            # Command-line packet analyzer
+    strace             # System call tracer
+    ltrace             # Library call tracer
+    csvkit             # CSV manipulation tools
+    jless              # JSON viewer (better than jq for large files)
+    yq-go              # YAML/XML processor (like jq for YAML)
+    miller             # CSV/JSON/YAML data processing
+    zoxide             # Smarter cd command (z replacement)
+    starship           # Cross-shell prompt
+    skim               # Fuzzy finder (fzf alternative)
+    choose             # Human-friendly cut/awk alternative
+    shellcheck         # Shell script linter
+    shfmt              # Shell formatter
+    
     # useseless tools
     cmatrix             # A terminal-based "Matrix" screen saver
 

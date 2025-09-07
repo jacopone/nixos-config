@@ -5,12 +5,11 @@ This document explains how yazi is configured to open different file types with 
 ## 🎯 Key Improvements
 
 - **Markdown files** now open with `glow` in pager mode for beautiful rendering (instead of helix)
-- **Images** open with `imv` (lightweight viewer) or Eye of GNOME
-- **PDFs** open with `zathura` (minimal) or Evince (GNOME default)  
-- **Videos** open with VLC
-- **Archives** open with File Roller for easy extraction
-- **JSON files** are pretty-printed with `jq` and `bat`
-- **Code files** still open with your preferred editor (Helix by default)
+- **Images** open with Eye of GNOME (eog) - clean, fast GNOME integration
+- **PDFs** open with Okular - full-featured with annotation support
+- **Code files** automatically open with Helix editor
+- **Rich previews** work seamlessly with rich-preview plugin for markdown, JSON, CSV
+- **Context-aware opening** - different behavior for interactive vs automated use
 
 ## 📋 File Type Associations
 
@@ -25,9 +24,9 @@ This document explains how yazi is configured to open different file types with 
 ### 🖼️ Media Files
 | File Type | Primary Action | Secondary Actions |
 |-----------|----------------|-------------------|
-| `*.jpg`, `*.png`, `*.gif`, etc. | `imv` | `eog` (Eye of GNOME) |
-| `*.mp4`, `*.mkv`, `*.avi`, etc. | `vlc` | - |
-| `*.pdf` | `zathura` | `evince` |
+| `*.jpg`, `*.png`, `*.gif`, etc. | `eog` (Eye of GNOME) | - |
+| `*.pdf` | `okular` | - |
+| Office docs (`*.doc`, `*.xlsx`, etc.) | `libreoffice` | - |
 
 ### 📦 Archives & Documents  
 | File Type | Primary Action | Secondary Actions |
@@ -67,11 +66,10 @@ This document explains how yazi is configured to open different file types with 
 ### Image Files  
 ```bash
 # When you press Enter on image.jpg:
-→ imv image.jpg        # Fast, lightweight image viewer
+→ eog image.jpg        # Eye of GNOME image viewer
 
 # Options available (press 'o'):
-1. View with imv              [PRIMARY]
-2. View with Eye of GNOME
+1. View with Eye of GNOME     [PRIMARY]
 ```
 
 ### JSON Files
@@ -93,13 +91,13 @@ The yazi opener configuration is defined in:
 ## 📦 Required Packages
 
 These packages are automatically installed for the file associations:
-- **`glow`** - Markdown renderer
-- **`imv`** - Lightweight image viewer  
-- **`zathura`** - Minimal PDF viewer
-- **`file-roller`** - Archive manager
-- **`vlc`** - Video player
+- **`glow`** - Markdown renderer with beautiful styling
+- **`eog`** - Eye of GNOME image viewer
+- **`okular`** - Full-featured PDF viewer with annotations
+- **`libreoffice`** - Office document suite
+- **`helix`** - Post-modern text editor for code
 - **`jq`** - JSON processor
-- **`bat`** - Syntax highlighter
+- **`bat`** - Syntax highlighter with git integration
 
 ## 🎨 Customization
 

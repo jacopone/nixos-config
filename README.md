@@ -101,6 +101,19 @@ cat file.py          # → bat file.py (syntax highlighted code)
 ls                   # → eza --icons --git (with icons)  
 ll                   # → eza -la --icons --git --group-directories-first
 grep "pattern"       # → rg "pattern" (faster search)
+cd project           # → zoxide smart directory jumping
+```
+
+### New Tool Abbreviations (Type + Space)
+```bash
+yamlcat              # → yq . (YAML processing)
+csvcat               # → csvlook (CSV viewing) 
+ruffcheck            # → ruff check (Python linting)
+uvrun                # → uv run (fast Python execution)
+dcp                  # → docker-compose
+pods                 # → k9s (Kubernetes dashboard)
+netscan              # → nmap -sn (network discovery)
+trace                # → strace -f (system call tracing)
 ```
 
 ### Fish Shell Help
@@ -125,17 +138,25 @@ search pattern      # Search text in files (rg)
 ### Development Tools
 - **Editors**: Helix, Zed, VSCode, Cursor  
 - **AI Agents**: Claude Code, Plandex, Gemini CLI
-- **Version Control**: Git, GitHub CLI
+- **Version Control**: Git, GitHub CLI, `delta` (enhanced diffs), `gitui`, `lazygit`
 - **Languages**: Node.js 20, Python 3, GCC
+- **Package Managers**: `npm`, `yarn`, `pnpm` (Node.js), `uv` (Python)
 - **Environment**: DevEnv, Direnv, Cachix
+- **Containers**: Docker, Docker Compose, Podman, K9s (Kubernetes)
+- **Database**: PostgreSQL, Redis
+- **Quality**: `shellcheck` (shell scripts), `ruff` (Python), `semgrep` (security)
 
 ### CLI Enhancements  
-- **File Viewing**: `glow` (markdown rendering), `bat` (syntax highlighting)
-- **File Listing**: `eza` (icons, git status)
-- **File Finding**: `fd` (fast find), `fzf` (fuzzy finder)
-- **Text Search**: `ripgrep` (fast grep), `peco` (interactive filter)
-- **System Monitoring**: `htop`, `gtop`, `ncdu`, `pydf`
-- **File Management**: `yazi` (terminal file manager)
+- **File Viewing**: `glow` (markdown), `bat` (syntax highlighting), `jless` (large JSON)
+- **File Listing**: `eza` (icons, git status), `dust` (disk usage), `duf` (disk free)
+- **File Finding**: `fd` (fast find), `fzf`/`skim` (fuzzy finders), `choose` (text extraction)
+- **Text Search**: `ripgrep` (fast grep), `ast-grep` (structural search)
+- **System Monitoring**: `htop`, `gtop`, `bottom`, `procs`, `hyperfine` (benchmarking)
+- **File Management**: `yazi` (terminal file manager), `zoxide` (smart directory jumping)
+- **Data Processing**: `jq` (JSON), `yq` (YAML), `csvkit` (CSV), `miller` (multi-format)
+- **Development**: `tmux` (sessions), `entr` (file watching), `just` (task runner)
+- **Network & Debug**: `nmap`, `wireshark`, `strace`, `ltrace`
+- **Python Tools**: `ruff` (linting/formatting), `uv` (package management)
 
 ### Productivity Applications
 - **Browser**: Google Chrome
