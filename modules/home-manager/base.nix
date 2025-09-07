@@ -696,6 +696,62 @@
     };
   };
 
+  # Enhanced Starship prompt configuration for visual git branch display
+  programs.starship = {
+    enable = true;
+    enableFishIntegration = true;
+    settings = {
+      format = "$directory$git_branch$git_status$git_metrics$character";
+      
+      directory = {
+        format = "[$path]($style)[$read_only]($read_only_style) ";
+        style = "bold bright-blue";
+        truncation_length = 4;
+        truncate_to_repo = true;
+        fish_style_pwd_dir_length = 1;
+      };
+      
+      git_branch = {
+        format = "[$symbol$branch(:$remote_branch)]($style) ";
+        symbol = "🚀 ";
+        style = "bold purple";
+        truncation_length = 25;
+      };
+      
+      git_status = {
+        format = "([\\[$all_status$ahead_behind\\]]($style) )";
+        style = "bright-red";
+        ahead = "⇡$count";
+        behind = "⇣$count";
+        diverged = "⇕⇡$ahead_count⇣$behind_count";
+        conflicted = "≠$count";
+        deleted = "✘$count";
+        renamed = "»$count";
+        modified = "✱$count"; 
+        staged = "✚$count";
+        untracked = "?$count";
+        stashed = "📦$count";
+      };
+      
+      git_metrics = {
+        format = "(\\(+$added/-$deleted\\) )";
+        added_style = "bright-green";
+        deleted_style = "bright-red";
+        disabled = false;
+      };
+      
+      character = {
+        success_symbol = "[❯](bold green)";
+        error_symbol = "[❯](bold red)";
+        vicmd_symbol = "[❮](bold yellow)";
+      };
+      
+      # Performance optimization
+      scan_timeout = 10;
+      command_timeout = 500;
+    };
+  };
+
   # You can also manage settings for other programs, for example:
   # programs.git = {
   #   enable = true;
