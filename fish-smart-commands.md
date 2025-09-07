@@ -4,26 +4,25 @@ This document explains the intelligent command substitution system configured in
 
 ## ✨ Visual Prompt Enhancement (NEW!)
 
-Your terminal now includes **Starship Catppuccin Powerline prompt** with Nerd Font symbols:
+Your terminal now includes **Starship prompt** with Nerd Font symbols:
 
 ```bash
-󰌽 guyfawkes  nixos-config  main ✓ 🐍 3.11  14:30 ❯
+~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯
 ```
 
-**Powerline segments:**
-- `󰌽 guyfawkes` - NixOS icon + username (red segment)
-- ` nixos-config` - Directory path with folder icon (peach segment)
-- ` main ✓` - Git branch with status (yellow segment)  
-- `🐍 3.11` - Python version detected (green segment)
-- ` 14:30` - Current time with clock icon (lavender segment)
+**What you see:**
+- `~/nixos-config` - Current directory path (blue)
+- ` main` - Git branch with Nerd Font git icon (purple)
+- `[✱2✚1⇡3]` - Git status: 2 modified, 1 staged, 3 ahead (red)
+- `(+15/-3)` - Git metrics: 15 lines added, 3 deleted (green/red)
 - `❯` - Prompt character (green for success, red for errors)
 
 **Enhanced features:**
-- **Nerd Font symbols** for all programming languages and tools
-- **Catppuccin Mocha colors** matching your terminal theme
-- **Powerline segments** with smooth color transitions
-- **Real-time updates** for git status, language versions, time
-- **Context-aware display** - only shows relevant information
+- **Nerd Font symbols** including  for git branches and 󰌾 for read-only directories
+- **Clean, simple design** without heavy powerline segments
+- **Real-time git status** with comprehensive indicators
+- **Directory icons** for Documents 󰈙, Downloads , Music 󰝚, Pictures 
+- **Performance optimized** for quick response
 
 ## 🧠 How It Works
 
