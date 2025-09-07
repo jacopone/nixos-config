@@ -28,6 +28,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
             # The path to your home-manager config, username is set to "guyfawkes"
             home-manager.users.guyfawkes = import ./users/guyfawkes/home.nix;
           }
