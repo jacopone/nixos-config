@@ -35,11 +35,11 @@
         ];
       };
       opener = {
-        # Markdown files - use glow for opening (but rich-preview for preview)  
+        # Markdown files - stable glow configuration for yazi
         markdown = [
-          { run = "sh -c 'glow -p \"$@\"' -- "; desc = "View with Glow (pager)"; }
-          { run = "glow \"$@\""; desc = "View with Glow"; }
-          { run = "helix \"$@\""; desc = "Edit with Helix"; }
+          { run = ''${pkgs.kitty}/bin/kitty -e ${pkgs.glow}/bin/glow -p "$@"''; desc = "View with Glow (pager)"; block = true; }
+          { run = ''${pkgs.kitty}/bin/kitty -e ${pkgs.glow}/bin/glow "$@"''; desc = "View with Glow"; block = true; }
+          { run = "helix \"$@\""; desc = "Edit with Helix"; block = true; }
         ];
         # Images - modern viewers
         image = [
