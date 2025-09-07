@@ -76,7 +76,7 @@
     entr               # File watcher for automated rebuilds/tests
     watchman           # Facebook's file watching service
     just               # Modern command runner (better than make)
-    dirstat-rs         # Fast directory statistics
+    kdirstat           # Directory statistics (disk usage visualization)
     bottom             # Modern system monitor (btm command)
     ast-grep           # Structural search and replace for code
     semgrep            # Static analysis for pattern matching
