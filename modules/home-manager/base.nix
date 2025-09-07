@@ -28,33 +28,41 @@
         prepend_previewers = [
           { name = "*.csv"; run = "rich-preview"; }
           { name = "*.md"; run = "rich-preview"; }
+          { name = "*.markdown"; run = "rich-preview"; }
           { name = "*.rst"; run = "rich-preview"; }
           { name = "*.ipynb"; run = "rich-preview"; }
           { name = "*.json"; run = "rich-preview"; }
         ];
       };
       opener = {
-        # Markdown files - use glow for opening (but rich-preview for preview)
+        # Markdown files - use glow for opening (but rich-preview for preview)  
         markdown = [
-          { run = "glow -p \"$@\""; desc = "View with Glow (pager)"; }
+          { run = "sh -c 'glow -p \"$@\"' -- "; desc = "View with Glow (pager)"; }
           { run = "glow \"$@\""; desc = "View with Glow"; }
           { run = "helix \"$@\""; desc = "Edit with Helix"; }
         ];
         # Images - modern viewers
         image = [
-          { run = "feh --scale-down --auto-zoom \"$@\""; desc = "View with feh"; block = true; }
-          { run = "sxiv \"$@\""; desc = "Browse with sxiv"; block = true; }
-          { run = "eog \"$@\""; desc = "View with Eye of GNOME"; block = true; }
+          { run = "/run/current-system/sw/bin/feh --scale-down --auto-zoom \"$@\""; desc = "View with feh"; block = true; }
+          { run = "/run/current-system/sw/bin/sxiv \"$@\""; desc = "Browse with sxiv"; block = true; }
+          { run = "/run/current-system/sw/bin/eog \"$@\""; desc = "View with Eye of GNOME"; block = true; }
         ];
         # PDFs - modern viewers
         pdf = [
-          { run = "sioyek \"$@\""; desc = "View with Sioyek (technical docs)"; orphan = true; }
-          { run = "mupdf \"$@\""; desc = "View with MuPDF (fast)"; orphan = true; }
-          { run = "okular \"$@\""; desc = "View with Okular (full-featured)"; orphan = true; }
+          { run = "/run/current-system/sw/bin/sioyek \"$@\""; desc = "View with Sioyek (technical docs)"; orphan = true; }
+          { run = "/run/current-system/sw/bin/mupdf \"$@\""; desc = "View with MuPDF (fast)"; orphan = true; }
+          { run = "/run/current-system/sw/bin/okular \"$@\""; desc = "View with Okular (full-featured)"; orphan = true; }
         ];
         # Office documents
         office = [
-          { run = "libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
+          { run = "/run/current-system/sw/bin/libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
+        ];
+        
+        # Text/code files - default editor
+        edit = [
+          { run = "helix \"$@\""; desc = "Edit with Helix"; }
+          { run = "zed \"$@\""; desc = "Edit with Zed"; }
+          { run = "code \"$@\""; desc = "Edit with VS Code"; }
         ];
       };
       open = {
@@ -82,6 +90,27 @@
           { name = "*.odt"; use = "office"; }
           { name = "*.ods"; use = "office"; }
           { name = "*.odp"; use = "office"; }
+          
+          # Text and code files
+          { name = "*.txt"; use = "edit"; }
+          { name = "*.py"; use = "edit"; }
+          { name = "*.js"; use = "edit"; }
+          { name = "*.ts"; use = "edit"; }
+          { name = "*.rs"; use = "edit"; }
+          { name = "*.go"; use = "edit"; }
+          { name = "*.c"; use = "edit"; }
+          { name = "*.cpp"; use = "edit"; }
+          { name = "*.h"; use = "edit"; }
+          { name = "*.css"; use = "edit"; }
+          { name = "*.html"; use = "edit"; }
+          { name = "*.xml"; use = "edit"; }
+          { name = "*.yaml"; use = "edit"; }
+          { name = "*.yml"; use = "edit"; }
+          { name = "*.toml"; use = "edit"; }
+          { name = "*.json"; use = "edit"; }
+          { name = "*.ini"; use = "edit"; }
+          { name = "*.conf"; use = "edit"; }
+          { name = "*.cfg"; use = "edit"; }
         ];
       };
     };
