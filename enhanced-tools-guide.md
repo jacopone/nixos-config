@@ -4,17 +4,19 @@ This guide shows you the modern, enhanced alternatives to traditional Unix tools
 
 ## 🚀 Visual Git Workflow (NEW!)
 
-Your terminal now has **Starship prompt** providing real-time visual git information:
+Your terminal now has **Starship Catppuccin Powerline prompt** with Nerd Font symbols:
 
 ```bash
-~/nixos-config 🚀 master [✱2✚1⇡3] (+15/-3) ❯ cat README.md
+󰌽 guyfawkes  nixos-config  main ✓ 🐍 3.11  14:30 ❯ cat README.md
 ```
 
-**Visual git indicators:**
-- `🚀 master` - Current branch with rocket symbol  
-- `[✱2✚1⇡3]` - Status: 2 modified, 1 staged, 3 ahead of remote
-- `(+15/-3)` - Metrics: 15 lines added, 3 deleted
-- Updates in real-time as you work
+**Powerline visual indicators:**
+- `󰌽 guyfawkes` - NixOS icon + username in red segment
+- ` nixos-config` - Directory with folder icon in peach segment  
+- ` main ✓` - Git branch + status in yellow segment
+- `🐍 3.11` - Python version detected in green segment
+- ` 14:30` - Time with clock icon in lavender segment
+- Updates in real-time with smooth color transitions
 
 **Benefits over traditional git status:**
 - Always visible - no need to run `git status`  

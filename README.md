@@ -19,7 +19,7 @@
 - 🎨 **Kitty Terminal** with advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
 - 📁 **Yazi File Manager** with rich preview support for markdown, JSON, CSV
 - 🐟 **Fish Shell** as default with intelligent command enhancements
-- 🚀 **Starship Prompt** with visual git branch display (`🚀 master [✱2✚1⇡3] (+15/-3) ❯`)
+- 🚀 **Starship Prompt** with Catppuccin Powerline + Nerd Font symbols (`󰌽 guyfawkes  nixos-config  main ✓ 🐍 3.11  14:30 ❯`)
 
 ### 🛠️ **Enhanced CLI Experience**
 - 🚀 **Visual Git Integration** - Real-time branch status in terminal prompt
@@ -109,14 +109,16 @@ nix flake check                    # Syntax validation
 
 ### Visual Git Prompt (Always Visible)
 ```bash
-# Your terminal prompt now shows:
-~/nixos-config 🚀 master [✱2✚1⇡3] (+15/-3) ❯
+# Your terminal prompt now shows (Catppuccin Powerline + Nerd Font symbols):
+󰌽 guyfawkes  nixos-config  main ✓ 🐍 3.11  14:30 ❯
 
-# Real-time git information:
-# 🚀 master     = current branch with rocket symbol
-# [✱2✚1⇡3]     = 2 modified, 1 staged, 3 ahead of remote  
-# (+15/-3)      = 15 lines added, 3 deleted
-# ❯             = green for success, red for errors
+# Powerline segments:
+# 󰌽 guyfawkes    = NixOS icon + username (red segment)
+#  nixos-config  = directory path (peach segment)  
+#  main ✓        = git branch + status (yellow segment)
+# 🐍 3.11         = Python version detected (green segment)
+#  14:30          = current time (lavender segment)
+# ❯               = prompt character (green for success, red for errors)
 ```
 
 ### Enhanced CLI Tools (Automatic)

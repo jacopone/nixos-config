@@ -711,25 +711,51 @@
         disabled = false;
         style = "bg:red fg:crust";
         symbols = {
-          Windows = "";
-          Ubuntu = "󰕈";
-          SUSE = "";
-          Raspbian = "󰐿";
-          Mint = "󰣭";
-          Macos = "󰀵";
-          Manjaro = "";
-          Linux = "󰌽";
-          Gentoo = "󰣨";
-          Fedora = "󰣛";
-          Alpine = "";
-          Amazon = "";
-          Android = "";
-          Arch = "󰣇";
-          Artix = "󰣇";
-          CentOS = "";
-          Debian = "󰣚";
-          Redhat = "󱄛";
-          RedHatEnterprise = "󱄛";
+          Alpaquita = " ";
+          Alpine = " ";
+          AlmaLinux = " ";
+          Amazon = " ";
+          Android = " ";
+          Arch = " ";
+          Artix = " ";
+          CachyOS = " ";
+          CentOS = " ";
+          Debian = " ";
+          DragonFly = " ";
+          Emscripten = " ";
+          EndeavourOS = " ";
+          Fedora = " ";
+          FreeBSD = " ";
+          Garuda = "󰛓 ";
+          Gentoo = " ";
+          HardenedBSD = "󰞌 ";
+          Illumos = "󰈸 ";
+          Kali = " ";
+          Linux = " ";
+          Mabox = " ";
+          Macos = " ";
+          Manjaro = " ";
+          Mariner = " ";
+          MidnightBSD = " ";
+          Mint = " ";
+          NetBSD = " ";
+          NixOS = " ";
+          Nobara = " ";
+          OpenBSD = "󰈺 ";
+          openSUSE = " ";
+          OracleLinux = "󰌷 ";
+          Pop = " ";
+          Raspbian = " ";
+          Redhat = " ";
+          RedHatEnterprise = " ";
+          RockyLinux = " ";
+          Redox = "󰀘 ";
+          Solus = "󰠳 ";
+          SUSE = " ";
+          Ubuntu = " ";
+          Unknown = " ";
+          Void = " ";
+          Windows = "󰍲 ";
         };
       };
       
@@ -745,6 +771,7 @@
         format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
+        read_only = " 󰌾";
         substitutions = {
           "Documents" = "󰈙 ";
           "Downloads" = " ";
@@ -755,7 +782,7 @@
       };
       
       git_branch = {
-        symbol = "";
+        symbol = " ";
         style = "bg:yellow";
         format = "[[ $symbol $branch ](fg:crust bg:yellow)]($style)";
       };
@@ -766,7 +793,7 @@
       };
       
       nodejs = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
@@ -778,19 +805,19 @@
       };
       
       rust = {
-        symbol = "";
+        symbol = "󱘗 ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
       
       golang = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
       
       php = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
@@ -802,31 +829,31 @@
       };
       
       kotlin = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
       
       haskell = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version) ](fg:crust bg:green)]($style)";
       };
       
       python = {
-        symbol = "";
+        symbol = " ";
         style = "bg:green";
         format = "[[ $symbol( $version)(\\($virtualenv\\)) ](fg:crust bg:green)]($style)";
       };
       
       docker_context = {
-        symbol = "";
+        symbol = " ";
         style = "bg:sapphire";
         format = "[[ $symbol( $context) ](fg:crust bg:sapphire)]($style)";
       };
       
       conda = {
-        symbol = "  ";
+        symbol = " ";
         style = "fg:crust bg:sapphire";
         format = "[$symbol$environment ]($style)";
         ignore_base = false;
@@ -889,6 +916,143 @@
         base = "#1e1e2e";
         mantle = "#181825";
         crust = "#11111b";
+      };
+      
+      # Additional Nerd Font symbols for other modules
+      aws = {
+        symbol = "  ";
+      };
+      
+      buf = {
+        symbol = " ";
+      };
+      
+      bun = {
+        symbol = " ";
+      };
+      
+      cmake = {
+        symbol = " ";
+      };
+      
+      crystal = {
+        symbol = " ";
+      };
+      
+      dart = {
+        symbol = " ";
+      };
+      
+      deno = {
+        symbol = " ";
+      };
+      
+      elixir = {
+        symbol = " ";
+      };
+      
+      elm = {
+        symbol = " ";
+      };
+      
+      fennel = {
+        symbol = " ";
+      };
+      
+      fossil_branch = {
+        symbol = " ";
+      };
+      
+      gcloud = {
+        symbol = "  ";
+      };
+      
+      git_commit = {
+        tag_symbol = "  ";
+      };
+      
+      guix_shell = {
+        symbol = " ";
+      };
+      
+      haxe = {
+        symbol = " ";
+      };
+      
+      hg_branch = {
+        symbol = " ";
+      };
+      
+      hostname = {
+        ssh_symbol = " ";
+      };
+      
+      julia = {
+        symbol = " ";
+      };
+      
+      lua = {
+        symbol = " ";
+      };
+      
+      memory_usage = {
+        symbol = "󰍛 ";
+      };
+      
+      meson = {
+        symbol = "󰔷 ";
+      };
+      
+      nim = {
+        symbol = "󰆥 ";
+      };
+      
+      nix_shell = {
+        symbol = " ";
+      };
+      
+      ocaml = {
+        symbol = " ";
+      };
+      
+      package = {
+        symbol = "󰏗 ";
+      };
+      
+      perl = {
+        symbol = " ";
+      };
+      
+      pijul_channel = {
+        symbol = " ";
+      };
+      
+      pixi = {
+        symbol = "󰏗 ";
+      };
+      
+      rlang = {
+        symbol = "󰟔 ";
+      };
+      
+      ruby = {
+        symbol = " ";
+      };
+      
+      scala = {
+        symbol = " ";
+      };
+      
+      swift = {
+        symbol = " ";
+      };
+      
+      zig = {
+        symbol = " ";
+      };
+      
+      gradle = {
+        symbol = " ";
       };
     };
   };
