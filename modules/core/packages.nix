@@ -64,6 +64,8 @@
     # fonts
     dejavu_fonts        # A font family based on the Vera Fonts
     roboto              # Google's signature font family
+    jetbrains-mono      # JetBrains Mono - programming font with ligatures and better readability
+    nerd-fonts.jetbrains-mono # JetBrains Mono Nerd Font - adds programming icons and symbols
 
     # Claude Code performance optimization tools
     sqlite             # Database for project indexing and analysis

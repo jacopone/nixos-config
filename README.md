@@ -16,7 +16,7 @@
 
 ### 🖥️ **Desktop Environment**
 - 🌟 **GNOME Desktop** with curated application selection
-- 🎨 **Kitty Terminal** with Catppuccin Mocha theme
+- 🎨 **Kitty Terminal** with advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
 - 📁 **Yazi File Manager** with rich preview support for markdown, JSON, CSV
 - 🐟 **Fish Shell** as default with intelligent command enhancements
 
@@ -25,6 +25,7 @@
 - 🎨 **Syntax Highlighting** with `bat` instead of `cat`
 - 📊 **Modern File Listing** with `eza` instead of `ls`
 - 🔍 **Blazing Fast Search** with `ripgrep` and `fd`
+- 🔤 **Programming Font** with JetBrains Mono Nerd Font ligatures and icons
 - 🤖 **Agent-Compatible** - Scripts and AI agents get original commands automatically
 
 ### 👨‍💻 **Development Environment**
@@ -192,6 +193,7 @@ The system detects:
 - **[CLAUDE.md](CLAUDE.md)** - AI agent instructions and project overview
 - **[fish-smart-commands.md](fish-smart-commands.md)** - Complete Fish shell documentation
 - **[enhanced-tools-guide.md](enhanced-tools-guide.md)** - Modern CLI tools reference
+- **[kitty-optimization-guide.md](kitty-optimization-guide.md)** - Complete Kitty terminal optimization guide
 
 ## 🛡️ Safety Features
 
