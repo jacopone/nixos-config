@@ -2,6 +2,26 @@
 
 This guide shows you the modern, enhanced alternatives to traditional Unix tools that are installed in your NixOS system, along with their most useful workflows and options.
 
+## 🚀 Visual Git Workflow (NEW!)
+
+Your terminal now has **Starship prompt** providing real-time visual git information:
+
+```bash
+~/nixos-config 🚀 master [✱2✚1⇡3] (+15/-3) ❯ cat README.md
+```
+
+**Visual git indicators:**
+- `🚀 master` - Current branch with rocket symbol  
+- `[✱2✚1⇡3]` - Status: 2 modified, 1 staged, 3 ahead of remote
+- `(+15/-3)` - Metrics: 15 lines added, 3 deleted
+- Updates in real-time as you work
+
+**Benefits over traditional git status:**
+- Always visible - no need to run `git status`  
+- Performance optimized - won't slow down your terminal
+- Context-aware - only shows in git repositories
+- Integrated with Fish shell smart commands
+
 ## File Viewing & Reading
 
 ### `glow` for Markdown Files + `bat` for Code
@@ -287,6 +307,32 @@ history | peco
 
 ## Development Tools
 
+### Visual Git Status Integration
+**With Starship prompt, you get instant git feedback:**
+```bash
+# Your prompt shows everything you need:
+~/myproject 🚀 feature/auth [✚1?2] ❯ 
+
+# No need for these commands anymore:
+# git status    # Info already in prompt
+# git branch    # Current branch always visible
+# git diff --stat  # Change metrics in prompt
+```
+
+### Advanced Git Workflows
+**Combine Starship with enhanced tools:**
+```bash
+# Visual git log with bat
+git log --oneline | bat --language=gitlog
+
+# Enhanced git diff (already configured with delta)
+git diff  # Uses delta with side-by-side display
+
+# Interactive git operations
+lazygit   # Full-featured git TUI
+gitui     # Alternative git terminal UI
+```
+
 ### `tree` for directory structure
 **Usage**:
 ```bash
@@ -297,11 +343,13 @@ tree -L 2                   # Limit depth
 ```
 
 ### Fish Shell Features
-**Your shell has enhanced features**:
+**Your shell has enhanced features + visual git:**
 ```bash
 # Directory jumping with z plugin
 z project                   # Jump to frequently used directories
 
+# Visual git branch in prompt (always visible)
+# Real-time git status indicators
 # Enhanced auto-completion (just start typing and press Tab)
 # Syntax highlighting as you type
 # Better history search with up/down arrows
@@ -386,15 +434,18 @@ mdp      # → glow -p
 
 ## Tool Comparison Summary
 
-| Traditional | Enhanced | Key Benefits | Fish Smart Command |
-|------------|----------|--------------|-------------------|
-| `cat` (markdown) | `glow` | Beautiful markdown rendering, themes, paging | ✅ Auto-switches |
-| `cat` (code) | `bat` | Syntax highlighting, line numbers, Git integration | ✅ Auto-switches |
-| `ls` | `eza` | Colors, icons, Git status, better formatting | ✅ Auto-switches |
-| `grep` | `ripgrep` | Faster, respects .gitignore, better defaults | ✅ Auto-switches |
-| `find` | `fd` | Simpler syntax, faster, colored output | Manual use |
-| `top` | `htop` | Interactive, mouse support, better interface | Abbreviation |
-| `du` | `ncdu` | Interactive browsing, visual bars | Abbreviation |
-| File manager | `yazi` | Rich previews, vim-style navigation | Manual use |
+| Traditional | Enhanced | Key Benefits | Fish Smart Command | Visual Git Integration |
+|------------|----------|--------------|-------------------|----------------------|
+| `git status` | Starship prompt | Always visible, real-time updates | ✅ Auto-enabled | ✅ Built-in |
+| `git branch` | Starship prompt | Current branch always visible | ✅ Auto-enabled | ✅ Built-in |
+| `cat` (markdown) | `glow` | Beautiful markdown rendering, themes, paging | ✅ Auto-switches | — |
+| `cat` (code) | `bat` | Syntax highlighting, line numbers, Git integration | ✅ Auto-switches | — |
+| `ls` | `eza` | Colors, icons, Git status, better formatting | ✅ Auto-switches | ✅ Shows git status |
+| `grep` | `ripgrep` | Faster, respects .gitignore, better defaults | ✅ Auto-switches | — |
+| `find` | `fd` | Simpler syntax, faster, colored output | Manual use | — |
+| `git diff` | `delta` | Side-by-side, syntax highlighting | ✅ Auto-enabled | ✅ Enhanced display |
+| `top` | `htop` | Interactive, mouse support, better interface | Abbreviation | — |
+| `du` | `ncdu` | Interactive browsing, visual bars | Abbreviation | — |
+| File manager | `yazi` | Rich previews, vim-style navigation | Manual use | — |
 
-**Start by just typing your normal commands** - the Fish shell will automatically give you the enhanced versions while keeping everything compatible for scripts and agents!
+**Start by just typing your normal commands** - the Fish shell will automatically give you the enhanced versions, and your Starship prompt provides continuous visual git feedback!

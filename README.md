@@ -19,9 +19,11 @@
 - 🎨 **Kitty Terminal** with advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
 - 📁 **Yazi File Manager** with rich preview support for markdown, JSON, CSV
 - 🐟 **Fish Shell** as default with intelligent command enhancements
+- 🚀 **Starship Prompt** with visual git branch display (`🚀 master [✱2✚1⇡3] (+15/-3) ❯`)
 
 ### 🛠️ **Enhanced CLI Experience**
-- ⚡ **Smart Command Substitutions** - Get enhanced tools automatically
+- 🚀 **Visual Git Integration** - Real-time branch status in terminal prompt
+- ⚡ **Smart Command Substitutions** - Get enhanced tools automatically  
 - 🎨 **Syntax Highlighting** with `bat` instead of `cat`
 - 📊 **Modern File Listing** with `eza` instead of `ls`
 - 🔍 **Blazing Fast Search** with `ripgrep` and `fd`
@@ -103,6 +105,18 @@ sudo nixos-rebuild switch --flake .
 sudo nixos-rebuild switch --flake . # Direct rebuild
 nix flake update                   # Update inputs
 nix flake check                    # Syntax validation
+```
+
+### Visual Git Prompt (Always Visible)
+```bash
+# Your terminal prompt now shows:
+~/nixos-config 🚀 master [✱2✚1⇡3] (+15/-3) ❯
+
+# Real-time git information:
+# 🚀 master     = current branch with rocket symbol
+# [✱2✚1⇡3]     = 2 modified, 1 staged, 3 ahead of remote  
+# (+15/-3)      = 15 lines added, 3 deleted
+# ❯             = green for success, red for errors
 ```
 
 ### Enhanced CLI Tools (Automatic)

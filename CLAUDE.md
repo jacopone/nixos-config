@@ -83,7 +83,8 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - **Modular Configuration**: Fully migrated to ZaneyOS-inspired structure with `hosts/`, `modules/`, `users/`, and `profiles/` directories
 - **Kitty Terminal**: Advanced optimizations with JetBrains Mono Nerd Font, programming ligatures, performance tuning for AI tool outputs, powerline tabs, and comprehensive keyboard shortcuts
 - **Yazi File Manager**: Full rich preview functionality working with enhanced file previews for markdown, JSON, CSV, and other formats
-- **Fish Shell**: Set as default user shell with z plugin for directory jumping
+- **Fish Shell**: Set as default user shell with z plugin for directory jumping and smart command substitutions
+- **Starship Prompt**: Visual git branch display with `🚀 master [✱2✚1⇡3] (+15/-3) ❯` showing branch, status, and metrics
 - **Development Environment**: Comprehensive tool setup with multiple editors (Helix, Zed, VSCode, Cursor)
 
 ### Tool Configurations Working
@@ -91,6 +92,8 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - **File Dependencies**: All yazi dependencies resolved including `fdfind` compatibility symlink
 - **System Packages**: Proper linking and availability in PATH
 - **Home Manager Integration**: Seamless integration for user-specific configurations
+- **Visual Git Integration**: Starship prompt shows real-time git branch, status indicators, and change metrics
+- **Smart Fish Commands**: Context-aware command substitutions (bat/eza for interactive, cat/ls for scripts)
 
 ### Migration Completed
 The NixOS configuration has been successfully migrated from a monolithic structure to a modular, maintainable system:

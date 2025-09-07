@@ -2,6 +2,26 @@
 
 This document explains the intelligent command substitution system configured in your Fish shell that automatically provides enhanced tools for interactive use while preserving compatibility for agents and scripts.
 
+## ✨ Visual Prompt Enhancement (NEW!)
+
+Your terminal now includes **Starship prompt** with beautiful visual git branch display:
+
+```bash
+~/nixos-config 🚀 master [✱2✚1⇡3] (+15/-3) ❯
+```
+
+**What you see:**
+- `🚀 master` - Current git branch with rocket symbol
+- `[✱2✚1⇡3]` - Git status: 2 modified files, 1 staged, 3 commits ahead
+- `(+15/-3)` - Git metrics: 15 lines added, 3 deleted
+- `❯` - Green for success, red for errors
+
+**Starship features:**
+- Real-time git status updates
+- Performance optimized for large repositories  
+- Context-aware display (only shows git info in repositories)
+- Customizable symbols and colors
+
 ## 🧠 How It Works
 
 Your Fish shell now has **context-aware command substitutions** that:
@@ -73,6 +93,8 @@ df       # → pydf (colorized disk usage)
 gdiff    # → git diff | bat --language=diff (colorized diff)
 glog     # → git log --oneline | head -20 (short log)
 ```
+
+**Git Integration Note**: Your Starship prompt already shows comprehensive git status, so you have visual git information at all times without needing to run separate commands!
 
 ### JSON Processing
 ```bash
