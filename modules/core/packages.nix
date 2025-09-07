@@ -135,6 +135,7 @@
     imagemagick         # Image processing for previews
     
     # File viewers and openers for yazi
+    eog                 # Eye of GNOME - default GNOME image viewer
     feh                 # Fast, keyboard-driven image viewer
     sxiv                # Simple X Image Viewer with thumbnails
     sioyek              # Modern PDF viewer for technical documents

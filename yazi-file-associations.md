@@ -4,10 +4,11 @@ This document explains how yazi is configured to open different file types with 
 
 ## 🎯 Key Improvements
 
-- **Markdown files** now open with `glow` in pager mode for beautiful rendering (instead of helix)
-- **Images** open with Eye of GNOME (eog) - clean, fast GNOME integration
+- **Markdown files** now open with `glow` in pager mode for beautiful rendering (uses `hx` command for editing)
+- **Images** open with Eye of GNOME (`eog`) - clean, fast GNOME integration
+- **CSV files** show rich formatted previews and open with LibreOffice Calc
 - **PDFs** open with Okular - full-featured with annotation support
-- **Code files** automatically open with Helix editor
+- **Code files** automatically open with Helix editor (`hx` command)
 - **Rich previews** work seamlessly with rich-preview plugin for markdown, JSON, CSV
 - **Context-aware opening** - different behavior for interactive vs automated use
 
@@ -16,16 +17,18 @@ This document explains how yazi is configured to open different file types with 
 ### 📝 Text & Documentation
 | File Type | Primary Action | Secondary Actions |
 |-----------|----------------|-------------------|
-| `*.md`, `*.markdown` | `glow -p` (pager) | `glow`, `helix`, `zed` |
-| `*.txt`, `*.py`, `*.js`, etc. | `helix` | `zed`, `code` |
-| `*.json` | `jq . file \| bat` | `helix` |
-| `*.log` | `bat --paging=always` | `less` |
+| `*.md`, `*.markdown` | `glow -p` (pager) | `glow`, `hx` (helix) |
+| `*.txt`, `*.py`, `*.js`, etc. | `hx` (helix) | `zed`, `code` |
+| `*.csv` | LibreOffice Calc | `csvlook`, `hx` |
+| `*.json` | `hx` (helix) | `zed`, `code` |
+| `*.log` | `hx` (helix) | `bat`, `less` |
 
 ### 🖼️ Media Files
 | File Type | Primary Action | Secondary Actions |
 |-----------|----------------|-------------------|
-| `*.jpg`, `*.png`, `*.gif`, etc. | `eog` (Eye of GNOME) | - |
+| `*.jpg`, `*.png`, `*.gif`, etc. | `eog` (Eye of GNOME) | `sxiv`, `feh` |
 | `*.pdf` | `okular` | - |
+| `*.csv` | LibreOffice Calc | `csvlook`, `hx` |
 | Office docs (`*.doc`, `*.xlsx`, etc.) | `libreoffice` | - |
 
 ### 📦 Archives & Documents  
@@ -92,11 +95,12 @@ The yazi opener configuration is defined in:
 
 These packages are automatically installed for the file associations:
 - **`glow`** - Markdown renderer with beautiful styling
-- **`eog`** - Eye of GNOME image viewer
+- **`eog`** - Eye of GNOME image viewer (newly added)
 - **`okular`** - Full-featured PDF viewer with annotations
-- **`libreoffice`** - Office document suite
-- **`helix`** - Post-modern text editor for code
-- **`jq`** - JSON processor
+- **`libreoffice`** - Office document suite and CSV viewer
+- **`helix` (`hx`)** - Post-modern text editor for code (fixed command name)
+- **`csvkit`** - CSV processing tools (includes `csvlook`)
+- **`rich-preview`** - Enhanced previews for CSV, JSON, markdown
 - **`bat`** - Syntax highlighter with git integration
 
 ## 🎨 Customization

@@ -100,14 +100,35 @@
       
       # Smart cd function - zoxide for interactive, cd for automation
       function cd --description "Smart cd: zoxide for interactive directory jumping, cd for automation"
+          # Prevent infinite recursion by checking if we're already in a cd call
+          if set -q _CD_RECURSIVE_GUARD
+              builtin cd $argv
+              return
+          end
+          
           if _is_automated_context
-              command cd $argv
+              builtin cd $argv
           else
-              # Use zoxide for interactive directory jumping
+              # Handle special cases that should use builtin cd instead of zoxide
               if test (count $argv) -eq 0
+                  # No arguments - go to home (let zoxide handle this)
+                  set -g _CD_RECURSIVE_GUARD 1
                   z
+                  set -e _CD_RECURSIVE_GUARD
+              else if string match -q "..*" $argv[1]
+                  # Parent directory navigation (.. ../ ../../etc) - use builtin cd
+                  builtin cd $argv
+              else if string match -q "/*" $argv[1]
+                  # Absolute path - use builtin cd
+                  builtin cd $argv
+              else if string match -q "~*" $argv[1]
+                  # Home path - use builtin cd
+                  builtin cd $argv
               else
+                  # Regular directory name - use zoxide for smart jumping
+                  set -g _CD_RECURSIVE_GUARD 1
                   z $argv
+                  set -e _CD_RECURSIVE_GUARD
               end
           end
       end
@@ -314,7 +335,15 @@
       mgr = {
         show_hidden = true;
       };
+      preview = {
+        image_filter = "lanczos3";
+        image_quality = 90;
+        max_width = 600;
+        max_height = 900;
+        cache_dir = "";
+      };
       plugin = {
+        # Re-enabled rich-preview for enhanced file previews
         prepend_previewers = [
           { name = "*.csv"; run = "rich-preview"; }
           { name = "*.md"; run = "rich-preview"; }
@@ -325,15 +354,17 @@
         ];
       };
       opener = {
-        # Markdown files - stable glow configuration for yazi
+        # Markdown files - direct glow usage (no nested terminal)
         markdown = [
-          { run = ''${pkgs.kitty}/bin/kitty -e ${pkgs.glow}/bin/glow -p "$@"''; desc = "View with Glow (pager)"; block = true; }
-          { run = ''${pkgs.kitty}/bin/kitty -e ${pkgs.glow}/bin/glow "$@"''; desc = "View with Glow"; block = true; }
-          { run = "helix \"$@\""; desc = "Edit with Helix"; block = true; }
+          { run = "glow -p \"$@\""; desc = "View with Glow (pager)"; block = true; }
+          { run = "glow \"$@\""; desc = "View with Glow"; block = true; }
+          { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
         ];
-        # Images - Eye of GNOME as default
+        # Images - Eye of GNOME as primary
         image = [
-          { run = "/run/current-system/sw/bin/eog \"$@\""; desc = "View with Eye of GNOME"; orphan = true; }
+          { run = "eog \"$@\""; desc = "View with Eye of GNOME"; orphan = true; }
+          { run = "sxiv \"$@\""; desc = "View with sxiv"; orphan = true; }
+          { run = "feh \"$@\""; desc = "View with feh"; orphan = true; }
         ];
         # PDFs - Okular as default  
         pdf = [
@@ -344,9 +375,16 @@
           { run = "/run/current-system/sw/bin/libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
         ];
         
+        # CSV files - LibreOffice Calc as primary opener
+        csv = [
+          { run = "libreoffice --calc \"$@\""; desc = "Open with LibreOffice Calc"; orphan = true; }
+          { run = "csvlook \"$@\""; desc = "View with csvlook"; block = true; }
+          { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
+        ];
+        
         # Text/code files - helix first, then other editors
         edit = [
-          { run = "helix \"$@\""; desc = "Edit with Helix"; block = true; }
+          { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
           { run = "zed \"$@\""; desc = "Edit with Zed"; }
           { run = "code \"$@\""; desc = "Edit with VS Code"; }
         ];
@@ -366,6 +404,8 @@
           { name = "*.webp"; use = "image"; }
           # PDFs
           { name = "*.pdf"; use = "pdf"; }
+          # CSV files
+          { name = "*.csv"; use = "csv"; }
           # Office documents  
           { name = "*.doc"; use = "office"; }
           { name = "*.docx"; use = "office"; }
