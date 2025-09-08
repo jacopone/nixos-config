@@ -28,6 +28,12 @@ The system is configured with:
 *   **Check package availability:** `nix-env -qaP | grep <package-name>`
 *   **Search nixpkgs:** `nix search nixpkgs <package-name>`
 
+### AI Orchestration System
+*   **Master Orchestrator:** `./ai-orchestration/scripts/master-orchestrator.sh`
+*   **Project Inception Wizard:** Select option 0 after choosing "Experienced User" mode
+*   **Platform Optimization:** Supports Google One Ultra, Cursor Pro, Lovable + Supabase
+*   **CCPM Integration:** Complete project management with PRD → Epic → Issues workflow
+
 
 ## Architecture Overview
 
@@ -70,12 +76,14 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 4. **User verification** - prompts to accept or rollback changes
 5. **Git integration** - stage changes and prompt for commit message
 6. **Generation cleanup** - interactively remove old system generations
-7. **Optional push** to remote repository
+7. **Cache cleanup** - interactive removal of large cache directories (UV, Chrome, Yarn, Playwright)
+8. **Optional push** to remote repository
 
 **Key safety features:**
 - Rollback capability if changes are rejected
 - Pre-activation testing to prevent broken systems
 - Interactive generation management
+- Smart cache detection and cleanup with size reporting
 
 ## Current Status & Working Features
 
@@ -86,6 +94,9 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - **Fish Shell**: Set as default user shell with z plugin for directory jumping and smart command substitutions
 - **Starship Prompt**: Visual git display with Nerd Font symbols (`~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯`)
 - **Development Environment**: Comprehensive tool setup with multiple editors (Helix, Zed, VSCode, Cursor)
+- **AI Orchestration System**: Complete CCPM integration with Project Inception Wizard, platform optimization for Google One Ultra/Cursor Pro/Lovable, and unified Master Orchestrator interface
+- **Performance Optimization**: Memory management tuning with optimized swap settings, zram compression, and build process limitations
+- **Automated Maintenance**: Enhanced rebuild script with cache cleanup, weekly garbage collection, and monthly system updates
 
 ### Tool Configurations Working
 - **Rich Preview**: Successfully rendering markdown files with syntax highlighting and formatting
@@ -101,6 +112,46 @@ The NixOS configuration has been successfully migrated from a monolithic structu
 - Reusable modules organized in `modules/core/` and `modules/home-manager/`
 - User configurations managed through `users/guyfawkes/`
 - Desktop profiles properly structured in `profiles/desktop/`
+
+## Performance Optimization & Maintenance
+
+### Memory Management
+The system includes optimized kernel parameters for desktop performance:
+- **Swappiness**: Reduced from 60 to 10 for desktop use
+- **VFS Cache Pressure**: Set to 50 for better file cache management  
+- **Zram Swap**: 25% of RAM with zstd compression for faster swap
+- **Build Limitations**: CPU cores limited to 4, max parallel jobs to 2
+
+### Automated Maintenance Schedule
+| **Frequency** | **Task** | **Status** |
+|---------------|----------|-----------|
+| **Weekly** | Nix garbage collection | ✅ **Automated** |
+| **Monthly** | System updates | ✅ **Automated** |
+| **Interactive** | Cache cleanup via rebuild script | ✅ **Enhanced** |
+| **Interactive** | Generation management | ✅ **Enhanced** |
+
+### System Monitoring Commands
+```bash
+# Quick system health check
+free -h && uptime && df -h / | tail -1
+
+# Process monitoring
+htop          # Interactive process viewer
+procs         # Modern process list
+btm           # System monitor
+
+# Disk analysis  
+dua           # Disk usage analyzer
+dust          # Directory sizes
+```
+
+### Cache Management
+The rebuild script automatically detects and offers to clean:
+- **UV Python cache** (typically 1-6GB)
+- **Google Chrome cache** (typically 1-5GB)
+- **Yarn/PNPM caches** (typically 0.5-2GB each)
+- **MS Playwright cache** (typically 1-2GB)
+- **Other development caches**
 
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`
