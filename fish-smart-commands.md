@@ -55,6 +55,39 @@ The system uses `_is_automated_context` function to detect when commands should 
 | `ll` | `eza -la --icons --git --group-directories-first` | `ls -la` | Enhanced long listing |
 | `la` | `eza -A --icons --git --group-directories-first` | `ls -A` | Show all files enhanced |
 | `grep pattern` | `rg pattern` (simple) | `grep pattern` | Faster search for simple patterns |
+| `cd project` | Smart directory jumping | `cd project` | Uses zoxide for frequently visited dirs |
+
+## 🧭 Smart Directory Navigation
+
+### Enhanced `cd` Function
+Your `cd` command is enhanced with **intelligent path handling**:
+
+```bash
+# These use builtin cd (fast, direct):
+cd ..                    # Parent directory navigation
+cd ../..                 # Multi-level parent navigation
+cd /absolute/path        # Absolute paths
+cd ~/home/path          # Home directory paths  
+cd desktop-assistant/   # Relative paths with slashes
+cd SomeDirectory        # Existing local directories
+
+# This uses zoxide (smart jumping):
+cd project              # Directory name only → zoxide finds best match
+```
+
+**How it works:**
+1. **Parent directories** (`..`, `../..`) → Always use builtin `cd`
+2. **Absolute paths** (`/path`) → Always use builtin `cd`  
+3. **Home paths** (`~/path`) → Always use builtin `cd`
+4. **Relative paths with slashes** (`dir/subdir`) → Use builtin `cd`
+5. **Existing directories** → Use builtin `cd` if directory exists locally
+6. **Directory names only** → Use `zoxide` for smart jumping to frequently visited directories
+
+**Benefits:**
+- ✅ **Reliable**: Local directories always work (no more "did not match any results")
+- ⚡ **Fast**: Direct paths use builtin cd for instant navigation
+- 🧠 **Smart**: Directory names use zoxide for intelligent jumping
+- 🔄 **Compatible**: Works with all existing cd patterns
 
 ## 🚀 Abbreviations Available
 

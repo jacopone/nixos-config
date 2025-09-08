@@ -126,6 +126,7 @@ cat file.py          # → bat file.py (syntax highlighted code)
 ls                   # → eza --icons --git (with icons)  
 ll                   # → eza -la --icons --git --group-directories-first
 grep "pattern"       # → rg "pattern" (faster search)
+cd desktop-assistant/ # → builtin cd (reliable for local paths)
 cd project           # → zoxide smart directory jumping
 ```
 

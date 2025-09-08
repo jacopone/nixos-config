@@ -346,14 +346,31 @@ tree -L 2                   # Limit depth
 ### Fish Shell Features
 **Your shell has enhanced features + visual git:**
 ```bash
-# Directory jumping with z plugin
-z project                   # Jump to frequently used directories
+# Smart directory navigation (enhanced cd function)
+cd desktop-assistant/       # Relative paths work reliably  
+cd project                  # Smart jumping to frequently used directories
+cd ..                       # Parent directory navigation
+z project                   # Direct zoxide usage for smart jumping
 
 # Visual git branch in prompt (always visible)
 # Real-time git status indicators
 # Enhanced auto-completion (just start typing and press Tab)
 # Syntax highlighting as you type
 # Better history search with up/down arrows
+```
+
+### Enhanced Directory Navigation
+**Smart `cd` function handles all path types:**
+```bash
+# Local directories (use builtin cd):
+cd desktop-assistant/       # ✅ Works reliably now
+cd ../other-project/        # ✅ Parent + relative navigation
+cd /absolute/path          # ✅ Absolute paths
+cd ~/Documents             # ✅ Home directory paths
+
+# Smart jumping (uses zoxide):  
+cd project                 # 🧠 Finds best match from visited directories
+z frequently-used          # 🧠 Direct zoxide usage
 ```
 
 ## File Management Workflows
