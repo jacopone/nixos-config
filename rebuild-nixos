@@ -21,6 +21,14 @@ echo "--> Test build successful. New configuration path: $NEW_CONFIG_PATH"
 echo "--> Activating the new configuration..."
 sudo nixos-rebuild switch --flake .
 
+# Update Claude Code tool inventory
+echo "--> Updating Claude Code tool inventory..."
+if python3 scripts/update-claude-tools.py; then
+    echo "✅ Claude tools inventory updated successfully"
+else
+    echo "⚠️  Failed to update Claude tools inventory (continuing anyway)"
+fi
+
 echo "--> Configuration activated. Please test the changes now."
 read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
 echo

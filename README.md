@@ -33,7 +33,7 @@
 ### 👨‍💻 **Development Environment**
 - 🔨 **Multiple Editors**: Helix, Zed, VSCode, Cursor
 - 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI
-- 🧠 **AI Orchestration System**: Multi-agent coordination framework for 90%+ performance improvements
+- 🧠 **CCPM-Enhanced AI Orchestration**: Advanced hybrid system with 90%+ performance improvements + structured project management
 - 📦 **Node.js & Python** pre-installed for instant development
 - 🏗️ **DevEnv & Direnv** for per-project environments
 

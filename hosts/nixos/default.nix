@@ -104,8 +104,10 @@
   users.defaultUserShell = pkgs.fish;
 
   # Enable Permitted Insecure Packages to solve a dipendency needed to install Obsidian
+  # and temporarily allow libsoup-2 for Google Drive support
   nixpkgs.config.permittedInsecurePackages = [
                 "electron-24.8.6"
+                "libsoup-2.74.3"
               ];
 
   # Some programs need SUID wrappers, can be configured further or are

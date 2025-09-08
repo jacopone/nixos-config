@@ -4,6 +4,17 @@
   # Enable the GNOME Desktop Environment.
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  
+  # Enable GVFS with Google Drive support
+  services.gvfs = {
+    enable = true;
+    package = pkgs.gvfs.override {
+      gnomeSupport = true;
+      googleSupport = true;
+      libgdata = pkgs.libgdata;
+      libsoup_3 = pkgs.libsoup_3;
+    };
+  };
 
   # Exclude some default applications
   environment.gnome.excludePackages = with pkgs; [
