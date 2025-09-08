@@ -31,11 +31,31 @@
     settings.auto-optimise-store = true;
     settings.experimental-features = [ "nix-command"  "flakes" ];
     settings.trusted-users = [ "root" "guyfawkes" ];  # Enable cachix for user
+    settings.cores = 4;  # Use half CPU cores for builds (8-core system)
+    settings.max-jobs = 2;  # Limit parallel builds to reduce memory pressure
     gc = {
       automatic = true;
       dates = "weekly";
       options = "--delete-older-than +2";
     };
+  };
+
+  # Memory and Swap Optimization
+  boot.kernel.sysctl = {
+    # Reduce swap aggressiveness (default 60 -> 10 for desktop use)
+    "vm.swappiness" = 10;
+    # Improve memory management for interactive desktop
+    "vm.vfs_cache_pressure" = 50;
+    # Better dirty page management for SSD
+    "vm.dirty_ratio" = 15;
+    "vm.dirty_background_ratio" = 5;
+  };
+
+  # Enable zram swap for better memory compression
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";  # Better compression than default
+    memoryPercent = 25;  # Use 25% of RAM for compressed swap
   };
 
   # Automatic Updates
