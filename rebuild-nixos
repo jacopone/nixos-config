@@ -69,6 +69,30 @@ else
     echo "--> No generations selected for deletion."
 fi
 
+# Clean up cache directories
+echo "--> Cache cleanup options..."
+echo "Large cache directories detected:"
+if [ -d ~/.cache/uv ]; then echo "  - UV Python cache: $(du -sh ~/.cache/uv 2>/dev/null | cut -f1)"; fi
+if [ -d ~/.cache/google-chrome ]; then echo "  - Google Chrome cache: $(du -sh ~/.cache/google-chrome 2>/dev/null | cut -f1)"; fi
+if [ -d ~/.cache/yarn ]; then echo "  - Yarn cache: $(du -sh ~/.cache/yarn 2>/dev/null | cut -f1)"; fi
+if [ -d ~/.cache/ms-playwright ]; then echo "  - MS Playwright cache: $(du -sh ~/.cache/ms-playwright 2>/dev/null | cut -f1)"; fi
+if [ -d ~/.cache/pnpm ]; then echo "  - PNPM cache: $(du -sh ~/.cache/pnpm 2>/dev/null | cut -f1)"; fi
+
+read -p "Clean these cache directories? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "--> Cleaning cache directories..."
+    [ -d ~/.cache/uv ] && echo "  Cleaning UV cache..." && rm -rf ~/.cache/uv
+    [ -d ~/.cache/google-chrome ] && echo "  Cleaning Google Chrome cache..." && rm -rf ~/.cache/google-chrome
+    [ -d ~/.cache/yarn ] && echo "  Cleaning Yarn cache..." && rm -rf ~/.cache/yarn
+    [ -d ~/.cache/ms-playwright ] && echo "  Cleaning MS Playwright cache..." && rm -rf ~/.cache/ms-playwright
+    [ -d ~/.cache/pnpm ] && echo "  Cleaning PNPM cache..." && rm -rf ~/.cache/pnpm
+    [ -d ~/.cache/chromium ] && echo "  Cleaning Chromium cache..." && rm -rf ~/.cache/chromium
+    echo "--> Cache cleanup complete."
+else
+    echo "--> Cache cleanup skipped."
+fi
+
 echo ""
 echo "NixOS system rebuild and cleanup complete!"
 
