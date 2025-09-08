@@ -9,6 +9,7 @@ This system implements **Anthropic's Research System architecture** combined wit
 ### 🆕 **Adaptive Intelligence System (Phase 4 Complete - Ultimate Intelligence)**
 
 The ultimate AI-powered development system with **Adaptive Intelligence & Dynamic Optimization**:
+- **🎯 Project Inception Wizard**: AI-powered project discovery with Claude Code subagent integration
 - **🔍 Tool Verification**: Dynamic detection of available AI platforms and capabilities
 - **🎯 Adaptive Workflows**: Automatically optimized workflows based on your actual tools  
 - **⚡ Smart Fallbacks**: Intelligent degradation when premium tools aren't available
@@ -30,6 +31,8 @@ cd /path/to/your/project
 # Run the Master Orchestration Control System
 ~/nixos-config/ai-orchestration/scripts/master-orchestrator.sh
 
+# Select mode 2 (Experienced User), then choose:
+# 0. 🎯 Project Inception Wizard - AI-powered project discovery & specification
 # Access all tools through unified interface with guided workflows
 ```
 
@@ -100,6 +103,7 @@ ai-orchestration/
 │   └── COMMANDS.md                      # Command reference
 ├── scripts/
 │   ├── master-orchestrator.sh           # Master control system (Phase 4)
+│   ├── project-inception-wizard.sh      # AI-powered project discovery & specification
 │   ├── tool-detector.sh                 # Dynamic tool verification & detection
 │   ├── adaptive-workflow-generator.sh   # Intelligent workflow adaptation
 │   ├── platform-optimizer.sh            # Premium platform optimization
@@ -138,6 +142,7 @@ See `docs/UNIVERSAL_INSTALLATION.md` for complete global installation instructio
 - **Command Reference**: `ccpm/COMMANDS.md`
 
 ### **🧠 Adaptive Intelligence System (NEW)**
+- **🎯 Project Inception Wizard**: `scripts/project-inception-wizard.sh` (AI-powered project discovery with Claude Code subagent integration)
 - **Tool Verification**: `scripts/tool-detector.sh` (Dynamic AI tool detection and verification)
 - **Adaptive Workflows**: `scripts/adaptive-workflow-generator.sh` (Smart workflow generation based on available tools)
 - **Configuration Management**: `~/.ai-orchestration-config.json` (Persistent tool configuration and optimization tracking)
