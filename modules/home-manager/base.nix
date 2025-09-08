@@ -124,8 +124,14 @@
               else if string match -q "~*" $argv[1]
                   # Home path - use builtin cd
                   builtin cd $argv
+              else if string match -q "*/*" $argv[1]
+                  # Relative path with slashes - use builtin cd
+                  builtin cd $argv
+              else if test -d $argv[1]
+                  # Directory exists locally - use builtin cd
+                  builtin cd $argv
               else
-                  # Regular directory name - use zoxide for smart jumping
+                  # Directory name only - try zoxide for smart jumping
                   set -g _CD_RECURSIVE_GUARD 1
                   z $argv
                   set -e _CD_RECURSIVE_GUARD
