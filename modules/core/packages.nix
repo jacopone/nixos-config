@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
@@ -9,6 +9,10 @@
     code-cursor         # An AI-powered code editor based on VSCode - https://cursor.so/
     plandex             # An open-source, terminal-based AI coding agent - https://plandex.ai/
     claude-code         # A code-generation tool using Anthropic's Claude model
+    # Claude Flow - AI orchestration platform (alpha version via npx)
+    (pkgs.writeShellScriptBin "claude-flow" ''
+      exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
+    '')
     gemini-cli          # A command-line interface for Google's Gemini models
     git                 # A free and open source distributed version control system - https://git-scm.com/
     gh                  # GitHub's official command-line tool - https://cli.github.com/

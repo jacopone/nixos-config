@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
@@ -33,6 +33,7 @@
     settings.trusted-users = [ "root" "guyfawkes" ];  # Enable cachix for user
     settings.cores = 4;  # Use half CPU cores for builds (8-core system)
     settings.max-jobs = 2;  # Limit parallel builds to reduce memory pressure
+    settings.download-buffer-size = 268435456;  # 256MB download buffer (default is 64MB)
     gc = {
       automatic = true;
       dates = "weekly";

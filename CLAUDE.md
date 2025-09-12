@@ -33,6 +33,10 @@ The system is configured with:
 *   **Project Inception Wizard:** Select option 0 after choosing "Experienced User" mode
 *   **Platform Optimization:** Supports Google One Ultra, Cursor Pro, Lovable + Supabase
 *   **CCPM Integration:** Complete project management with PRD → Epic → Issues workflow
+*   **Claude Flow:** `claude-flow` or `npx claude-flow@alpha` - Enterprise-grade AI agent orchestration platform
+    - Quick start: `npx claude-flow@alpha init` or `npx claude-flow@alpha hive-mind wizard`
+    - Swarm intelligence: `claude-flow swarm "build API"` 
+    - Hive mind coordination with multi-agent workflows
 
 
 ## Architecture Overview

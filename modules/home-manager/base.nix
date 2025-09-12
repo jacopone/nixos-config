@@ -491,7 +491,7 @@
     # - Nerd Font icons for file types, git status, etc.
     # - Better readability for code with optimized character spacing
     font = {
-      name = "JetBrains Mono Nerd Font";
+      name = "JetBrainsMono Nerd Font";
       size = 11;
     };
     
@@ -526,10 +526,10 @@
       
       # FONT CONFIGURATION
       # Comprehensive font family setup with fallbacks
-      font_family = "JetBrains Mono Nerd Font";
-      bold_font = "JetBrains Mono Nerd Font Bold";
-      italic_font = "JetBrains Mono Nerd Font Italic";
-      bold_italic_font = "JetBrains Mono Nerd Font Bold Italic";
+      font_family = "JetBrainsMono Nerd Font";
+      bold_font = "JetBrainsMono Nerd Font Bold";
+      italic_font = "JetBrainsMono Nerd Font Italic";
+      bold_italic_font = "JetBrainsMono Nerd Font Bold Italic";
       
       # LIGATURE CONTROL
       # Show ligatures everywhere except at cursor position for better editing
