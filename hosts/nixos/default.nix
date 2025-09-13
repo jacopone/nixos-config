@@ -120,6 +120,11 @@
 
   # Enable Gnome Online Accounts to manage Google Drive
 
+  # Hardware Optimizations
+  services.fstrim.enable = true;  # Weekly SSD TRIM for disk health
+  services.fwupd.enable = true;   # Firmware updates for ThinkPad
+  hardware.graphics.enable = true;  # Graphics hardware acceleration
+
   # Enable fish shell
   programs.fish.enable = true;
   users.defaultUserShell = pkgs.fish;

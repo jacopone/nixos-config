@@ -65,6 +65,10 @@ if [ -n "$generations_to_delete" ]; then
     echo "--> Deleting generations: $generations_to_delete"
     sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
     echo "--> Selected generations deleted."
+    
+    echo "--> Running garbage collection to free up disk space..."
+    nix-collect-garbage
+    echo "--> Garbage collection complete."
 else
     echo "--> No generations selected for deletion."
 fi
