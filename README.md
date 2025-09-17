@@ -2,7 +2,7 @@
 
 > A modern, modular NixOS configuration featuring GNOME desktop, enhanced CLI tools, and intelligent Fish shell integration
 
-[![NixOS](https://img.shields.io/badge/NixOS-24.05-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
+[![NixOS](https://img.shields.io/badge/NixOS-25.11-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
 [![Flakes](https://img.shields.io/badge/Nix-Flakes-informational.svg?style=flat-square&logo=nixos)](https://nixos.wiki/wiki/Flakes)
 [![Home Manager](https://img.shields.io/badge/Home-Manager-orange.svg?style=flat-square)](https://github.com/nix-community/home-manager)
 
@@ -15,11 +15,13 @@
 - 🔧 **Interactive rebuild script** with safety checks and rollback capability
 
 ### 🖥️ **Desktop Environment**
-- 🌟 **GNOME Desktop** with curated application selection
-- 🎨 **Kitty Terminal** with advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
-- 📁 **Yazi File Manager** with rich preview support for markdown, JSON, CSV
-- 🐟 **Fish Shell** as default with intelligent command enhancements
-- 🚀 **Starship Prompt** with Nerd Font symbols (`~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯`)
+- 🌟 **GNOME Desktop** with curated application selection and Wayland optimization
+- 🎨 **Kitty Terminal** with 35+ advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
+- 📁 **Yazi File Manager** with rich preview support for 40+ file types (markdown, JSON, CSV, images, PDFs)
+- 🐟 **Fish Shell** as default with intelligent command enhancements and context-aware automation
+- 🚀 **Starship Prompt** with comprehensive Nerd Font symbols (`~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯`)
+- 🌍 **Multi-locale Support** (US English with Italian regional settings)
+- 🔧 **Helix Editor** as system default with modern modal editing
 
 ### 🛠️ **Enhanced CLI Experience**
 - 🚀 **Visual Git Integration** - Real-time branch status in terminal prompt
@@ -32,10 +34,20 @@
 
 ### 👨‍💻 **Development Environment**
 - 🔨 **Multiple Editors**: Helix, Zed, VSCode, Cursor
-- 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI
+- 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI, Claude Flow (alpha)
 - 🧠 **CCPM-Enhanced AI Orchestration**: Advanced hybrid system with 90%+ performance improvements + structured project management
 - 📦 **Node.js & Python** pre-installed for instant development
 - 🏗️ **DevEnv & Direnv** for per-project environments
+- 🚀 **Build Optimizations**: CPU-limited builds (4 cores, 2 max jobs) for system stability
+
+### ⚡ **Performance Optimization**
+- 🧠 **Memory Management**: Optimized kernel parameters for desktop performance
+- 💾 **Zram Compression**: 25% of RAM with zstd compression for faster swap
+- 🔧 **Kernel Tuning**: Reduced swappiness (10), optimized VFS cache pressure (50)
+- 🏗️ **Build Performance**: Limited parallel builds to prevent memory exhaustion
+- 🗑️ **Automatic Maintenance**: Weekly garbage collection, monthly system updates
+- 💽 **SSD Optimization**: Weekly TRIM, firmware updates, write optimization
+- 📦 **Nix Store Optimization**: Auto-store optimization and download buffering
 
 ## 📂 Repository Structure
 
@@ -76,9 +88,19 @@ nixos-config/
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- NixOS installed with flakes enabled
-- Git for cloning the repository
+### Prerequisites & System Requirements
+- **NixOS** installed with flakes enabled
+- **Git** for cloning the repository
+- **Minimum 8GB RAM** (recommended 16GB+ for optimal build performance)
+- **x86_64 architecture** (Intel/AMD 64-bit)
+- **SSD storage** recommended for optimal Nix store performance
+- **Hardware acceleration** support (automatically enabled)
+
+### Hardware Optimizations
+- **ThinkPad optimizations** included (firmware updates, power management)
+- **GNOME Wayland** with hardware acceleration
+- **Automatic SSD TRIM** for disk health
+- **Zram compression** for memory efficiency
 
 ### Installation
 ```bash
@@ -269,12 +291,43 @@ The system detects:
 - **Automatic rollback** if changes are rejected
 - **Git integration** with commit prompts
 - **Generation cleanup** with interactive selection
+- **Cache cleanup** with size reporting (UV, Chrome, Yarn, Playwright)
 
 ### Backup & Recovery
 - **System generations** for easy rollback
 - **Configuration versioning** with Git
 - **Hardware configuration** isolation
 - **Modular design** for selective updates
+
+## 🔧 Advanced Configuration
+
+### Kitty Terminal Optimizations
+- **700+ lines** of advanced terminal configuration
+- **Performance tuning** for AI development workflows (50k scrollback, optimized repaints)
+- **Typography enhancements** with ligature control and advanced text rendering
+- **Catppuccin Mocha** theme with enhanced contrast
+- **Powerline tabs** with slanted segments and file path display
+- **35+ keyboard shortcuts** for productivity
+
+### Yazi File Manager Features
+- **Rich preview system** with 40+ file type support
+- **Custom openers** for each file type (Helix, Zed, VSCode, Cursor)
+- **Image viewers** (Eye of GNOME, sxiv, feh)
+- **PDF viewers** (Okular with KDE integration)
+- **Office integration** (LibreOffice with CSV support)
+- **Markdown rendering** with Glow integration
+
+### Fish Shell Intelligence
+- **Context detection** for automation vs interactive use
+- **Smart command substitutions** (bat/cat, eza/ls, rg/grep)
+- **50+ abbreviations** for rapid development
+- **Git shortcuts** and development aliases
+- **Agent compatibility** with fallback commands
+
+### System Version Management
+- **NixOS System Version**: 25.11 (current running version)
+- **Configuration State Version**: 24.05 (for compatibility, should not be changed)
+- **Automatic distinction** between system updates and state compatibility
 
 ## 🎨 Customization
 
@@ -295,6 +348,58 @@ home.packages = with pkgs; [
 - **GNOME apps** excluded in `profiles/desktop/gnome.nix`
 - **Terminal themes** configured in `modules/home-manager/base.nix`
 - **Window manager** settings in `profiles/desktop/base.nix`
+
+## 🔧 Troubleshooting
+
+### Common Issues & Solutions
+
+#### **Insecure Packages (Obsidian/LibSoup)**
+```bash
+# Already configured in the system:
+nixpkgs.config.permittedInsecurePackages = [
+  "electron-24.8.6"    # For Obsidian compatibility
+  "libsoup-2.74.3"     # For Google Drive support
+];
+```
+
+#### **Build Memory Issues**
+- System is pre-configured with 4 CPU cores and 2 max parallel jobs
+- If builds still fail: temporarily reduce with `--cores 2 --max-jobs 1`
+
+#### **Locale Configuration**
+```bash
+# Current setup: US English with Italian regional settings
+i18n.defaultLocale = "en_US.UTF-8";
+# Regional settings for Italy (dates, currency, etc.)
+```
+
+#### **Version Compatibility**
+- **System Version**: 25.11 (updates with `nixos-rebuild`)
+- **State Version**: 24.05 (compatibility layer, should NOT be changed)
+- These are different by design for system stability
+
+#### **Hardware Acceleration Issues**
+```bash
+# Check graphics status
+lspci | grep -i gpu
+# Hardware acceleration automatically enabled via:
+hardware.graphics.enable = true;
+```
+
+#### **Fish Shell Not Default**
+```bash
+# Verify Fish is set as default shell
+echo $SHELL  # Should show /run/current-system/sw/bin/fish
+# If not, run: sudo chsh -s $(which fish) $(whoami)
+```
+
+#### **Yazi Preview Issues**
+```bash
+# Check required dependencies
+which glow bat file ffmpegthumbnailer
+# All should be available in PATH
+# Rich preview plugin automatically configured
+```
 
 ## 🤝 Contributing
 
