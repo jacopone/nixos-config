@@ -14,6 +14,11 @@
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
     '')
     gemini-cli          # A command-line interface for Google's Gemini models
+    
+    # MCP NixOS Server - Model Context Protocol for NixOS package/option info
+    (pkgs.writeShellScriptBin "mcp-nixos" ''
+      exec ${pkgs.uv}/bin/uvx mcp-nixos "$@"
+    '')
     git                 # A free and open source distributed version control system - https://git-scm.com/
     gh                  # GitHub's official command-line tool - https://cli.github.com/
     wget                # A free software package for retrieving files using HTTP, HTTPS, FTP and FTPS - https://www.gnu.org/software/wget/
