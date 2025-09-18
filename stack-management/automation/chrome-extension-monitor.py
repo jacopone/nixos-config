@@ -35,6 +35,28 @@ EXTENSION_NAMES = {
     "pbmlfaiicoikhdbjagjbglnbfcbcojpj": "Simplify Gmail"
 }
 
+# Built-in Chrome extensions and components to ignore
+CHROME_BUILTIN_EXTENSIONS = {
+    "aohghmigkfhddiffpmpbdggpcijllcdb",  # CryptoToken Component Extension
+    "apdfllckaahabafndbhieahigkjlhalf",  # Google Drive
+    "blpcfgokakmgnkcojhhkbfbldkacnbeo",  # YouTube
+    "coobgpohoikkiipiblmjeljniedjpjpf",  # Google Search
+    "ejidjjhkpiempkbhmpbfngldlkglhimk",  # Unknown Chrome component
+    "felcaaldnbdncclmgdcncolpebgiejap",  # Google Docs
+    "fignfifoniblkonapihmkfakmlgkbkcf",  # Google Network Speech
+    "floipahigmmkfhkoapmnijnlnboniglg",  # Unknown Chrome component
+    "gplegfbjlmmehdoakndmohflojccocli",  # Unknown Chrome component
+    "jbohegmdfkmocmbpmjckoccgdladboco",  # Unknown Chrome component
+    "jgbefhffiiongohodpopckdcalediegk",  # Unknown Chrome component
+    "kmendfapggjehodndflmmgagdbamhnfd",  # CryptoToken Component Extension (alt)
+    "mgndgikekgjfcpckkfioiadnlibdjbkf",  # Chrome component
+    "mhjfbmdgcfjbbpaeojofohoefgiehjai",  # Chrome PDF Viewer
+    "neajdppkdcdipfabeoofebfddakdcjhd",  # Google Network Speech (alt)
+    "nkeimhogjdpnpccoofpliimaahmaaome",  # Google Hangouts (optional builtin)
+    "nmmhkkegccagdldgiimedpiccmgmieda",  # Google Wallet
+    "pjkljhegncpnkpknbcohdijeoejaedia",  # Gmail
+}
+
 def get_installed_extensions() -> Dict[str, dict]:
     """Get all currently installed Chrome extensions."""
     if not CHROME_PREFS.exists():
@@ -49,10 +71,14 @@ def get_installed_extensions() -> Dict[str, dict]:
         ext_settings = prefs.get('extensions', {}).get('settings', {})
         
         for ext_id, settings in ext_settings.items():
-            if len(ext_id) == 32:  # Valid Chrome extension ID length
+            if len(ext_id) == 32 and ext_id not in CHROME_BUILTIN_EXTENSIONS:  # Valid Chrome extension ID length, not builtin
                 manifest = settings.get('manifest', {})
                 name = manifest.get('name', EXTENSION_NAMES.get(ext_id, 'Unknown'))
                 install_time = settings.get('install_time', '0')
+                
+                # Skip extensions that are clearly Chrome components (have no name or version)
+                if name == 'Unknown' and manifest.get('version', 'unknown') == 'unknown':
+                    continue
                 
                 extensions[ext_id] = {
                     'name': name,

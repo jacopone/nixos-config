@@ -155,9 +155,58 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # Chrome/Chromium System-wide Settings & Policies
+  # (stack-management: consistent UX across machines)
+  programs.chromium = {
+    enable = true;
+    extraOpts = {
+      # ═══════════════════════════════════════════════════════════════════
+      # EXTRACTED CHROME SETTINGS (2025 Structure)
+      # Generated on 2025-09-18 12:51:43
+      # Moved to system-wide config for compatibility
+      # ═══════════════════════════════════════════════════════════════════
+
+      # Zoom & Display Settings
+      "DefaultZoomLevel" = 1.1;
+      "ZoomSettings" = 1;
+      "PerHostZoomLevels" = {
+      };
+
+      # UI & Appearance
+      "BookmarkBarEnabled" = false;
+      "ShowHomeButton" = false;
+      "HomepageLocation" = "http://www.google.com/";
+      "HomepageIsNewTabPage" = true;
+
+      # Download Settings
+      "DownloadDirectory" = "/home/guyfawkes/Downloads";
+      "PromptForDownloadLocation" = true;
+
+      # Privacy & Security
+      "SafeBrowsingProtectionLevel" = 1;
+      "PasswordManagerEnabled" = true;
+
+      # Performance & Features
+      "HardwareAccelerationModeEnabled" = true;
+      "BackgroundModeEnabled" = false;
+      "NetworkPredictionOptions" = 0;
+
+      # Content & Security Defaults
+      "DefaultJavaScriptSetting" = 1;
+      "DefaultImagesSetting" = 1;
+      "DefaultPopupsSetting" = 2;
+      "DefaultNotificationsSetting" = 3;
+      "DeveloperToolsAvailability" = 1;
+
+      # Font Settings
+      "DefaultFontSize" = 16;
+      "MinimumFontSize" = 0;
+    };
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # on your system were taken. It's perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
