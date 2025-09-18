@@ -702,6 +702,181 @@
     };
   };
 
+  # Chrome/Chromium with managed extensions and settings
+  programs.chromium = {
+    enable = true;
+    package = pkgs.google-chrome;
+    
+    # Managed Extensions (stack-management: core extensions)
+    extensions = [
+      # Core Productivity Extensions (stack-management: always installed)
+      { id = "dbepggeogbaibhgnhhndojpepiihcmeb"; } # Vimium - keyboard navigation
+      { id = "kbfnbcaeplbcioakkpcpgfkobkghlhen"; } # Grammarly - writing assistant
+      { id = "jjhefcfhmnkfeepcpnilbbkaadhngkbi"; } # Readwise Highlighter
+      
+      # Development Tools (stack-management: dev workflow)
+      { id = "fmkadmapgofadopljbjfkapdkoienihi"; } # React Developer Tools
+      { id = "mhjhnkcfbdhnjickkkdbjoemdmbfginb"; } # SelectorGadget
+      
+      # Security & Privacy (stack-management: essential security)
+      { id = "nkbihfbeogaeaoehlefnkodbefgpgknn"; } # MetaMask
+      { id = "fjoaledfpmneenckfbpdfhkmimnjocfa"; } # NordVPN
+      
+      # Utilities (stack-management: workflow enhancers)
+      { id = "niloccemoadcdkdjlinkgdfekeahmflj"; } # Save to Pocket
+      { id = "ohfgljdgelakfkefopgklcohadegdpjf"; } # Smallpdf
+      { id = "pbmlfaiicoikhdbjagjbglnbfcbcojpj"; } # Simplify Gmail
+      { id = "ipikiaejjblmdopojhpejjmbedhlibno"; } # SwiftRead
+      { id = "kadmollpgjhjcclemeliidekkajnjaih"; } # Project Mariner Companion
+      
+      # Theme & Appearance (stack-management: UI preferences)
+      { id = "aghfnjkcakhmadgdomlmlhhaocbkloab"; } # Just Black theme
+      { id = "djflhoibgkdhkhhcedjiklpkjnoahfmg"; } # User-Agent Switcher
+      { id = "ghbmnnjooekpmoecnnnilnnbdlolhkhi"; } # Google Docs Offline
+    ];
+
+    # Browser Settings & Policies (stack-management: consistent UX across machines)
+    extraOpts = {
+      # ═══════════════════════════════════════════════════════════════════
+      # DISPLAY & ZOOM SETTINGS
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Default zoom level (100% = 1.0, 125% = 1.25, 150% = 1.5, etc.)
+      "DefaultZoomLevel" = 1.0;  # Adjust this to your preferred default
+      
+      # Remember zoom levels per site
+      "ZoomSettings" = 1; # 1 = remember per site, 0 = always use default
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # PRIVACY & SECURITY SETTINGS  
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Safe Browsing (2 = Enhanced, 1 = Standard, 0 = Disabled)
+      "SafeBrowsingProtectionLevel" = 2;
+      
+      # DNS-over-HTTPS
+      "DnsOverHttpsMode" = "secure"; # "off", "automatic", "secure"
+      
+      # Password manager
+      "PasswordManagerEnabled" = true;
+      
+      # Auto-fill addresses and credit cards  
+      "AutofillAddressEnabled" = true;
+      "AutofillCreditCardEnabled" = true;
+      
+      # Block third-party cookies
+      "BlockThirdPartyCookies" = false; # Set true for stricter privacy
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # BROWSING BEHAVIOR
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Default search engine (0 = allow user choice)
+      "DefaultSearchProviderEnabled" = true;
+      "DefaultSearchProviderSearchURL" = "https://www.google.com/search?q={searchTerms}";
+      "DefaultSearchProviderName" = "Google";
+      
+      # Homepage and startup
+      "HomepageLocation" = "https://www.google.com";
+      "HomepageIsNewTabPage" = true;
+      "RestoreOnStartup" = 1; # 1 = restore, 4 = open URLs, 5 = new tab
+      
+      # New tab page
+      "NewTabPageLocation" = "https://www.google.com/"; # Custom new tab URL
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # DOWNLOAD & FILE HANDLING
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Default download directory
+      "DownloadDirectory" = "/home/guyfawkes/Downloads";
+      
+      # Ask where to save files
+      "PromptForDownloadLocation" = false; # true = always ask
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # PERFORMANCE & FEATURES
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Hardware acceleration
+      "HardwareAccelerationModeEnabled" = true;
+      
+      # Background apps when Chrome is closed
+      "BackgroundModeEnabled" = false; # Set true if you want Chrome to stay in background
+      
+      # Preload pages for faster browsing
+      "NetworkPredictionOptions" = 1; # 0 = never, 1 = wifi only, 2 = always
+      
+      # Chrome sync
+      "SyncDisabled" = false; # Set true to disable sync completely
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # DEVELOPER & ADVANCED FEATURES
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Developer tools availability
+      "DeveloperToolsAvailability" = 1; # 0 = never, 1 = allow, 2 = force enable
+      
+      # Allow JavaScript on sites
+      "DefaultJavaScriptSetting" = 1; # 1 = allow, 2 = block
+      
+      # Allow images
+      "DefaultImagesSetting" = 1; # 1 = allow, 2 = block
+      
+      # Pop-up blocking
+      "DefaultPopupsSetting" = 2; # 1 = allow, 2 = block
+      
+      # Notification permissions
+      "DefaultNotificationsSetting" = 2; # 1 = allow, 2 = block, 3 = ask
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # UI & APPEARANCE PREFERENCES
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Show bookmarks bar
+      "BookmarkBarEnabled" = true;
+      
+      # Show home button
+      "ShowHomeButton" = true;
+      
+      # Browser theme (if using default theme)
+      "BrowserThemeColor" = "#1e1e1e"; # Dark theme color
+      
+      # Font settings
+      "DefaultFontSize" = 16; # Default font size
+      "MinimumFontSize" = 12; # Minimum readable size
+      
+      # ═══════════════════════════════════════════════════════════════════
+      # SITE-SPECIFIC SETTINGS (Examples)
+      # ═══════════════════════════════════════════════════════════════════
+      
+      # Allow notifications for specific sites
+      "NotificationsAllowedForUrls" = [
+        "https://claude.ai"
+        "https://github.com" 
+        "https://gmail.com"
+      ];
+      
+      # Block notifications for specific sites  
+      "NotificationsBlockedForUrls" = [
+        "https://facebook.com"
+        "https://twitter.com"
+      ];
+      
+      # JavaScript allowed on specific sites (if globally blocked)
+      "JavaScriptAllowedForUrls" = [
+        "https://claude.ai"
+        "https://github.com"
+      ];
+      
+      # Zoom levels for specific sites
+      "PerHostZoomLevels" = {
+        "github.com" = 1.1; # 110% zoom for GitHub
+        "claude.ai" = 1.0;   # 100% zoom for Claude
+      };
+    };
+  };
+
   # Enhanced Starship prompt configuration with Nerd Font symbols
   programs.starship = {
     enable = true;
