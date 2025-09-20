@@ -159,6 +159,37 @@
   # (stack-management: consistent UX across machines)
   programs.chromium = {
     enable = true;
+
+    # Managed Extensions (stack-management: core extensions)
+    extensions = [
+      "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+
+      # Core Productivity Extensions (stack-management: always installed)
+      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+      "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - writing assistant
+      "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
+
+      # Development Tools (stack-management: dev workflow)
+      "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
+      "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
+
+      # Security & Privacy (stack-management: essential security)
+      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+      "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN
+
+      # Utilities (stack-management: workflow enhancers)
+      "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
+      "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf
+      "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
+      "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
+      "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner Companion
+
+      # Theme & Appearance (stack-management: UI preferences)
+      "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black theme
+      "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher
+      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+    ];
+
     extraOpts = {
       # ═══════════════════════════════════════════════════════════════════
       # EXTRACTED CHROME SETTINGS (2025 Structure)
@@ -166,11 +197,8 @@
       # Moved to system-wide config for compatibility
       # ═══════════════════════════════════════════════════════════════════
 
-      # Zoom & Display Settings
-      "DefaultZoomLevel" = 1.1;
-      "ZoomSettings" = 1;
-      "PerHostZoomLevels" = {
-      };
+      # Zoom & Display Settings (using correct logarithmic values)
+      "DefaultZoomLevel" = 0.5227586988632231;  # 110% zoom (decimal value required)
 
       # UI & Appearance
       "BookmarkBarEnabled" = false;
@@ -198,9 +226,9 @@
       "DefaultNotificationsSetting" = 3;
       "DeveloperToolsAvailability" = 1;
 
-      # Font Settings
+      # Font Settings (valid range 9-72 for Chrome policies)
       "DefaultFontSize" = 16;
-      "MinimumFontSize" = 0;
+      "MinimumFontSize" = 9;
     };
   };
 

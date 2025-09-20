@@ -702,41 +702,9 @@
     };
   };
 
-  # Chrome/Chromium with managed extensions and settings
-  programs.chromium = {
-    enable = true;
-    package = pkgs.google-chrome;
-    
-    # Managed Extensions (stack-management: core extensions)
-    extensions = [
-    { id = "ahfgeienlihckogmohjhadlkjgocpleb"; } # Web Store
-
-      # Core Productivity Extensions (stack-management: always installed)
-      { id = "dbepggeogbaibhgnhhndojpepiihcmeb"; } # Vimium - keyboard navigation
-      { id = "kbfnbcaeplbcioakkpcpgfkobkghlhen"; } # Grammarly - writing assistant
-      { id = "jjhefcfhmnkfeepcpnilbbkaadhngkbi"; } # Readwise Highlighter
-      
-      # Development Tools (stack-management: dev workflow)
-      { id = "fmkadmapgofadopljbjfkapdkoienihi"; } # React Developer Tools
-      { id = "mhjhnkcfbdhnjickkkdbjoemdmbfginb"; } # SelectorGadget
-      
-      # Security & Privacy (stack-management: essential security)
-      { id = "nkbihfbeogaeaoehlefnkodbefgpgknn"; } # MetaMask
-      { id = "fjoaledfpmneenckfbpdfhkmimnjocfa"; } # NordVPN
-      
-      # Utilities (stack-management: workflow enhancers)
-      { id = "niloccemoadcdkdjlinkgdfekeahmflj"; } # Save to Pocket
-      { id = "ohfgljdgelakfkefopgklcohadegdpjf"; } # Smallpdf
-      { id = "pbmlfaiicoikhdbjagjbglnbfcbcojpj"; } # Simplify Gmail
-      { id = "ipikiaejjblmdopojhpejjmbedhlibno"; } # SwiftRead
-      { id = "kadmollpgjhjcclemeliidekkajnjaih"; } # Project Mariner Companion
-      
-      # Theme & Appearance (stack-management: UI preferences)
-      { id = "aghfnjkcakhmadgdomlmlhhaocbkloab"; } # Just Black theme
-      { id = "djflhoibgkdhkhhcedjiklpkjnoahfmg"; } # User-Agent Switcher
-      { id = "ghbmnnjooekpmoecnnnilnnbdlolhkhi"; } # Google Docs Offline
-    ];
-  };
+  # Note: Chrome/Chromium policies moved to system-level configuration
+  # in hosts/nixos/default.nix to avoid conflicts and ensure proper
+  # policy application. Extensions are managed there as well.
 
   # Enhanced Starship prompt configuration with Nerd Font symbols
   programs.starship = {
