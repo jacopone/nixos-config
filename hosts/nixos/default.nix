@@ -197,8 +197,8 @@
       # Moved to system-wide config for compatibility
       # ═══════════════════════════════════════════════════════════════════
 
-      # Zoom & Display Settings (using correct logarithmic values)
-      "DefaultZoomLevel" = 0.5227586988632231;  # 110% zoom (decimal value required)
+      # Zoom & Display Settings (using correct decimal values)
+      "DefaultZoomLevel" = 1.1;  # 110% zoom (1.1 = 110%)
 
       # UI & Appearance
       "BookmarkBarEnabled" = false;
@@ -226,9 +226,9 @@
       "DefaultNotificationsSetting" = 3;
       "DeveloperToolsAvailability" = 1;
 
-      # Font Settings (valid range 9-72 for Chrome policies)
+      # Font Settings (Chrome policy defaults)
       "DefaultFontSize" = 16;
-      "MinimumFontSize" = 9;
+      "MinimumFontSize" = 0;
     };
   };
 
