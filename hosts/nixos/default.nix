@@ -197,8 +197,8 @@
       # Moved to system-wide config for compatibility
       # ═══════════════════════════════════════════════════════════════════
 
-      # Zoom & Display Settings (using correct decimal values)
-      "DefaultZoomLevel" = 1.1;  # 110% zoom (1.1 = 110%)
+      # Zoom & Display Settings (using Chrome's logarithmic zoom format)
+      "DefaultZoomLevel" = 0.369;  # 110% zoom (log(1.1)/log(1.2) ≈ 0.369)
 
       # UI & Appearance
       "BookmarkBarEnabled" = false;
@@ -226,9 +226,9 @@
       "DefaultNotificationsSetting" = 3;
       "DeveloperToolsAvailability" = 1;
 
-      # Font Settings (Chrome policy defaults)
-      "DefaultFontSize" = 16;
-      "MinimumFontSize" = 0;
+      # Font Settings (string format for proper JSON serialization)
+      "DefaultFontSize" = "16";
+      "MinimumFontSize" = "0";
     };
   };
 
