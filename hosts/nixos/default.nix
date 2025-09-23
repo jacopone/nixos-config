@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/core/packages.nix
+      ../../modules/chrome-profiles.nix
       ../../profiles/desktop
     ];
 
@@ -155,14 +156,123 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # Chrome Installation (Multi-Profile Strategy 3)
-  # Note: Removed programs.chromium policy management due to mixed consumer/enterprise profiles
-  # Chrome policies cause conflicts when profiles have different account types:
-  # - Consumer Gmail accounts: Policies show "Unknown policy" errors
-  # - Enterprise accounts: Policies work but create inconsistent experience
-  #
-  # New approach: Install Chrome without policy management, use profile-specific management
-  # See: ~/nixos-config/stack-management/chrome-profiles/ for per-profile configuration
+  # Chrome Profile-Specific Extension Management
+  # Each profile gets its own declarative extension list with full control
+  programs.chrome-profiles = {
+    enable = true;
+
+    profiles = {
+      # Personal Gmail Profile - Privacy & Development focused
+      personal-gmail = {
+        profileName = "Personal Gmail (jacopo.anselmi@gmail.com)";
+        accountType = "consumer";
+        extensions = [
+          # Essential Management
+          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+
+          # Core Productivity
+          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+          "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
+
+          # Development Tools
+          "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
+          "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
+
+          # Privacy & Security (Personal)
+          "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+          "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN (YOU WERE RIGHT!)
+
+          # Personal Productivity
+          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
+
+          # Theme & Appearance (Personal)
+          "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black theme
+          "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher
+        ];
+      };
+
+      # Tenuta Larnianone Business Profile
+      tenuta-larnianone = {
+        profileName = "Tenuta Larnianone Business";
+        accountType = "enterprise"; # May have enterprise policies
+        extensions = [
+          # Essential Management
+          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+
+          # Core Productivity
+          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+
+          # Business Communication
+          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - business writing
+          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
+
+          # Business Tools
+          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document handling
+          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient reading
+          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket - business articles
+
+          # Collaboration
+          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+        ];
+      };
+
+      # Slanciamoci Business Profile (Jacopo - Owner)
+      slanciamoci-jacopo = {
+        profileName = "Slanciamoci - Jacopo (Owner)";
+        accountType = "enterprise";
+        extensions = [
+          # Essential Management
+          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+
+          # Core Productivity
+          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+
+          # Business & Management
+          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - professional communication
+          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail - clean interface
+
+          # Administrative Tools
+          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document management
+          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient reading
+          "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner Companion
+
+          # Business Productivity
+          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
+
+          # Collaboration
+          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+
+          # Development Tools (Owner needs these)
+          "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
+        ];
+      };
+
+      # Slanciamoci Business Profile (Marina)
+      slanciamoci-marina = {
+        profileName = "Slanciamoci - Marina";
+        accountType = "enterprise";
+        extensions = [
+          # Essential Management
+          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+
+          # Core Productivity
+          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+
+          # Business Communication
+          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - business writing
+          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail - clean interface
+
+          # Business Tools
+          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document handling
+          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient processing
+          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket - business reading
+
+          # Collaboration
+          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+        ];
+      };
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
