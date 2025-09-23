@@ -155,82 +155,14 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # Chrome/Chromium System-wide Settings & Policies
-  # (stack-management: consistent UX across machines)
-  programs.chromium = {
-    enable = true;
-
-    # Managed Extensions (stack-management: core extensions)
-    extensions = [
-      "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
-
-      # Core Productivity Extensions (stack-management: always installed)
-      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
-      "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - writing assistant
-      "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
-
-      # Development Tools (stack-management: dev workflow)
-      "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
-      "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
-
-      # Security & Privacy (stack-management: essential security)
-      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
-      "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN
-
-      # Utilities (stack-management: workflow enhancers)
-      "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
-      "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf
-      "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
-      "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
-      "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner Companion
-
-      # Theme & Appearance (stack-management: UI preferences)
-      "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black theme
-      "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher
-      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
-    ];
-
-    extraOpts = {
-      # ═══════════════════════════════════════════════════════════════════
-      # EXTRACTED CHROME SETTINGS (2025 Structure)
-      # Generated on 2025-09-18 12:51:43
-      # Moved to system-wide config for compatibility
-      # ═══════════════════════════════════════════════════════════════════
-
-      # Zoom & Display Settings (using Chrome's logarithmic zoom format)
-      "DefaultZoomLevel" = 0.369;  # 110% zoom (log(1.1)/log(1.2) ≈ 0.369)
-
-      # UI & Appearance
-      "BookmarkBarEnabled" = false;
-      "ShowHomeButton" = false;
-      "HomepageLocation" = "http://www.google.com/";
-      "HomepageIsNewTabPage" = true;
-
-      # Download Settings
-      "DownloadDirectory" = "/home/guyfawkes/Downloads";
-      "PromptForDownloadLocation" = true;
-
-      # Privacy & Security
-      "SafeBrowsingProtectionLevel" = 1;
-      "PasswordManagerEnabled" = true;
-
-      # Performance & Features
-      "HardwareAccelerationModeEnabled" = true;
-      "BackgroundModeEnabled" = false;
-      "NetworkPredictionOptions" = 0;
-
-      # Content & Security Defaults
-      "DefaultJavaScriptSetting" = 1;
-      "DefaultImagesSetting" = 1;
-      "DefaultPopupsSetting" = 2;
-      "DefaultNotificationsSetting" = 3;
-      "DeveloperToolsAvailability" = 1;
-
-      # Font Settings (integer format for proper policy validation)
-      "DefaultFontSize" = 16;
-      "MinimumFontSize" = 0;
-    };
-  };
+  # Chrome Installation (Multi-Profile Strategy 3)
+  # Note: Removed programs.chromium policy management due to mixed consumer/enterprise profiles
+  # Chrome policies cause conflicts when profiles have different account types:
+  # - Consumer Gmail accounts: Policies show "Unknown policy" errors
+  # - Enterprise accounts: Policies work but create inconsistent experience
+  #
+  # New approach: Install Chrome without policy management, use profile-specific management
+  # See: ~/nixos-config/stack-management/chrome-profiles/ for per-profile configuration
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

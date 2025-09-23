@@ -101,6 +101,7 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 - **AI Orchestration System**: Complete CCPM integration with Project Inception Wizard, platform optimization for Google One Ultra/Cursor Pro/Lovable, and unified Master Orchestrator interface
 - **Performance Optimization**: Memory management tuning with optimized swap settings, zram compression, and build process limitations
 - **Automated Maintenance**: Enhanced rebuild script with cache cleanup, weekly garbage collection, and monthly system updates
+- **Chrome Configuration**: Consumer account-compatible policy management with extension lifecycle tracking
 
 ### Tool Configurations Working
 - **Rich Preview**: Successfully rendering markdown files with syntax highlighting and formatting
@@ -157,6 +158,37 @@ The rebuild script automatically detects and offers to clean:
 - **MS Playwright cache** (typically 1-2GB)
 - **Other development caches**
 
+## Chrome Configuration Notes (Strategy 3 - Multi-Profile)
+
+### Current Architecture: Profile-Specific Management
+- **No System-Wide Policies**: Chrome installed as package only, no NixOS policy management
+- **Profile-Specific Configuration**: Each profile managed independently based on account type
+- **4 Active Profiles**: Mixed consumer/enterprise accounts require different strategies
+
+### Profile Inventory
+| Profile | Account Type | Management Strategy |
+|---------|--------------|-------------------|
+| Default | Consumer Gmail | Manual settings, documentation-tracked extensions |
+| Profile 1 | Corporate (tenutalarnianone.com) | Test enterprise policies, business tools |
+| Profile 2 | Corporate (slanciamoci.it - jacopo) | Administrative/owner configuration |
+| Profile 6 | Corporate (slanciamoci.it - marina) | Role-specific business configuration |
+
+### Management Location
+- **Primary Documentation**: `~/nixos-config/stack-management/chrome-profiles/CHROME-MULTI-PROFILE-STRATEGY.md`
+- **Profile Configs**: `~/nixos-config/stack-management/chrome-profiles/*/`
+- **Legacy Docs**: `~/nixos-config/stack-management/CHROME-EXTENSIONS.md` (deprecated)
+
+### Key Changes Made
+- ✅ **Phase 1**: Removed all `programs.chromium` configuration from NixOS
+- ✅ **Phase 1**: Eliminated enterprise policy conflicts and "Unknown policy" errors
+- ✅ **Phase 2**: Built enterprise policy detection system with policy inheritance awareness
+- ✅ **Phase 2**: Created user-controllable configuration strategies respecting admin restrictions
+- ✅ **Phase 2**: Developed multi-profile extension management system
+- ✅ **Phase 2**: Profile-specific documentation and automation tools
+
+**Result**: Research-based, enterprise-aware multi-profile management system that respects policy inheritance and focuses on user-controllable settings only.
+
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`
 - **Yazi module reference**: `https://github.com/typovrak/nixos-yazi`
+- **Chrome Enterprise Policies**: `https://chromeenterprise.google/policies/`

@@ -1,5 +1,24 @@
 # Chrome Extension & Settings Management with Stack Management
 
+**⚠️ DEPRECATED: This document is being replaced by Strategy 3 Multi-Profile Management**
+
+**NEW LOCATION**: See `~/nixos-config/stack-management/chrome-profiles/CHROME-MULTI-PROFILE-STRATEGY.md`
+
+---
+
+## 🚨 **Migration Notice**
+
+This single-profile Chrome management approach has been **deprecated** due to:
+- **Multi-Profile Conflicts**: Mixed consumer/enterprise Chrome profiles causing policy errors
+- **Enterprise Policy Issues**: Policies don't work with consumer Gmail accounts
+- **Profile Complexity**: 4 active Chrome profiles need different management strategies
+
+**New Approach**: Profile-specific management with clean separation between account types.
+
+---
+
+## 📚 **Legacy Documentation**
+
 **Intelligent tracking and lifecycle management for Chrome extensions and settings**
 
 ---
@@ -30,10 +49,11 @@ programs.chromium = {
     # ... other core extensions
   ];
   extraOpts = {
-    "DefaultZoomLevel" = 1.1;  # 110% zoom
-    "BookmarkBarEnabled" = true;
+    "BookmarkBarEnabled" = false;
     "PasswordManagerEnabled" = true;
-    # ... other Chrome settings
+    "SafeBrowsingProtectionLevel" = 1;
+    # Note: Font/zoom settings removed - Enterprise-only policies
+    # Configure font size and zoom via Chrome Settings → Appearance
   };
 };
 ```
@@ -95,11 +115,11 @@ The `chrome-settings-smart.py` script extracts your current Chrome settings and 
 ```
 
 **Supported Settings:**
-- **Zoom & Display**: Default zoom level, per-site zoom levels
 - **UI & Behavior**: Bookmark bar, home button, homepage, downloads
 - **Security & Performance**: Password manager, safe browsing, hardware acceleration
 - **Content Settings**: JavaScript, images, popups, notifications
-- **Font Settings**: Default and minimum font sizes
+
+**Note**: Font size and zoom settings are **Enterprise-only policies** that don't work with consumer Gmail accounts. Configure these directly in Chrome Settings → Appearance instead.
 
 **Smart Features:**
 - ✅ **Conflict Detection**: Identifies duplicate settings before applying
@@ -304,11 +324,17 @@ ls -la ~/.config/google-chrome/Default/Preferences
 ps aux | grep chrome
 
 # Verify NixOS config has extraOpts section
-grep -A 5 "extraOpts" ~/nixos-config/modules/home-manager/base.nix
+grep -A 5 "extraOpts" ~/nixos-config/hosts/nixos/default.nix
 
 # Test settings extraction without applying
 ./automation/chrome-settings-smart.py
 ```
+
+### **Policy Errors in chrome://policy**
+If you see "Unknown policy" errors:
+- **Enterprise vs Consumer**: Many policies only work with Google Workspace accounts, not consumer Gmail accounts
+- **Font/Zoom Policies**: `DefaultFontSize`, `MinimumFontSize`, and `DefaultZoomLevel` are Enterprise-only
+- **Solution**: Remove these policies from your NixOS config and configure them in Chrome Settings → Appearance
 
 ### **Extension Conflicts**
 - Some extensions conflict with policy management

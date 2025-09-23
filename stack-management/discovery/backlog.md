@@ -6,19 +6,12 @@
 
 ### Recent Discoveries
 
-#### 2024-01-XX - Claude Code Extension Ecosystem
+#### 2025-09-15 - New Productivity tool to automate work
 - **Source**: Hacker News thread
-- **URL**: https://news.ycombinator.com/item?id=example
-- **Quick Notes**: New VSCode extensions for AI coding
-- **Priority**: High
-- **Why Interesting**: Could improve current AI workflow
-
-#### 2024-01-XX - New Terminal Emulator
-- **Source**: r/linux
-- **URL**: https://reddit.com/r/linux/...
-- **Quick Notes**: GPU-accelerated, claims 50% faster than Alacritty
-- **Priority**: Medium
-- **Why Interesting**: Current Kitty setup could be improved
+- **URL**: https://news.ycombinator.com/item?id=45129031
+- **Quick Notes**: Seems an alternative to Make or Zapier
+- **Priority**: Low
+- **Why Interesting**: Could improve and automate document processing
 
 ---
 
