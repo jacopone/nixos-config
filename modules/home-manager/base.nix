@@ -285,16 +285,6 @@
       function orig_grep --description "Force original grep"
           command grep $argv
       end
-      
-      # FZF integration for interactive history search
-      # Ctrl+R for fuzzy history search with fzf
-      function __fzf_history --description "Search command history with fzf"
-          history --null | fzf --read0 --print0 --tiebreak=index --bind=ctrl-r:toggle-sort --query=(commandline) | read -lz result
-          and commandline -- $result
-      end
-
-      # Bind Ctrl+R to fzf history search
-      bind \cr '__fzf_history'
 
       # Git shortcuts
       alias gd='git diff'

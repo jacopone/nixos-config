@@ -226,9 +226,9 @@
       "DefaultNotificationsSetting" = 3;
       "DeveloperToolsAvailability" = 1;
 
-      # Font Settings (string format for proper JSON serialization)
-      "DefaultFontSize" = "16";
-      "MinimumFontSize" = "0";
+      # Font Settings (integer format for proper policy validation)
+      "DefaultFontSize" = 16;
+      "MinimumFontSize" = 0;
     };
   };
 
