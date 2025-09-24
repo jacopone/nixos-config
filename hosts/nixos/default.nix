@@ -9,7 +9,6 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/core/packages.nix
-      ../../modules/chrome-profiles.nix
       ../../profiles/desktop
     ];
 
@@ -156,122 +155,51 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # Chrome Profile-Specific Extension Management
-  # Each profile gets its own declarative extension list with full control
-  programs.chrome-profiles = {
+  # Chrome Universal Extension Management
+  # Reality check: Chrome policies are browser-wide, not profile-specific
+  # Solution: Install all needed extensions, manage usage per profile manually
+  programs.chromium = {
     enable = true;
 
-    profiles = {
-      # Personal Gmail Profile - Privacy & Development focused
-      personal-gmail = {
-        profileName = "Personal Gmail (jacopo.anselmi@gmail.com)";
-        accountType = "consumer";
-        extensions = [
-          # Essential Management
-          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+    # Universal Extension List - Available to all profiles
+    # Each profile can enable/disable what they need
+    extensions = [
+      # Essential Management
+      "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
 
-          # Core Productivity
-          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
-          "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
+      # Core Productivity (Universal)
+      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+      "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
 
-          # Development Tools
-          "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
-          "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
+      # Development Tools
+      "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
+      "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
 
-          # Privacy & Security (Personal)
-          "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
-          "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN (YOU WERE RIGHT!)
+      # Security & Privacy
+      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+      "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN
 
-          # Personal Productivity
-          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
+      # Business Communication
+      "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly
+      "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
 
-          # Theme & Appearance (Personal)
-          "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black theme
-          "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher
-        ];
-      };
+      # Business Tools
+      "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf
+      "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
+      "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner Companion
 
-      # Tenuta Larnianone Business Profile
-      tenuta-larnianone = {
-        profileName = "Tenuta Larnianone Business";
-        accountType = "enterprise"; # May have enterprise policies
-        extensions = [
-          # Essential Management
-          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
+      # Utilities
+      "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
 
-          # Core Productivity
-          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
+      # Collaboration
+      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
 
-          # Business Communication
-          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - business writing
-          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
+      # Theme & Appearance
+      "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black theme
+      "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher
+    ];
 
-          # Business Tools
-          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document handling
-          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient reading
-          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket - business articles
-
-          # Collaboration
-          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
-        ];
-      };
-
-      # Slanciamoci Business Profile (Jacopo - Owner)
-      slanciamoci-jacopo = {
-        profileName = "Slanciamoci - Jacopo (Owner)";
-        accountType = "enterprise";
-        extensions = [
-          # Essential Management
-          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
-
-          # Core Productivity
-          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
-
-          # Business & Management
-          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - professional communication
-          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail - clean interface
-
-          # Administrative Tools
-          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document management
-          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient reading
-          "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner Companion
-
-          # Business Productivity
-          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket
-
-          # Collaboration
-          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
-
-          # Development Tools (Owner needs these)
-          "mhjhnkcfbdhnjickkkdbjoemdmbfginb" # SelectorGadget
-        ];
-      };
-
-      # Slanciamoci Business Profile (Marina)
-      slanciamoci-marina = {
-        profileName = "Slanciamoci - Marina";
-        accountType = "enterprise";
-        extensions = [
-          # Essential Management
-          "ahfgeienlihckogmohjhadlkjgocpleb" # Web Store
-
-          # Core Productivity
-          "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium - keyboard navigation
-
-          # Business Communication
-          "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly - business writing
-          "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail - clean interface
-
-          # Business Tools
-          "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf - document handling
-          "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead - efficient processing
-          "niloccemoadcdkdjlinkgdfekeahmflj" # Save to Pocket - business reading
-
-          # Collaboration
-          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
-        ];
-      };
-    };
+    # No extraOpts to avoid consumer/enterprise conflicts
   };
 
   # This value determines the NixOS release from which the default

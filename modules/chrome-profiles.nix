@@ -91,7 +91,7 @@ in {
     # Install Chrome
     environment.systemPackages = [ pkgs.google-chrome ];
 
-    # Create profile-specific policy directories
+    # Create profile-specific policy directories and documentation
     environment.etc =
       let
         # Create policy files for each profile
@@ -106,59 +106,66 @@ in {
               mode = "0644";
             };
           };
+
+        # All profile policy files
+        profilePolicies = lib.foldr (a: b: a // b) {} (lib.mapAttrsToList createProfilePolicy cfg.profiles);
+
+        # Profile mapping documentation
+        profileMapping = {
+          "opt/chrome/policies/profile-mapping.json" = {
+            text = builtins.toJSON {
+              profiles = mapAttrs (id: profile: {
+                name = profile.profileName;
+                accountType = profile.accountType;
+                extensions = profile.extensions;
+                managedBy = "NixOS chrome-profiles module";
+              }) cfg.profiles;
+              generated = "NixOS";
+              timestamp = "system-build-time";
+            };
+            mode = "0644";
+          };
+        };
+
+        # Documentation
+        documentation = {
+          "opt/chrome/policies/README.md" = {
+            text = ''
+              # Chrome Profile-Specific Policies
+
+              This directory contains Chrome policies managed by NixOS chrome-profiles module.
+
+              ## Profile Configuration
+
+              ${concatStringsSep "\n" (mapAttrsToList (id: profile: ''
+              ### ${profile.profileName} (${id})
+              - **Account Type**: ${profile.accountType}
+              - **Extensions**: ${toString (length profile.extensions)} extensions
+              - **Policy File**: profile-${id}.json
+              '') cfg.profiles)}
+
+              ## How It Works
+
+              Chrome reads policies from /etc/opt/chrome/policies/managed/ directory.
+              Each profile gets its own policy file with specific extensions and settings.
+
+              ## Viewing Applied Policies
+
+              1. Open Chrome with desired profile
+              2. Navigate to chrome://policy
+              3. Check ExtensionInstallForcelist policy
+
+              ## Configuration
+
+              Edit your NixOS configuration at:
+              programs.chrome-profiles.profiles.{profile-name}
+
+              Then rebuild: sudo nixos-rebuild switch --flake .
+            '';
+            mode = "0644";
+          };
+        };
       in
-        lib.foldr (a: b: a // b) {} (lib.mapAttrsToList createProfilePolicy cfg.profiles);
-
-    # Create profile mapping documentation
-    environment.etc."opt/chrome/policies/profile-mapping.json" = {
-      text = builtins.toJSON {
-        profiles = mapAttrs (id: profile: {
-          name = profile.profileName;
-          accountType = profile.accountType;
-          extensions = profile.extensions;
-          managedBy = "NixOS chrome-profiles module";
-        }) cfg.profiles;
-        generated = "NixOS";
-        timestamp = "system-build-time";
-      };
-      mode = "0644";
-    };
-
-    # Documentation and helper scripts
-    environment.etc."opt/chrome/policies/README.md" = {
-      text = ''
-        # Chrome Profile-Specific Policies
-
-        This directory contains Chrome policies managed by NixOS chrome-profiles module.
-
-        ## Profile Configuration
-
-        ${concatStringsSep "\n" (mapAttrsToList (id: profile: ''
-        ### ${profile.profileName} (${id})
-        - **Account Type**: ${profile.accountType}
-        - **Extensions**: ${toString (length profile.extensions)} extensions
-        - **Policy File**: profile-${id}.json
-        '') cfg.profiles)}
-
-        ## How It Works
-
-        Chrome reads policies from /etc/opt/chrome/policies/managed/ directory.
-        Each profile gets its own policy file with specific extensions and settings.
-
-        ## Viewing Applied Policies
-
-        1. Open Chrome with desired profile
-        2. Navigate to chrome://policy
-        3. Check ExtensionInstallForcelist policy
-
-        ## Configuration
-
-        Edit your NixOS configuration at:
-        programs.chrome-profiles.profiles.{profile-name}
-
-        Then rebuild: sudo nixos-rebuild switch --flake .
-      '';
-      mode = "0644";
-    };
+        profilePolicies // profileMapping // documentation;
   };
 }
