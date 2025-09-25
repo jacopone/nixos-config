@@ -30,52 +30,68 @@ Chrome multi-profile management with clean separation between consumer and enter
 
 ---
 
-## 🏗️ **New Architecture**
+## 🏗️ **Final Architecture (Reality-Based)**
 
-### **System Level (NixOS)**
+### **System Level (NixOS) - Universal Extension Management**
 ```nix
-# Only Chrome installation, no policy management
-environment.systemPackages = with pkgs; [
-  google-chrome  # No programs.chromium configuration
-];
+# Chrome with universal extension list - all extensions available to all profiles
+programs.chromium = {
+  enable = true;
+  extensions = [
+    # Universal extension list - 15 extensions available to all profiles
+    "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
+    "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+    "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN
+    "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
+    "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly
+    # ... all other extensions
+  ];
+  # No extraOpts to avoid consumer/enterprise conflicts
+};
 ```
 
-### **Profile Level Structure**
+### **Profile Level Management - Manual Usage Control**
 ```
 ~/nixos-config/stack-management/chrome-profiles/
-├── personal-gmail/          # Default profile (jacopo.anselmi@gmail.com)
-│   ├── README.md           # Profile purpose and settings strategy
-│   ├── extensions.md       # Manual extension management
-│   ├── settings-guide.md   # Manual settings configuration guide
-│   └── automation/         # Profile-specific scripts
-├── tenuta-larnianone/      # Profile 1 (jacopo@tenutalarnianone.com)
-│   ├── README.md           # Business profile configuration
-│   ├── extensions.md       # Professional extension management
-│   ├── enterprise-policies.json  # If enterprise policies are supported
-│   └── automation/
-├── slanciamoci-jacopo/     # Profile 2 (jacopo@slanciamoci.it)
-│   └── ... (similar structure)
-└── slanciamoci-marina/     # Profile 6 (marina.camera@slanciamoci.it)
-    └── ... (similar structure)
+├── personal-gmail/          # Usage strategy for personal profile
+│   └── README.md           # Which extensions to use from universal list
+├── tenuta-larnianone/      # Usage strategy for business profile
+│   └── README.md           # Business-appropriate extension usage
+├── automation/             # Analysis and monitoring tools
+│   ├── policy-detector.py         # Enterprise policy detection
+│   └── multi-profile-extension-manager.py # Extension usage analysis
+└── CHROME-MULTI-PROFILE-STRATEGY.md # This strategy document
 ```
 
 ---
 
-## 🔧 **Management Strategy by Profile Type**
+## 🔧 **Final Management Strategy (Universal Extensions)**
 
-### **Consumer Gmail Profile (personal-gmail)**
+### **System-Wide Extension Management**
+- **Declarative Installation**: All 15 extensions installed via NixOS programs.chromium
+- **Universal Availability**: Every extension available in every profile automatically
+- **No Policy Conflicts**: Only extension management, no settings policies
+- **Version Controlled**: Extensions managed through NixOS configuration
+
+### **Profile-Specific Usage (Manual Control)**
+
+#### **Consumer Gmail Profile (personal-gmail)**
+- **Extensions to Use**: MetaMask, NordVPN, React DevTools, Vimium, Readwise, themes
+- **Extensions to Avoid**: Business tools (Grammarly, Google Docs Offline)
 - **Settings**: Manual configuration via Chrome Settings UI
-- **Extensions**: Manual installation, tracked in markdown documentation
-- **Policies**: None (enterprise policies don't work)
-- **Sync**: Google account sync for settings and extensions
-- **Management**: Documentation-based with automation for monitoring
+- **Management**: Use what you need from universal list
 
-### **Corporate Domain Profiles (tenuta-larnianone, slanciamoci-*)**
-- **Settings**: Test enterprise policy support, fallback to manual
-- **Extensions**: Potentially policy-managed if enterprise features work
-- **Policies**: JSON-based enterprise policies (if account supports them)
-- **Sync**: Domain-based sync if Google Workspace configured
-- **Management**: Hybrid policy + documentation approach
+#### **Corporate Domain Profiles (tenuta-larnianone, slanciamoci-*)**
+- **Extensions to Use**: Grammarly, Google Docs Offline, Smallpdf, Vimium, business tools
+- **Extensions to Avoid**: Personal tools (MetaMask, NordVPN)
+- **Settings**: Manual configuration, may inherit enterprise policies
+- **Management**: Business-appropriate usage from universal list
+
+### **Key Benefits of Universal Approach**
+- ✅ **Works Within Chrome Limitations**: No profile-specific policy conflicts
+- ✅ **Fully Declarative**: All extensions managed through NixOS
+- ✅ **Simple & Reliable**: One extension list, manual usage control
+- ✅ **No Missing Extensions**: All original extensions available everywhere
 
 ---
 
@@ -95,12 +111,12 @@ environment.systemPackages = with pkgs; [
 - [x] Developed user-controllable vs admin-controlled configuration strategies
 - [x] Created profile-specific READMEs with actionable configuration guides
 
-### 🔄 **Phase 3: Smart Automation (READY TO START)**
-- [ ] Deploy automation scripts and generate initial reports
-- [ ] Create profile-specific extension inventories
-- [ ] Implement policy-aware configuration management
-- [ ] Build cross-profile optimization recommendations
-- [ ] Integrate with existing stack management workflows
+### ✅ **Phase 3: Reality Check & Final Solution (COMPLETE)**
+- [x] **Discovered Chrome Policy Limitation**: Enterprise policies are browser-wide, not profile-specific
+- [x] **Tested Profile-Specific Approach**: Failed - Chrome applies ALL policy files to ALL profiles
+- [x] **Implemented Universal Extension Strategy**: All extensions available to all profiles
+- [x] **Simplified to Working Solution**: Single declarative extension list managed via programs.chromium
+- [x] **Removed Non-Functional Module**: chrome-profiles.nix approach abandoned for practical solution
 
 ---
 

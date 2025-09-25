@@ -158,35 +158,51 @@ The rebuild script automatically detects and offers to clean:
 - **MS Playwright cache** (typically 1-2GB)
 - **Other development caches**
 
-## Chrome Configuration Notes (Strategy 3 - Multi-Profile)
+## Chrome Configuration Notes (Final Solution - Universal Extensions)
 
-### Current Architecture: Profile-Specific Management
-- **No System-Wide Policies**: Chrome installed as package only, no NixOS policy management
-- **Profile-Specific Configuration**: Each profile managed independently based on account type
-- **4 Active Profiles**: Mixed consumer/enterprise accounts require different strategies
+### Current Architecture: Universal Extension Management
+- **Declarative Extension Control**: All extensions managed via NixOS `programs.chromium`
+- **Universal Availability**: All 15 extensions available in every profile
+- **No Policy Conflicts**: Only extension management, no settings policies
+- **Reality-Based Solution**: Works within Chrome's browser-wide policy limitations
 
-### Profile Inventory
-| Profile | Account Type | Management Strategy |
-|---------|--------------|-------------------|
-| Default | Consumer Gmail | Manual settings, documentation-tracked extensions |
-| Profile 1 | Corporate (tenutalarnianone.com) | Test enterprise policies, business tools |
-| Profile 2 | Corporate (slanciamoci.it - jacopo) | Administrative/owner configuration |
-| Profile 6 | Corporate (slanciamoci.it - marina) | Role-specific business configuration |
+### Final Solution Summary
+After discovering that **Chrome enterprise policies are browser-wide, not profile-specific**, the system evolved to a practical universal extension approach:
 
-### Management Location
-- **Primary Documentation**: `~/nixos-config/stack-management/chrome-profiles/CHROME-MULTI-PROFILE-STRATEGY.md`
-- **Profile Configs**: `~/nixos-config/stack-management/chrome-profiles/*/`
-- **Legacy Docs**: `~/nixos-config/stack-management/CHROME-EXTENSIONS.md` (deprecated)
+```nix
+programs.chromium = {
+  enable = true;
+  extensions = [
+    # All 15 extensions available to all profiles
+    "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
+    "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+    "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN
+    # ... complete list
+  ];
+};
+```
 
-### Key Changes Made
-- ✅ **Phase 1**: Removed all `programs.chromium` configuration from NixOS
-- ✅ **Phase 1**: Eliminated enterprise policy conflicts and "Unknown policy" errors
-- ✅ **Phase 2**: Built enterprise policy detection system with policy inheritance awareness
-- ✅ **Phase 2**: Created user-controllable configuration strategies respecting admin restrictions
-- ✅ **Phase 2**: Developed multi-profile extension management system
-- ✅ **Phase 2**: Profile-specific documentation and automation tools
+### Profile Usage Strategy
+| Profile | Account Type | Extension Usage Strategy |
+|---------|--------------|------------------------|
+| Default (Gmail) | Consumer | Use: MetaMask, NordVPN, React DevTools, themes |
+| Profile 1 (Tenuta) | Corporate | Use: Grammarly, Google Docs, business tools |
+| Profile 2 (Slanciamoci-J) | Corporate | Use: Business tools + admin extensions |
+| Profile 6 (Slanciamoci-M) | Corporate | Use: Role-specific business tools |
 
-**Result**: Research-based, enterprise-aware multi-profile management system that respects policy inheritance and focuses on user-controllable settings only.
+### Key Evolution & Lessons Learned
+- ✅ **Phase 1**: Removed conflicting enterprise policies from NixOS
+- ✅ **Phase 2**: Built enterprise policy detection and profile-specific strategies
+- ✅ **Phase 3**: **Discovered Chrome Limitation** - policies are browser-wide only
+- ✅ **Phase 3**: **Implemented Universal Solution** - all extensions available everywhere
+- ✅ **Final**: Simple, declarative, working system within Chrome's constraints
+
+### Documentation Location
+- **Primary Strategy**: `~/nixos-config/stack-management/chrome-profiles/CHROME-MULTI-PROFILE-STRATEGY.md`
+- **Analysis Tools**: `~/nixos-config/stack-management/chrome-profiles/automation/`
+- **Legacy Docs**: Preserved for reference but superseded by universal approach
+
+**Result**: Pragmatic solution that provides full declarative extension management while working within Chrome's technical limitations.
 
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`

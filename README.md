@@ -49,6 +49,10 @@
 - 💽 **SSD Optimization**: Weekly TRIM, firmware updates, write optimization
 - 📦 **Nix Store Optimization**: Auto-store optimization and download buffering
 
+### 🤖 AI Tooling & Automation
+- 🧠 **Automated CLAUDE.md Generation**: The `scripts/update-claude-tools.py` script automatically scans your NixOS configuration and generates a `CLAUDE.md` file in your home directory. This file provides a comprehensive list of all available tools and their descriptions, ensuring that AI assistants have an up-to-date context of your system's capabilities.
+- 🔄 **Automatic Updates**: This script is automatically executed by the `rebuild-nixos` script, so your AI assistant's knowledge of your system is always current.
+
 ## 📂 Repository Structure
 
 ```
@@ -79,6 +83,8 @@ nixos-config/
 │   │   ├── USAGE_GUIDE.md
 │   │   └── UNIVERSAL_INSTALLATION.md
 │   └── README.md
+├── 📁 scripts/
+│   └── update-claude-tools.py    # Script to update AI assistant context
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
 ├── 📚 CLAUDE.md                 # AI agent instructions
