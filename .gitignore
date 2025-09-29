@@ -1,0 +1,33 @@
+# BASB (Building a Second Brain) - Keep books/PDFs local only
+*.pdf
+Building-a-Second-Brain-By-Tiago-Forte.pdf
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+result
+result-*
+
+# Personal notes and drafts (if any)
+drafts/
+personal-notes/
