@@ -52,7 +52,7 @@
 ### 🤖 AI Tooling & Automation
 - 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
 - ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
-- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 110+ installed tools
+- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 121+ installed tools
 - 📋 **Behavioral Enforcement**: Claude Code now defaults to advanced tools with specific command examples and usage patterns
 - 🎯 **Expert-Level Optimization**: System declares "EXPERT" optimization level, ensuring Claude Code leverages your sophisticated toolkit
 - 🔧 **Zero Manual Intervention**: Tool inventory, behavioral policies, and command examples stay automatically synchronized
@@ -629,7 +629,9 @@ See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete do
 - **Environment**: DevEnv, Direnv, Cachix
 - **Containers**: Docker, Docker Compose, Podman, K9s (Kubernetes)
 - **Database**: PostgreSQL, Redis
-- **Quality**: `shellcheck` (shell scripts), `ruff` (Python), `semgrep` (security)
+- **Quality**: `shellcheck` (shell scripts), `semgrep` (security)
+- **Database CLI**: `pgcli` (PostgreSQL), `mycli` (MySQL), `usql` (universal)
+- **API Testing**: `hurl` (file-based HTTP testing), `httpie`/`xh` (interactive)
 
 ### CLI Enhancements  
 - **File Viewing**: `glow` (markdown), `bat` (syntax highlighting), `jless` (large JSON)
@@ -641,7 +643,28 @@ See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete do
 - **Data Processing**: `jq` (JSON), `yq` (YAML), `csvkit` (CSV), `miller` (multi-format)
 - **Development**: `tmux` (sessions), `entr` (file watching), `just` (task runner)
 - **Network & Debug**: `nmap`, `wireshark`, `strace`, `ltrace`
-- **Python Tools**: `ruff` (linting/formatting), `uv` (package management)
+- **Python Tools**: `uv` (package management)
+- **AI Development**: `aider` (pair programming), `atuin` (smart history), `mise` (runtime management)
+
+### System vs Project-Level Architecture
+
+**🔧 System-Level Tools (Universal Utilities)**
+- **Database CLI tools**: Always available for any project (`pgcli`, `mycli`, `usql`)
+- **AI development tools**: Universal AI agent support (`aider`, `atuin`, `broot`, `mise`)
+- **API testing**: Generic HTTP utilities (`hurl`, `httpie`, `xh`)
+- **File management**: Universal navigation and processing tools
+
+**📋 Project-Level Tools (Context-Specific)**
+- **Code quality**: `gitleaks`, `typos`, `pre-commit` via `devenv.nix` or `package.json`
+- **Formatters/Linters**: `ruff`, `black`, `eslint`, `prettier` with project-specific configs
+- **Testing frameworks**: Project-appropriate versions and configurations
+- **Language tools**: Runtime-specific tools managed via project environments
+
+**Benefits:**
+- ✅ AI agents get consistent, universal tool access
+- ✅ Projects maintain reproducible, team-specific configurations
+- ✅ No version conflicts between system and project requirements
+- ✅ Optimal balance of convenience and precision
 
 ### Productivity Applications
 - **Browser**: Google Chrome
@@ -690,7 +713,7 @@ The system detects:
 - **Git integration** with commit prompts
 - **Generation cleanup** with interactive selection
 - **Cache cleanup** with size reporting (UV, Chrome, Yarn, Playwright)
-- **Claude Code tool intelligence update** - automatically updates AI behavior policies
+- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 121 system tools
 
 ### Backup & Recovery
 - **System generations** for easy rollback

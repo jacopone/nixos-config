@@ -276,7 +276,15 @@ if python3 scripts/update-claude-tools.py; then
 - **Data Processing**: jq, yq, miller, choose, csvkit
 - **System Monitoring**: procs, bottom, duf, dust
 
-**The system ensures that every Claude Code session automatically leverages the full modern CLI ecosystem rather than defaulting to legacy commands.**
+**The system ensures that every Claude Code session automatically leverages the full modern CLI ecosystem while maintaining optimal system/project-level tool distribution.**
+
+### **Strategic Tool Distribution**
+
+**System-Level (Universal)**: Database CLI tools (`pgcli`, `mycli`, `usql`), AI development tools (`aider`, `atuin`, `broot`, `mise`), API testing (`hurl`), universal file processing tools.
+
+**Project-Level (Context-Specific)**: Code quality tools (`gitleaks`, `typos`, `pre-commit`) managed via `devenv.nix` or `package.json` with project-specific configurations, formatters/linters with team-specific rules, testing frameworks appropriate to each project.
+
+This architecture provides AI agents with consistent tool access while ensuring projects maintain reproducible, team-collaborative configurations without version conflicts.
 
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`

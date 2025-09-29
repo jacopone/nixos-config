@@ -12,7 +12,7 @@ Claude Code was defaulting to legacy commands:
 - ❌ `cat` instead of `bat`
 - ❌ `grep` instead of `rg`
 
-Despite having **110+ premium modern CLI tools** installed!
+Despite having **121+ premium modern CLI tools** installed and strategically distributed!
 
 ## ⚡ **The Solution**
 
@@ -72,8 +72,8 @@ jless config.json  # for large JSON files
 
 - **Script**: `scripts/update-claude-tools.py`
 - **Target**: `~/.claude/CLAUDE.md` (system-level context)
-- **Tools Documented**: 110+ modern CLI tools
-- **Categories**: Development, file ops, data processing, system monitoring
+- **Tools Documented**: 121+ modern CLI tools (optimized system/project distribution)
+- **Categories**: Development, file ops, data processing, system monitoring, database access
 - **Automation**: Zero manual intervention required
 
 ## ✅ **Key Benefits**
@@ -94,6 +94,26 @@ Try asking Claude Code to:
 
 If Claude Code still uses legacy commands, run `./rebuild-nixos` to refresh the automation.
 
+## 🏗️ **Strategic System/Project-Level Architecture**
+
+### **System-Level Tools (Universal Access)**
+- **Database CLI**: `pgcli`, `mycli`, `usql` - Always available for any database work
+- **AI Development**: `aider`, `atuin`, `broot`, `mise` - Universal AI agent support
+- **API Testing**: `hurl`, `httpie`, `xh` - Generic HTTP testing utilities
+- **File Management**: `fd`, `eza`, `bat`, `jq`, `yq` - Universal processing tools
+
+### **Project-Level Tools (Context-Specific)**
+- **Code Quality**: `gitleaks`, `typos`, `pre-commit` - Managed via `devenv.nix` or `package.json`
+- **Formatters**: `ruff`, `black`, `eslint`, `prettier` - Project-specific configurations
+- **Testing**: Project-appropriate frameworks and versions
+- **Language Tools**: Runtime-specific utilities in project environments
+
+### **Why This Balance?**
+✅ **AI agents** get consistent, universal tool access across all projects
+✅ **Teams** maintain reproducible, version-controlled project configurations
+✅ **No conflicts** between system-wide and project-specific tool versions
+✅ **Optimal productivity** with the right tool in the right context
+
 ---
 
-**This system ensures that every Claude Code session automatically leverages your full modern CLI ecosystem.**
+**This system ensures that every Claude Code session automatically leverages your full modern CLI ecosystem while respecting project-specific requirements and team collaboration needs.**

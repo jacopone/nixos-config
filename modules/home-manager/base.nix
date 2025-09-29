@@ -177,6 +177,11 @@
       # New tool abbreviations
       abbr -a zz 'zoxide'
       abbr -a sk 'skim'
+      abbr -a ai 'aider'
+      abbr -a aicode 'aider --dark-mode --model anthropic/claude-3-5-sonnet-20241022'
+      abbr -a br 'broot'
+      abbr -a cm 'chezmoi'
+      abbr -a record 'vhs'
       abbr -a yamlcat 'yq .'
       abbr -a yamlp 'yq -P .'
       abbr -a csvcat 'csvlook'
@@ -190,6 +195,17 @@
       abbr -a ruffformat 'ruff format'
       abbr -a uvrun 'uv run'
       abbr -a uvinstall 'uv add'
+
+      # Database development (AI-friendly)
+      abbr -a pgcli 'pgcli'
+      abbr -a mycli 'mycli'
+      abbr -a dbcli 'usql'
+
+      # Note: Code quality tools are project-level
+      # Use: `devenv shell` or project-specific commands
+      # - gitleaks: configured per-project in devenv.nix
+      # - typos: project-specific dictionaries
+      # - pre-commit: .pre-commit-config.yaml per project
       abbr -a dcp 'docker-compose'
       abbr -a dcup 'docker-compose up'
       abbr -a dcdown 'docker-compose down'
@@ -234,6 +250,26 @@
       
       function show_enhanced_tools --description "Show all available enhanced commands"
           echo "🚀 Enhanced CLI Tools Available:"
+          echo ""
+          echo "🤖 AI Development Tools:"
+          echo "  ai        → aider (AI pair programming)"
+          echo "  aicode    → aider with Claude Sonnet"
+          echo "  br        → broot (interactive tree navigation)"
+          echo "  cm        → chezmoi (dotfile management)"
+          echo "  record    → vhs (terminal session recording)"
+          echo ""
+          echo "🗄️ Database & API Tools:"
+          echo "  pgcli     → PostgreSQL client with autocompletion"
+          echo "  mycli     → MySQL/MariaDB client with smart completion"
+          echo "  dbcli     → Universal database CLI (usql)"
+          echo "  hurl      → HTTP testing with file-based definitions"
+          echo ""
+          echo "🔧 Project-Level Tools (devenv/package.json):"
+          echo "  gitleaks  → Security scanning (per-project configs)"
+          echo "  typos     → Spell checking (project dictionaries)"
+          echo "  pre-commit → Git hooks (project-specific rules)"
+          echo "  ruff/black → Python formatting (project versions)"
+          echo "  eslint/prettier → JS formatting (project configs)"
           echo ""
           echo "📝 Smart Commands (context-aware):"
           echo "  cat       → glow (markdown) / bat (code) / cat (automation)"
@@ -318,6 +354,34 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+  };
+
+  # Configure atuin for intelligent shell history
+  programs.atuin = {
+    enable = true;
+    enableFishIntegration = true;
+    settings = {
+      # AI workflow optimizations
+      auto_sync = true;
+      sync_frequency = "1h";
+      search_mode = "fuzzy";
+      filter_mode = "global";
+      style = "compact";
+      show_preview = true;
+      max_preview_height = 4;
+      # Better context for AI agents
+      history_filter = [
+        "^\\s"        # Skip commands starting with space
+        "^exit$"      # Skip exit commands
+        "^clear$"     # Skip clear commands
+      ];
+    };
+  };
+
+  # Enable broot for interactive directory navigation
+  programs.broot = {
+    enable = true;
+    enableFishIntegration = true;
   };
 
   programs.git = {

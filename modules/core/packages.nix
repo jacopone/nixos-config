@@ -14,7 +14,16 @@
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
     '')
     gemini-cli          # A command-line interface for Google's Gemini models
-    
+
+    # AI Development Enhancement Tools
+    (pkgs.writeShellScriptBin "aider" ''
+      exec ${pkgs.uv}/bin/uvx aider-chat "$@"
+    '')
+    mise                # Modern runtime manager (replaces asdf/nvm/pyenv)
+    atuin               # Neural network-powered shell history
+    broot               # Interactive tree navigation with fuzzy search
+    chezmoi             # Declarative dotfiles management
+
     # MCP NixOS Server - Model Context Protocol for NixOS package/option info
     (pkgs.writeShellScriptBin "mcp-nixos" ''
       exec ${pkgs.uv}/bin/uvx mcp-nixos "$@"
@@ -98,6 +107,25 @@
     lazygit            # Simple terminal UI for git
     duf                # Modern df alternative with color
     
+    # Additional AI workflow enhancement tools
+    vhs                # Terminal session recording for AI workflow documentation
+    mcfly              # Smart command history search with neural networks
+    lsd                # Enhanced directory listings (alternative to eza)
+
+    # Database development tools (AI-friendly CLI clients)
+    pgcli              # PostgreSQL client with autocompletion and syntax highlighting
+    mycli              # MySQL/MariaDB client with smart completion
+    usql               # Universal database CLI for multiple database types
+
+    # Advanced API development
+    hurl               # HTTP testing with file-based test definitions
+
+    # Note: Code quality tools moved to project-level (devenv/package.json)
+    # gitleaks, pre-commit, typos are better managed per-project for:
+    # - Custom configurations (.gitleaksignore, .pre-commit-config.yaml)
+    # - Project-specific rules and dictionaries
+    # - Team collaboration and reproducibility
+
     # Additional Claude Code enhancement packages
     postgresql         # Database operations and schema analysis
     redis              # In-memory data operations
