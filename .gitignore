@@ -1,6 +1,6 @@
 # BASB (Building a Second Brain) - Keep books/PDFs local only
 *.pdf
-Building-a-Second-Brain-By-Tiago-Forte.pdf
+basb-system/*.pdf
 
 # Temporary files
 *.tmp
