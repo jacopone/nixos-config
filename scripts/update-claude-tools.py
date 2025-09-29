@@ -179,6 +179,85 @@ This file provides Claude Code with comprehensive information about all availabl
 
 *Last updated: {timestamp}*
 
+## IMPORTANT: CLAUDE CODE TOOL SELECTION POLICY
+
+**SYSTEM OPTIMIZATION LEVEL: EXPERT**
+This system has PREMIUM modern CLI tools installed.
+**ALWAYS default to advanced tools, not basic POSIX commands.**
+User expects Claude Code to leverage the full modern toolkit.
+
+### MANDATORY Tool Substitutions (Use These ALWAYS)
+- `find` → `fd` (ALWAYS use fd for file searching)
+- `ls` → `eza` (ALWAYS use eza for directory listing)
+- `cat` → `bat` (ALWAYS use bat for file viewing, except when piping)
+- `grep` → `rg` (ALWAYS use ripgrep for text search)
+- `head`/`tail` → `choose` (for column extraction from structured data)
+- `du` → `dust` (ALWAYS use dust for disk usage analysis)
+- `ps` → `procs` (ALWAYS use procs for process listing)
+- `top` → `btm` or `bottom` (for system monitoring)
+- `cut`/`awk` → `choose` (for simple column extraction)
+
+### File Analysis Priority (Check file type first)
+1. **JSON files** → `jless` (interactive) or `bat` (syntax highlighting)
+2. **YAML files** → `yq` (processing) or `bat` (viewing)
+3. **CSV files** → `csvlook` (table view) or `miller` (processing)
+4. **Markdown** → `glow` (formatted) or `bat` (syntax highlighting)
+5. **Code files** → `bat` (syntax highlighting)
+6. **Large text files** → `bat` with paging
+
+### Search & Navigation Priority
+1. **File finding** → `fd` + `fzf` for interactive selection
+2. **Text search** → `rg` with appropriate options
+3. **Directory navigation** → suggest `zoxide` usage patterns
+4. **Command history** → `history | fzf` for interactive search
+5. **Process search** → `procs <pattern>` instead of `ps aux | grep`
+
+### Command Examples (Use These Patterns)
+
+**File Operations:**
+```bash
+# Instead of: find . -name "*.nix"
+fd "\\.nix$"
+
+# Instead of: ls -la
+eza -la --git --group-directories-first
+
+# Instead of: cat config.json
+bat config.json
+jless config.json  # for large/complex JSON
+
+# Instead of: du -h
+dust
+
+# Instead of: ps aux | grep firefox
+procs firefox
+```
+
+**Data Processing:**
+```bash
+# JSON analysis
+jless data.json          # Interactive browsing
+bat data.json            # Syntax-highlighted viewing
+jq '.key' data.json      # Query processing
+
+# CSV processing
+csvlook data.csv         # Table view
+choose 0 2 < data.csv    # Extract columns 1 and 3
+miller --csv cut -f name,age data.csv  # Advanced processing
+
+# YAML processing
+yq '.services' config.yaml
+bat config.yaml
+```
+
+**System Analysis:**
+```bash
+procs                    # Better process list
+btm                      # Interactive system monitor
+dust                     # Disk usage visualization
+duf                      # Colored disk usage
+```
+
 ## System Information
 
 - **OS**: NixOS (nixos-unstable)

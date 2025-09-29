@@ -77,17 +77,19 @@ The `./rebuild-nixos` script provides a safe, interactive rebuild process:
 1. **Update flake inputs** (`nix flake update`)
 2. **Test build** without activation to catch errors early
 3. **Switch configuration** (`sudo nixos-rebuild switch --flake .`)
-4. **User verification** - prompts to accept or rollback changes
-5. **Git integration** - stage changes and prompt for commit message
-6. **Generation cleanup** - interactively remove old system generations
-7. **Cache cleanup** - interactive removal of large cache directories (UV, Chrome, Yarn, Playwright)
-8. **Optional push** to remote repository
+4. **🤖 Update Claude Code tool intelligence** - automatically generates behavioral policies for AI agents
+5. **User verification** - prompts to accept or rollback changes
+6. **Git integration** - stage changes and prompt for commit message
+7. **Generation cleanup** - interactively remove old system generations
+8. **Cache cleanup** - interactive removal of large cache directories (UV, Chrome, Yarn, Playwright)
+9. **Optional push** to remote repository
 
 **Key safety features:**
 - Rollback capability if changes are rejected
 - Pre-activation testing to prevent broken systems
 - Interactive generation management
 - Smart cache detection and cleanup with size reporting
+- **Automated Claude Code intelligence updates** - ensures AI agents use modern tools
 
 ## Current Status & Working Features
 
@@ -204,7 +206,80 @@ programs.chromium = {
 
 **Result**: Pragmatic solution that provides full declarative extension management while working within Chrome's technical limitations.
 
+## Advanced Claude Code Integration System
+
+### Revolutionary Tool Selection Automation
+
+This system features **automated Claude Code behavior optimization** that ensures AI agents leverage the full sophisticated CLI toolkit instead of defaulting to basic POSIX commands.
+
+#### **The Problem We Solved**
+- Claude Code was defaulting to `find`, `ls`, `cat`, `grep` instead of modern alternatives
+- Despite having 110+ premium CLI tools installed, AI agents used basic commands
+- Manual intervention was required to specify tool preferences
+- Tool knowledge was static and became outdated with system changes
+
+#### **The Solution: Intelligent Tool Selection Policy Engine**
+
+**Automated System Components:**
+1. **`scripts/update-claude-tools.py`** - Enhanced automation engine
+2. **Behavioral Policy Generation** - Mandatory tool substitution rules
+3. **System-Level Context Updates** - Updates `~/.claude/CLAUDE.md` automatically
+4. **Integration with `./rebuild-nixos`** - Zero-maintenance automation
+
+#### **How It Works**
+
+**Every `./rebuild-nixos` execution:**
+```bash
+# Lines 24-30 in rebuild-nixos script
+echo "--> Updating Claude Code tool inventory..."
+if python3 scripts/update-claude-tools.py; then
+    echo "✅ Claude tools inventory updated successfully"
+```
+
+**What the enhanced script generates:**
+- **Tool inventory**: All 110+ installed tools with descriptions
+- **Mandatory substitution rules**: `find` → `fd`, `ls` → `eza`, etc.
+- **Command examples**: Specific usage patterns for each tool
+- **File analysis priorities**: JSON→jless, YAML→yq, CSV→csvlook
+- **Expert-level declarations**: Forces Claude Code to use advanced tools
+
+**Result**: Claude Code automatically receives this context:
+```markdown
+## IMPORTANT: CLAUDE CODE TOOL SELECTION POLICY
+**SYSTEM OPTIMIZATION LEVEL: EXPERT**
+**ALWAYS default to advanced tools, not basic POSIX commands.**
+
+### MANDATORY Tool Substitutions (Use These ALWAYS)
+- `find` → `fd` (ALWAYS use fd for file searching)
+- `ls` → `eza` (ALWAYS use eza for directory listing)
+- `cat` → `bat` (ALWAYS use bat for file viewing)
+```
+
+#### **Key Benefits**
+
+✅ **Self-Maintaining**: Updates automatically with system changes
+✅ **Behavioral Enforcement**: Claude Code can't ignore tool preferences
+✅ **Zero Manual Work**: No need to manually specify tool choices
+✅ **Expert-Level Optimization**: Forces use of sophisticated toolkit
+✅ **Context-Aware**: Adapts to current system state and available tools
+
+#### **Technical Implementation Details**
+
+**Script Location**: `scripts/update-claude-tools.py`
+**Target File**: `~/.claude/CLAUDE.md` (system-level Claude Code instructions)
+**Trigger**: Automatically executed by `./rebuild-nixos`
+**Scope**: 110+ tools across development, file management, system monitoring, data processing
+
+**Example Output Categories:**
+- **Development Tools**: ast-grep, semgrep, tokei, hyperfine
+- **File Operations**: fd, eza, bat, dust, procs, jless
+- **Data Processing**: jq, yq, miller, choose, csvkit
+- **System Monitoring**: procs, bottom, duf, dust
+
+**The system ensures that every Claude Code session automatically leverages the full modern CLI ecosystem rather than defaulting to legacy commands.**
+
 ### References
 - **ZaneyOS inspiration**: `https://gitlab.com/Zaney/zaneyos`
 - **Yazi module reference**: `https://github.com/typovrak/nixos-yazi`
 - **Chrome Enterprise Policies**: `https://chromeenterprise.google/policies/`
+- **Enhanced Script**: `scripts/update-claude-tools.py` (automated tool selection engine)

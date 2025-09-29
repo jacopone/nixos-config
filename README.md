@@ -50,8 +50,12 @@
 - 📦 **Nix Store Optimization**: Auto-store optimization and download buffering
 
 ### 🤖 AI Tooling & Automation
-- 🧠 **Automated CLAUDE.md Generation**: The `scripts/update-claude-tools.py` script automatically scans your NixOS configuration and generates a `CLAUDE.md` file in your home directory. This file provides a comprehensive list of all available tools and their descriptions, ensuring that AI assistants have an up-to-date context of your system's capabilities.
-- 🔄 **Automatic Updates**: This script is automatically executed by the `rebuild-nixos` script, so your AI assistant's knowledge of your system is always current.
+- 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
+- ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
+- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 110+ installed tools
+- 📋 **Behavioral Enforcement**: Claude Code now defaults to advanced tools with specific command examples and usage patterns
+- 🎯 **Expert-Level Optimization**: System declares "EXPERT" optimization level, ensuring Claude Code leverages your sophisticated toolkit
+- 🔧 **Zero Manual Intervention**: Tool inventory, behavioral policies, and command examples stay automatically synchronized
 
 ## 📂 Repository Structure
 
@@ -84,46 +88,433 @@ nixos-config/
 │   │   └── UNIVERSAL_INSTALLATION.md
 │   └── README.md
 ├── 📁 scripts/
-│   └── update-claude-tools.py    # Script to update AI assistant context
+│   └── update-claude-tools.py    # Enhanced Claude Code behavior automation engine
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
 ├── 📚 CLAUDE.md                 # AI agent instructions
-├── 🐟 fish-smart-commands.md    # Fish shell documentation  
+├── 🤖 CLAUDE-CODE-AUTOMATION.md # Claude Code tool selection automation
+├── 🐟 fish-smart-commands.md    # Fish shell documentation
 └── 📖 enhanced-tools-guide.md   # Modern CLI tools guide
 ```
 
-## 🚀 Quick Start
+## 🚀 Setup Instructions
 
 ### Prerequisites & System Requirements
-- **NixOS** installed with flakes enabled
+- **Fresh NixOS installation** (minimal or desktop)
 - **Git** for cloning the repository
 - **Minimum 8GB RAM** (recommended 16GB+ for optimal build performance)
 - **x86_64 architecture** (Intel/AMD 64-bit)
 - **SSD storage** recommended for optimal Nix store performance
-- **Hardware acceleration** support (automatically enabled)
+- **EFI boot mode** (systemd-boot configuration)
+- **Network connection** for package downloads
 
-### Hardware Optimizations
-- **ThinkPad optimizations** included (firmware updates, power management)
-- **GNOME Wayland** with hardware acceleration
-- **Automatic SSD TRIM** for disk health
-- **Zram compression** for memory efficiency
+### Hardware Compatibility
+- **Intel/AMD processors** with KVM support
+- **Intel integrated graphics** or discrete GPU with Linux drivers
+- **Standard USB, SATA, AHCI** storage controllers
+- **ThinkPad-specific optimizations** included but compatible with other laptops
 
-### Installation
+---
+
+## 📋 Step-by-Step Setup Guide
+
+### 1. **Enable Nix Flakes (Required)**
+
+If starting from a fresh NixOS installation, first enable flakes system-wide:
+
 ```bash
-# Clone the repository
-git clone <your-repo-url> ~/nixos-config
+# Edit your current configuration
+sudo nano /etc/nixos/configuration.nix
+
+# Add this to the configuration:
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+# Apply the change
+sudo nixos-rebuild switch
+
+# Verify flakes are enabled
+nix --version  # Should show flake support
+```
+
+### 2. **Clone the Repository**
+
+```bash
+# Clone to a temporary location first
+cd /tmp
+git clone https://github.com/your-username/nixos-config.git
+cd nixos-config
+
+# Or clone directly if you're confident:
+git clone https://github.com/your-username/nixos-config.git ~/nixos-config
 cd ~/nixos-config
+```
 
-# Review and customize the configuration
-# Edit hosts/nixos/hardware-configuration.nix with your hardware
-# Update users/guyfawkes/home.nix with your username
+### 3. **Generate Your Hardware Configuration**
 
-# Apply the configuration
+Your system needs its own hardware configuration:
+
+```bash
+# Generate new hardware configuration
+sudo nixos-generate-config --show-hardware-config > /tmp/new-hardware-config.nix
+
+# Compare with existing config to see what needs updating
+diff hosts/nixos/hardware-configuration.nix /tmp/new-hardware-config.nix
+
+# Replace with your hardware configuration
+sudo cp /tmp/new-hardware-config.nix hosts/nixos/hardware-configuration.nix
+```
+
+**Important hardware-specific settings to verify:**
+- **File system UUIDs** (will be different on your system)
+- **Boot loader configuration** (EFI vs BIOS)
+- **Available kernel modules** for your hardware
+- **CPU type** (Intel vs AMD microcode)
+
+### 4. **Customize User Configuration**
+
+Update the configuration for your username and preferences:
+
+```bash
+# Create your user directory (if your username isn't 'guyfawkes')
+mkdir -p users/yourusername
+
+# Update the main flake.nix with your username
+sed -i 's/guyfawkes/yourusername/g' flake.nix
+
+# Update the host configuration
+sed -i 's/guyfawkes/yourusername/g' hosts/nixos/default.nix
+
+# Copy and customize the user configuration
+cp users/guyfawkes/home.nix users/yourusername/home.nix
+```
+
+**Essential customizations in `hosts/nixos/default.nix`:**
+```nix
+# Update the user account definition:
+users.users.yourusername = {
+  isNormalUser = true;
+  description = "Your Full Name";
+  extraGroups = [ "networkmanager" "wheel" ];
+  packages = with pkgs; [
+    # Your additional packages
+  ];
+};
+```
+
+### 5. **Review System Settings**
+
+Before applying, review these key settings in `hosts/nixos/default.nix`:
+
+```nix
+# Hostname (change if desired)
+networking.hostName = "nixos";
+
+# Timezone (uncomment and set)
+# time.timeZone = "Europe/Rome";  # Change to your timezone
+
+# Locale settings (modify for your region)
+i18n.defaultLocale = "en_US.UTF-8";
+i18n.extraLocaleSettings = {
+  LC_ADDRESS = "en_US.UTF-8";      # Change from "it_IT.UTF-8" if needed
+  LC_IDENTIFICATION = "en_US.UTF-8";
+  # ... update other locale settings as needed
+};
+```
+
+### 6. **Apply the Configuration**
+
+Now apply the configuration to your system:
+
+```bash
+# Method 1: Direct application (experienced users)
 sudo nixos-rebuild switch --flake .
 
-# Or use the interactive script (recommended)
+# Method 2: Interactive script with safety checks (recommended)
+chmod +x rebuild-nixos
 ./rebuild-nixos
 ```
+
+**The rebuild script will:**
+- ✅ Update flake inputs to latest versions
+- ✅ Test build without activation (catches errors early)
+- ✅ Apply configuration with rollback option
+- ✅ **Update Claude Code tool intelligence** (forces modern CLI usage)
+- ✅ Prompt for user confirmation
+- ✅ Offer to commit changes to git
+- ✅ Clean up old generations and caches
+
+### 7. **Post-Installation Setup**
+
+After successful installation:
+
+```bash
+# Verify Fish shell is working
+fish --version
+
+# Check enhanced tools
+show_enhanced_tools
+
+# Test file manager
+yazi
+
+# Verify git integration in prompt
+cd ~/nixos-config  # Should show git status in prompt
+
+# Test smart commands
+cat README.md      # Should use glow for markdown
+ls                 # Should use eza with icons
+```
+
+### 8. **Optional: Configure Additional Settings**
+
+#### **Set up Git (if not already configured)**
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+#### **Configure locale and timezone**
+```bash
+# Check current timezone
+timedatectl
+
+# Set timezone (if using localtimed)
+sudo timedatectl set-timezone Europe/Rome  # or your timezone
+```
+
+#### **Install additional fonts (if needed)**
+Additional fonts can be added to `modules/core/packages.nix`:
+```nix
+# Add to environment.systemPackages
+nerd-fonts.fira-code
+nerd-fonts.source-code-pro
+# ... other fonts
+```
+
+---
+
+## 🔧 Customization Guide
+
+### **Adding Your Own Packages**
+
+#### System-wide packages (`modules/core/packages.nix`):
+```nix
+environment.systemPackages = with pkgs; [
+  # Development tools
+  your-editor
+  your-language-runtime
+
+  # Productivity apps
+  your-browser
+  your-office-suite
+
+  # System utilities
+  your-monitoring-tool
+];
+```
+
+#### User-specific packages (`modules/home-manager/base.nix`):
+```nix
+home.packages = with pkgs; [
+  your-personal-tools
+];
+```
+
+### **Modifying Desktop Environment**
+
+#### Remove unwanted GNOME apps (`profiles/desktop/gnome.nix`):
+```nix
+environment.gnome.excludePackages = with pkgs; [
+  # Add more GNOME apps to exclude
+  gnome-maps
+  gnome-weather
+];
+```
+
+#### Change default editor (`hosts/nixos/default.nix`):
+```nix
+environment.variables.EDITOR = "code";  # Change from "hx"
+```
+
+### **Customizing Terminal and Shell**
+
+#### Modify Kitty theme (`modules/home-manager/base.nix`):
+```nix
+programs.kitty.settings = {
+  # Change theme colors
+  background = "#your-color";
+  foreground = "#your-color";
+};
+```
+
+#### Add Fish abbreviations:
+```nix
+# In programs.fish.interactiveShellInit section
+abbr -a yourabbr 'your-command'
+```
+
+---
+
+## 🛠️ Troubleshooting Setup Issues
+
+### **Common Setup Problems**
+
+#### **1. Hardware Configuration Issues**
+```bash
+# Error: "could not find any boot loader"
+# Solution: Ensure your hardware-configuration.nix has correct boot settings
+
+# For EFI systems (most modern computers):
+boot.loader.systemd-boot.enable = true;
+boot.loader.efi.canTouchEfiVariables = true;
+
+# For BIOS systems (older computers):
+boot.loader.grub.enable = true;
+boot.loader.grub.device = "/dev/sda";  # Your disk
+```
+
+#### **2. Flakes Not Working**
+```bash
+# Error: "experimental feature 'flakes' is not enabled"
+# Solution: Enable flakes in current configuration first
+
+sudo nano /etc/nixos/configuration.nix
+# Add: nix.settings.experimental-features = [ "nix-command" "flakes" ];
+sudo nixos-rebuild switch
+```
+
+#### **3. Username/UID Conflicts**
+```bash
+# Error: user already exists
+# Solution: Either use different username or remove existing user
+
+# Check existing users
+cat /etc/passwd | grep 1000
+
+# Option 1: Use different username in configuration
+# Option 2: Remove existing user (careful!)
+sudo userdel -r existinguser
+```
+
+#### **4. Build Memory Issues**
+```bash
+# Error: out of memory during build
+# Solution: Temporarily reduce build parallelism
+
+sudo nixos-rebuild switch --flake . --cores 2 --max-jobs 1
+
+# Or edit hosts/nixos/default.nix to permanently reduce:
+nix.settings.cores = 2;
+nix.settings.max-jobs = 1;
+```
+
+#### **5. Network/DNS Issues**
+```bash
+# Error: cannot fetch packages
+# Solution: Check network and DNS
+
+ping 8.8.8.8
+nslookup cache.nixos.org
+
+# If DNS fails, temporarily use public DNS:
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+```
+
+#### **6. Permission Issues**
+```bash
+# Error: permission denied for flake operations
+# Solution: Ensure user is in trusted-users
+
+# Check current setting in hosts/nixos/default.nix:
+nix.settings.trusted-users = [ "root" "yourusername" ];
+```
+
+### **Rollback if Something Goes Wrong**
+
+```bash
+# List available generations
+sudo nixos-rebuild list-generations
+
+# Rollback to previous generation
+sudo nixos-rebuild switch --rollback
+
+# Or rollback to specific generation
+sudo nixos-rebuild switch --switch-generation 42
+```
+
+### **Starting Over (Nuclear Option)**
+
+If the configuration is completely broken:
+
+```bash
+# Boot from NixOS installer USB
+# Mount your existing system
+sudo mount /dev/your-root-partition /mnt
+sudo mount /dev/your-boot-partition /mnt/boot
+
+# Restore original configuration
+sudo cp /mnt/etc/nixos/configuration.nix.backup /mnt/etc/nixos/configuration.nix
+
+# Rebuild from installer
+sudo nixos-install --root /mnt
+
+# Reboot and try again
+```
+
+---
+
+## 📋 Pre-Installation Checklist
+
+Before starting, ensure you have:
+
+- [ ] **Fresh NixOS installation** completed
+- [ ] **Internet connection** working
+- [ ] **Your hardware details** noted (GPU type, CPU type, storage layout)
+- [ ] **Backup** of important data (this config replaces your current setup)
+- [ ] **GitHub account** and SSH keys (for pushing changes)
+- [ ] **Username chosen** (if different from 'guyfawkes')
+- [ ] **Timezone identified** (e.g., "America/New_York", "Europe/London")
+- [ ] **Locale preferences** decided (language, region, keyboard layout)
+
+## ⚡ Quick Verification Commands
+
+After installation, verify everything works:
+
+```bash
+# System info
+fastfetch
+
+# Package managers
+which nix && nix --version
+which npm && npm --version
+which python3 && python3 --version
+
+# Enhanced CLI tools
+which eza && eza --version
+which bat && bat --version
+which rg && rg --version
+
+# Desktop environment
+echo $XDG_CURRENT_DESKTOP  # Should show "GNOME"
+echo $XDG_SESSION_TYPE     # Should show "wayland"
+
+# Shell integration
+echo $SHELL                # Should show fish path
+fish -c "echo 'Fish works'"
+
+# Development editors
+which hx && hx --version
+which code && code --version
+```
+
+## 🎯 Next Steps After Setup
+
+1. **Explore the enhanced CLI tools**: Run `show_enhanced_tools`
+2. **Set up development projects**: The system includes DevEnv and Direnv
+3. **Configure AI tools**: Claude Code, Plandex, and Gemini CLI are ready
+4. **Customize the configuration**: Add your preferred packages and settings
+5. **Set up the AI orchestration system**: Try the multi-agent coordination
+6. **Join the community**: Share your configuration improvements
 
 ## 🎯 Key Commands
 
@@ -284,6 +675,7 @@ The system detects:
 ## 📚 Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - AI agent instructions and project overview
+- **[CLAUDE-CODE-AUTOMATION.md](CLAUDE-CODE-AUTOMATION.md)** - Revolutionary Claude Code tool selection automation system
 - **[ai-orchestration/README.md](ai-orchestration/README.md)** - Universal multi-agent AI coordination system
 - **[fish-smart-commands.md](fish-smart-commands.md)** - Complete Fish shell documentation
 - **[enhanced-tools-guide.md](enhanced-tools-guide.md)** - Modern CLI tools reference
@@ -298,6 +690,7 @@ The system detects:
 - **Git integration** with commit prompts
 - **Generation cleanup** with interactive selection
 - **Cache cleanup** with size reporting (UV, Chrome, Yarn, Playwright)
+- **Claude Code tool intelligence update** - automatically updates AI behavior policies
 
 ### Backup & Recovery
 - **System generations** for easy rollback
