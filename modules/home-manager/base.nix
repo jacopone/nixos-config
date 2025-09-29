@@ -180,7 +180,6 @@
       abbr -a ai 'aider'
       abbr -a aicode 'aider --dark-mode --model anthropic/claude-3-5-sonnet-20241022'
       abbr -a br 'broot'
-      abbr -a cm 'chezmoi'
       abbr -a record 'vhs'
       abbr -a yamlcat 'yq .'
       abbr -a yamlp 'yq -P .'
@@ -195,6 +194,13 @@
       abbr -a ruffformat 'ruff format'
       abbr -a uvrun 'uv run'
       abbr -a uvinstall 'uv add'
+
+      # Modern Nix/Flakes commands
+      abbr -a ndev 'nix develop'
+      abbr -a nshell 'nix shell nixpkgs#'
+      abbr -a nsearch 'nix search nixpkgs'
+      abbr -a nrun 'nix run nixpkgs#'
+      abbr -a devshell 'devenv shell'
 
       # Database development (AI-friendly)
       abbr -a pgcli 'pgcli'

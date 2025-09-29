@@ -104,7 +104,7 @@
   users.users.guyfawkes = {
     isNormalUser = true;
     description = "Guy Fawkes";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
     #  thunderbird
     ];
@@ -124,6 +124,20 @@
   services.fstrim.enable = true;  # Weekly SSD TRIM for disk health
   services.fwupd.enable = true;   # Firmware updates for ThinkPad
   hardware.graphics.enable = true;  # Graphics hardware acceleration
+
+  # NixOS Services (replaces manual package management)
+  virtualisation.docker.enable = true;
+
+  # Development Services (enable as needed per project)
+  # services.postgresql = {
+  #   enable = true;
+  #   package = pkgs.postgresql_15;
+  # };
+  #
+  # services.redis.servers.default = {
+  #   enable = true;
+  #   port = 6379;
+  # };
 
   # Enable fish shell
   programs.fish.enable = true;

@@ -19,10 +19,8 @@
     (pkgs.writeShellScriptBin "aider" ''
       exec ${pkgs.uv}/bin/uvx aider-chat "$@"
     '')
-    mise                # Modern runtime manager (replaces asdf/nvm/pyenv)
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search
-    chezmoi             # Declarative dotfiles management
 
     # MCP NixOS Server - Model Context Protocol for NixOS package/option info
     (pkgs.writeShellScriptBin "mcp-nixos" ''
@@ -38,8 +36,6 @@
     peco                # Simplistic interactive filtering tool
     gedit               # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
     jq                  # JSON processor - essential for development
-    tree                # Directory visualization  
-    htop                # Better system monitoring
     ripgrep             # Super fast grep (rg command)
     fd                  # Modern find alternative
     bat                 # Better cat with syntax highlighting
@@ -49,7 +45,6 @@
       mkdir -p $out/bin
       ln -s ${pkgs.fd}/bin/fd $out/bin/fdfind
     '')
-    docker
     
     # Core development tools (for instant AI agent commands)
     nodejs_20           # Node.js 20.19.4 with npm - eliminates devenv activation overhead
@@ -110,7 +105,6 @@
     # Additional AI workflow enhancement tools
     vhs                # Terminal session recording for AI workflow documentation
     mcfly              # Smart command history search with neural networks
-    lsd                # Enhanced directory listings (alternative to eza)
 
     # Database development tools (AI-friendly CLI clients)
     pgcli              # PostgreSQL client with autocompletion and syntax highlighting
@@ -127,12 +121,7 @@
     # - Team collaboration and reproducibility
 
     # Additional Claude Code enhancement packages
-    postgresql         # Database operations and schema analysis
-    redis              # In-memory data operations
     ruff               # Lightning-fast Python linter/formatter
-    uv                 # Ultra-fast Python package manager
-    yarn               # Alternative Node.js package manager
-    pnpm               # Efficient Node.js package manager
     docker-compose     # Container orchestration
     k9s                # Kubernetes cluster management
     podman             # Docker alternative
@@ -157,7 +146,6 @@
 
     # file searchers and visualizers
     fzf                 # A command-line fuzzy finder
-    ncdu                # NCurses Disk Usage
     yazi                # A modern terminal file manager
     yaziPlugins.rich-preview # Rich preview for Yazi
     rich-cli            # Rich command-line interface for rich preview

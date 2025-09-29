@@ -24,8 +24,8 @@ The system is configured with:
 *   **Build without switching:** `nix build .#nixosConfigurations.nixos.config.system.build.toplevel`
 
 ### Development Environment
-*   **Enter development shell:** `nix develop . -c -- <command>`
-*   **Check package availability:** `nix-env -qaP | grep <package-name>`
+*   **Enter development shell:** `nix develop` or `devenv shell`
+*   **Ad-hoc packages:** `nix shell nixpkgs#<package-name>`
 *   **Search nixpkgs:** `nix search nixpkgs <package-name>`
 
 ### AI Orchestration System
