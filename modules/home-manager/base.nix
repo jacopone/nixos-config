@@ -170,6 +170,8 @@
       abbr -a mdcat 'glow'
       abbr -a mdp 'glow -p'
       abbr -a mdw 'glow -w 80'
+      abbr -a pdf2md 'python3 -m pymupdf4llm'
+      abbr -a pdftomarkdown 'python3 -m pymupdf4llm'
       abbr -a mkd 'mkdir -p'
       abbr -a batl 'bat --paging=never'
       abbr -a batp 'bat --style=plain'
