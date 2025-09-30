@@ -19,6 +19,10 @@
     (pkgs.writeShellScriptBin "aider" ''
       exec ${pkgs.uv}/bin/uvx aider-chat "$@"
     '')
+    # Serena MCP Server - Semantic code analysis toolkit for coding agents
+    (pkgs.writeShellScriptBin "serena" ''
+      exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"
+    '')
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search
 
