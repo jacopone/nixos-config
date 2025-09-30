@@ -76,13 +76,13 @@ initial_prompt: |
   When working with this project:
   1. Use `find_symbol` for locating package definitions, functions, and configurations
   2. Pay attention to module imports and inter-dependencies
-  3. The rebuild-nixos script is the main build/test interface
+  3. For AI agents: Use `nix flake check` and `nix build` (rebuild-nixos requires sudo)
   4. Fish shell abbreviations are defined in modules/home-manager/base.nix
   5. System packages are in modules/core/packages.nix (109+ tools)
 
   Common tasks:
   - Adding packages: Edit modules/core/packages.nix or modules/home-manager/base.nix
-  - Testing changes: Use ./rebuild-nixos script
+  - Testing changes: Use `nix flake check` and `nix build` for AI agents, `./rebuild-nixos` for users
   - Module configuration: Check hosts/nixos/ for host-specific settings
 
 project_name: "nixos-config"

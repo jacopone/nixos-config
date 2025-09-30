@@ -31,3 +31,7 @@ result-*
 # Personal notes and drafts (if any)
 drafts/
 personal-notes/
+
+# Claude automation backup files
+CLAUDE*.backup-*
+CLAUDE-AUTO-BACKUP.md

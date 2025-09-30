@@ -520,11 +520,22 @@ which code && code --version
 ## 🎯 Key Commands
 
 ### System Management
+
+**⚠️ Note for AI Assistants**: `./rebuild-nixos` requires sudo privileges. Use these alternatives:
+
+**AI-Safe Commands (No Sudo Required):**
+```bash
+nix flake check                    # Syntax validation
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel # Test build
+nix flake update                   # Update inputs
+python3 scripts/update-claude-configs-fallback.py # Update CLAUDE.md files
+nix-collect-garbage                # Clean nix store (user-level)
+```
+
+**User Commands (Require Sudo):**
 ```bash
 ./rebuild-nixos                    # Interactive rebuild with safety checks
 sudo nixos-rebuild switch --flake . # Direct rebuild
-nix flake update                   # Update inputs
-nix flake check                    # Syntax validation
 ```
 
 ### Visual Git Prompt (Always Visible)

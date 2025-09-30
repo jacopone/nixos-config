@@ -25,6 +25,15 @@ Despite having **121+ premium modern CLI tools** installed and strategically dis
 ## 🎯 **How It Works**
 
 ### **Automatic Execution**
+
+**⚠️ Note**: Claude Code cannot run `./rebuild-nixos` (requires sudo privileges)
+
+**For AI Assistants:**
+```bash
+python3 scripts/update-claude-configs-fallback.py  # Update CLAUDE.md files directly
+```
+
+**For Users:**
 ```bash
 ./rebuild-nixos  # Triggers the automation automatically
 ```
@@ -93,7 +102,7 @@ Try asking Claude Code to:
 3. **"List processes"** → Should use `procs`
 4. **"View JSON file"** → Should use `jless` or `bat`
 
-If Claude Code still uses legacy commands, run `./rebuild-nixos` to refresh the automation.
+If Claude Code still uses legacy commands, run `python3 scripts/update-claude-configs-fallback.py` to refresh the automation.
 
 ## 🏗️ **Strategic System/Project-Level Architecture**
 

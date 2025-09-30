@@ -97,9 +97,18 @@ User expects Claude Code to leverage the full modern toolkit.
 ## Essential Commands
 
 ### System Management
+**⚠️ Note**: Claude Code cannot run `./rebuild-nixos` (requires sudo privileges)
+
+**For Claude Code - Configuration Testing & Updates:**
+- `nix flake check` - Validate configuration syntax
+- `nix build .#nixosConfigurations.nixos.config.system.build.toplevel` - Test build configuration
+- `nix flake update` - Update flake inputs
+- `python3 scripts/update-claude-configs-fallback.py` - Update CLAUDE.md files
+- `nix-collect-garbage` - Clean nix store (user-level)
+
+**For User - System Application:**
 - `./rebuild-nixos` - Interactive rebuild with safety checks (PREFERRED)
 - `sudo nixos-rebuild switch --flake .` - Direct system rebuild
-- `nix flake check` - Validate configuration syntax
 - `nix develop` or `devenv shell` - Enter development environment
 
 ### Modern CLI Tools (ALWAYS USE THESE)
