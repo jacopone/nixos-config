@@ -123,6 +123,14 @@ du       # → ncdu (interactive disk usage)
 df       # → pydf (colorized disk usage)
 ```
 
+### AI Development Tools
+```bash
+ai       # → aider (AI pair programming assistant)
+aicode   # → aider --dark-mode --model anthropic/claude-3-5-sonnet-20241022 (pre-configured)
+br       # → broot (interactive tree navigation)
+record   # → vhs (terminal session recording)
+```
+
 ### Git & Development
 ```bash
 gdiff    # → git diff | bat --language=diff (colorized diff)
