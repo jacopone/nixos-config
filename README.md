@@ -52,7 +52,7 @@
 ### 🤖 AI Tooling & Automation
 - 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
 - ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
-- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 121+ installed tools
+- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 109 installed tools
 - 📋 **Behavioral Enforcement**: Claude Code now defaults to advanced tools with specific command examples and usage patterns
 - 🎯 **Expert-Level Optimization**: System declares "EXPERT" optimization level, ensuring Claude Code leverages your sophisticated toolkit
 - 🔧 **Zero Manual Intervention**: Tool inventory, behavioral policies, and command examples stay automatically synchronized
@@ -713,7 +713,7 @@ The system detects:
 - **Git integration** with commit prompts
 - **Generation cleanup** with interactive selection
 - **Cache cleanup** with size reporting (UV, Chrome, Yarn, Playwright)
-- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 121 system tools
+- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 109 system tools
 
 ### Backup & Recovery
 - **System generations** for easy rollback

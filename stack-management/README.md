@@ -298,6 +298,6 @@ git commit -m "Add service X (stack-management: +$20/month, see active/subscript
 
 ---
 
-**Last Updated**: $(date)  
-**System Version**: 1.0  
+**Last Updated**: 2025-09-30
+**System Version**: 1.0
 **Maintainer**: Personal stack management system

@@ -1,6 +1,6 @@
 # Enhanced Tools Guide - Modern CLI Alternatives
 
-This guide shows you the modern, enhanced alternatives to traditional Unix tools that are installed in your NixOS system, along with their most useful workflows and options. The 121+ tools are strategically distributed between system-level (universal access for AI agents) and project-level (context-specific configurations) for optimal productivity.
+This guide shows you the modern, enhanced alternatives to traditional Unix tools that are installed in your NixOS system, along with their most useful workflows and options. The 109 tools are strategically distributed between system-level (universal access for AI agents) and project-level (context-specific configurations) for optimal productivity.
 
 ## 🚀 Visual Git Workflow (NEW!)
 
@@ -18,10 +18,80 @@ Your terminal now has **Starship prompt** with Nerd Font symbols:
 - Updates in real-time as you work with files
 
 **Benefits over traditional git status:**
-- Always visible - no need to run `git status`  
+- Always visible - no need to run `git status`
 - Performance optimized - won't slow down your terminal
 - Context-aware - only shows in git repositories
 - Integrated with Fish shell smart commands
+
+## 🤖 AI Development Tools (NEW!)
+
+### `aider` - AI Pair Programming Assistant
+**Purpose**: Direct integration with Claude and GPT-4 for conversational code editing
+
+```bash
+# Quick AI coding session
+ai some-file.py
+
+# Pre-configured with Claude Sonnet
+aicode src/*.py
+```
+
+**Key features:**
+- Structured context provided to AI models
+- Automatic git commits with descriptive messages
+- Multi-file editing with intelligent context management
+- Works with your existing codebase and git workflow
+
+### `atuin` - Neural Network Shell History
+**Purpose**: AI-powered command history with context awareness
+
+```bash
+# Enhanced history search (Ctrl+R replacement)
+atuin search "git commit"
+
+# Sync history across machines
+atuin sync
+```
+
+**Benefits over traditional history:**
+- Learns from command patterns and context
+- Cross-session and cross-machine synchronization
+- Rich context (directory, time, exit code)
+- Fuzzy search with smart ranking
+
+### `broot` - Interactive Tree Navigation
+**Purpose**: Enhanced directory navigation with fuzzy search
+
+```bash
+# Interactive tree browser
+br
+
+# Direct navigation with search
+br src/components
+```
+
+**Features:**
+- Real-time directory tree with file previews
+- Fuzzy search across entire directory structure
+- Quick file operations (copy, move, delete)
+- Integrated with Fish shell for seamless navigation
+
+### `vhs` - Terminal Session Recording
+**Purpose**: Create reproducible terminal session recordings
+
+```bash
+# Record a session
+record demo.tape
+
+# Generate GIF/video from commands
+vhs demo.tape
+```
+
+**Use cases:**
+- Document AI interaction workflows
+- Create tutorials and demos
+- Share reproducible examples
+- Debug complex command sequences
 
 ## File Viewing & Reading
 
