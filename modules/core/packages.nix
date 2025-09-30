@@ -17,7 +17,7 @@
 
     # AI Development Enhancement Tools
     (pkgs.writeShellScriptBin "aider" ''
-      exec ${pkgs.uv}/bin/uvx --from aider-chat aider "$@"
+      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from aider-chat aider "$@"
     '')
     # Serena MCP Server - Semantic code analysis toolkit for coding agents
     (pkgs.writeShellScriptBin "serena" ''
