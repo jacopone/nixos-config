@@ -182,16 +182,6 @@
           end
       end
 
-      # CRITICAL: Smart git wrapper to strip emoji from output in automated contexts
-      function git --description "Smart git: strip emoji and ANSI codes in automated contexts"
-          if _is_automated_context
-              # Force git to output plain text and strip problematic characters
-              env TERM=dumb command git --no-pager $argv | _strip_formatting
-          else
-              # Interactive mode - normal git with colors and formatting
-              command git $argv
-          end
-      end
       
       # Abbreviations - expand as you type
       abbr -a tree 'eza --tree'
