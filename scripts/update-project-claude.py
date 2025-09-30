@@ -44,7 +44,7 @@ def count_packages_in_file(file_path: Path) -> int:
 
         lines = content.split('\n')
         in_packages_section = False
-        package_count = 0
+        packages = set()  # Use set to automatically deduplicate
 
         for line in lines:
             # Skip comments and empty lines
@@ -65,10 +65,21 @@ def count_packages_in_file(file_path: Path) -> int:
                 for pattern in patterns:
                     match = re.match(pattern, line)
                     if match:
-                        package_count += 1
+                        pkg_name = match.group(1)
+
+                        # Apply same filtering as system-level script
+                        if pkg_name.startswith('pkgs.') or pkg_name in ['with', 'pkgs']:
+                            continue
+
+                        # Clean up package name (same as system-level script)
+                        pkg_name = pkg_name.replace('pkgs.', '').strip()
+
+                        # Add to set (automatically deduplicates)
+                        if pkg_name and not pkg_name.startswith(('(', '{')):
+                            packages.add(pkg_name)
                         break  # Found a match, don't check other patterns
 
-        return package_count
+        return len(packages)
     except Exception as e:
         print(f"Warning: Could not count packages in {file_path}: {e}")
         return 0
