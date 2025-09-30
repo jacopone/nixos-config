@@ -793,62 +793,62 @@
   # in hosts/nixos/default.nix to avoid conflicts and ensure proper
   # policy application. Extensions are managed there as well.
 
-  # Enhanced Starship prompt configuration with Nerd Font symbols
+  # Enhanced Starship prompt configuration with environment-aware Unicode handling
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
     settings = {
       format = "$directory$git_branch$git_status$git_metrics$character";
-      
+
       directory = {
         format = "[$path]($style)[$read_only]($read_only_style) ";
         style = "bold bright-blue";
         truncation_length = 4;
         truncate_to_repo = true;
         fish_style_pwd_dir_length = 1;
-        read_only = " 󰌾";
+        read_only = " RO";  # Safe fallback instead of 󰌾
         substitutions = {
-          "Documents" = "󰈙 ";
-          "Downloads" = " ";
-          "Music" = "󰝚 ";
-          "Pictures" = " ";
-          "Developer" = "󰲋 ";
+          "Documents" = "docs/";  # Safe alternatives for programmatic use
+          "Downloads" = "dl/";
+          "Music" = "music/";
+          "Pictures" = "pics/";
+          "Developer" = "dev/";
         };
       };
-      
+
       git_branch = {
         format = "[$symbol$branch(:$remote_branch)]($style) ";
-        symbol = " ";
+        symbol = "";  # Remove git branch symbol for compatibility
         style = "bold purple";
         truncation_length = 25;
       };
-      
+
       git_status = {
         format = "([\\[$all_status$ahead_behind\\]]($style) )";
         style = "bright-red";
-        ahead = "⇡$count";
-        behind = "⇣$count";
-        diverged = "⇕⇡$ahead_count⇣$behind_count";
-        conflicted = "≠$count";
-        deleted = "✘$count";
-        renamed = "»$count";
-        modified = "✱$count"; 
-        staged = "✚$count";
-        untracked = "?$count";
-        stashed = "📦$count";
+        ahead = "^$count";       # Safe ASCII alternative to ⇡
+        behind = "v$count";      # Safe ASCII alternative to ⇣
+        diverged = "<>^$ahead_countv$behind_count";  # Safe alternative to ⇕⇡⇣
+        conflicted = "!$count";  # Safe ASCII alternative to ≠
+        deleted = "D$count";     # Safe ASCII alternative to ✘
+        renamed = "R$count";     # Safe ASCII alternative to »
+        modified = "M$count";    # Safe ASCII alternative to ✱
+        staged = "A$count";      # Safe ASCII alternative to ✚
+        untracked = "?$count";   # ? is safe ASCII
+        stashed = "S$count";     # Safe ASCII alternative to 📦
       };
-      
+
       git_metrics = {
         format = "(\\(+$added/-$deleted\\) )";
         added_style = "bright-green";
         deleted_style = "bright-red";
         disabled = false;
       };
-      
+
       character = {
-        success_symbol = "[❯](bold green)";
-        error_symbol = "[❯](bold red)";
-        vicmd_symbol = "[❮](bold yellow)";
+        success_symbol = "[>](bold green)";   # Safe ASCII alternative to ❯
+        error_symbol = "[>](bold red)";       # Safe ASCII alternative to ❯
+        vicmd_symbol = "[<](bold yellow)";    # Safe ASCII alternative to ❮
       };
       
       # Performance optimization
