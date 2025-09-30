@@ -127,7 +127,7 @@
     # - Team collaboration and reproducibility
 
     # Code Quality & Analysis Tools (Enterprise-grade)
-    lizard             # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
+    python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
     python312Packages.radon # Python code metrics and complexity analysis
     nodePackages.jscpd    # JavaScript/TypeScript clone detection (< 5% duplication threshold)
     ruff               # Lightning-fast Python linter/formatter
