@@ -17,7 +17,7 @@
 
     # AI Development Enhancement Tools
     (pkgs.writeShellScriptBin "aider" ''
-      exec ${pkgs.uv}/bin/uvx aider-chat "$@"
+      exec ${pkgs.uv}/bin/uvx --from aider-chat aider "$@"
     '')
     # Serena MCP Server - Semantic code analysis toolkit for coding agents
     (pkgs.writeShellScriptBin "serena" ''
@@ -126,7 +126,10 @@
     # - Project-specific rules and dictionaries
     # - Team collaboration and reproducibility
 
-    # Additional Claude Code enhancement packages
+    # Code Quality & Analysis Tools (Enterprise-grade)
+    lizard             # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
+    python312Packages.radon # Python code metrics and complexity analysis
+    nodePackages.jscpd    # JavaScript/TypeScript clone detection (< 5% duplication threshold)
     ruff               # Lightning-fast Python linter/formatter
     docker-compose     # Container orchestration
     k9s                # Kubernetes cluster management

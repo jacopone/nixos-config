@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  # Note: cursor-enhanced.nix import removed until module is completed
+
   # Home Manager needs a state version.
   # Please read the relevant section in the Home Manager manual
   # before changing this value.

@@ -26,8 +26,7 @@
     ruff
     # Enhanced quality gates (2025 AI code quality)
     semgrep              # Advanced security patterns
-    lizard              # Complexity analysis
-    nodePackages.jscpd  # Clone detection
+    # Note: lizard and jscpd available system-wide via NixOS configuration
     # Add project-specific packages here
   ];
 
@@ -76,7 +75,8 @@
       echo "Git Hooks: $(git --version)"
       echo "Gitleaks: $(gitleaks version 2>/dev/null || echo 'Available')"
       echo "Semgrep: $(semgrep --version 2>/dev/null | head -1 || echo 'Available')"
-      echo "Lizard: $(lizard --version 2>/dev/null || echo 'Available')"
+      echo "Lizard: $(lizard --version 2>/dev/null || echo 'Available (system-wide)')"
+      echo "JSCPD: $(jscpd --version 2>/dev/null || echo 'Available (system-wide)')"
       echo ""
       echo "📋 Run 'quality-report' to see all quality gates"
     '';
@@ -114,6 +114,60 @@
       devenv shell git-hooks.installationScript
       echo "✅ Git hooks installed"
       echo "📋 Hooks will run automatically on commit/push"
+    '';
+
+    setup-cursor.exec = ''
+      echo "🎯 Setting up Cursor AI integration..."
+
+      # Ensure .cursor/rules directory exists
+      mkdir -p .cursor/rules
+
+      # Copy rule templates if they don't exist
+      if [[ ! -f .cursor/rules/index.mdc ]]; then
+        echo "📋 Installing Cursor AI rules..."
+        cp ~/nixos-config/templates/ai-quality-devenv/.cursor/rules/*.mdc .cursor/rules/ 2>/dev/null || {
+          echo "⚠️  Could not copy rules templates automatically"
+          echo "📂 Manual setup: copy from ~/nixos-config/templates/ai-quality-devenv/.cursor/rules/"
+        }
+      fi
+
+      # Create project-specific .cursorignore
+      if [[ ! -f .cursorignore ]]; then
+        cat > .cursorignore << 'EOF'
+# Build artifacts
+.devenv/
+result
+result-*
+dist/
+build/
+
+# Dependencies
+node_modules/
+__pycache__/
+.pytest_cache/
+
+# Environment
+.env
+.env.*
+
+# Quality tools output
+coverage/
+.coverage
+.nyc_output/
+playwright-report/
+test-results/
+EOF
+        echo "📄 Created project .cursorignore"
+      fi
+
+      echo "✅ Cursor AI integration ready!"
+      echo "🔧 Available rules:"
+      echo "   - index.mdc: Core development rules"
+      echo "   - security.mdc: Security-focused rules"
+      echo "   - testing.mdc: Testing and QA rules"
+      echo ""
+      echo "🎯 Edit .cursor/rules/*.mdc to customize AI behavior"
+      echo "💡 Use Ctrl+I for Agent mode, Ctrl+E for background mode"
     '';
   };
 
@@ -153,10 +207,11 @@
     };
 
     # Enhanced quality gates (AI code protection)
+    # Note: Using system-wide tools for consistency across all projects
     complexity-check = {
       enable = true;
       name = "complexity-check";
-      entry = "${pkgs.lizard}/bin/lizard --CCN 10 --length 50";
+      entry = "lizard --CCN 10 --length 50";  # Available system-wide
       files = "\\.(py|js|ts|tsx)$";
       excludes = [ ".devenv/" "node_modules/" "coverage/" "dist/" ];
     };
@@ -164,7 +219,7 @@
     jscpd = {
       enable = true;
       name = "clone-detection";
-      entry = "${pkgs.nodePackages.jscpd}/bin/jscpd --threshold 5 --min-lines 10";
+      entry = "jscpd --threshold 5 --min-lines 10";  # Available system-wide
       files = "\\.(js|ts|tsx)$";
       excludes = [ "node_modules/" "coverage/" "dist/" ];
     };

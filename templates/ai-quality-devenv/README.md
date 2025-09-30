@@ -7,8 +7,8 @@ Enterprise-grade development environment with comprehensive quality gates design
 ### 🔒 Security & Quality Gates
 - **Gitleaks**: Secret detection and prevention
 - **Semgrep**: Advanced security pattern analysis
-- **Lizard**: Code complexity analysis (CCN < 10)
-- **JSCPD**: Clone detection (threshold 5%)
+- **Lizard**: Code complexity analysis (CCN < 10) - *Available system-wide via nixpkgs*
+- **JSCPD**: Clone detection (threshold 5%) - *Available system-wide via nixpkgs*
 - **Commitizen**: Conventional commit format enforcement
 
 ### 🛠️ Development Tools
@@ -38,8 +38,9 @@ devenv shell         # Manual activation
 # Option 2: Standard Nix Flake
 nix develop --no-pure-eval
 
-# Install git hooks and verify
+# Install git hooks and setup Cursor AI
 setup-git-hooks
+setup-cursor
 quality-report
 ```
 
@@ -49,6 +50,7 @@ quality-report
 - `quality-report` - Show all active quality gates
 - `quality-check` - Run comprehensive quality analysis
 - `setup-git-hooks` - Install git hooks manually
+- `setup-cursor` - Setup Cursor AI integration with project rules
 
 ## Quality Standards
 
@@ -62,9 +64,11 @@ quality-report
 All hooks run automatically on commit:
 1. **Security**: Gitleaks secret scanning
 2. **Format**: Prettier/ESLint for JS/TS, Black/Ruff for Python
-3. **Quality**: Complexity analysis and clone detection
+3. **Quality**: Complexity analysis and clone detection (*via system tools*)
 4. **Patterns**: Security vulnerability detection
 5. **Messages**: Conventional commit format
+
+> **Note**: Lizard (complexity) and JSCPD (clone detection) are available system-wide through your NixOS configuration rather than in the DevEnv package set for optimal performance and consistency.
 
 ## Customization
 
@@ -88,6 +92,36 @@ services = {
 
 ### Adjusting Quality Thresholds
 Modify hook configurations in `git-hooks.hooks` section.
+
+## Cursor AI Integration
+
+### Modern Rules System (2025)
+This template uses the latest `.cursor/rules` system with MDC (Metadata + Content) format files for AI behavior configuration.
+
+### Available Rule Files
+- **`index.mdc`**: Core development rules with quality standards and technology stack integration
+- **`security.mdc`**: Security-focused rules for secure coding practices
+- **`testing.mdc`**: Testing and QA rules for comprehensive test coverage
+
+### Cursor Configuration Features
+- **YOLO Mode**: Enabled for advanced AI capabilities with build/test execution
+- **Model Selection**: Claude 3.5 Sonnet (primary), GPT-4o (secondary) with auto-selection
+- **Agent Mode**: Enhanced shortcuts (`Ctrl+I` for agent, `Ctrl+E` for background)
+- **Privacy Mode**: Enterprise-grade privacy settings for sensitive code
+- **Context Management**: Optimized for large codebases with proper exclusions
+
+### Project Setup
+1. Run `setup-cursor` to initialize project-specific rules
+2. Edit `.cursor/rules/*.mdc` files to customize AI behavior
+3. Use `.cursorignore` to exclude files from AI context
+4. Leverage Agent mode for complex refactoring and implementation tasks
+
+### Integration with Quality Gates
+Cursor AI rules are synchronized with the project's quality gates:
+- All AI-generated code respects complexity thresholds (CCN < 10)
+- Security rules prevent credential exposure and enforce best practices
+- Testing rules ensure comprehensive coverage for AI-suggested code
+- Code formatting and linting rules match pre-commit hook configuration
 
 ## Architecture: Hybrid Approach
 

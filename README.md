@@ -36,6 +36,7 @@
 - 🔨 **Multiple Editors**: Helix, Zed, VSCode, Cursor
 - 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI, Claude Flow (alpha)
 - 🧠 **CCPM-Enhanced AI Orchestration**: Advanced hybrid system with 90%+ performance improvements + structured project management
+- 🎯 **Cursor AI Integration**: Modern `.cursor/rules` system with MDC format and enterprise-grade quality gates
 - 📦 **Node.js & Python** pre-installed for instant development
 - 🏗️ **DevEnv & Direnv** for per-project environments
 - 🚀 **Build Optimizations**: CPU-limited builds (4 cores, 2 max jobs) for system stability
@@ -78,6 +79,13 @@ nixos-config/
 ├── 📁 users/
 │   └── guyfawkes/
 │       └── home.nix             # User home-manager entry point
+├── 📁 templates/                # Enterprise-grade project templates
+│   ├── ai-quality-devenv/       # DevEnv template with Cursor AI integration and quality gates
+│   │   ├── .cursor/rules/       # AI behavior configuration (MDC format)
+│   │   ├── devenv.nix           # Development environment with quality gates
+│   │   ├── flake.nix            # Nix flake for CI/CD and packaging
+│   │   └── README.md            # Complete template documentation
+│   └── README.md                # Template system overview and usage guide
 ├── 📁 ai-orchestration/         # Multi-agent AI coordination system
 │   ├── scripts/
 │   │   └── ai-orchestration-universal.sh
@@ -634,11 +642,41 @@ Automatically detects and adapts to:
 
 See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete documentation.
 
+## 🏗️ **Enterprise Development Templates**
+
+### **AI Quality DevEnv Template**
+
+Pre-configured template with enterprise-grade quality gates and **Cursor AI integration**:
+
+```bash
+# Quick project initialization
+cp -r templates/ai-quality-devenv/* /path/to/new-project/
+cd /path/to/new-project
+
+# Setup development environment
+direnv allow               # Auto-activate environment
+setup-git-hooks           # Install quality gates
+setup-cursor              # Configure AI development
+quality-report             # Verify all systems
+
+# Start AI-enhanced development with quality enforcement
+```
+
+**✅ Includes:**
+- **🤖 Cursor AI Rules**: Complete `.cursor/rules/` system with MDC format
+- **🔒 Quality Gates**: Lizard complexity, JSCPD duplication, Semgrep security
+- **⚡ System Integration**: Uses system-wide quality tools for consistency
+- **🚀 Modern Stack**: Node.js 20, Python 3.13 with uv, DevEnv + Nix Flakes
+- **📋 Git Hooks**: Automated enforcement (gitleaks, eslint, ruff, prettier)
+
+**See [templates/README.md](templates/README.md) for complete template documentation.**
+
 ## 🧰 Installed Tools & Applications
 
 ### Development Tools
-- **Editors**: Helix, Zed, VSCode, Cursor  
+- **Editors**: Helix, Zed, VSCode, Cursor
 - **AI Agents**: Claude Code, Plandex, Gemini CLI, Serena (MCP server)
+- **AI Development**: Cursor AI with `.cursor/rules` MDC system, enterprise quality gates integration
 - **MCP Servers**: Serena (semantic code analysis), MCP-NixOS (package info)
 - **Version Control**: Git, GitHub CLI, `delta` (enhanced diffs), `gitui`, `lazygit`
 - **Languages**: Node.js 20, Python 3, GCC
@@ -676,6 +714,8 @@ See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete do
 - **Formatters/Linters**: `ruff`, `black`, `eslint`, `prettier` with project-specific configs
 - **Testing frameworks**: Project-appropriate versions and configurations
 - **Language tools**: Runtime-specific tools managed via project environments
+- **AI Development**: `.cursor/rules` MDC files for project-specific AI behavior and quality gates
+- **Template System**: Enterprise-grade templates in `templates/` with integrated quality gates
 
 **Benefits:**
 - ✅ AI agents get consistent, universal tool access
@@ -716,6 +756,8 @@ The system detects:
 
 - **[CLAUDE.md](CLAUDE.md)** - AI agent instructions and project overview
 - **[CLAUDE-CODE-AUTOMATION.md](CLAUDE-CODE-AUTOMATION.md)** - Revolutionary Claude Code tool selection automation system
+- **[templates/README.md](templates/README.md)** - Enterprise-grade development templates with Cursor AI integration
+- **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Comprehensive Cursor AI and quality gates integration guide
 - **[ai-orchestration/README.md](ai-orchestration/README.md)** - Universal multi-agent AI coordination system
 - **[fish-smart-commands.md](fish-smart-commands.md)** - Complete Fish shell documentation
 - **[enhanced-tools-guide.md](enhanced-tools-guide.md)** - Modern CLI tools reference
