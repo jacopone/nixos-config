@@ -56,6 +56,7 @@
     python312Packages.pymupdf4llm  # PyMuPDF for LLM-optimized PDF processing
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
+    ninja               # Build system for faster compilation (required by numpy/aider)
     pkg-config          # Package config tool for native module builds
     
     # Development environment management (completes AI agent optimization)
