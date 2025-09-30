@@ -80,10 +80,9 @@ nixos-config/
 │   └── guyfawkes/
 │       └── home.nix             # User home-manager entry point
 ├── 📁 templates/                # Enterprise-grade project templates
-│   ├── ai-quality-devenv/       # DevEnv template with Cursor AI integration and quality gates
+│   ├── ai-quality-devenv/       # Pure DevEnv template with Cursor AI integration and quality gates
 │   │   ├── .cursor/rules/       # AI behavior configuration (MDC format)
-│   │   ├── devenv.nix           # Development environment with quality gates
-│   │   ├── flake.nix            # Nix flake for CI/CD and packaging
+│   │   ├── devenv.nix           # Complete development environment configuration
 │   │   └── README.md            # Complete template documentation
 │   └── README.md                # Template system overview and usage guide
 ├── 📁 ai-orchestration/         # Multi-agent AI coordination system
@@ -666,7 +665,7 @@ quality-report             # Verify all systems
 - **🤖 Cursor AI Rules**: Complete `.cursor/rules/` system with MDC format
 - **🔒 Quality Gates**: Lizard complexity, JSCPD duplication, Semgrep security
 - **⚡ System Integration**: Uses system-wide quality tools for consistency
-- **🚀 Modern Stack**: Node.js 20, Python 3.13 with uv, DevEnv + Nix Flakes
+- **🚀 Modern Stack**: Node.js 20, Python 3.13 with uv, Pure DevEnv approach
 - **📋 Git Hooks**: Automated enforcement (gitleaks, eslint, ruff, prettier)
 
 **See [templates/README.md](templates/README.md) for complete template documentation.**

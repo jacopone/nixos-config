@@ -1,14 +1,14 @@
 # AI Quality DevEnv Template
 
-Enterprise-grade development environment with comprehensive quality gates designed for AI-assisted coding.
+**Pure DevEnv approach** - Enterprise-grade development environment with comprehensive quality gates designed for AI-assisted coding.
 
 ## Features
 
 ### 🔒 Security & Quality Gates
 - **Gitleaks**: Secret detection and prevention
 - **Semgrep**: Advanced security pattern analysis
-- **Lizard**: Code complexity analysis (CCN < 10) - *Available system-wide via nixpkgs*
-- **JSCPD**: Clone detection (threshold 5%) - *Available system-wide via nixpkgs*
+- **Lizard**: Code complexity analysis (CCN < 10) - *Available system-wide*
+- **JSCPD**: Clone detection via npx wrapper (threshold 5%) - *Available system-wide*
 - **Commitizen**: Conventional commit format enforcement
 
 ### 🛠️ Development Tools
@@ -28,15 +28,10 @@ cd /home/guyfawkes/nixos-config
 cp -r templates/ai-quality-devenv/* /path/to/new-project/
 cd /path/to/new-project
 
-# Choose your workflow:
-
-# Option 1: DevEnv (Recommended - Enhanced Experience)
-direnv allow         # Automatic activation
+# Enter development environment
+direnv allow         # Automatic activation (recommended)
 # OR
 devenv shell         # Manual activation
-
-# Option 2: Standard Nix Flake
-nix develop --no-pure-eval
 
 # Install git hooks and setup Cursor AI
 setup-git-hooks
@@ -123,27 +118,30 @@ Cursor AI rules are synchronized with the project's quality gates:
 - Testing rules ensure comprehensive coverage for AI-suggested code
 - Code formatting and linting rules match pre-commit hook configuration
 
-## Architecture: Hybrid Approach
+## Architecture: Pure DevEnv Approach
 
-This template uses **both** `devenv.nix` and `flake.nix` based on the battle-tested `account-harmony-ai-37599577` pattern:
+This template uses **only** `devenv.nix` based on the proven `account-harmony-ai-37599577` pattern:
 
-### 🔧 **devenv.nix** - Development Workflow
+### 🔧 **devenv.nix** - Complete Development Solution
+- **Unified experience** - Single configuration file for all development needs
+- **Auto-generated flake** - DevEnv automatically generates `.devenv.flake.nix` for Nix compatibility
 - **Enhanced developer experience** with git hooks, scripts, and automation
 - **Superior performance** for daily development tasks
 - **Purpose-built** for coding workflows with AI quality gates
 - **Rich integration** with direnv and development processes
 
-### 📦 **flake.nix** - Build & Deploy
-- **Industry standard** for Nix community compatibility
-- **CI/CD integration** for automated builds and testing
-- **Package definitions** for production deployments
-- **Template discoverability** via `nix flake init`
+### 🎯 **Why Pure DevEnv?**
+- **Simplicity**: Single `devenv.nix` file to maintain
+- **Automatic Nix integration**: DevEnv handles flake generation automatically
+- **Developer-focused**: Built specifically for development workflows, not packaging
+- **Real-world proven**: Based on successful production usage in account-harmony-ai
+- **Reduced complexity**: No need to maintain separate flake.nix and devenv.nix files
+- **Better performance**: DevEnv optimized for development speed over generic Nix usage
 
-### 🎯 **Why Both?**
-- **Flexibility**: Teams can choose their preferred workflow
-- **Evolution**: Projects can grow from development to production
-- **Standards**: Matches both devenv best practices AND Nix ecosystem expectations
-- **Future-proof**: Adaptable to changing team needs and tooling
+### 🔄 **How it works**
+1. **You maintain**: Only `devenv.nix` with your development environment
+2. **DevEnv generates**: `.devenv.flake.nix` automatically for Nix compatibility
+3. **You get**: Full Nix ecosystem benefits without the complexity
 
 ## Integration
 
