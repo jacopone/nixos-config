@@ -12,36 +12,66 @@ from datetime import datetime
 from typing import Dict, List, Set
 
 def get_package_count() -> int:
-    """Get accurate package count from packages.nix."""
+    """Get accurate package count from both packages.nix and home-manager."""
+    total_packages = 0
+
+    # Count system packages
     packages_file = Path("modules/core/packages.nix")
+    total_packages += count_packages_in_file(packages_file)
+
+    # Count home-manager packages
+    home_file = Path("modules/home-manager/base.nix")
+    total_packages += count_packages_in_file(home_file)
+
+    return total_packages
+
+def count_packages_in_file(file_path: Path) -> int:
+    """Count packages in a specific Nix file using robust pattern matching."""
+    if not file_path.exists():
+        return 0
+
     try:
-        with open(packages_file, 'r') as f:
+        with open(file_path, 'r') as f:
             content = f.read()
 
-        # Count actual package lines (exclude comments, whitespace, etc.)
-        package_count = 0
-        in_packages_section = False
+        # Match package declarations with optional comments
+        patterns = [
+            r'^\s*([a-zA-Z0-9_.-]+)\s*;\s*#\s*(.+)$',  # pkgname; # comment
+            r'^\s*([a-zA-Z0-9_.-]+)\s*#\s*(.+)$',      # pkgname # comment
+            r'^\s*([a-zA-Z0-9_.-]+)\s*;\s*$',          # pkgname; (no comment)
+            r'^\s*([a-zA-Z0-9_.-]+)\s*$',              # pkgname (no comment, no semicolon)
+        ]
 
-        for line in content.split('\n'):
+        lines = content.split('\n')
+        in_packages_section = False
+        package_count = 0
+
+        for line in lines:
+            # Skip comments and empty lines
             stripped = line.strip()
             if not stripped or stripped.startswith('#'):
                 continue
 
-            if 'systemPackages' in line:
+            # Check if we're in a packages section
+            if 'systemPackages' in line or 'home.packages' in line:
                 in_packages_section = True
                 continue
             elif stripped.startswith(']') and in_packages_section:
-                break
+                in_packages_section = False
+                continue
 
             if in_packages_section:
-                # Count lines that look like package declarations
-                if re.match(r'^\s*[a-zA-Z0-9_.-]+', line) and not any(skip in line for skip in ['with', 'pkgs', '(', '{']):
-                    package_count += 1
+                # Try each pattern
+                for pattern in patterns:
+                    match = re.match(pattern, line)
+                    if match:
+                        package_count += 1
+                        break  # Found a match, don't check other patterns
 
         return package_count
     except Exception as e:
-        print(f"Warning: Could not count packages: {e}")
-        return 109  # fallback
+        print(f"Warning: Could not count packages in {file_path}: {e}")
+        return 0
 
 def get_fish_abbreviation_count() -> int:
     """Get fish abbreviation count from home-manager config."""
