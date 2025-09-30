@@ -9,7 +9,6 @@
 - **Terminal**: Kitty with JetBrains Mono Nerd Font
 - **Package Manager**: Nix + Home Manager
 - **Development**: DevEnv + Direnv for project environments
-- **AI Editor**: Cursor Pro with enhanced rules system and quality gates
 
 ## Essential Commands
 
@@ -25,12 +24,6 @@
 - `ai filename.py` - Quick AI pair programming session
 - `aicode src/*.py` - Pre-configured Claude Sonnet session
 
-### Cursor AI Editor
-- `cursor-setup` - Configure enhanced Cursor with 2025 optimizations
-- `cursor-project-init` - Initialize project with Cursor AI rules
-- `code-cursor` or `cursor` - Launch Cursor AI editor
-- **Agent Shortcuts**: `Ctrl+I` (agent mode), `Ctrl+E` (background mode)
-
 ### Modern CLI Tools (ALWAYS USE THESE)
 - `fd` instead of `find` - Fast file searching
 - `eza` instead of `ls` - Enhanced directory listing
@@ -44,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (111 tools)
+- `modules/core/packages.nix` - System-wide packages (113 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -57,7 +50,6 @@
 - **System tools**: Add to `modules/core/packages.nix`
 - **User programs**: Add to `modules/home-manager/base.nix`
 - **Project-specific**: Use `devenv.nix` or `shell.nix`
-- **Cursor AI rules**: Use `.cursor/rules/*.mdc` for project-specific AI behavior
 
 ### Configuration Changes
 - Always run `nix flake check` before rebuilding
@@ -79,7 +71,6 @@
 - BASB knowledge management system
 - AI orchestration with CCPM integration
 - Chrome declarative extension management
-- Cursor Pro with enhanced AI rules system and quality gates
 
 ## Do Not Touch
 - `/etc/nixos/` (use this repo instead)
@@ -93,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (111 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (113 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -105,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 0M 0A 0U
-- **Last Updated**: 2025-09-30 08:51:19
+- **Git Status**: clean
+- **Last Updated**: 2025-09-30 10:41:54
 - **Fish Abbreviations**: 57
-- **Total System Tools**: 111
+- **Total System Tools**: 113
 
 ---
 *Auto-updated by ./rebuild-nixos script*
