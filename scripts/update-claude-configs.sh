@@ -17,7 +17,7 @@ echo
 
 # Update system-level tool inventory (~/.claude/CLAUDE.md)
 echo "🛠️  Updating system-level tool inventory (~/.claude/CLAUDE.md)..."
-if python3 scripts/update-claude-tools.py; then
+if python3 scripts/update-system-claude.py; then
     echo "✅ System-level Claude configuration updated"
 else
     echo "❌ Failed to update system-level Claude config"
