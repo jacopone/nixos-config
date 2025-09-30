@@ -95,8 +95,11 @@ nixos-config/
 │   │   └── UNIVERSAL_INSTALLATION.md
 │   └── README.md
 ├── 📁 scripts/
-│   ├── update-system-claude.py   # System-level Claude Code automation engine
-│   └── update-project-claude.py  # Project-level CLAUDE.md automation
+│   ├── claude-automation/        # Modern template-based automation system
+│   ├── update-system-claude-v2.py   # System-level Claude Code automation engine (Jinja2/Pydantic)
+│   ├── update-project-claude-v2.py  # Project-level CLAUDE.md automation (Jinja2/Pydantic)
+│   ├── update-claude-configs-v2.sh  # Standalone script for both CLAUDE.md files
+│   └── devenv.nix               # DevEnv automation environment
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
 ├── 📚 CLAUDE.md                 # AI agent instructions
@@ -535,7 +538,7 @@ which code && code --version
 nix flake check                    # Syntax validation
 nix build .#nixosConfigurations.nixos.config.system.build.toplevel # Test build
 nix flake update                   # Update inputs
-python3 scripts/update-claude-configs-fallback.py # Update CLAUDE.md files
+scripts/update-claude-configs-v2.sh # Update CLAUDE.md files (modern Jinja2 templates)
 nix-collect-garbage                # Clean nix store (user-level)
 ```
 

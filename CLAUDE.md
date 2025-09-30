@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (113 tools)
+- `modules/core/packages.nix` - System-wide packages (163 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -64,7 +64,7 @@
 - Include URLs for package references when helpful
 
 ## Working Features ✅
-- Fish shell with 57 smart abbreviations
+- Fish shell with smart abbreviations
 - Yazi file manager with rich previews
 - Starship prompt with visual git status
 - Auto-updating Claude Code tool intelligence
@@ -84,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (113 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (163 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 1M 0A 0U
-- **Last Updated**: 2025-09-30 12:25:03
+- **Git Status**: 22M 0A 1U
+- **Last Updated**: 2025-09-30 20:37:50
 - **Fish Abbreviations**: 57
-- **Total System Tools**: 113
+- **Total System Tools**: 163
 
 ---
 *Auto-updated by ./rebuild-nixos script*

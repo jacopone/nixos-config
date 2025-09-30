@@ -35,3 +35,23 @@ personal-notes/
 # Claude automation backup files
 CLAUDE*.backup-*
 CLAUDE-AUTO-BACKUP.md
+
+# DevEnv environment files
+.devenv/
+.devenv.flake.nix
+scripts/.devenv/
+scripts/devenv.lock
+
+# Python cache and environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.venv/
+env/
+venv/
+
+# UV Python package manager
+.uv-cache/

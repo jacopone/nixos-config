@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Enhanced standalone script to update both CLAUDE.md configurations v2.0
-# Uses the new template-based automation system
+# Modern standalone script to update both CLAUDE.md configurations v2.0
+# Uses Jinja2 templating and Pydantic validation via DevEnv
 
 set -e
 
@@ -15,35 +15,9 @@ cd "$CONFIG_DIR"
 echo "📁 Working directory: $PWD"
 echo
 
-# Check if we can import required modules
-echo "🔍 Checking dependencies..."
-if ! python3 -c "import jinja2, pydantic" 2>/dev/null; then
-    echo "⚠️  Missing required Python packages (jinja2, pydantic)"
-    echo "    Consider installing with: pip install jinja2 pydantic"
-    echo "    Falling back to legacy scripts..."
-
-    # Fallback to legacy scripts
-    if python3 scripts/update-system-claude.py; then
-        echo "✅ System-level Claude configuration updated (legacy)"
-    else
-        echo "❌ Failed to update system-level Claude config"
-        exit 1
-    fi
-
-    if python3 scripts/update-project-claude.py; then
-        echo "✅ Project-level CLAUDE.md updated (legacy)"
-    else
-        echo "❌ Failed to update project-level CLAUDE.md"
-        exit 1
-    fi
-
-    echo "🎉 Configurations updated using legacy scripts!"
-    exit 0
-fi
-
-# Use new template-based system
+# Use DevEnv-managed modern template-based system
 echo "🛠️  Updating system-level tool inventory (~/.claude/CLAUDE.md)..."
-if python3 scripts/update-system-claude-v2.py; then
+if (cd scripts && devenv shell python update-system-claude-v2.py); then
     echo "✅ System-level Claude configuration updated"
 else
     echo "❌ Failed to update system-level Claude config"
@@ -52,7 +26,7 @@ fi
 echo
 
 echo "📋 Updating project-level CLAUDE.md (./CLAUDE.md)..."
-if python3 scripts/update-project-claude-v2.py; then
+if (cd scripts && devenv shell python update-project-claude-v2.py); then
     echo "✅ Project-level CLAUDE.md updated"
 else
     echo "❌ Failed to update project-level CLAUDE.md"
@@ -67,6 +41,7 @@ echo "   - System-level: ~/.claude/CLAUDE.md (tool inventory for Claude Code)"
 echo "   - Project-level: ./CLAUDE.md (project guidance and context)"
 echo
 echo "💡 These files are now synchronized with your current NixOS configuration."
+echo "🔧 Generated using modern Jinja2 templates with Pydantic validation"
 
 # Show git status if in a git repo
 if git rev-parse --git-dir > /dev/null 2>&1; then

@@ -5,6 +5,7 @@
   env = {
     GREET = "CLAUDE.md Automation System";
     CLAUDE_AUTOMATION_ROOT = "$DEVENV_ROOT";
+    PYTHONPATH = "$DEVENV_PROFILE/lib/python3.13/site-packages";
   };
 
   # Fix dotenv integration warning
@@ -15,13 +16,15 @@
     # Modern Python setup with uv (2025 standard)
     uv
     python313
+    python313Packages.pip
+    python313Packages.jinja2
+    python313Packages.pydantic
+    python313Packages.pytest
     # Code quality tools
-    python3Packages.black
+    python313Packages.black
     ruff
     # Git tools
     git
-    # Testing tools
-    python3Packages.pytest
   ];
 
   # Languages configuration following account harmony pattern
@@ -48,18 +51,18 @@
 
     update-system-claude.exec = ''
       echo "🔍 Updating system-level CLAUDE.md..."
-      uv run python update-system-claude-v2.py
+      python update-system-claude-v2.py
     '';
 
     update-project-claude.exec = ''
       echo "📋 Updating project-level CLAUDE.md..."
-      uv run python update-project-claude-v2.py
+      python update-project-claude-v2.py
     '';
 
     update-claude-configs.exec = ''
       echo "🔄 Updating both CLAUDE.md configurations..."
-      uv run python update-system-claude-v2.py
-      uv run python update-project-claude-v2.py
+      python update-system-claude-v2.py
+      python update-project-claude-v2.py
       echo "✅ All CLAUDE.md configurations updated!"
     '';
 
@@ -113,9 +116,9 @@ else:
 
       echo "✅ CLAUDE.md automation environment ready!"
       echo "📋 Available commands:"
-      echo "   update-system-claude    # Update ~/.claude/CLAUDE.md"
-      echo "   update-project-claude   # Update ./CLAUDE.md"
-      echo "   update-claude-configs   # Update both files"
+      echo "   update-system-claude    # Update ~/.claude/CLAUDE.md (v2)"
+      echo "   update-project-claude   # Update ./CLAUDE.md (v2)"
+      echo "   update-claude-configs   # Update both files (v2)"
       echo "   validate-claude-files   # Validate existing files"
       echo "   test-automation         # Run test suite"
     '';
@@ -138,6 +141,18 @@ else:
   };
 
   enterShell = ''
+    # Set up Python environment
+    export PYTHONPATH="$DEVENV_PROFILE/lib/python3.13/site-packages:$PYTHONPATH"
+    export PATH="$DEVENV_PROFILE/bin:$PATH"
+
+    # Test dependencies
+    echo "🔧 Testing Python dependencies..."
+    if python -c "import jinja2, pydantic" 2>/dev/null; then
+      echo "✅ Jinja2 and Pydantic loaded successfully"
+    else
+      echo "⚠️  Dependencies not found, but continuing..."
+    fi
+
     hello
   '';
 }
