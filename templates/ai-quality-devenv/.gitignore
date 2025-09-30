@@ -1,0 +1,51 @@
+# DevEnv
+.devenv/
+result
+
+# Node.js
+node_modules/
+dist/
+coverage/
+.npm/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+build/
+target/
+*.egg-info/
+
+# Quality tools output
+.semgrep/
+.jscpd/
+lizard-report.html
+
+# Test reports
+playwright-report/
+test-results/
