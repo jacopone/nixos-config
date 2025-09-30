@@ -27,18 +27,46 @@
           if set -q CI; or set -q AUTOMATION; or set -q AGENT_MODE
               return 0  # true - automated
           end
-          
+
           # Check if input/output is redirected (non-interactive)
           if not isatty stdin; or not isatty stdout
-              return 0  # true - automated  
+              return 0  # true - automated
           end
-          
+
           # Check for agent indicators in TERM
           if string match -q "*agent*" $TERM; or string match -q "*script*" $TERM
               return 0  # true - automated
           end
-          
+
+          # Check for dumb terminal (often used by AI tools)
+          if test "$TERM" = "dumb"
+              return 0  # true - automated
+          end
+
+          # Check parent process for AI tools (Claude, Cursor, etc.)
+          set -l parent_cmd (ps -o comm= -p $fish_pid 2>/dev/null || echo "")
+          if string match -q "*cursor*" $parent_cmd; or string match -q "*claude*" $parent_cmd; or string match -q "*vscode*" $parent_cmd
+              return 0  # true - automated
+          end
+
           return 1  # false - interactive
+      end
+
+      # Utility function to strip emoji and ANSI codes from output
+      function _strip_formatting
+          # Use a comprehensive approach to remove problematic characters
+          # 1. Remove ANSI escape sequences
+          # 2. Remove common emoji using explicit patterns
+          # 3. Remove other Unicode control characters
+          sed -E '
+              s/\x1b\[[0-9;]*[mGKHFJ]//g     # ANSI escape sequences
+              s/🔒//g; s/🗑️//g; s/🔧//g       # Common commit emoji
+              s/📦//g; s/⚡//g; s/🚀//g        # More common emoji
+              s/✨//g; s/🐛//g; s/🎨//g        # Git conventional emoji
+              s/♻️//g; s/⬆️//g; s/⬇️//g        # Dependency emoji
+              s/🔥//g; s/💄//g; s/📝//g        # Other common ones
+              s/🏗️//g; s/🎯//g; s/🤖//g        # Build/AI emoji
+          ' | tr -cd '[:print:]\n\t'           # Keep only printable ASCII + newlines/tabs
       end
       
       # Smart cat function - context-aware file viewing
@@ -151,6 +179,17 @@
               echo "  fd -e py         # Find by extension"
               echo "  fd -t f          # Files only"
               command find $argv
+          end
+      end
+
+      # CRITICAL: Smart git wrapper to strip emoji from output in automated contexts
+      function git --description "Smart git: strip emoji and ANSI codes in automated contexts"
+          if _is_automated_context
+              # Force git to output plain text and strip problematic characters
+              env TERM=dumb command git --no-pager $argv | _strip_formatting
+          else
+              # Interactive mode - normal git with colors and formatting
+              command git $argv
           end
       end
       
