@@ -129,7 +129,10 @@
     # Code Quality & Analysis Tools (Enterprise-grade)
     python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
     python312Packages.radon # Python code metrics and complexity analysis
-    nodePackages.jscpd    # JavaScript/TypeScript clone detection (< 5% duplication threshold)
+    # jscpd - JavaScript/TypeScript clone detection via npm
+    (pkgs.writeShellScriptBin "jscpd" ''
+      exec ${pkgs.nodejs_20}/bin/npx jscpd "$@"
+    '')
     ruff               # Lightning-fast Python linter/formatter
     docker-compose     # Container orchestration
     k9s                # Kubernetes cluster management

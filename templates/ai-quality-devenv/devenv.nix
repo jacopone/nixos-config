@@ -219,7 +219,7 @@ EOF
     jscpd = {
       enable = true;
       name = "clone-detection";
-      entry = "jscpd --threshold 5 --min-lines 10";  # Available system-wide
+      entry = "jscpd --threshold 5 --min-lines 10";  # Available system-wide via npx wrapper
       files = "\\.(js|ts|tsx)$";
       excludes = [ "node_modules/" "coverage/" "dist/" ];
     };
