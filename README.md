@@ -88,7 +88,8 @@ nixos-config/
 │   │   └── UNIVERSAL_INSTALLATION.md
 │   └── README.md
 ├── 📁 scripts/
-│   └── update-claude-tools.py    # Enhanced Claude Code behavior automation engine
+│   ├── update-system-claude.py   # System-level Claude Code automation engine
+│   └── update-project-claude.py  # Project-level CLAUDE.md automation
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
 ├── 📚 CLAUDE.md                 # AI agent instructions

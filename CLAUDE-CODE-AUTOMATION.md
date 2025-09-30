@@ -31,7 +31,8 @@ Despite having **121+ premium modern CLI tools** installed and strategically dis
 
 **Script Flow:**
 ```
-rebuild-nixos → scripts/update-claude-tools.py → ~/.claude/CLAUDE.md
+rebuild-nixos → scripts/update-system-claude.py → ~/.claude/CLAUDE.md
+              → scripts/update-project-claude.py → ./CLAUDE.md
 ```
 
 ### **Generated Policies**
@@ -70,9 +71,9 @@ jless config.json  # for large JSON files
 
 ## 📊 **Technical Details**
 
-- **Script**: `scripts/update-claude-tools.py`
-- **Target**: `~/.claude/CLAUDE.md` (system-level context)
-- **Tools Documented**: 121+ modern CLI tools (optimized system/project distribution)
+- **System Script**: `scripts/update-system-claude.py` → `~/.claude/CLAUDE.md` (109 tools + expert policies)
+- **Project Script**: `scripts/update-project-claude.py` → `./CLAUDE.md` (project guidance + dynamic status)
+- **Tools Documented**: 109 modern CLI tools with consistent counting logic
 - **Categories**: Development, file ops, data processing, system monitoring, database access
 - **Automation**: Zero manual intervention required
 
