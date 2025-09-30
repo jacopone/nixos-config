@@ -52,6 +52,12 @@ User expects Claude Code to leverage the full modern toolkit.
 - `du` → `dust` (ALWAYS use dust for disk usage analysis)
 - `ps` → `procs` (ALWAYS use procs for process listing)
 
+### AI DEVELOPMENT PRIORITY TOOLS
+- `serena` - Semantic code analysis MCP server (PREFERRED for code analysis)
+- `aider` - AI pair programming assistant (uvx aider-chat)
+- `claude-code` - Primary AI coding interface
+- `claude-flow` - Enterprise AI orchestration platform
+
 ## Available Command Line Tools
 
 """
@@ -104,6 +110,11 @@ User expects Claude Code to leverage the full modern toolkit.
 - `dua` instead of `du` - Interactive disk usage
 - `procs` instead of `ps` - Modern process viewer
 
+### AI Development Tools
+- `serena` - Semantic code analysis and MCP server
+- `aider` - AI pair programming (uvx aider-chat)
+- `claude-flow` - Enterprise AI orchestration (npx claude-flow@alpha)
+
 ## Project Structure
 - `modules/core/packages.nix` - System-wide packages ({context['package_count']} tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
@@ -133,7 +144,7 @@ def parse_nix_file_basic(file_path: Path) -> dict[str, Any]:
         packages = {}
         in_packages_section = False
 
-        for line_num, line in enumerate(content.split("\n"), 1):
+        for _line_num, line in enumerate(content.split("\n"), 1):
             stripped = line.strip()
 
             # Skip comments and empty lines
@@ -186,6 +197,17 @@ def parse_nix_file_basic(file_path: Path) -> dict[str, Any]:
                                 for word in ["system", "monitor", "process"]
                             ):
                                 category = "System Tools"
+                            elif any(
+                                word in description.lower() or word in pkg_name.lower()
+                                for word in [
+                                    "ai",
+                                    "semantic",
+                                    "analysis",
+                                    "serena",
+                                    "mcp",
+                                ]
+                            ):
+                                category = "AI Development Enhancement Tools"
 
                             packages[pkg_name] = {
                                 "name": pkg_name,
@@ -327,6 +349,7 @@ def generate_project_claude(output_path: Path, config_dir: Path) -> bool:
             "Yazi file manager with rich previews",
             "Starship prompt with visual git status",
             "Auto-updating Claude Code tool intelligence",
+            "Serena MCP server for semantic code analysis",
             "BASB knowledge management system",
             "AI orchestration with CCPM integration",
         ]

@@ -52,7 +52,7 @@
 ### 🤖 AI Tooling & Automation
 - 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
 - ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
-- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 109 installed tools
+- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 174 installed tools
 - 📋 **Behavioral Enforcement**: Claude Code now defaults to advanced tools with specific command examples and usage patterns
 - 🎯 **Expert-Level Optimization**: System declares "EXPERT" optimization level, ensuring Claude Code leverages your sophisticated toolkit
 - 🔧 **Zero Manual Intervention**: Tool inventory, behavioral policies, and command examples stay automatically synchronized
@@ -553,13 +553,17 @@ cd project           # → zoxide smart directory jumping
 ### New Tool Abbreviations (Type + Space)
 ```bash
 yamlcat              # → yq . (YAML processing)
-csvcat               # → csvlook (CSV viewing) 
+csvcat               # → csvlook (CSV viewing)
 ruffcheck            # → ruff check (Python linting)
 uvrun                # → uv run (fast Python execution)
 dcp                  # → docker-compose
 pods                 # → k9s (Kubernetes dashboard)
 netscan              # → nmap -sn (network discovery)
 trace                # → strace -f (system call tracing)
+ai                   # → aider (AI pair programming)
+aicode               # → aider --dark-mode --model claude-3-5-sonnet
+br                   # → broot (interactive tree navigation)
+record               # → vhs (terminal session recording)
 ```
 
 ### Fish Shell Help
@@ -623,16 +627,16 @@ See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete do
 
 ### Development Tools
 - **Editors**: Helix, Zed, VSCode, Cursor  
-- **AI Agents**: Claude Code, Plandex, Gemini CLI
+- **AI Agents**: Claude Code, Plandex, Gemini CLI, Serena (MCP server)
+- **MCP Servers**: Serena (semantic code analysis), MCP-NixOS (package info)
 - **Version Control**: Git, GitHub CLI, `delta` (enhanced diffs), `gitui`, `lazygit`
 - **Languages**: Node.js 20, Python 3, GCC
-- **Package Managers**: `npm`, `yarn`, `pnpm` (Node.js), `uv` (Python)
+- **Package Managers**: `npm` (Node.js), `uv` (Python package manager)
 - **Environment**: DevEnv, Direnv, Cachix
-- **Containers**: Docker, Docker Compose, Podman, K9s (Kubernetes)
-- **Database**: PostgreSQL, Redis
+- **Containers**: Docker Compose, Podman, K9s (Kubernetes)
 - **Quality**: `shellcheck` (shell scripts), `semgrep` (security)
-- **Database CLI**: `pgcli` (PostgreSQL), `mycli` (MySQL), `usql` (universal)
-- **API Testing**: `hurl` (file-based HTTP testing), `httpie`/`xh` (interactive)
+- **Database CLI**: `pgcli` (PostgreSQL), `mycli` (MySQL/MariaDB), `usql` (universal database CLI)
+- **API Testing**: `hurl` (file-based HTTP testing), `httpie`/`xh` (interactive HTTP clients)
 
 ### CLI Enhancements  
 - **File Viewing**: `glow` (markdown), `bat` (syntax highlighting), `jless` (large JSON)
@@ -643,9 +647,10 @@ See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete do
 - **File Management**: `yazi` (terminal file manager), `zoxide` (smart directory jumping)
 - **Data Processing**: `jq` (JSON), `yq` (YAML), `csvkit` (CSV), `miller` (multi-format)
 - **Development**: `tmux` (sessions), `entr` (file watching), `just` (task runner)
-- **Network & Debug**: `nmap`, `wireshark`, `strace`, `ltrace`
-- **Python Tools**: `uv` (package management)
-- **AI Development**: `aider` (pair programming), `atuin` (smart history), `mise` (runtime management)
+- **Network & Security**: `nmap` (network discovery), `wireshark` (protocol analyzer), `tcpdump` (packet capture)
+- **System Analysis**: `strace` (system calls), `ltrace` (library calls), `ast-grep` (structural search)
+- **Python Tools**: `uv` (package management), `ruff` (linting/formatting)
+- **AI Development**: `aider` (pair programming), `atuin` (smart history), `vhs` (session recording), `mcfly` (neural history search)
 
 ### System vs Project-Level Architecture
 
@@ -713,8 +718,8 @@ The system detects:
 - **Automatic rollback** if changes are rejected
 - **Git integration** with commit prompts
 - **Generation cleanup** with interactive selection
-- **Cache cleanup** with size reporting (UV, Chrome, Yarn, Playwright)
-- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 109 system tools
+- **Cache cleanup** with size reporting (UV, Chrome, development caches)
+- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 174 system tools
 
 ### Backup & Recovery
 - **System generations** for easy rollback

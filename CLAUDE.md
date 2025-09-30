@@ -18,12 +18,6 @@
 - `nix flake check` - Validate configuration syntax
 - `nix develop` or `devenv shell` - Enter development environment
 
-### AI Orchestration
-- `./ai-orchestration/scripts/master-orchestrator.sh` - Master control system
-- `claude-flow` or `npx claude-flow@alpha` - Enterprise AI coordination
-- `ai filename.py` - Quick AI pair programming session
-- `aicode src/*.py` - Pre-configured Claude Sonnet session
-
 ### Modern CLI Tools (ALWAYS USE THESE)
 - `fd` instead of `find` - Fast file searching
 - `eza` instead of `ls` - Enhanced directory listing
@@ -31,73 +25,29 @@
 - `rg` instead of `grep` - Ultra-fast text search
 - `dua` instead of `du` - Interactive disk usage
 - `procs` instead of `ps` - Modern process viewer
-- `jless` instead of `less` for JSON files
-- `yq` for YAML processing
-- `glow` for markdown rendering
+
+### AI Development Tools
+- `serena` - Semantic code analysis and MCP server
+- `aider` - AI pair programming (uvx aider-chat)
+- `claude-flow` - Enterprise AI orchestration (npx claude-flow@alpha)
 
 ## Project Structure
-- `flake.nix` - Main configuration entry point
 - `modules/core/packages.nix` - System-wide packages (109 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
-- `hosts/nixos/` - Hardware-specific configuration
-- `basb-system/` - Building a Second Brain knowledge management
-- `ai-orchestration/` - Multi-agent AI coordination system
-- `stack-management/` - Technology stack lifecycle management
-
-## Development Conventions
-
-### Adding Packages
-- **System tools**: Add to `modules/core/packages.nix`
-- **User programs**: Add to `modules/home-manager/base.nix`
-- **Project-specific**: Use `devenv.nix` or `shell.nix`
-
-### Configuration Changes
-- Always run `nix flake check` before rebuilding
-- Use `./rebuild-nixos` for interactive safety checks
-- Test with `nixos-rebuild test --flake .` first
-- Keep modules focused on single responsibilities
-
-### Code Style
-- Follow existing Nix formatting conventions
-- Use descriptive comments for complex configurations
-- Group related packages logically
-- Include URLs for package references when helpful
 
 ## Working Features ✅
 - Fish shell with 55 smart abbreviations
 - Yazi file manager with rich previews
 - Starship prompt with visual git status
 - Auto-updating Claude Code tool intelligence
+- Serena MCP server for semantic code analysis
 - BASB knowledge management system
 - AI orchestration with CCPM integration
-- Chrome declarative extension management
 
-## Do Not Touch
-- `/etc/nixos/` (use this repo instead)
-- `result` symlinks (Nix build artifacts)
-- Files in `hosts/nixos/hardware-configuration.nix` (auto-generated)
-
-## Special Notes
-- System uses automated Claude Code optimization (updates tool knowledge automatically)
-- Fish shell context-aware commands (different behavior for interactive vs automated)
-- Chrome extensions managed declaratively via NixOS
-- BASB system integrated with Google Workspace + Sunsama + Readwise
-
-## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (109 tools in `packages.nix`)
-- **Project-level tools**: Context-specific via devenv/package.json
-- **Modular design**: Inspired by ZaneyOS architecture
-- **AI-first optimization**: Tools selected for Claude Code compatibility
-
-## Performance Optimization
-- Build limited to 4 CPU cores, 2 parallel jobs
-- Zram swap (25% RAM) with zstd compression
-- Weekly garbage collection + monthly updates automated
-- Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 1M 0A 0U
-- **Last Updated**: 2025-09-30 06:28:30
+- **Git Status**: 0M 0A 1U
+- **Last Updated**: 2025-09-30 06:38:14
 - **Fish Abbreviations**: 55
 - **Total System Tools**: 109
 
