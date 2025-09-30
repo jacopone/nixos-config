@@ -42,8 +42,16 @@ CLAUDE-AUTO-BACKUP.md
 scripts/.devenv/
 scripts/devenv.lock
 
+# DevEnv runtime artifacts - specific patterns
+scripts/.devenv/gc/
+scripts/.devenv/load-exports
+scripts/.devenv/profile
+scripts/.devenv/nix-eval-cache.db*
+scripts/.devenv/tasks.db*
+
 # Python cache and environments
 __pycache__/
+*/__pycache__/
 *.pyc
 *.pyo
 *.pyd
