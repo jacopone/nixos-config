@@ -13,13 +13,13 @@ nix flake update
 echo "--> Performing a test build (without activating)..."
 # Use 'build' instead of 'test' to get the path to the new configuration
 # and avoid the 'Failed to start transient service unit' error if not root
-NEW_CONFIG_PATH=$(nix build --no-link --print-out-paths .#nixosConfigurations."nixos".config.system.build.toplevel)
+NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel)
 
 echo "--> Test build successful. New configuration path: $NEW_CONFIG_PATH"
 
 # Activate the new configuration
 echo "--> Activating the new configuration..."
-sudo nixos-rebuild switch --flake .
+sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure
 
 # Update Claude Code configurations
 echo "--> Updating Claude Code configurations..."

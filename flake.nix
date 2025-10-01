@@ -17,9 +17,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Cursor - AI Code Editor (you are the maintainer)
+    cursor-nix = {
+      url = "github:jacopone/cursor-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, cursor-nix, ... }@inputs: {
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"
