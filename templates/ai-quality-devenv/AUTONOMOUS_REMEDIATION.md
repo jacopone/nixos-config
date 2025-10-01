@@ -16,6 +16,68 @@ The Autonomous Remediation System enables AI agents (Claude Code, Cursor, etc.) 
 - **📈 Progress Tracking** - Real-time metrics, ROI calculations, and stakeholder reporting
 - **🤖 Multi-Agent Support** - Parallel execution with work queue distribution for faster remediation
 
+## Setup
+
+### For New Projects
+
+Copy the entire template to start with a complete quality-first environment:
+
+```bash
+# Copy template
+cp -r ~/nixos-config/templates/ai-quality-devenv ~/my-new-project
+cd ~/my-new-project
+
+# Enter development environment (provides all quality tools)
+devenv shell
+
+# Verify tools are available
+assess-codebase --help
+```
+
+### For Existing Legacy Projects
+
+Add quality tooling to an existing project without disrupting current setup:
+
+```bash
+# Navigate to your existing project
+cd ~/my-legacy-project
+
+# Copy minimal required files
+cp ~/nixos-config/templates/ai-quality-devenv/devenv.nix .
+cp -r ~/nixos-config/templates/ai-quality-devenv/.quality .
+
+# Optional: Copy AI configuration if using Claude Code or Cursor
+cp -r ~/nixos-config/templates/ai-quality-devenv/.claude .
+cp -r ~/nixos-config/templates/ai-quality-devenv/.cursor .
+
+# Enter development environment
+devenv shell
+
+# Now all quality tools are available
+assess-codebase
+initialize-remediation-state
+```
+
+### What Gets Installed
+
+When you enter `devenv shell`, these tools become available:
+- `assess-codebase` - 8-step quality analysis
+- `initialize-remediation-state` - State initialization
+- `autonomous-remediation-session` - Main orchestrator
+- `identify-next-targets` - Priority-based target selection
+- `validate-target-improved` - Automatic validation
+- `checkpoint-progress` - Git automation
+- `quality-dashboard` - Real-time monitoring
+- `generate-progress-report` - Stakeholder reporting
+- All Tier 3 scripts (token estimation, failure analysis, parallel coordination)
+
+### Important Notes
+
+- **Tools are NOT global** - They only exist inside `devenv shell`
+- **No system installation** - Everything is project-isolated via DevEnv
+- **Pure environment** - No conflicts with system packages
+- **Exit with `exit`** - Leaves devenv shell and returns to normal environment
+
 ## Architecture
 
 ### Three-Tier System
