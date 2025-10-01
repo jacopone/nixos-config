@@ -92,6 +92,12 @@
         alsa-lib
         vulkan-loader
         libglvnd
+        mesa
+        xorg.libX11
+        xorg.libXext
+        xorg.libxcb
+        libxkbcommon
+        wayland
       ];
     })
 
