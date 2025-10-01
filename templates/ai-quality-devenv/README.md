@@ -91,7 +91,7 @@ See `QUALITY_BASELINE_GATES.md` for complete baseline gates system documentation
 - `generate-progress-report` - **Stakeholder-friendly markdown report with metrics and ROI**
 - `parallel-remediation-coordinator` - **Multi-agent coordination with work queue distribution**
 
-See `AUTONOMOUS_AGENT_COMPATIBILITY.md` for autonomous execution documentation.
+See `AUTONOMOUS_REMEDIATION.md` for complete autonomous execution documentation.
 
 ## Quality Standards
 
@@ -197,6 +197,9 @@ setup-claude                    # Initialize Claude Code integration
 
 # Customize
 # Edit .claude/CLAUDE.md        # Adjust behavior and guidelines
+
+# Documentation
+# See CLAUDE_CODE_SETUP.md for complete setup guide
 ```
 
 ### Shared Quality Standards
