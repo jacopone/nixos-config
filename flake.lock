@@ -21,7 +21,7 @@
         "type": "github"
       }
     },
-    "cursor-nix": {
+    "code-cursor-nix": {
       "inputs": {
         "flake-utils": "flake-utils_2",
         "nixpkgs": [
@@ -32,13 +32,13 @@
         "lastModified": 1759285948,
         "narHash": "sha256-EyM7O7N3/1AGvyNqs3K3iRhiGzfhE7rNBiLuvDOk/B4=",
         "owner": "jacopone",
-        "repo": "cursor-nix",
+        "repo": "code-cursor-nix",
         "rev": "bfdcd90e6ed8b023c0ea708c5ce845b71c3f7a64",
         "type": "github"
       },
       "original": {
         "owner": "jacopone",
-        "repo": "cursor-nix",
+        "repo": "code-cursor-nix",
         "type": "github"
       }
     },
@@ -117,7 +117,7 @@
     "root": {
       "inputs": {
         "claude-code-nix": "claude-code-nix",
-        "cursor-nix": "cursor-nix",
+        "code-cursor-nix": "code-cursor-nix",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }
