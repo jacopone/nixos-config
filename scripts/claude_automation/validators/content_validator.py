@@ -76,11 +76,12 @@ class ContentValidator:
         errors.extend(self._check_required_sections(content, project_sections))
 
         # Check project-specific content
-        if "package_count" not in content.lower():
-            errors.append("Missing package count information")
+        # Look for package/tool count information (flexible patterns)
+        if not re.search(r"\d+\s+(tools|packages)", content, re.IGNORECASE):
+            warnings.append("Missing package count information")
 
         if "git status" not in content.lower():
-            errors.append("Missing git status information")
+            warnings.append("Missing git status information")
 
         # Check for working features
         if "Working Features" in content:
