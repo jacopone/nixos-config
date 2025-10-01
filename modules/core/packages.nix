@@ -80,6 +80,21 @@
     vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
     libreoffice         # A powerful and free office suite - https://www.libreoffice.org/
 
+    # Handy - Offline speech-to-text transcription - https://github.com/cjpais/Handy
+    (pkgs.appimageTools.wrapType2 {
+      pname = "handy";
+      version = "0.5.1";
+      src = pkgs.fetchurl {
+        url = "https://github.com/cjpais/Handy/releases/download/v0.5.1/Handy_0.5.1_amd64.AppImage";
+        hash = "sha256-2O/FWekfKzTdgGJ7Jp5plWb3Z+vwGEj44LqfPBtJBQY=";
+      };
+      extraPkgs = pkgs: with pkgs; [
+        alsa-lib
+        vulkan-loader
+        libglvnd
+      ];
+    })
+
     # fonts
     dejavu_fonts        # A font family based on the Vera Fonts
     roboto              # Google's signature font family
