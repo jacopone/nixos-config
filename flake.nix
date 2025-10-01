@@ -11,9 +11,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Claude Code - Better packaged version with Node.js bundled
+    claude-code-nix = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, ... }@inputs: {
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"

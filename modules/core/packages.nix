@@ -8,7 +8,7 @@
     vscode-fhs          # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
     code-cursor         # An AI-powered code editor based on VSCode - https://cursor.so/
     plandex             # An open-source, terminal-based AI coding agent - https://plandex.ai/
-    claude-code         # A code-generation tool using Anthropic's Claude model
+    inputs.claude-code-nix.packages.${pkgs.system}.default  # A code-generation tool using Anthropic's Claude model (better packaged)
     # Claude Flow - AI orchestration platform (alpha version via npx)
     (pkgs.writeShellScriptBin "claude-flow" ''
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
