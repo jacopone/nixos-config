@@ -68,7 +68,7 @@ nixos-config/
 │       └── hardware-configuration.nix
 ├── 📁 modules/
 │   ├── core/
-│   │   └── packages.nix         # System-wide packages
+│   │   └── packages.nix         # System-wide packages (162 tools)
 │   └── home-manager/
 │       └── base.nix             # User-specific configurations
 ├── 📁 profiles/
@@ -94,18 +94,44 @@ nixos-config/
 │   │   ├── USAGE_GUIDE.md
 │   │   └── UNIVERSAL_INSTALLATION.md
 │   └── README.md
+├── 📁 basb-system/              # Building a Second Brain implementation
+│   ├── README.md                # BASB system overview
+│   ├── BASB-IMPLEMENTATION-GUIDE.md
+│   ├── BASB-Quick-Reference-Guide.md
+│   ├── BASB-Daily-Routines.md
+│   ├── BASB-Readwise-Setup.md
+│   └── BASB-Sunsama-Integration.md
+├── 📁 stack-management/         # Technology stack lifecycle management
+│   ├── README.md                # Stack management overview
+│   ├── discovery/               # New tool discovery and evaluation
+│   ├── active/                  # Active subscriptions and packages
+│   ├── deprecated/              # Postmortems and cost savings
+│   ├── automation/              # Cost calculator and review scripts
+│   └── chrome-profiles/         # Chrome multi-profile strategy
 ├── 📁 scripts/
-│   ├── claude-automation/        # Modern template-based automation system
-│   ├── update-system-claude-v2.py   # System-level Claude Code automation engine (Jinja2/Pydantic)
-│   ├── update-project-claude-v2.py  # Project-level CLAUDE.md automation (Jinja2/Pydantic)
+│   ├── claude-automation/       # CRITICAL: Claude Code auto-generation system
+│   │   ├── generators/          # System and project CLAUDE.md generators
+│   │   ├── parsers/             # Nix configuration parsers
+│   │   ├── templates/           # Jinja2 templates for auto-generation
+│   │   ├── validators/          # Content validation
+│   │   └── README.md            # DO NOT DELETE - see CLAUDE_ORCHESTRATION.md
+│   ├── update-system-claude-v2.py   # System-level Claude Code automation engine
+│   ├── update-project-claude-v2.py  # Project-level CLAUDE.md automation
 │   ├── update-claude-configs-v2.sh  # Standalone script for both CLAUDE.md files
 │   └── devenv.nix               # DevEnv automation environment
+├── 📁 docs/                     # Organized documentation
+│   ├── automation/
+│   │   └── claude-automation-system.md
+│   ├── tools/
+│   │   ├── fish-smart-commands.md
+│   │   ├── enhanced-tools-guide.md
+│   │   ├── kitty-optimization-guide.md
+│   │   └── yazi-file-associations.md
+│   └── CURSOR_AI_QUALITY_INTEGRATION.md
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
-├── 📚 CLAUDE.md                 # AI agent instructions
-├── 🤖 CLAUDE-CODE-AUTOMATION.md # Claude Code tool selection automation
-├── 🐟 fish-smart-commands.md    # Fish shell documentation
-└── 📖 enhanced-tools-guide.md   # Modern CLI tools guide
+├── 📚 CLAUDE.md                 # Project-level AI agent instructions (auto-generated)
+└── 🤖 CLAUDE_ORCHESTRATION.md   # Three-level Claude Code orchestration architecture
 ```
 
 ## 🚀 Setup Instructions
@@ -756,14 +782,25 @@ The system detects:
 
 ## 📚 Documentation
 
-- **[CLAUDE.md](CLAUDE.md)** - AI agent instructions and project overview
-- **[CLAUDE-CODE-AUTOMATION.md](CLAUDE-CODE-AUTOMATION.md)** - Revolutionary Claude Code tool selection automation system
+### Core System Documentation
+- **[CLAUDE.md](CLAUDE.md)** - Project-level AI agent instructions (auto-generated)
+- **[CLAUDE_ORCHESTRATION.md](CLAUDE_ORCHESTRATION.md)** - Three-level Claude Code orchestration architecture (System/Project/Template)
 - **[templates/README.md](templates/README.md)** - Enterprise-grade development templates with Cursor AI integration
-- **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Comprehensive Cursor AI and quality gates integration guide
+
+### Major Systems
+- **[basb-system/README.md](basb-system/README.md)** - Building a Second Brain knowledge management implementation
+- **[stack-management/README.md](stack-management/README.md)** - Technology stack lifecycle management system
 - **[ai-orchestration/README.md](ai-orchestration/README.md)** - Universal multi-agent AI coordination system
-- **[fish-smart-commands.md](fish-smart-commands.md)** - Complete Fish shell documentation
-- **[enhanced-tools-guide.md](enhanced-tools-guide.md)** - Modern CLI tools reference
-- **[kitty-optimization-guide.md](kitty-optimization-guide.md)** - Complete Kitty terminal optimization guide
+
+### AI Development Integration
+- **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration guide
+- **[scripts/claude-automation/README.md](scripts/claude-automation/README.md)** - Claude Code auto-generation system (CRITICAL INFRASTRUCTURE)
+
+### Tools & Configuration Guides
+- **[docs/tools/fish-smart-commands.md](docs/tools/fish-smart-commands.md)** - Fish shell documentation and abbreviations
+- **[docs/tools/enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md)** - Modern CLI tools reference
+- **[docs/tools/kitty-optimization-guide.md](docs/tools/kitty-optimization-guide.md)** - Complete Kitty terminal optimization guide
+- **[docs/tools/yazi-file-associations.md](docs/tools/yazi-file-associations.md)** - Yazi file manager configuration
 
 ## 🛡️ Safety Features
 
