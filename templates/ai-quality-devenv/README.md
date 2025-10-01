@@ -70,16 +70,26 @@ See `LEGACY_CODEBASE_RESCUE.md` for complete rescue system documentation.
 
 See `QUALITY_BASELINE_GATES.md` for complete baseline gates system documentation.
 
-### Autonomous Execution (NEW - Tier 1 & 2!)
+### Autonomous Execution (NEW - Complete!)
+
+#### Tier 1: Core Autonomy
 - `initialize-remediation-state` - **Initialize autonomous remediation with state management**
-- `autonomous-remediation-session` - **Main orchestrator for supervised autonomous refactoring**
+- `update-remediation-state` - **Internal: Update persistent state**
 - `identify-next-targets` - **Smart target prioritization algorithm**
-- `validate-target-improved` - **Automatic validation of refactoring improvements**
 - `checkpoint-progress` - **Git commit automation with tagging every 5 commits**
 - `needs-human-checkpoint` - **Safety gate checking for human approval**
+- `validate-target-improved` - **Automatic validation of refactoring improvements**
 - `mark-checkpoint-approved` - **Mark human approval for phase transitions**
 - `rollback-to-checkpoint` - **Rollback to last stable checkpoint**
-- `update-remediation-state` - **Internal: Update persistent state**
+
+#### Tier 2: Orchestration
+- `autonomous-remediation-session` - **Main orchestrator for supervised autonomous refactoring**
+
+#### Tier 3: Optimization & Analytics
+- `estimate-token-usage` - **Predict token cost for files and optimize batch sizing**
+- `analyze-failure-patterns` - **Identify common failure reasons and suggest strategies**
+- `generate-progress-report` - **Stakeholder-friendly markdown report with metrics and ROI**
+- `parallel-remediation-coordinator` - **Multi-agent coordination with work queue distribution**
 
 See `AUTONOMOUS_AGENT_COMPATIBILITY.md` for autonomous execution documentation.
 
