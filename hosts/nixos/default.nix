@@ -26,6 +26,12 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Enable uinput for ydotool (Wayland input automation)
+  boot.kernelModules = [ "uinput" ];
+  services.udev.extraRules = ''
+    KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"
+  '';
+
   # Nix Package Management and Flakes
   nix = {
     settings.auto-optimise-store = true;
@@ -100,11 +106,11 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.guyfawkes = {
     isNormalUser = true;
     description = "Guy Fawkes";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" ];  # Added 'input' for whisper-overlay
     packages = with pkgs; [
     #  thunderbird
     ];

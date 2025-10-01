@@ -46,6 +46,19 @@ target/
 .jscpd/
 lizard-report.html
 
+# Legacy codebase rescue system
+.quality/
+
 # Test reports
 playwright-report/
 test-results/
+
+# AI tool configurations (created by init-ai-tools script)
+# These are generated from .ai-templates/ and should not be committed to template
+.cursor/
+.claude/settings.local.json
+.claudeignore
+.cursorignore
+
+# Keep AI templates (template source files)
+!.ai-templates/

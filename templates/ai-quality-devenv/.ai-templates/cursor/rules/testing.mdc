@@ -1,0 +1,65 @@
+---
+description: Testing and quality assurance rules
+globs:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.test.js"
+  - "**/*.test.jsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "**/*.spec.js"
+  - "**/*.spec.jsx"
+  - "**/*test*.py"
+  - "**/*spec*.py"
+alwaysApply: false
+---
+
+# Testing and Quality Assurance Rules
+
+## Test Organization
+- Organize tests in clear describe/it blocks
+- Use descriptive test names that explain intent
+- Group related tests logically
+- Follow AAA pattern: Arrange, Act, Assert
+
+## Test Coverage Requirements
+- Minimum 75% code coverage for new code
+- Test all public interfaces and critical paths
+- Include edge cases and error conditions
+- Test both happy path and failure scenarios
+
+## Test Types
+- **Unit Tests**: Test individual functions/components in isolation
+- **Integration Tests**: Test component interactions
+- **E2E Tests**: Test complete user workflows with Playwright
+- **Contract Tests**: Verify API contracts and interfaces
+
+## Testing Best Practices
+- Keep tests independent and isolated
+- Use proper mocking for external dependencies
+- Clean up resources after tests (database, files, etc.)
+- Make tests deterministic and repeatable
+
+## JavaScript/TypeScript Testing
+- Use Vitest for unit and integration tests
+- Mock external services and APIs appropriately
+- Test React components with proper user interactions
+- Use data-testid attributes for stable selectors
+
+## Python Testing
+- Use pytest for all Python testing
+- Implement proper fixtures for test data
+- Use parametrized tests for multiple input scenarios
+- Mock external dependencies with unittest.mock
+
+## Test Maintenance
+- Update tests when requirements change
+- Remove obsolete tests regularly
+- Refactor tests to maintain readability
+- Monitor test execution time and optimize slow tests
+
+## Quality Gates Integration
+- All tests must pass before commits
+- No new code without corresponding tests
+- Coverage reports integrated with CI/CD
+- Automated test execution on pull requests

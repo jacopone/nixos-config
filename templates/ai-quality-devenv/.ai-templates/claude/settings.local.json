@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_QUALITY_MODE": "enterprise",
+    "CLAUDE_COMPLEXITY_TARGET": "8",
+    "CLAUDE_MIN_COVERAGE": "75"
+  },
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "*",
+      "WebSearch",
+      "Read(//home/guyfawkes/nixos-config/modules/core/**)",
+      "Bash(eza:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "default"
+  },
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🔍 Quality Gate: Ensure CCN < 10, duplication < 5%, no secrets'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '✅ File modified - run quality-check before committing'"
+          }
+        ]
+      }
+    ]
+  }
+}

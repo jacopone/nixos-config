@@ -60,12 +60,14 @@ direnv allow          # Automatic activation
 # OR
 devenv shell          # Manual activation
 
-# 3. Setup quality gates and AI integration
-setup-git-hooks       # Install pre-commit hooks
-setup-cursor          # Configure Cursor AI rules
-quality-report         # Verify all systems
+# 3. Interactive AI tools setup (NEW - RECOMMENDED!)
+init-ai-tools         # Choose Claude Code, Cursor AI, or both
 
-# 4. Start development
+# 4. Setup quality gates
+setup-git-hooks       # Install pre-commit hooks
+quality-report        # Verify all systems
+
+# 5. Start development
 npm init              # Initialize package.json
 uv init               # Initialize Python project
 ```
@@ -83,10 +85,21 @@ uv init               # Initialize Python project
 
 #### **🤖 AI Development Integration**
 
-The template includes comprehensive **Cursor AI integration** with enterprise-grade quality gates:
+The template includes comprehensive **dual AI system integration** (Cursor AI + Claude Code) with enterprise-grade quality gates:
 
+**Cursor AI:**
 - **MDC Rule System**: Modern `.cursor/rules/*.mdc` files for AI behavior configuration
-- **Quality Synchronization**: AI rules automatically enforce quality thresholds
+- **YOLO Mode**: Advanced AI capabilities with build/test execution
+- **Agent Mode**: Enhanced shortcuts for complex refactoring tasks
+
+**Claude Code (NEW - October 2025):**
+- **Project-Level CLAUDE.md**: Comprehensive 6KB instruction file with quality gate awareness
+- **MCP Serena Integration**: Optimized symbolic code operations for token efficiency
+- **Quality Hooks**: Pre/Post tool use reminders for complexity, duplication, security
+- **DevEnv Context**: Full understanding of Node.js 20, Python 3.13, and quality tools
+
+**Shared Features:**
+- **Quality Synchronization**: Both AI systems enforce identical quality thresholds
 - **Project Context**: AI understands technology stack, patterns, and constraints
 - **Security Integration**: AI prevents credential exposure and follows security best practices
 - **Testing Patterns**: AI generates comprehensive tests with proper coverage
@@ -154,11 +167,11 @@ direnv allow
 
 ### **2. Setup Development Environment**
 ```bash
+# Interactive AI tools setup (RECOMMENDED)
+init-ai-tools         # Choose Claude Code, Cursor AI, or both
+
 # Setup quality gates
 setup-git-hooks
-
-# Configure AI development
-setup-cursor
 
 # Initialize project files
 npm init              # For JavaScript/TypeScript projects
@@ -179,27 +192,74 @@ npm run dev           # Or your development command
 
 ## 🧠 **AI-Enhanced Development**
 
-### **Cursor AI Integration**
+### **Dual AI System Support**
 
-The template provides **state-of-the-art AI development integration**:
+The template provides **state-of-the-art AI development integration** for both major AI coding assistants:
 
+**Universal Features:**
 - **🎯 Context-Aware**: AI understands project structure, tech stack, and quality requirements
 - **🔒 Security-First**: AI rules prevent credential exposure and enforce security patterns
 - **🧪 Testing-Focused**: AI generates comprehensive tests with proper coverage patterns
-- **📏 Quality-Enforced**: AI respects complexity, duplication, and formatting standards
+- **📏 Quality-Enforced**: AI respects complexity (CCN < 10), duplication (< 5%), and formatting standards
 
-### **Usage Patterns**
+### **Interactive Setup (NEW - October 2025)**
 
 ```bash
+# One command to rule them all
+init-ai-tools
+
+# Interactive prompt appears:
+# 🤖 AI Development Tools Setup
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# Select AI tool(s) to configure:
+#   [ ] Claude Code - Token-efficient with MCP Serena
+#   [ ] Cursor AI - YOLO mode with Agent shortcuts
+#   [ ] Skip - Manual setup later
+#
+# Use Space to select, Enter to confirm
+```
+
+### **Cursor AI Usage**
+
+```bash
+# Setup
+init-ai-tools           # Select "Cursor AI" in prompt
+# OR
+setup-cursor            # Direct setup
+
 # Agent Mode for complex tasks
 # Ctrl+I in Cursor → "Implement user authentication with proper testing"
 
-# Background mode for suggestions
+# Background mode for continuous suggestions
 # Ctrl+E in Cursor → Continuous AI assistance
 
-# Quality-aware development
-# AI automatically respects CCN < 10, duplication < 5%, security patterns
+# Rules in .cursor/rules/*.mdc automatically enforce quality gates
 ```
+
+### **Claude Code Usage (October 2025)**
+
+```bash
+# Setup
+init-ai-tools           # Select "Claude Code" in prompt
+# OR
+setup-claude            # Direct setup
+
+# Quality-aware development
+claude-code .           # Start Claude Code session
+
+# Available optimizations:
+# - MCP Serena server for symbolic code operations (token efficient)
+# - .claude/CLAUDE.md with comprehensive quality gate instructions
+# - Pre/Post hooks remind about quality thresholds on Write/Edit
+# - Enterprise settings with full MCP server integration
+```
+
+**Claude Code Advantages:**
+- **Token Efficiency**: MCP Serena tools for surgical code operations
+- **Comprehensive Instructions**: 6KB CLAUDE.md with quality compliance strategies
+- **DevEnv Aware**: Knows about Node 20, Python 3.13, uv, and all quality tools
+- **Quality Hooks**: Automatic reminders when modifying code
 
 ## 🔧 **Integration with NixOS System**
 

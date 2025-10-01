@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (170 tools)
+- `modules/core/packages.nix` - System-wide packages (162 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -84,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (170 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (162 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: clean
-- **Last Updated**: 2025-10-01 05:19:05
+- **Git Status**: 0M 1A 0U
+- **Last Updated**: 2025-10-01 14:08:14
 - **Fish Abbreviations**: 57
-- **Total System Tools**: 170
+- **Total System Tools**: 162
 
 ---
 *Auto-updated by ./rebuild-nixos script*

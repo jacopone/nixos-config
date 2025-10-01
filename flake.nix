@@ -23,9 +23,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Whisper Dictation - Local speech-to-text (your project)
+    whisper-dictation = {
+      url = "path:/home/guyfawkes/whisper-dictation";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, ... }@inputs: {
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"
@@ -42,6 +48,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
+            home-manager.extraSpecialArgs = { inherit inputs; };
             # The path to your home-manager config, username is set to "guyfawkes"
             home-manager.users.guyfawkes = import ./users/guyfawkes/home.nix;
           }

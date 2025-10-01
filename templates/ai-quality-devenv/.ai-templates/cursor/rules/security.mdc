@@ -1,0 +1,52 @@
+---
+description: Security-focused development rules
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.py"
+  - "**/*.yaml"
+  - "**/*.yml"
+  - "**/*.json"
+  - "**/*.env*"
+alwaysApply: false
+---
+
+# Security Development Rules
+
+## Secret Management
+- Never hardcode API keys, passwords, or sensitive data
+- Use environment variables for all configuration
+- Implement proper secret rotation strategies
+- Use secure storage for production secrets
+
+## Input Validation
+- Validate and sanitize all user inputs
+- Use parameterized queries for database operations
+- Implement proper rate limiting on APIs
+- Validate file uploads and restrict file types
+
+## Authentication & Authorization
+- Implement proper session management
+- Use secure password hashing (bcrypt, Argon2)
+- Implement proper JWT token handling
+- Follow principle of least privilege
+
+## Data Protection
+- Encrypt sensitive data at rest and in transit
+- Implement proper CORS policies
+- Use HTTPS everywhere in production
+- Follow GDPR/privacy regulations for user data
+
+## Security Headers
+- Implement proper CSP (Content Security Policy)
+- Use HSTS (HTTP Strict Transport Security)
+- Set appropriate X-Frame-Options
+- Include X-XSS-Protection headers
+
+## Vulnerability Prevention
+- Keep dependencies updated and scan for vulnerabilities
+- Implement proper error handling without information leakage
+- Use secure communication protocols
+- Regular security audits and penetration testing

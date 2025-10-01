@@ -33,19 +33,55 @@ direnv allow         # Automatic activation (recommended)
 # OR
 devenv shell         # Manual activation
 
-# Install git hooks and setup Cursor AI
+# Interactive AI tools setup (RECOMMENDED - NEW!)
+init-ai-tools        # Choose Claude Code, Cursor AI, or both
+
+# Install git hooks
 setup-git-hooks
-setup-cursor
+
+# Verify setup
 quality-report
 ```
 
 ## Available Scripts
 
+### AI Tools Setup
+- `init-ai-tools` - **Interactive AI tools setup** (choose Claude Code, Cursor AI, or both)
+- `setup-cursor` - Setup Cursor AI only (use init-ai-tools instead)
+- `setup-claude` - Setup Claude Code only (use init-ai-tools instead)
+
+### Quality Gates
 - `hello` - Environment information
 - `quality-report` - Show all active quality gates
 - `quality-check` - Run comprehensive quality analysis
 - `setup-git-hooks` - Install git hooks manually
-- `setup-cursor` - Setup Cursor AI integration with project rules
+
+### Legacy Codebase Rescue (NEW!)
+- `assess-codebase` - **Comprehensive 8-step codebase analysis**
+- `generate-remediation-plan` - **AI-powered remediation plan with self-awareness**
+- `quality-dashboard` - Real-time quality metrics dashboard
+
+See `LEGACY_CODEBASE_RESCUE.md` for complete rescue system documentation.
+
+### Quality Baseline Gates (NEW!)
+- `check-feature-readiness` - **Validate all quality baseline thresholds before features**
+- `certify-feature-ready` - **Lock in baseline and enable strict mode enforcement**
+- `quality-regression-check` - **Pre-commit validation against baseline (strict mode)**
+
+See `QUALITY_BASELINE_GATES.md` for complete baseline gates system documentation.
+
+### Autonomous Execution (NEW - Tier 1 & 2!)
+- `initialize-remediation-state` - **Initialize autonomous remediation with state management**
+- `autonomous-remediation-session` - **Main orchestrator for supervised autonomous refactoring**
+- `identify-next-targets` - **Smart target prioritization algorithm**
+- `validate-target-improved` - **Automatic validation of refactoring improvements**
+- `checkpoint-progress` - **Git commit automation with tagging every 5 commits**
+- `needs-human-checkpoint` - **Safety gate checking for human approval**
+- `mark-checkpoint-approved` - **Mark human approval for phase transitions**
+- `rollback-to-checkpoint` - **Rollback to last stable checkpoint**
+- `update-remediation-state` - **Internal: Update persistent state**
+
+See `AUTONOMOUS_AGENT_COMPATIBILITY.md` for autonomous execution documentation.
 
 ## Quality Standards
 
@@ -88,35 +124,80 @@ services = {
 ### Adjusting Quality Thresholds
 Modify hook configurations in `git-hooks.hooks` section.
 
-## Cursor AI Integration
+## AI Development Integration
 
-### Modern Rules System (2025)
-This template uses the latest `.cursor/rules` system with MDC (Metadata + Content) format files for AI behavior configuration.
+This template provides **first-class support for both Cursor AI and Claude Code** with comprehensive quality gate awareness.
 
-### Available Rule Files
+### Cursor AI Integration
+
+**Modern Rules System (2025)**: Uses `.cursor/rules` with MDC format files.
+
+**Available Rule Files:**
 - **`index.mdc`**: Core development rules with quality standards and technology stack integration
 - **`security.mdc`**: Security-focused rules for secure coding practices
 - **`testing.mdc`**: Testing and QA rules for comprehensive test coverage
 
-### Cursor Configuration Features
-- **YOLO Mode**: Enabled for advanced AI capabilities with build/test execution
-- **Model Selection**: Claude 3.5 Sonnet (primary), GPT-4o (secondary) with auto-selection
-- **Agent Mode**: Enhanced shortcuts (`Ctrl+I` for agent, `Ctrl+E` for background)
-- **Privacy Mode**: Enterprise-grade privacy settings for sensitive code
-- **Context Management**: Optimized for large codebases with proper exclusions
+**Configuration Features:**
+- YOLO Mode for advanced AI capabilities with build/test execution
+- Claude 3.5 Sonnet (primary), GPT-4o (secondary) model selection
+- Agent Mode shortcuts (`Ctrl+I` for agent, `Ctrl+E` for background)
+- Enterprise-grade privacy settings for sensitive code
+- Optimized context management with `.cursorignore`
 
-### Project Setup
-1. Run `setup-cursor` to initialize project-specific rules
-2. Edit `.cursor/rules/*.mdc` files to customize AI behavior
-3. Use `.cursorignore` to exclude files from AI context
-4. Leverage Agent mode for complex refactoring and implementation tasks
+**Setup:**
+```bash
+# Option 1: Interactive (RECOMMENDED)
+init-ai-tools                   # Select Cursor AI in the prompt
 
-### Integration with Quality Gates
-Cursor AI rules are synchronized with the project's quality gates:
-- All AI-generated code respects complexity thresholds (CCN < 10)
-- Security rules prevent credential exposure and enforce best practices
-- Testing rules ensure comprehensive coverage for AI-suggested code
-- Code formatting and linting rules match pre-commit hook configuration
+# Option 2: Direct
+setup-cursor                    # Initialize Cursor AI integration
+
+# Customize
+# Edit .cursor/rules/*.mdc      # Adjust AI behavior and rules
+```
+
+### Claude Code Integration (NEW - October 2025)
+
+**Project-Level Configuration**: Uses `.claude/CLAUDE.md` for comprehensive Claude Code instructions.
+
+**Key Features:**
+- **Quality Gate Awareness**: Claude knows all thresholds (CCN < 10, duplication < 5%, etc.)
+- **MCP Serena Integration**: Optimized symbolic code operations for token efficiency
+- **DevEnv Context**: Full understanding of Node.js 20, Python 3.13, uv, quality tools
+- **Pre/Post Hooks**: Quality reminders on Write/Edit operations
+- **Enterprise Settings**: Permissions, environment variables, MCP server enablement
+
+**Configuration Files:**
+- **`.claude/CLAUDE.md`**: Comprehensive enterprise development guidelines (6KB)
+  - Quality gate compliance strategies
+  - MCP Serena tool usage optimization
+  - Technology stack integration
+  - Security-first development patterns
+  - Code generation best practices
+- **`.claude/settings.local.json`**: Hooks, permissions, environment variables
+- **`.claudeignore`**: Exclude build artifacts and dependencies from context
+
+**Setup:**
+```bash
+# Option 1: Interactive (RECOMMENDED)
+init-ai-tools                   # Select Claude Code in the prompt
+
+# Option 2: Direct
+setup-claude                    # Initialize Claude Code integration
+
+# Customize
+# Edit .claude/CLAUDE.md        # Adjust behavior and guidelines
+```
+
+### Shared Quality Standards
+
+Both AI systems enforce identical quality gates:
+- **Complexity**: CCN < 10 per function (Lizard)
+- **Duplication**: < 5% threshold (JSCPD)
+- **Security**: Zero secrets (Gitleaks), zero vulnerabilities (Semgrep)
+- **Formatting**: Prettier/ESLint (JS/TS), Black/Ruff (Python)
+- **Testing**: 75%+ coverage for new code
+- **Commits**: Conventional Commits format (Commitizen)
 
 ## Architecture: Pure DevEnv Approach
 
