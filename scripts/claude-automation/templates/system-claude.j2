@@ -1,0 +1,42 @@
+# System-Level CLAUDE.md
+
+This file provides Claude Code with comprehensive information about all available tools and utilities on this NixOS system.
+
+*Last updated: {{ timestamp.strftime('%Y-%m-%d %H:%M:%S') }}*
+
+## IMPORTANT: CLAUDE CODE TOOL SELECTION POLICY
+
+**SYSTEM OPTIMIZATION LEVEL: EXPERT**
+{% include 'shared/policies.j2' %}
+
+{% include 'shared/command_examples.j2' %}
+
+## System Information
+
+- **OS**: NixOS (nixos-unstable)
+- **Desktop**: GNOME (Wayland)
+- **Shell**: Fish (with smart command substitutions)
+- **Terminal**: Kitty (optimized for AI development)
+- **Package Management**: Nix Flakes + Home Manager
+
+## Available Command Line Tools
+
+{% for category, tools in tool_categories.items() %}
+### {{ category.value }}
+{% for tool in tools %}
+- `{{ tool.name }}` - {{ tool.description }}{% if tool.url %} - {{ tool.url }}{% endif %}
+{% endfor %}
+
+{% endfor %}
+
+{% include 'shared/fish_abbreviations.j2' %}
+
+## Maintenance
+
+This file is automatically maintained and should be updated when:
+- New packages are added to `nixos-config/modules/core/packages.nix`
+- New home-manager programs are configured
+- Fish shell abbreviations or functions are modified
+- Development tools or workflows change
+
+To regenerate this file, run the NixOS rebuild process which automatically updates Claude Code configurations.

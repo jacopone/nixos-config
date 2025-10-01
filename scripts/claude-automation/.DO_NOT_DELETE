@@ -1,0 +1,15 @@
+⚠️ CRITICAL INFRASTRUCTURE - DO NOT DELETE ⚠️
+
+This package is ACTIVE, ESSENTIAL infrastructure that auto-generates Claude Code configuration files.
+
+Deleting this will:
+- Break the rebuild-nixos script
+- Remove Claude's knowledge of your system tools
+- Disable automatic CLAUDE.md generation
+- Require manual Claude configuration
+
+See README.md in this directory for full details.
+
+This is NOT legacy code.
+This is NOT a duplicate folder.
+This IS critical system infrastructure.

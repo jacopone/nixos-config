@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (163 tools)
+- `modules/core/packages.nix` - System-wide packages ({{ package_count }} tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -64,13 +64,9 @@
 - Include URLs for package references when helpful
 
 ## Working Features ✅
-- Fish shell with smart abbreviations
-- Yazi file manager with rich previews
-- Starship prompt with visual git status
-- Auto-updating Claude Code tool intelligence
-- BASB knowledge management system
-- AI orchestration with CCPM integration
-- Chrome declarative extension management
+{% for feature in working_features %}
+- {{ feature }}
+{% endfor %}
 
 ## Do Not Touch
 - `/etc/nixos/` (use this repo instead)
@@ -84,7 +80,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (163 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents ({{ package_count }} tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,10 +92,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 0M 0A 2U
-- **Last Updated**: 2025-10-01 19:27:33
-- **Fish Abbreviations**: 57
-- **Total System Tools**: 163
+- **Git Status**: {{ git_status.status_string }}
+- **Last Updated**: {{ timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+- **Fish Abbreviations**: {{ fish_abbreviation_count }}
+- **Total System Tools**: {{ package_count }}
 
 ---
 *Auto-updated by ./rebuild-nixos script*

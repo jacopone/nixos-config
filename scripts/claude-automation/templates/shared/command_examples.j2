@@ -1,0 +1,45 @@
+### Command Examples (Use These Patterns)
+
+**File Operations:**
+```bash
+# Instead of: find . -name "*.nix"
+fd "\.nix$"
+
+# Instead of: ls -la
+eza -la --git --group-directories-first
+
+# Instead of: cat config.json
+bat config.json
+jless config.json  # for large/complex JSON
+
+# Instead of: du -h
+dust
+
+# Instead of: ps aux | grep firefox
+procs firefox
+```
+
+**Data Processing:**
+```bash
+# JSON analysis
+jless data.json          # Interactive browsing
+bat data.json            # Syntax-highlighted viewing
+jq '.key' data.json      # Query processing
+
+# CSV processing
+csvlook data.csv         # Table view
+choose 0 2 < data.csv    # Extract columns 1 and 3
+miller --csv cut -f name,age data.csv  # Advanced processing
+
+# YAML processing
+yq '.services' config.yaml
+bat config.yaml
+```
+
+**System Analysis:**
+```bash
+procs                    # Better process list
+btm                      # Interactive system monitor
+dust                     # Disk usage visualization
+duf                      # Colored disk usage
+```
