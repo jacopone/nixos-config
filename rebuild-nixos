@@ -110,6 +110,22 @@ else
     echo "--> Cache cleanup skipped."
 fi
 
+# Clean up old Claude backup files
+if [ -d .backups ]; then
+    backup_count=$(find .backups -name "*.backup-*" 2>/dev/null | wc -l)
+    if [ "$backup_count" -gt 0 ]; then
+        echo "--> Found $backup_count Claude backup files in .backups/"
+        read -p "Delete Claude backup files older than 7 days? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "--> Cleaning old Claude backups..."
+            find .backups -name "*.backup-*" -mtime +7 -delete 2>/dev/null && echo "  ✅ Old backups deleted"
+        else
+            echo "--> Claude backup cleanup skipped."
+        fi
+    fi
+fi
+
 echo ""
 echo "NixOS system rebuild and cleanup complete!"
 

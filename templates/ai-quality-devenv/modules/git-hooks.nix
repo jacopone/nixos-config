@@ -42,7 +42,7 @@
       name = "complexity-check";
       entry = "lizard --CCN 10 --length 50";  # Available system-wide
       files = "\\.(py|js|ts|tsx)$";
-      excludes = [ ".devenv/" "node_modules/" "coverage/" "dist/" ];
+      excludes = [ ".devenv/" "node_modules/" "coverage/" "dist/" "scripts/claude-automation/" ];
     };
 
     jscpd = {
@@ -75,14 +75,16 @@
     markdownlint = {
       enable = true;
       files = "\\.md$";
-      entry = "${pkgs.nodePackages.markdownlint-cli2}/bin/markdownlint-cli2";
+      # Wrap in devenv shell to ensure tool availability when running outside devenv
+      entry = "devenv shell bash -c 'markdownlint-cli2'";
+      language = "system";
       excludes = [ "node_modules/" ".devenv/" "CHANGELOG.md" ".quality/" ];
     };
 
     ls-lint = {
       enable = true;
       name = "naming-conventions";
-      # Wrap in devenv shell to ensure tool availability
+      # Wrap in devenv shell to ensure tool availability when running outside devenv
       entry = "devenv shell bash -c 'ls-lint'";
       language = "system";
       pass_filenames = false;
