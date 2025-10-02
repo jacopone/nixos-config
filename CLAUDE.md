@@ -95,6 +95,19 @@
 - Weekly garbage collection + monthly updates automated
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
+## Documentation Creation Policy
+
+**ALWAYS ask before creating documentation files (.md, .txt, README, etc.)**
+
+Before creating any doc, propose to user:
+- **Filename** and **type** (Status/Architecture/Guide/Reference/Changelog)
+- **Purpose** (1-2 sentences explaining why it's needed)
+- **Alternative** (Could this be a section in existing file instead?)
+
+Wait for approval before writing.
+
+**Exception**: Only auto-create if explicitly requested or part of agreed plan.
+
 ## System Status
 - **Git Status**: clean
 - **Last Updated**: 2025-10-01 23:01:43
