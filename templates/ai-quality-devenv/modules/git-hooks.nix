@@ -36,7 +36,7 @@
       excludes = [ ".devenv/" "result" "node_modules/" "coverage/" "dist/" "build/" ];
     };
 
-    # Enhanced quality gates (AI code protection)
+    # Code quality checks
     complexity-check = {
       enable = true;
       name = "complexity-check";
@@ -62,15 +62,16 @@
     };
 
     # Commit message formatting
-    # DISABLED: Hash mismatch in nixpkgs for commitizen (temporary)
-    # commitizen = {
-    #   enable = true;
-    #   name = "commitizen check";
-    #   entry = "${pkgs.commitizen}/bin/cz check --commit-msg-file";
-    #   stages = [ "commit-msg" ];
-    # };
+    # Uses Go implementation to avoid Python version dependency issues
+    commitizen-check = {
+      enable = true;
+      name = "commitizen-conventional-commits";
+      entry = "${pkgs.commitizen-go}/bin/commitizen-go";
+      stages = [ "commit-msg" ];
+      pass_filenames = false;
+    };
 
-    # Documentation & structure quality (Week 1)
+    # Documentation and structure validation
     markdownlint = {
       enable = true;
       files = "\\.md$";

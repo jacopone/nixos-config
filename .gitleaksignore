@@ -1,0 +1,11 @@
+# Gitleaks ignore file - use exact fingerprints from gitleaks detect
+# Format: commit:file:rule:line
+
+# Example API keys in documentation (not real secrets)
+aa7626798d6aff8b10dc16b8678aa34b83d2cab9:templates/ai-quality-devenv/CURSOR_AI_SETUP.md:generic-api-key:227
+4204e790868d7a43b257a0e7efe28a142402c2ac:templates/ai-quality-devenv/CLAUDE_CODE_SETUP.md:generic-api-key:215
+97bd3b09c591f5f5f1e2e772e31922efa082cdbd:templates/ai-quality-devenv/.ai-templates/claude/CLAUDE.md:generic-api-key:119
+
+# Example age encryption key in migration documentation (not real)
+796d9f95d0672a642c100b04b2fa8eb29ca41d98:MIGRATION_PLAN.md:age-secret-key:96
+796d9f95d0672a642c100b04b2fa8eb29ca41d98:MIGRATION_PLAN.md:age-secret-key:103

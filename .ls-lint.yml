@@ -1,0 +1,52 @@
+# ls-lint configuration for nixos-config repository
+# Naming conventions for files and directories
+
+ls:
+  # Nix files - kebab-case
+  .nix: kebab-case
+
+  # Shell scripts - kebab-case
+  .sh: kebab-case
+
+  # Python files - snake_case or kebab-case
+  .py: regex:^[a-z0-9_-]+$
+
+  # JavaScript/TypeScript - kebab-case or camelCase
+  .js: regex:^[a-z0-9-]+$|^[a-zA-Z0-9]+$
+  .ts: regex:^[a-z0-9-]+$|^[a-zA-Z0-9]+$
+
+  # Markdown - UPPERCASE or kebab-case
+  .md: regex:^[A-Z0-9_-]+$|^[a-z0-9-]+$
+
+  # YAML/JSON - kebab-case
+  .yaml: kebab-case
+  .yml: kebab-case
+  .json: kebab-case
+
+  # Text files - UPPERCASE or kebab-case
+  .txt: regex:^[A-Z0-9_-]+$|^[a-z0-9-]+$
+
+ignore:
+  # Build artifacts
+  - .devenv
+  - .devenv.*
+  - result
+  - .direnv
+
+  # Git
+  - .git
+
+  # Nix store paths
+  - /nix/store
+
+  # Cache
+  - .cache
+  - node_modules
+  - __pycache__
+  - .pytest_cache
+
+  # Backups
+  - .backups
+
+  # Quality reports
+  - .quality

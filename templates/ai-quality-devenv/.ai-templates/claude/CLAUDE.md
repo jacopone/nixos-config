@@ -1,11 +1,11 @@
 # AI Quality DevEnv - Claude Code Configuration
 
-> **Enterprise-Grade Development Environment Template**
+> Development Environment Template
 > Last Updated: 2025-10-01
 
 ## 🎯 Project Overview
 
-This is a **template project** for creating enterprise-grade development environments with comprehensive quality gates designed for AI-assisted coding. When used, it provides a complete DevEnv setup with automated quality enforcement.
+This is a template project for creating development environments with automated quality gates for AI-assisted coding. When used, it provides a DevEnv setup with automated quality enforcement.
 
 ### Technology Stack
 
@@ -30,7 +30,7 @@ This is a **template project** for creating enterprise-grade development environ
 ## 🤖 Claude Code Operational Guidelines
 
 ### Primary Directive
-You are operating in an **enterprise development template** with **automated quality gates**. All code you generate or modify MUST pass these gates before commit. Quality is enforced automatically - there are no exceptions.
+You are operating in a development template with automated quality gates. All code you generate or modify must pass these gates before commit. Quality is enforced automatically - there are no exceptions.
 
 ### MCP Server Integration
 
@@ -448,6 +448,253 @@ services = {
 - **Avoid duplication** by searching for similar implementations first
 - **Use env vars** for all configuration from the start
 
+## 🚫 Git Commit Policy
+
+**NEVER use `git commit --no-verify` without explicit user permission.**
+
+When git hooks fail:
+1. **First attempt**: Fix the underlying issue (formatting, complexity, tests, security)
+2. **Second attempt**: Fix it again if still failing
+3. **After a couple of failed attempts**: Ask the user if they want to use `--no-verify`
+4. **Only proceed with `--no-verify`** based on user's explicit instruction
+
+Git hooks enforce quality gates (security, complexity, formatting). Bypassing them introduces risks:
+- Security vulnerabilities (secrets, injection flaws)
+- Code complexity issues (CCN > 10)
+- Formatting inconsistencies
+- Non-standard commit messages
+
+This is a critical policy - git hooks exist for quality and security enforcement.
+
+## 📄 Documentation Creation Policy
+
+**ALWAYS ask before creating documentation files (.md, .txt, README, etc.)**
+
+Before creating any doc, propose to user:
+- **Filename** and **type** (Status/Architecture/Guide/Reference/Changelog)
+- **Purpose** (1-2 sentences explaining why it's needed)
+- **Alternative** (Could this be a section in existing file instead?)
+
+Wait for approval before writing.
+
+**Exception**: Only auto-create if explicitly requested or part of agreed plan.
+
+## 📝 Documentation and Commenting Policy
+
+### Core Principles
+
+**1. No Temporal Markers**
+Never use time-based references that will become confusing or meaningless:
+- ❌ Avoid: "NEW", "NEW 2025", "Week 1", "Phase 2", "October 2025", "Recently added"
+- ❌ Avoid: "ENHANCED", "UPDATED", "DEPRECATED (coming soon)"
+- ✅ Instead: Describe what the code/feature does, not when it was added
+
+**Examples:**
+```python
+# ❌ BAD - Temporal markers lose meaning over time
+# NEW 2025: Advanced authentication system
+# Week 3 implementation for user management
+class UserAuth:
+    pass
+
+# ✅ GOOD - Timeless, descriptive
+# JWT-based authentication with refresh tokens
+class UserAuth:
+    pass
+```
+
+**2. No Hyperbolic Language**
+Avoid marketing speak and subjective qualifiers in technical documentation:
+- ❌ Avoid: "enterprise-grade", "comprehensive", "advanced", "cutting-edge"
+- ❌ Avoid: "robust", "powerful", "superior", "best-in-class", "revolutionary"
+- ❌ Avoid: "state-of-the-art", "world-class", "premium", "next-generation"
+- ❌ Avoid: "modern", "latest", "enhanced", "ultimate", "perfect"
+- ✅ Instead: Use factual, technical descriptions
+
+**Examples:**
+```typescript
+// ❌ BAD - Hyperbolic, subjective
+// Enterprise-grade, comprehensive user management system
+// with cutting-edge authentication and advanced security
+class UserManager {
+  // Modern, powerful authentication method
+  async login(credentials: Credentials) { }
+}
+
+// ✅ GOOD - Factual, descriptive
+// User management with JWT authentication, role-based access control,
+// and password hashing using bcrypt
+class UserManager {
+  // Authenticate user and return JWT token
+  async login(credentials: Credentials) { }
+}
+```
+
+**3. Be Descriptive and Factual**
+Focus on technical details and behavior:
+```javascript
+// ❌ BAD
+// Enhanced data processing pipeline
+
+// ✅ GOOD
+// Processes CSV data in batches of 1000 rows,
+// validates against schema, transforms to JSON
+
+// ❌ BAD
+// Modern API client with advanced features
+
+// ✅ GOOD
+// HTTP client with automatic retry (3 attempts),
+// request/response logging, and timeout handling (30s)
+```
+
+**4. Comments Should Explain "Why", Not "What"**
+```python
+# ❌ BAD - States the obvious "what"
+# Loop through users
+for user in users:
+    process(user)
+
+# ✅ GOOD - Explains the "why"
+# Process users sequentially to avoid database connection pool exhaustion
+for user in users:
+    process(user)
+
+# ❌ BAD - Redundant with code
+# Add 1 to count
+count += 1
+
+# ✅ GOOD - Explains reasoning
+# Account for header row in total count
+count += 1
+```
+
+**5. Function/Class Documentation**
+Use JSDoc or Python docstrings, focus on behavior and constraints:
+```typescript
+/**
+ * Validates user email format and domain restrictions
+ *
+ * @param email - Email address to validate
+ * @returns true if valid, false otherwise
+ * @throws ValidationError if email is null/undefined
+ *
+ * Restrictions:
+ * - Must be valid RFC 5322 format
+ * - Domain must not be in blocklist
+ * - Maximum length: 254 characters
+ */
+function validateEmail(email: string): boolean {
+  // Implementation
+}
+```
+
+```python
+def process_payment(amount: Decimal, currency: str) -> PaymentResult:
+    """Process payment transaction with external payment gateway.
+
+    Args:
+        amount: Payment amount (must be positive, max 2 decimal places)
+        currency: ISO 4217 currency code (e.g., "USD", "EUR")
+
+    Returns:
+        PaymentResult containing transaction_id and status
+
+    Raises:
+        ValueError: If amount is negative or has >2 decimal places
+        PaymentGatewayError: If gateway returns error response
+
+    Side effects:
+        - Creates transaction record in database
+        - Sends confirmation email to user
+        - Logs transaction details
+    """
+```
+
+**6. Configuration and Magic Numbers**
+Always explain non-obvious values:
+```javascript
+// ❌ BAD
+const TIMEOUT = 30000;
+const MAX_RETRIES = 3;
+
+// ✅ GOOD
+// API timeout in milliseconds. Based on p95 response time (22s) + buffer
+const API_TIMEOUT_MS = 30000;
+
+// Maximum retry attempts. Balance between user experience and server load
+const MAX_RETRY_ATTEMPTS = 3;
+```
+
+**7. TODO Comments**
+Be specific about what needs to be done and why:
+```python
+# ❌ BAD
+# TODO: Fix this
+# TODO: Improve performance
+# TODO: Add error handling
+
+# ✅ GOOD
+# TODO: Replace with bulk insert to reduce DB round trips from N to 1
+# TODO: Add retry logic for transient network errors (503, timeout)
+# TODO: Validate email format before database lookup to avoid unnecessary queries
+```
+
+### Documentation Files
+
+When writing README, CONTRIBUTING, or other documentation:
+
+**Structure**:
+- Start with what the project/feature does
+- Explain prerequisites and dependencies
+- Provide installation/setup steps
+- Include usage examples
+- Document configuration options
+- List known limitations or constraints
+
+**Tone**:
+- Factual and technical
+- Present tense for current behavior
+- Imperative mood for instructions
+- Avoid first-person plural ("we built", "our system")
+- Avoid second-person excessive cheerleading ("you'll love", "you'll be amazed")
+
+**Example**:
+```markdown
+# User Authentication Module
+
+Handles user registration, login, and session management using JWT tokens.
+
+## Features
+
+- Password hashing with bcrypt (cost factor: 10)
+- JWT tokens with 1-hour expiration
+- Refresh token rotation
+- Rate limiting: 5 attempts per 15 minutes per IP
+
+## Installation
+
+```bash
+npm install
+npm run setup-db
+```
+
+## Usage
+
+```typescript
+import { AuthService } from './auth';
+
+const auth = new AuthService(config);
+const session = await auth.login(email, password);
+```
+
+## Configuration
+
+- `JWT_SECRET`: Secret key for token signing (required)
+- `TOKEN_EXPIRY`: Token lifetime in seconds (default: 3600)
+- `MAX_LOGIN_ATTEMPTS`: Failed attempts before lockout (default: 5)
+```
+
 ## 📚 Additional Resources
 
 ### Quality Gate Documentation
@@ -505,4 +752,4 @@ git commit -m "feat(module): add feature X"
 
 ---
 
-**Remember**: Quality gates are not obstacles - they're guardrails ensuring enterprise-grade code. Write with quality in mind from the start, and commits will be smooth.
+**Remember**: Quality gates are not obstacles - they're guardrails ensuring quality standards. Write with quality in mind from the start, and commits will be smooth.

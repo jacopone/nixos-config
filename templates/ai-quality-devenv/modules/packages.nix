@@ -3,31 +3,35 @@
 {
   # https://devenv.sh/packages/
   packages = with pkgs; [
-    # Core development tools
+    # Development tools
     nodejs_20
     git
     gh
 
-    # Modern Python setup with uv (2025 standard)
+    # Python environment with uv package manager
     uv
     python313
 
-    # Git hooks and security tools
+    # Git hooks and security
     gitleaks
-    # commitizen - DISABLED: Hash mismatch in nixpkgs (temporary)
-    black       # Promoted to top-level in nixpkgs
+    commitizen-go           # Go implementation (avoids Python version dependency issues)
+    black
     ruff
 
-    # Enhanced quality gates (2025 AI code quality)
-    semgrep              # Advanced security patterns
+    # Static analysis
+    semgrep                 # Pattern-based security and code quality scanning
 
-    # Documentation quality (Week 1)
+    # Documentation tooling
     nodePackages.markdownlint-cli2  # Markdown linting
-    # Note: typedoc not available in nodePackages, install via npm
-    # Note: interrogate not available in python313Packages, install via pip/uv
+    nodePackages.jsdoc              # JavaScript API documentation
+    python313Packages.sphinx        # Python documentation generator
 
-    # Naming conventions (Week 1)
-    ls-lint                         # File/folder naming enforcement
+    # Optional: Install per-project via npm/uv if needed
+    # - TypeDoc (TypeScript):  npm install -D typedoc
+    # - Interrogate (Python):  uv add --dev interrogate
+
+    # File and folder naming validation
+    ls-lint
 
     # Note: lizard and jscpd available system-wide via NixOS configuration
     # Add project-specific packages here
