@@ -28,6 +28,13 @@ Thumbs.db
 result
 result-*
 
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
 # Personal notes and drafts (if any)
 drafts/
 personal-notes/
