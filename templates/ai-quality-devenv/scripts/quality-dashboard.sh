@@ -1,23 +1,141 @@
 #!/usr/bin/env bash
-      echo ""
-      echo "┌─────────────────────────────────────────────┐"
-      echo "│     Codebase Quality Dashboard              │"
-      echo "├─────────────────────────────────────────────┤"
 
-      # Extract metrics if available
-      if [ -f .quality/stats.json ]; then
-        TOTAL_LOC=$(cat .quality/stats.json | jq '.Total.code' 2>/dev/null || echo "N/A")
-        echo "│ Total LOC:       $TOTAL_LOC                │"
-      else
-        echo "│ Total LOC:       N/A (run assess-codebase) │"
-      fi
+echo ""
+echo "╔═════════════════════════════════════════════════════════════╗"
+echo "║           Codebase Quality Dashboard (2025)                 ║"
+echo "╚═════════════════════════════════════════════════════════════╝"
+echo ""
 
-      echo "├─────────────────────────────────────────────┤"
-      echo "│ Run 'assess-codebase' for full analysis     │"
-      echo "│ Run 'generate-remediation-plan' for roadmap │"
-      echo "└─────────────────────────────────────────────┘"
-      echo ""
-    '';
+# Code Quality Metrics
+echo "📊 CODE QUALITY"
+echo "─────────────────────────────────────────────────────────────"
+
+if [ -f .quality/stats.json ]; then
+  TOTAL_LOC=$(cat .quality/stats.json | jq '.Total.code' 2>/dev/null || echo "N/A")
+  echo "  Lines of Code:    $TOTAL_LOC"
+else
+  echo "  Lines of Code:    N/A (run assess-codebase)"
+fi
+
+if [ -f .quality/complexity.json ]; then
+  AVG_CCN=$(cat .quality/complexity.json | jq '[.[] | .average_cyclomatic_complexity] | add / length' 2>/dev/null || echo "N/A")
+  MAX_CCN=$(cat .quality/complexity.json | jq '[.[] | .max_cyclomatic_complexity] | max' 2>/dev/null || echo "N/A")
+  echo "  Avg Complexity:   $AVG_CCN CCN"
+  echo "  Max Complexity:   $MAX_CCN CCN"
+else
+  echo "  Complexity:       N/A (run assess-codebase)"
+fi
+
+if [ -f .quality/jscpd-report.json ]; then
+  DUPLICATION=$(cat .quality/jscpd-report.json | jq '.statistics.total.percentage' 2>/dev/null || echo "N/A")
+  echo "  Duplication:      $DUPLICATION%"
+else
+  echo "  Duplication:      N/A (run assess-codebase)"
+fi
+
+echo ""
+echo "🔒 SECURITY"
+echo "─────────────────────────────────────────────────────────────"
+
+if [ -f .quality/gitleaks.json ]; then
+  SECRETS=$(cat .quality/gitleaks.json | jq 'length' 2>/dev/null || echo "N/A")
+  if [ "$SECRETS" = "0" ]; then
+    echo "  Exposed Secrets:  ✅ None"
+  else
+    echo "  Exposed Secrets:  ❌ $SECRETS found"
+  fi
+else
+  echo "  Exposed Secrets:  N/A (run assess-codebase)"
+fi
+
+if [ -f .quality/semgrep.json ]; then
+  VULNS=$(cat .quality/semgrep.json | jq '[.results[] | select(.extra.severity == "ERROR")] | length' 2>/dev/null || echo "N/A")
+  if [ "$VULNS" = "0" ]; then
+    echo "  Vulnerabilities:  ✅ None"
+  else
+    echo "  Vulnerabilities:  ❌ $VULNS critical"
+  fi
+else
+  echo "  Vulnerabilities:  N/A (run assess-codebase)"
+fi
+
+echo ""
+echo "📝 DOCUMENTATION (NEW)"
+echo "─────────────────────────────────────────────────────────────"
+
+if [ -f .quality/markdown-lint-errors.txt ]; then
+  MD_ERRORS=$(wc -l < .quality/markdown-lint-errors.txt 2>/dev/null || echo "N/A")
+  if [ "$MD_ERRORS" = "0" ]; then
+    echo "  Markdown Lint:    ✅ No errors"
+  else
+    echo "  Markdown Lint:    ⚠️  $MD_ERRORS errors"
+  fi
+else
+  echo "  Markdown Lint:    N/A (run assess-documentation)"
+fi
+
+# Check for required docs
+REQUIRED_DOCS="README.md ARCHITECTURE.md"
+MISSING_DOCS=""
+for doc in $REQUIRED_DOCS; do
+  if [ ! -f "$doc" ]; then
+    MISSING_DOCS="$MISSING_DOCS $doc"
+  fi
+done
+
+if [ -z "$MISSING_DOCS" ]; then
+  echo "  Required Docs:    ✅ All present"
+else
+  echo "  Required Docs:    ⚠️  Missing:$MISSING_DOCS"
+fi
+
+echo ""
+echo "📁 FOLDER STRUCTURE (NEW)"
+echo "─────────────────────────────────────────────────────────────"
+
+if [ -f .quality/folder-structure.json ]; then
+  MAX_DEPTH=$(cat .quality/folder-structure.json | jq '.max_depth' 2>/dev/null || echo "N/A")
+  GOD_DIRS=$(cat .quality/folder-structure.json | jq '.god_directories_count' 2>/dev/null || echo "N/A")
+  STRUCTURE_SCORE=$(cat .quality/folder-structure.json | jq '.structure_score' 2>/dev/null || echo "N/A")
+
+  echo "  Max Depth:        $MAX_DEPTH levels"
+
+  if [ "$GOD_DIRS" = "0" ]; then
+    echo "  God Directories:  ✅ None"
+  else
+    echo "  God Directories:  ⚠️  $GOD_DIRS found"
+  fi
+
+  echo "  Structure Score:  $STRUCTURE_SCORE/100"
+else
+  echo "  Folder Analysis:  N/A (run analyze-folder-structure)"
+fi
+
+echo ""
+echo "📛 NAMING CONVENTIONS (NEW)"
+echo "─────────────────────────────────────────────────────────────"
+
+if [ -f .quality/naming-violations.txt ]; then
+  NAMING_VIOLATIONS=$(grep -c "FAILED" .quality/naming-violations.txt 2>/dev/null || echo "0")
+  if [ "$NAMING_VIOLATIONS" = "0" ]; then
+    echo "  Naming Violations: ✅ None"
+  else
+    echo "  Naming Violations: ⚠️  $NAMING_VIOLATIONS found"
+  fi
+else
+  echo "  Naming Check:      N/A (run check-naming-conventions)"
+fi
+
+echo ""
+echo "═════════════════════════════════════════════════════════════"
+echo ""
+echo "📋 QUICK ACTIONS"
+echo "  • assess-codebase          - Full code quality analysis"
+echo "  • assess-documentation     - Documentation quality check"
+echo "  • analyze-folder-structure - Folder complexity analysis"
+echo "  • check-naming-conventions - File/folder naming validation"
+echo "  • check-feature-readiness  - Validate all quality gates"
+echo ""
 
     # ============================================================================
     # AUTONOMOUS EXECUTION LAYER - TIER 1 & TIER 2
