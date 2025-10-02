@@ -28,6 +28,8 @@ Development environment with automated quality gates for AI-assisted coding.
 ### 🤖 Automated Quality Checks
 Quality gates run automatically via pre-commit hooks on each commit.
 
+**Important**: Git hooks run inside `devenv shell` automatically. This ensures all quality tools (ls-lint, markdownlint, gitleaks, etc.) are available when you commit, even from outside the devenv shell.
+
 ## Quick Start
 
 ```bash
@@ -44,8 +46,9 @@ devenv shell         # Manual activation
 # Interactive AI tools setup
 init-ai-tools        # Choose Claude Code, Cursor AI, or both
 
-# Install git hooks
-setup-git-hooks
+# Git hooks are installed automatically on first devenv shell
+# Verify installation:
+ls -la .git/hooks/pre-commit
 
 # Verify setup
 quality-report
@@ -247,6 +250,62 @@ This template uses only `devenv.nix` based on the `account-harmony-ai-37599577` 
 1. **You maintain**: Only `devenv.nix` with your development environment
 2. **DevEnv generates**: `.devenv.flake.nix` automatically for Nix compatibility
 3. **You get**: Nix ecosystem benefits without the complexity
+
+## Troubleshooting
+
+### Git Hooks Not Running
+
+If git hooks fail with "Executable not found" errors:
+
+1. **Verify devenv shell activation**:
+   ```bash
+   devenv shell bash -c "which ls-lint"
+   # Should show: /nix/store/.../ls-lint-2.3.1/bin/ls-lint
+   ```
+
+2. **Regenerate hooks**:
+   ```bash
+   rm -f .pre-commit-config.yaml .git/hooks/*
+   devenv shell  # Hooks auto-install on shell entry
+   ```
+
+3. **Check .pre-commit-config.yaml**:
+   ```bash
+   # ls-lint entry should be wrapped in devenv shell:
+   grep "ls-lint" .pre-commit-config.yaml
+   # Should show: "entry": "devenv shell bash -c 'ls-lint'"
+   ```
+
+### Git Hooks Architecture
+
+**How it works**:
+- Git hooks run **outside** the devenv shell by default
+- Template wraps quality tools in `devenv shell bash -c 'command'`
+- This ensures tools are available when git triggers hooks
+- The `nix` package in devenv.nix provides `nix-store` for GC root creation
+
+**Why this approach**:
+- No need to install tools system-wide
+- Works in any environment (CI, different machines, containers)
+- Developers don't need to remember to run hooks from within devenv shell
+- Quality gates enforced automatically on every commit
+
+### Common Issues
+
+**"nix-store: command not found"** during devenv shell:
+- Solution: `nix` package is included in template's devenv.nix
+- If using older version, add `pkgs.nix` to packages list
+
+**Hooks slow on first run**:
+- First commit after `devenv shell` spawns new devenv instance
+- Subsequent commits are faster (devenv shell cached)
+- This is expected behavior
+
+**"Your pre-commit configuration is unstaged"**:
+```bash
+git add .pre-commit-config.yaml
+git commit -m "your message"
+```
 
 ## Integration
 

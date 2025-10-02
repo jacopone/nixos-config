@@ -80,6 +80,11 @@
 - BASB knowledge management system
 - AI orchestration with CCPM integration
 - Chrome declarative extension management
+- **Quality gates via ai-quality-devenv template** (dogfooding)
+  - Git hooks working with devenv shell wrapper
+  - ls-lint, markdownlint, gitleaks, semgrep, commitizen enforced on every commit
+  - Root `devenv.nix` imports template modules
+  - Manual quality checks via `quality-check.sh`
 
 ## Do Not Touch
 
@@ -93,6 +98,22 @@
 - Fish shell context-aware commands (different behavior for interactive vs automated)
 - Chrome extensions managed declaratively via NixOS
 - BASB system integrated with Google Workspace + Sunsama + Readwise
+
+### Git Hooks and Devenv Integration
+
+**How it works**: Git hooks run inside `devenv shell` automatically
+
+- Git hooks are triggered outside devenv by default
+- Template wraps quality tools in `devenv shell bash -c 'command'`
+- This ensures ls-lint, markdownlint, etc. are available when committing
+- The `nix` package in devenv.nix provides `nix-store` for garbage collection roots
+
+**Why this matters**:
+
+- No need to install quality tools system-wide
+- Quality gates work in any environment (CI, containers, different machines)
+- Developers don't need to remember to commit from within devenv shell
+- Consistent enforcement across all contributors
 
 ## Architecture Philosophy
 
