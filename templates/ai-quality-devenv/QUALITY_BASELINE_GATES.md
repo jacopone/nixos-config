@@ -61,8 +61,14 @@ These are the **non-negotiable minimums** before feature work begins:
 | **Test Coverage** 🟡 | Changed Files (30d) | ≥ 50% | ≥ 70% | ≥ 80% | Active code MUST have tests |
 | **Duplication** 🟢 | Clone Percentage | < 15% | < 10% | < 5% | Duplication = bugs multiply |
 | **Code Quality** 🟢 | Linter Compliance | 100% | 100% | 100% | Formatting chaos = merge conflicts |
-| **Documentation** 🟡 | README exists | Yes | Yes | Yes | New devs need onboarding docs |
-| **Documentation** 🟡 | Architecture docs | Basic | Good | Excellent | Features need context |
+| **Documentation** 🔴 | Markdown Lint | 0 errors | 0 errors | 0 errors | Broken docs = poor onboarding |
+| **Documentation** 🟡 | API Coverage | ≥ 40% | ≥ 60% | ≥ 80% | Undocumented APIs = integration failures |
+| **Documentation** 🟡 | Required Files | All exist | All exist | All exist | README, ARCHITECTURE mandatory |
+| **Folder Structure** 🟡 | Max Depth | ≤ 5 levels | ≤ 4 levels | ≤ 3 levels | Deep nesting = hard to navigate |
+| **Folder Structure** 🟢 | God Directories | 0 | 0 | 0 | Huge directories = organization chaos |
+| **Folder Structure** 🟢 | Root Clutter | ≤ 5 files | ≤ 5 files | ≤ 3 files | Clean root = professional project |
+| **Naming** 🔴 | Convention Violations | 0 | 0 | 0 | Inconsistent names = confusion |
+| **Naming** 🟢 | Non-ASCII Files | 0 | 0 | 0 | ASCII-only = cross-platform safety |
 | **Git Hygiene** 🟢 | Secrets in history | 0 | 0 | 0 | Can't un-leak committed secrets |
 | **Git Hygiene** 🟢 | .gitignore proper | Yes | Yes | Yes | Avoid committing build artifacts |
 

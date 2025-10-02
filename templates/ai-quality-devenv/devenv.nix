@@ -26,6 +26,12 @@
     ruff
     # Enhanced quality gates (2025 AI code quality)
     semgrep              # Advanced security patterns
+    # Documentation quality (Week 1)
+    nodePackages.markdownlint-cli2  # Markdown linting
+    nodePackages.typedoc            # TypeScript documentation
+    python313Packages.interrogate   # Python docstring coverage
+    # Naming conventions (Week 1)
+    ls-lint                         # File/folder naming enforcement
     # Note: lizard and jscpd available system-wide via NixOS configuration
     # Add project-specific packages here
   ];
@@ -2469,6 +2475,14 @@ EOF
       echo "✅ Coordinator setup complete!"
       echo "   Agents can now begin parallel execution."
     '';
+
+    # ============================================================================
+    # WEEK 1: DOCUMENTATION & STRUCTURE QUALITY GATES
+    # ============================================================================
+
+    assess-documentation.exec = "bash scripts/assess-documentation.sh";
+    analyze-folder-structure.exec = "bash scripts/analyze-folder-structure.sh";
+    check-naming-conventions.exec = "bash scripts/check-naming-conventions.sh";
   };
 
   # https://devenv.sh/pre-commit-hooks/
@@ -2539,9 +2553,27 @@ EOF
       entry = "${pkgs.python3Packages.commitizen}/bin/cz check --commit-msg-file";
       stages = [ "commit-msg" ];
     };
+
+    # ============================================================================
+    # WEEK 1: DOCUMENTATION & STRUCTURE QUALITY HOOKS
+    # ============================================================================
+
+    # Markdown linting
+    markdownlint = {
+      enable = true;
+      files = "\\.md$";
+      entry = "${pkgs.nodePackages.markdownlint-cli2}/bin/markdownlint-cli2";
+      excludes = [ "node_modules/" ".devenv/" "CHANGELOG.md" ".quality/" ];
+    };
+
+    # Naming conventions
+    ls-lint = {
+      enable = true;
+      name = "naming-conventions";
+      entry = "${pkgs.ls-lint}/bin/ls-lint";
+      pass_filenames = false;
+    };
   };
 
   enterShell = ''
     hello
-  '';
-}

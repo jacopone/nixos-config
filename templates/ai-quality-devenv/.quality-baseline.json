@@ -1,0 +1,92 @@
+{
+  "version": "2.0",
+  "description": "Extended quality baseline thresholds including documentation, structure, and naming conventions",
+  "updated": "2025-10-02",
+  "baseline": {
+    "security": {
+      "critical_issues": 0,
+      "high_severity": 0,
+      "secrets_exposed": 0,
+      "vulnerable_dependencies": 5
+    },
+    "complexity": {
+      "average_ccn": 15,
+      "max_ccn": 30,
+      "functions_over_20_ccn": 20,
+      "max_function_length": 50
+    },
+    "tests": {
+      "overall_coverage_pct": 40,
+      "critical_paths_coverage_pct": 60,
+      "changed_files_30d_coverage_pct": 50
+    },
+    "duplication": {
+      "clone_percentage": 15,
+      "min_clone_lines": 10
+    },
+    "documentation": {
+      "markdown_lint_errors": 0,
+      "public_api_documented_pct": 60,
+      "jsdoc_coverage_pct": 40,
+      "docstring_coverage_pct": 40,
+      "required_files": ["README.md", "ARCHITECTURE.md"],
+      "missing_docs_max": 0
+    },
+    "folder_structure": {
+      "max_depth": 5,
+      "max_files_per_directory": 30,
+      "god_directories_count": 0,
+      "orphan_files_root_max": 5,
+      "structure_score_min": 60
+    },
+    "naming": {
+      "ls_lint_violations": 0,
+      "non_ascii_filenames": 0,
+      "max_filename_length": 50,
+      "special_chars_violations": 0
+    },
+    "code_quality": {
+      "linter_compliance_pct": 100,
+      "formatter_compliance_pct": 100
+    },
+    "git_hygiene": {
+      "secrets_in_history": 0,
+      "gitignore_proper": true,
+      "conventional_commits": true
+    }
+  },
+  "thresholds": {
+    "minimum": {
+      "description": "Absolute minimum before feature work",
+      "health_score": 40
+    },
+    "target": {
+      "description": "Target for ongoing maintenance",
+      "health_score": 65
+    },
+    "ideal": {
+      "description": "Excellence standard",
+      "health_score": 85
+    }
+  },
+  "phase_gates": {
+    "security_complete": {
+      "required": ["security.critical_issues == 0", "security.secrets_exposed == 0"]
+    },
+    "structure_complete": {
+      "required": ["folder_structure.max_depth <= 5", "naming.ls_lint_violations == 0"]
+    },
+    "documentation_complete": {
+      "required": ["documentation.markdown_lint_errors == 0", "documentation.missing_docs_max == 0"]
+    },
+    "complexity_complete": {
+      "required": ["complexity.average_ccn <= 12", "complexity.max_ccn <= 20"]
+    },
+    "tests_complete": {
+      "required": ["tests.overall_coverage_pct >= 50", "tests.critical_paths_coverage_pct >= 75"]
+    },
+    "duplication_complete": {
+      "required": ["duplication.clone_percentage <= 10"]
+    }
+  }
+}
