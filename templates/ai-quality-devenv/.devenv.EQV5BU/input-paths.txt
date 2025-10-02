@@ -1,0 +1,10 @@
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/.devenv.EQV5BU/flake.json
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/.devenv.flake.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/devenv.local.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/devenv.lock
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/devenv.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/devenv.yaml
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/modules/git-hooks.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/modules/languages.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/modules/packages.nix
+/home/guyfawkes/nixos-config/templates/ai-quality-devenv/modules/scripts.nix

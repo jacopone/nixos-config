@@ -33,6 +33,7 @@ drafts/
 personal-notes/
 
 # Claude automation backup files
+.backups/
 CLAUDE*.backup-*
 docs/automation/backup-strategy.md
 docs/automation/claude-backup-legacy.md
@@ -43,6 +44,7 @@ data/models/**/*.ggml
 
 # DevEnv environment files
 .devenv/
+.devenv.*/
 .devenv.flake.nix
 scripts/.devenv/
 scripts/devenv.lock

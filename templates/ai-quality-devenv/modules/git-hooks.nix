@@ -62,12 +62,13 @@
     };
 
     # Commit message formatting
-    commitizen = {
-      enable = true;
-      name = "commitizen check";
-      entry = "${pkgs.python3Packages.commitizen}/bin/cz check --commit-msg-file";
-      stages = [ "commit-msg" ];
-    };
+    # DISABLED: Hash mismatch in nixpkgs for commitizen (temporary)
+    # commitizen = {
+    #   enable = true;
+    #   name = "commitizen check";
+    #   entry = "${pkgs.commitizen}/bin/cz check --commit-msg-file";
+    #   stages = [ "commit-msg" ];
+    # };
 
     # Documentation & structure quality (Week 1)
     markdownlint = {

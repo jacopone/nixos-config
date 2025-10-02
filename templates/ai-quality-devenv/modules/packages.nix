@@ -14,8 +14,8 @@
 
     # Git hooks and security tools
     gitleaks
-    python3Packages.commitizen
-    python3Packages.black
+    # commitizen - DISABLED: Hash mismatch in nixpkgs (temporary)
+    black       # Promoted to top-level in nixpkgs
     ruff
 
     # Enhanced quality gates (2025 AI code quality)
@@ -23,8 +23,8 @@
 
     # Documentation quality (Week 1)
     nodePackages.markdownlint-cli2  # Markdown linting
-    nodePackages.typedoc            # TypeScript documentation
-    python313Packages.interrogate   # Python docstring coverage
+    # Note: typedoc not available in nodePackages, install via npm
+    # Note: interrogate not available in python313Packages, install via pip/uv
 
     # Naming conventions (Week 1)
     ls-lint                         # File/folder naming enforcement
