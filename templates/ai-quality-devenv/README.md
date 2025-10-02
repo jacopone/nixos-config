@@ -9,6 +9,8 @@
 - **Semgrep**: Advanced security pattern analysis
 - **Lizard**: Code complexity analysis (CCN < 10) - *Available system-wide*
 - **JSCPD**: Clone detection via npx wrapper (threshold 5%) - *Available system-wide*
+- **Markdownlint**: Documentation quality enforcement (NEW 2025)
+- **ls-lint**: File/folder naming convention validation (NEW 2025)
 - **Commitizen**: Conventional commit format enforcement
 
 ### 🛠️ Development Tools
@@ -58,8 +60,12 @@ quality-report
 
 ### Legacy Codebase Rescue (NEW!)
 - `assess-codebase` - **Comprehensive 8-step codebase analysis**
+- `assess-documentation` - **Markdown linting, required docs, JSDoc coverage** (NEW 2025)
+- `analyze-folder-structure` - **Depth analysis, god directories, structure score** (NEW 2025)
+- `check-naming-conventions` - **File/folder naming validation** (NEW 2025)
 - `generate-remediation-plan` - **AI-powered remediation plan with self-awareness**
-- `quality-dashboard` - Real-time quality metrics dashboard
+- `quality-dashboard` - Real-time quality metrics for **7 quality categories** (ENHANCED 2025)
+- `post-commit-docs` - **Auto-documentation reminders after commits** (NEW 2025)
 
 See `LEGACY_CODEBASE_RESCUE.md` for complete rescue system documentation.
 
