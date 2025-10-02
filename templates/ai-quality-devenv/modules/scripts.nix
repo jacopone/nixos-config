@@ -49,5 +49,8 @@
     analyze-failure-patterns.exec = "bash scripts/analyze-failure-patterns.sh";
     generate-progress-report.exec = "bash scripts/generate-progress-report.sh";
     parallel-remediation-coordinator.exec = "bash scripts/parallel-remediation-coordinator.sh";
+
+    # Auto-documentation (Week 3)
+    post-commit-docs.exec = "bash scripts/post-commit-docs.sh";
   };
 }

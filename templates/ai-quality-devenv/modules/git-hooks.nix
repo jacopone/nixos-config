@@ -84,5 +84,9 @@
       entry = "${pkgs.ls-lint}/bin/ls-lint";
       pass_filenames = false;
     };
+
+    # Note: Post-commit hooks run scripts/post-commit-docs.sh manually
+    # or via git hooks. Pre-commit framework doesn't support post-commit hooks natively.
+    # To enable: Add to .git/hooks/post-commit (done via setup-git-hooks script)
   };
 }
