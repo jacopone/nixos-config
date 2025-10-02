@@ -82,7 +82,9 @@
     ls-lint = {
       enable = true;
       name = "naming-conventions";
-      entry = "${pkgs.ls-lint}/bin/ls-lint";
+      # Wrap in devenv shell to ensure tool availability
+      entry = "devenv shell bash -c 'ls-lint'";
+      language = "system";
       pass_filenames = false;
     };
 

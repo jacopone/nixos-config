@@ -4,8 +4,7 @@
   # Import quality modules from the ai-quality-devenv template
   imports = [
     ./templates/ai-quality-devenv/modules/packages.nix
-    # Temporarily disable git-hooks due to nix-store availability issue in devenv
-    # ./templates/ai-quality-devenv/modules/git-hooks.nix
+    ./templates/ai-quality-devenv/modules/git-hooks.nix
   ];
 
   # Environment variables
@@ -22,6 +21,7 @@
     # Nix development
     nixpkgs-fmt
     nil
+    nix  # Required for git-hooks installation (provides nix-store command)
 
     # CLAUDE.md automation dependencies (keep existing)
     uv
