@@ -9,12 +9,15 @@ The Autonomous Remediation System enables AI agents (Claude Code, Cursor, etc.) 
 ## Key Features
 
 - **📊 Automated Assessment** - Comprehensive codebase analysis with 8-step quality evaluation
+- **📝 Documentation Quality Gates** - Markdown linting, required docs, JSDoc/docstring coverage (NEW 2025)
+- **📁 Structure Quality Gates** - Folder depth limits, god directory detection, naming conventions (NEW 2025)
 - **🎯 Smart Prioritization** - Algorithm-based target selection using complexity, change frequency, and coverage
 - **🔄 State Persistence** - JSON-based state tracking across sessions with rollback capability
-- **✅ Automatic Validation** - Test execution, complexity checks, and security scanning after each fix
+- **✅ Automatic Validation** - Test execution, complexity checks, security scanning, and doc validation
 - **🚦 Safety Checkpoints** - Human approval gates at phase transitions and failure thresholds
-- **📈 Progress Tracking** - Real-time metrics, ROI calculations, and stakeholder reporting
+- **📈 Progress Tracking** - Real-time metrics for 7 quality categories, ROI calculations, and stakeholder reporting
 - **🤖 Multi-Agent Support** - Parallel execution with work queue distribution for faster remediation
+- **📄 Post-Commit Auto-Docs** - Automatic documentation updates and reminders after commits (NEW 2025)
 
 ## Setup
 
@@ -309,7 +312,68 @@ generate-progress-report
 glow .quality/PROGRESS_REPORT.md
 ```
 
-### Example 2: Multi-Agent Parallel Remediation
+### Example 2: Documentation & Structure Quality Gates (NEW - 2025)
+
+```bash
+# New phases added for comprehensive quality (Weeks 1-4 implementation)
+
+# 1. Initialize with extended assessment
+assess-codebase  # Code quality
+assess-documentation  # Markdown lint, required docs, JSDoc coverage
+analyze-folder-structure  # Depth, god directories, structure score
+check-naming-conventions  # File/folder naming violations
+
+# 2. Initialize remediation with all target types
+initialize-remediation-state
+# Now detects 7 target categories:
+#  - security (secrets, vulnerabilities)
+#  - complexity (high CCN functions)
+#  - documentation (markdown errors, missing docs)
+#  - structure (god directories, excessive depth)
+#  - naming (convention violations)
+#  - duplication (code clones)
+#  - tests (coverage gaps)
+
+# 3. Documentation Phase
+autonomous-remediation-session
+# Agent will:
+#  - Fix markdown linting errors
+#  - Create missing README.md/ARCHITECTURE.md
+#  - Add JSDoc to undocumented exports
+#  - Update outdated documentation
+
+# 4. Structure Phase
+autonomous-remediation-session
+# Agent will:
+#  - Refactor god directories (>50 files)
+#  - Reduce directory nesting depth
+#  - Reorganize for better logical grouping
+
+# 5. Naming Phase
+autonomous-remediation-session
+# Agent will:
+#  - Rename files/folders to match conventions
+#  - Fix camelCase/snake_case violations
+#  - Apply language-specific standards
+
+# 6. Monitor with enhanced dashboard
+quality-dashboard
+# Shows all 7 quality categories:
+#  📊 Code Quality (CCN, duplication)
+#  🔒 Security (secrets, vulnerabilities)
+#  📝 Documentation (markdown, required docs)
+#  📁 Folder Structure (depth, god dirs)
+#  📛 Naming Conventions (violations)
+
+# 7. Post-commit auto-documentation
+post-commit-docs
+# Runs after each commit to:
+#  - Check for new exports requiring docs
+#  - Remind about README/CHANGELOG updates
+#  - Detect structure changes
+```
+
+### Example 3: Multi-Agent Parallel Remediation
 
 ```bash
 # 1. Initialize
