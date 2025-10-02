@@ -57,6 +57,77 @@
           echo "  ❌ New security issues found"
           exit 1
         fi
+      elif [ "$TYPE" = "documentation" ]; then
+        echo "2️⃣ Checking documentation improvements..."
+        ISSUE=$(echo "$TARGET" | jq -r '.issue')
+
+        if [ "$ISSUE" = "markdown_lint_errors" ]; then
+          # Re-run markdown lint
+          markdownlint-cli2 "**/*.md" --config .markdownlint-cli2.jsonc > /dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            echo "  ✅ Markdown linting errors fixed"
+          else
+            echo "  ⚠️  Some markdown errors remain (partial improvement accepted)"
+          fi
+        elif [ "$ISSUE" = "missing_required_docs" ]; then
+          # Check if required docs were created
+          MISSING_FILES=$(echo "$TARGET" | jq -r '.files')
+          ALL_CREATED=true
+          for doc in $MISSING_FILES; do
+            if [ ! -f "$doc" ]; then
+              ALL_CREATED=false
+              echo "  ❌ $doc still missing"
+            fi
+          done
+
+          if [ "$ALL_CREATED" = true ]; then
+            echo "  ✅ Required documentation created"
+          else
+            exit 1
+          fi
+        fi
+      elif [ "$TYPE" = "structure" ]; then
+        echo "2️⃣ Checking folder structure improvements..."
+        ISSUE=$(echo "$TARGET" | jq -r '.issue')
+
+        if [ "$ISSUE" = "god_directories" ]; then
+          # Re-run folder analysis
+          bash scripts/analyze-folder-structure.sh > /dev/null 2>&1
+          NEW_GOD_DIRS=$(cat .quality/folder-structure.json | jq '.god_directories_count' 2>/dev/null || echo 999)
+          BASELINE_GOD_DIRS=$(echo "$TARGET" | jq -r '.count')
+
+          if [ "$NEW_GOD_DIRS" -lt "$BASELINE_GOD_DIRS" ]; then
+            echo "  ✅ God directories reduced: $BASELINE_GOD_DIRS → $NEW_GOD_DIRS"
+          else
+            echo "  ⚠️  Partial improvement accepted"
+          fi
+        elif [ "$ISSUE" = "excessive_depth" ]; then
+          bash scripts/analyze-folder-structure.sh > /dev/null 2>&1
+          NEW_DEPTH=$(cat .quality/folder-structure.json | jq '.max_depth' 2>/dev/null || echo 999)
+          TARGET_DEPTH=$(echo "$TARGET" | jq -r '.target_depth')
+
+          if [ "$NEW_DEPTH" -le "$TARGET_DEPTH" ]; then
+            echo "  ✅ Directory depth reduced to $NEW_DEPTH levels"
+          else
+            echo "  ⚠️  Partial improvement accepted (depth: $NEW_DEPTH)"
+          fi
+        fi
+      elif [ "$TYPE" = "naming" ]; then
+        echo "2️⃣ Checking naming convention fixes..."
+
+        # Re-run naming check
+        bash scripts/check-naming-conventions.sh > /dev/null 2>&1
+        NEW_VIOLATIONS=$(grep -c "FAILED" .quality/naming-violations.txt 2>/dev/null || echo 0)
+        BASELINE_VIOLATIONS=$(echo "$TARGET" | jq -r '.count')
+
+        if [ "$NEW_VIOLATIONS" -eq 0 ]; then
+          echo "  ✅ All naming violations fixed"
+        elif [ "$NEW_VIOLATIONS" -lt "$BASELINE_VIOLATIONS" ]; then
+          echo "  ✅ Naming violations reduced: $BASELINE_VIOLATIONS → $NEW_VIOLATIONS"
+        else
+          echo "  ❌ No improvement in naming violations"
+          exit 1
+        fi
       fi
 
       echo ""

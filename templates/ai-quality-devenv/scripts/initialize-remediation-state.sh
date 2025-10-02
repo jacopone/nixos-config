@@ -66,8 +66,103 @@
         }
       ] | sort_by(.priority, -.ccn_current)' || echo "[]")
 
-      # Combine targets
-      ALL_TARGETS=$(echo "$SECURITY_TARGETS $COMPLEXITY_TARGETS" | jq -s 'add')
+      # Documentation targets (NEW - Week 3)
+      DOCUMENTATION_TARGETS="[]"
+      if [ -f .quality/markdown-lint-errors.txt ]; then
+        MD_ERROR_COUNT=$(wc -l < .quality/markdown-lint-errors.txt 2>/dev/null || echo 0)
+        if [ "$MD_ERROR_COUNT" -gt 0 ]; then
+          DOCUMENTATION_TARGETS=$(cat <<EOF_DOC
+[{
+  "id": "doc_markdown_lint",
+  "type": "documentation",
+  "issue": "markdown_lint_errors",
+  "count": $MD_ERROR_COUNT,
+  "priority": 2,
+  "description": "Fix markdown linting errors"
+}]
+EOF_DOC
+)
+        fi
+      fi
+
+      # Check for missing required docs
+      MISSING_DOCS=""
+      [ ! -f README.md ] && MISSING_DOCS="README.md "
+      [ ! -f ARCHITECTURE.md ] && MISSING_DOCS="${MISSING_DOCS}ARCHITECTURE.md"
+
+      if [ -n "$MISSING_DOCS" ]; then
+        DOC_TARGET=$(cat <<EOF_DOC2
+[{
+  "id": "doc_missing_files",
+  "type": "documentation",
+  "issue": "missing_required_docs",
+  "files": "$MISSING_DOCS",
+  "priority": 2,
+  "description": "Create missing required documentation"
+}]
+EOF_DOC2
+)
+        DOCUMENTATION_TARGETS=$(echo "$DOCUMENTATION_TARGETS $DOC_TARGET" | jq -s 'add')
+      fi
+
+      # Folder structure targets (NEW - Week 3)
+      STRUCTURE_TARGETS="[]"
+      if [ -f .quality/folder-structure.json ]; then
+        GOD_DIRS=$(cat .quality/folder-structure.json | jq '.god_directories_count' 2>/dev/null || echo 0)
+        MAX_DEPTH=$(cat .quality/folder-structure.json | jq '.max_depth' 2>/dev/null || echo 0)
+
+        if [ "$GOD_DIRS" -gt 0 ]; then
+          STRUCTURE_TARGETS=$(cat <<EOF_STRUCT
+[{
+  "id": "struct_god_directories",
+  "type": "structure",
+  "issue": "god_directories",
+  "count": $GOD_DIRS,
+  "priority": 3,
+  "description": "Refactor god directories (>50 files)"
+}]
+EOF_STRUCT
+)
+        fi
+
+        if [ "$MAX_DEPTH" -gt 5 ]; then
+          DEPTH_TARGET=$(cat <<EOF_DEPTH
+[{
+  "id": "struct_max_depth",
+  "type": "structure",
+  "issue": "excessive_depth",
+  "current_depth": $MAX_DEPTH,
+  "target_depth": 5,
+  "priority": 3,
+  "description": "Reduce directory nesting depth"
+}]
+EOF_DEPTH
+)
+          STRUCTURE_TARGETS=$(echo "$STRUCTURE_TARGETS $DEPTH_TARGET" | jq -s 'add')
+        fi
+      fi
+
+      # Naming convention targets (NEW - Week 3)
+      NAMING_TARGETS="[]"
+      if [ -f .quality/naming-violations.txt ]; then
+        NAMING_COUNT=$(grep -c "FAILED" .quality/naming-violations.txt 2>/dev/null || echo 0)
+        if [ "$NAMING_COUNT" -gt 0 ]; then
+          NAMING_TARGETS=$(cat <<EOF_NAMING
+[{
+  "id": "naming_violations",
+  "type": "naming",
+  "issue": "convention_violations",
+  "count": $NAMING_COUNT,
+  "priority": 2,
+  "description": "Fix file/folder naming convention violations"
+}]
+EOF_NAMING
+)
+        fi
+      fi
+
+      # Combine all targets
+      ALL_TARGETS=$(echo "$SECURITY_TARGETS $COMPLEXITY_TARGETS $DOCUMENTATION_TARGETS $STRUCTURE_TARGETS $NAMING_TARGETS" | jq -s 'add')
       TARGET_COUNT=$(echo "$ALL_TARGETS" | jq 'length')
 
       echo "  ✓ Identified $TARGET_COUNT targets"
@@ -103,7 +198,11 @@
       "avg_ccn": $(cat .quality/complexity.json 2>/dev/null | jq '[.[] | .average_cyclomatic_complexity] | add / length' || echo 0),
       "coverage": 0,
       "duplication": $(cat .quality/jscpd-report.json 2>/dev/null | jq '.statistics.total.percentage' || echo 0),
-      "security_issues": $(cat .quality/gitleaks.json 2>/dev/null | jq 'length' || echo 0)
+      "security_issues": $(cat .quality/gitleaks.json 2>/dev/null | jq 'length' || echo 0),
+      "markdown_errors": $([ -f .quality/markdown-lint-errors.txt ] && wc -l < .quality/markdown-lint-errors.txt || echo 0),
+      "god_directories": $(cat .quality/folder-structure.json 2>/dev/null | jq '.god_directories_count' || echo 0),
+      "max_depth": $(cat .quality/folder-structure.json 2>/dev/null | jq '.max_depth' || echo 0),
+      "naming_violations": $([ -f .quality/naming-violations.txt ] && grep -c "FAILED" .quality/naming-violations.txt || echo 0)
     }
   ],
   "consecutive_failures": 0
