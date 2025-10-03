@@ -253,7 +253,15 @@
       abbr -a portscan 'nmap -sS'
       abbr -a trace 'strace -f'
       abbr -a ltrace 'ltrace -f'
-      
+
+      # Readwise BASB Integration (Gum-powered)
+      abbr -a rwsetup '~/nixos-config/basb-system/scripts/readwise-basb setup'
+      abbr -a rwdaily '~/nixos-config/basb-system/scripts/readwise-basb daily'
+      abbr -a rwtag '~/nixos-config/basb-system/scripts/readwise-basb tag'
+      abbr -a rwstats '~/nixos-config/basb-system/scripts/readwise-basb stats'
+      abbr -a rwtfp '~/nixos-config/basb-system/scripts/readwise-basb stats --tfp'
+      abbr -a rwweekly '~/nixos-config/basb-system/scripts/readwise-basb stats --weekly'
+
       # Utility functions
       function preview --description "Enhanced file preview"
           if test (count $argv) -eq 0

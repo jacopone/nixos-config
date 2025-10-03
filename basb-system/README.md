@@ -37,7 +37,28 @@ This directory contains the complete **Building a Second Brain (BASB)** system i
 
 - ✅ **Phase 1:** Foundation setup and taxonomy design
 - ✅ **Phase 2:** Workflows and platform integration
+- ✅ **Phase 2.5:** Readwise Reader API Integration (Gum-powered CLI) 🎉
 - ⏳ **Phase 3:** Optimization and automation (planned)
+
+## 🆕 NEW: Readwise API Integration
+
+**Your Readwise library is now connected to BASB!**
+
+- 📚 **2,929 articles** ready to organize
+- 🎨 **Beautiful Gum-powered CLI** for interactive workflows
+- 🏷️ **Automated tagging** with BASB taxonomy
+- 📊 **Knowledge metrics dashboard** with TFP coverage
+
+**Quick Start:**
+```bash
+rwdaily    # Morning BASB review routine
+rwtag      # Interactive article tagging
+rwstats    # Knowledge pipeline metrics
+```
+
+**Documentation:**
+- 🚀 [Quick Start Guide](./README-QUICKSTART.md) - Start here!
+- 📖 [Full API Integration](./BASB-Readwise-API-Integration.md) - Complete reference
 
 ---
 

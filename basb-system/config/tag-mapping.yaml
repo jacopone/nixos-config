@@ -1,0 +1,97 @@
+# Readwise Reader → BASB Tag Mapping
+# This file defines how Readwise tags map to BASB taxonomy
+
+# PARA Categories with priorities
+para_categories:
+  projects:
+    - code: "P1"
+      name: "Critical Projects (Daily)"
+    - code: "P2"
+      name: "Important Projects (Weekly)"
+    - code: "P3"
+      name: "Useful Projects (Monthly)"
+
+  areas:
+    - code: "A1"
+      name: "Critical Areas (Daily)"
+    - code: "A2"
+      name: "Important Areas (Weekly)"
+    - code: "A3"
+      name: "Useful Areas (Monthly)"
+
+  resources:
+    - code: "R2"
+      name: "Important Resources (Weekly)"
+    - code: "R3"
+      name: "Useful Resources (Monthly)"
+
+  archive:
+    - code: "X2"
+      name: "Important Archive"
+    - code: "X3"
+      name: "Low Priority Archive"
+
+# Domain codes
+domains:
+  FAM: "Family & Personal Life"
+  HLT: "Health & Wellness"
+  WRK: "Work & Career"
+  FIN: "Finance & Money"
+  TEC: "Technology & Coding"
+  RES: "Research & Development"
+  BIZ: "Business & Accounting"
+  LRN: "Learning & Content"
+  ART: "Art & Music"
+  GEN: "General/Administrative"
+
+# Twelve Favorite Problems
+tfps:
+  tfp1: "How can I build AI systems that amplify human creativity?"
+  tfp2: "How can I optimize my physical, mental and spiritual health systematically?"
+  tfp3: "How can I create stress-free and improve financial systems: taxes, savings & investments?"
+  tfp4: "How can I improve my professional growth?"
+  tfp5: "How can I turn learning into action faster?"
+  tfp6: "How can I live more sustainably?"
+  tfp7: "How can I organize information for easy retrieval?"
+  tfp8: "How can I improve my artistic - music, sculpture, dance skills?"
+
+# Progressive Summarization Layers
+layers:
+  layer1: "Captured - Initial save with key excerpts"
+  layer2: "Bolded - Main points identified"
+  layer3: "Highlighted - Key insights extracted"
+  layer4: "Summary - Executive summary created"
+
+# Action Levels
+action_levels:
+  now: "Today's tasks - immediate action"
+  soon: "This week's planning"
+  maybe: "Someday/maybe list"
+  ref: "Reference only - no action"
+
+# Readwise tag → BASB mapping
+# Format: "readwise-tag": "BASB-CODE_Folder-Name"
+tag_mappings:
+  # Projects
+  "project-ai-agents": "P1-TEC_AI-Agents-System"
+  "project-accounting": "P2-BIZ_AI-Accounting"
+  "project-research": "P1-RES_Research-Projects"
+  "project-creative": "P2-ART_Creative-Projects"
+
+  # Areas
+  "area-family": "A1-FAM_Family-Life"
+  "area-health": "A1-HLT_Health-Wellness"
+  "area-work": "A1-WRK_Work-Career"
+  "area-finance": "A1-FIN_Personal-Finance"
+  "area-tech": "A1-TEC_Tech-Development"
+  "area-art": "A2-ART_Creative-Pursuits"
+
+  # Resources
+  "resource-learning": "R2-LRN_Learning-Pipeline"
+  "resource-tech": "R2-TEC_Code-Notebooks"
+  "resource-health": "R2-HLT_Health-Research"
+  "resource-business": "R2-BIZ_Business-Research"
+  "resource-art": "R3-ART_Creative-Inspiration"
+
+  # Archive
+  "archive-completed": "X2-GEN_Completed-Research"

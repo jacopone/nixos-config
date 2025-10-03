@@ -29,9 +29,34 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Claude NixOS Automation - CLAUDE.md management tools
+    claude-automation = {
+      url = "path:/home/guyfawkes/claude-nixos-automation";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, ... }@inputs:
+  let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {
+      inherit system;
+      overlays = [ self.overlays.default ];
+    };
+  in
+  {
+    # Overlays for custom packages
+    overlays.default = final: prev: {
+      google-jules = final.callPackage ./overlays/jules.nix { };
+    };
+
+    # Expose packages for `nix build`
+    packages.${system} = {
+      google-jules = pkgs.google-jules;
+      default = pkgs.google-jules;
+    };
+
     # Your NixOS system configuration
     nixosConfigurations = {
       # Hostname is set to "nixos"
@@ -41,6 +66,11 @@
         modules = [
           # Your main configuration file
           ./hosts/nixos
+
+          # Apply overlays
+          {
+            nixpkgs.overlays = [ self.overlays.default ];
+          }
 
           # Home Manager module (optional)
           home-manager.nixosModules.home-manager

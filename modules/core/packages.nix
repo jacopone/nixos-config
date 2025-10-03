@@ -14,6 +14,7 @@
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
     '')
     gemini-cli-bin      # A command-line interface for Google's Gemini models (v0.6.0)
+    google-jules        # Jules, the asynchronous coding agent from Google (CLI)
 
     # AI Development Enhancement Tools
     (pkgs.writeShellScriptBin "aider" ''

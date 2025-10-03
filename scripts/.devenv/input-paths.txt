@@ -1,6 +1,0 @@
-/home/guyfawkes/nixos-config/scripts/.devenv/flake.json
-/home/guyfawkes/nixos-config/scripts/.devenv.flake.nix
-/home/guyfawkes/nixos-config/scripts/devenv.local.nix
-/home/guyfawkes/nixos-config/scripts/devenv.lock
-/home/guyfawkes/nixos-config/scripts/devenv.nix
-/home/guyfawkes/nixos-config/scripts/devenv.yaml
