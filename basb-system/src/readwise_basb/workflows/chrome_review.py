@@ -151,32 +151,54 @@ def run_bookmark_review(
                 ]
             )
 
-            if action and "Delete from Chrome" in action:
+            # Debug: show what action was selected
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Broken URLs action selected: {repr(action)}")
+
+            if not action:
+                # User cancelled or gum failed
+                ui.warning("\n⚠️  No action selected - keeping broken URLs in queue")
+                ui.info("They will be checked again next session\n")
+                session_bookmarks = accessible_bookmarks
+
+            elif "Delete from Chrome" in action:
                 # Mark all broken bookmarks for deletion
-                ui.warning("\n⚠️  Marking broken URLs for deletion")
-                ui.info("They will be deleted at the end of this session\n")
+                ui.warning("\n🗑️  Marked for deletion")
+                ui.info(f"   {len(broken_bookmarks)} broken URLs will be deleted at session end")
+                ui.info("   (You'll be prompted to close Chrome before deletion)\n")
 
                 for bookmark in broken_bookmarks:
                     chrome.mark_for_deletion(bookmark["id"])
                     chrome.save_reviewed(bookmark["id"])
 
-                ui.success(f"✓ Marked {len(broken_bookmarks)} broken URLs for deletion\n")
+                ui.success(f"✓ {len(broken_bookmarks)} bookmarks queued for deletion\n")
                 session_bookmarks = accessible_bookmarks
 
-            elif action and "Mark as reviewed" in action:
+            elif "Mark as reviewed" in action:
                 for bookmark in broken_bookmarks:
                     chrome.save_reviewed(bookmark["id"])
-                ui.success(f"✓ Marked {len(broken_bookmarks)} broken URLs as reviewed\n")
+                ui.success(f"✓ Marked {len(broken_bookmarks)} broken URLs as reviewed")
+                ui.info("   They won't appear in future sessions\n")
                 session_bookmarks = accessible_bookmarks
 
-            elif action and "Show me each one" in action:
+            elif "Keep in queue" in action:
+                # Explicitly keep in queue
+                ui.info(f"⏭️  Kept {len(broken_bookmarks)} broken URLs in queue")
+                ui.info("   They will be checked again next session\n")
+                session_bookmarks = accessible_bookmarks
+
+            elif "Show me each one" in action:
                 # Add broken bookmarks to session for manual review
+                ui.info(f"👁️  Added {len(broken_bookmarks)} broken URLs to review queue")
+                ui.info("   You'll review each one individually\n")
                 session_bookmarks = accessible_bookmarks + broken_bookmarks
-                ui.info("Added broken URLs to review session for manual inspection\n")
 
             else:
-                # Keep in queue - do nothing
-                ui.info("Broken URLs will be checked again next session\n")
+                # Unknown action - shouldn't happen but be safe
+                ui.warning(f"\n⚠️  Unknown action: {action}")
+                ui.info("   Keeping broken URLs in queue for next session\n")
                 session_bookmarks = accessible_bookmarks
         else:
             ui.success("✓ All URLs are accessible\n")
@@ -230,20 +252,26 @@ def run_bookmark_review(
 
         action = ui.choose(actions)
 
-        # Debug: show what was selected
+        # Handle no action (user cancelled or gum failed)
         if not action:
-            ui.warning("\n⚠️  ERROR: No action selected")
-            ui.info("Possible causes:")
-            ui.info("  - You pressed Ctrl+C to cancel")
-            ui.info("  - Terminal input is not available")
-            ui.info("  - Gum failed to run")
-            ui.info("\nCheck the log file: ~/.local/share/basb/readwise-basb.log")
-            ui.info("Skipping this bookmark...\n")
-            skipped_count += 1
-            continue
+            ui.warning("\n⚠️  No action selected")
 
-        # Debug: show selected action
-        ui.style(f"\n→ Selected: {action}", foreground="cyan")
+            # Ask if user wants to stop or continue
+            should_continue = ui.confirm("Continue to next bookmark?", default=True)
+            if not should_continue:
+                ui.warning("\n🛑 Stopping review session...")
+                stopped_early = True
+                break
+            else:
+                ui.info("⏭️  Skipping this bookmark...\n")
+                skipped_count += 1
+                continue
+
+        # Debug: show selected action (only in debug mode)
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Bookmark action selected: {repr(action)}")
 
         if "Save to Readwise" in action:
             # Save to Readwise
@@ -294,7 +322,8 @@ def run_bookmark_review(
             ui.info("⏭️  Skipped for later")
 
         elif "Stop" in action:
-            ui.warning("\n🛑 Stopping review session...")
+            # User explicitly chose to stop
+            ui.info("\n🛑 Session stopped by user\n")
             stopped_early = True
             break
 

@@ -92,41 +92,36 @@ class GumUI:
 
         args.extend(options)
 
-        # IMPORTANT: Gum needs full terminal access
-        # We need to let gum inherit stdin for user input
-        # - stdin: inherit from parent process (the terminal)
-        # - stdout: capture to get the user's selection
-        # - stderr: inherit for rendering the interactive UI
-        import sys
-
+        # CRITICAL: stdin=None and stderr=None to inherit from parent
+        # This gives gum full terminal access for both input and output
         try:
             result = subprocess.run(
                 args,
-                stdin=sys.stdin,  # Inherit stdin from parent process
-                stdout=subprocess.PIPE,  # Capture selection
-                stderr=sys.stderr,  # Inherit stderr for UI rendering
+                stdin=None,  # Inherit stdin - lets gum read keyboard
+                stdout=subprocess.PIPE,  # Capture the selection
+                stderr=None,  # Inherit stderr - lets gum render UI
                 text=True,
             )
 
-            # Check if gum exited successfully
+            # Gum returns 130 on Ctrl+C, non-zero on ESC or error
             if result.returncode != 0:
-                # User cancelled (Ctrl+C) or other error
                 return [] if multiple else None
 
             output = result.stdout.strip() if result.stdout else ""
-        except Exception as e:
-            # Gum failed for some reason
-            import logging
 
-            logging.error(f"gum choose failed: {e}")
+            if not output:
+                return [] if multiple else None
+
+            if multiple:
+                return output.split("\n") if output else []
+            return output
+
+        except KeyboardInterrupt:
+            # User pressed Ctrl+C
             return [] if multiple else None
-
-        if not output:
+        except Exception:
+            # Any other error
             return [] if multiple else None
-
-        if multiple:
-            return output.split("\n") if output else []
-        return output
 
     @staticmethod
     def filter_list(
