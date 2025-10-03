@@ -7,14 +7,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1759509401,
-        "narHash": "sha256-nKtBQ4UTYMMWZ+rh5Ye3YJwsUKRulx70rYiJtKP5Urk=",
-        "path": "/home/guyfawkes/claude-nixos-automation",
-        "type": "path"
+        "lastModified": 1759511162,
+        "narHash": "sha256-R/ydfKu1gxgWdH4BIb+SHAJ6bRfl2KsT7SbRsSKFqk4=",
+        "owner": "jacopone",
+        "repo": "claude-nixos-automation",
+        "rev": "d5fb97bf4f49ef7419dabe74d2d524ad8e49c7bb",
+        "type": "github"
       },
       "original": {
-        "path": "/home/guyfawkes/claude-nixos-automation",
-        "type": "path"
+        "owner": "jacopone",
+        "repo": "claude-nixos-automation",
+        "type": "github"
       }
     },
     "claude-code-nix": {
