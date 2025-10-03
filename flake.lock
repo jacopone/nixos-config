@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759511162,
-        "narHash": "sha256-R/ydfKu1gxgWdH4BIb+SHAJ6bRfl2KsT7SbRsSKFqk4=",
+        "lastModified": 1759512983,
+        "narHash": "sha256-oWZH3f/JldXgVdd95W76Cd3v4HCrdhtUjsG+ZwJsjvo=",
         "owner": "jacopone",
         "repo": "claude-nixos-automation",
-        "rev": "d5fb97bf4f49ef7419dabe74d2d524ad8e49c7bb",
+        "rev": "554ee6000a270728aaa775416a0bbc2ef8be28dd",
         "type": "github"
       },
       "original": {
