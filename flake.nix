@@ -31,7 +31,7 @@
 
     # Claude NixOS Automation - CLAUDE.md management tools
     claude-automation = {
-      url = "path:/home/guyfawkes/claude-nixos-automation";
+      url = "github:jacopone/claude-nixos-automation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

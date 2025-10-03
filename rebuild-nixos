@@ -25,7 +25,7 @@ sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure
 echo "--> Updating Claude Code configurations..."
 
 # Run automation from the claude-nixos-automation flake (must be run from nixos-config directory)
-if (cd ~/nixos-config && nix run ~/claude-nixos-automation#update-all); then
+if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all); then
     echo "    ✅ Claude Code configurations updated"
 else
     echo "    ⚠️  Failed to update Claude configs (continuing anyway)"
