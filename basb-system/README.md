@@ -60,6 +60,29 @@ rwstats    # Knowledge pipeline metrics
 - 🚀 [Quick Start Guide](./README-QUICKSTART.md) - Start here!
 - 📖 [Full API Integration](./BASB-Readwise-API-Integration.md) - Complete reference
 
+## 🆕 NEW: Chrome Bookmarks Integration
+
+**Your Chrome bookmarks are now integrated with BASB!**
+
+- 🔖 **1,885 bookmarks** ready to review
+- 🎯 **Strategic review workflow** with folder prioritization
+- 📊 **Progress tracking** across review sessions
+- 🏷️ **Auto-tagging** based on folder structure
+- 💾 **Save to Readwise** or keep in Chrome
+
+**Quick Start:**
+```bash
+rwcstats    # Show bookmark statistics
+rwchrome    # Start reviewing bookmarks (20/session)
+rwcgtd      # Review GTD folder first
+```
+
+**Features:**
+- **Progressive Review:** 20 bookmarks per session (default)
+- **Auto-Tagging:** Folder → BASB taxonomy mapping
+- **Actions:** Save to Readwise, Delete, Keep, Skip
+- **Session Tracking:** Pick up where you left off
+
 ---
 
 *This system integrates with the broader nixos-config for a complete personal knowledge and productivity management solution.*

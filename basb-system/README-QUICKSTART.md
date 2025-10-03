@@ -39,12 +39,19 @@ rwstats
 ## 📋 Available Commands
 
 ### Quick Access (Fish Abbreviations)
+
+**Readwise Articles:**
 - `rwsetup` - Setup wizard (already done, use to reconfigure)
 - `rwdaily` - Morning BASB review routine ⭐ **Start here!**
 - `rwtag` - Interactive article tagging
 - `rwstats` - Full knowledge pipeline dashboard
 - `rwtfp` - TFP coverage report
 - `rwweekly` - This week's metrics
+
+**Chrome Bookmarks:**
+- `rwcstats` - Show bookmark statistics
+- `rwchrome` - Review bookmarks (20/session)
+- `rwcgtd` - Review GTD folder first
 
 ### Long Form (Direct Script)
 ```bash
@@ -144,16 +151,19 @@ rwweekly
 1. ✅ Run `rwdaily` to process recent articles
 2. ✅ Tag 3-5 articles with `rwtag` to practice
 3. ✅ Check TFP coverage with `rwtfp`
+4. ✅ Review bookmark stats with `rwcstats`
 
 ### This Week:
 1. 🎯 Process 10-15 articles with BASB tags
 2. 🎯 Build daily morning routine habit (8:30 AM)
 3. 🎯 Run weekly review on Sunday with `rwstats`
+4. 🎯 Start Chrome bookmark review with `rwcgtd` (GTD folder first)
 
 ### This Month:
 1. 📚 Tag your top 100 high-value articles
 2. 📊 Balance TFP coverage across all 8 problems
 3. 🚀 Move articles through progressive summarization (Layer 1→4)
+4. 🔖 Review 200+ Chrome bookmarks (10/day = 20 days)
 
 ---
 
@@ -202,6 +212,7 @@ rwweekly
 - 🎯 **Tag during capture** - Add BASB tags when saving to Readwise
 - 📊 **Weekly TFP audit** - Run `rwtfp` every Sunday
 - 🚀 **Morning routine ritual** - `rwdaily` at 8:30 AM daily
+- 🔖 **Daily bookmark cleanup** - Review 10-20 bookmarks per day with `rwchrome`
 
 ### Quality Over Quantity:
 - ⭐ Don't tag everything - focus on TFP-relevant content
@@ -242,9 +253,10 @@ rwsetup
 ## 📚 Documentation
 
 - **Full Integration Guide**: [BASB-Readwise-API-Integration.md](./BASB-Readwise-API-Integration.md)
+- **Chrome Bookmarks Guide**: [CHROME-BOOKMARKS-INTEGRATION.md](./CHROME-BOOKMARKS-INTEGRATION.md)
 - **BASB Implementation**: [BASB-IMPLEMENTATION-GUIDE.md](./BASB-IMPLEMENTATION-GUIDE.md)
 - **Readwise Setup**: [BASB-Readwise-Setup.md](./BASB-Readwise-Setup.md)
-- **Tag Mapping**: [config/tag-mapping.yaml](./config/tag-mapping.yaml)
+- **Tag Mapping**: [config/tag-mapping.json](./config/tag-mapping.json)
 
 ---
 
@@ -252,22 +264,27 @@ rwsetup
 
 ✅ **Beautiful Gum-powered CLI** for Readwise interaction
 ✅ **BASB taxonomy integration** with your 2,929 articles
+✅ **Chrome bookmarks integration** with 1,885 bookmarks
 ✅ **Interactive workflows** for daily routines and tagging
 ✅ **Knowledge metrics dashboard** for insights
 ✅ **Fish shell abbreviations** for quick access
 ✅ **Secure API authentication** with token protection
+✅ **Progress tracking** across review sessions
 
 ---
 
 ## 🚀 Start Now!
 
 ```bash
-# Your first command
+# Check your Readwise articles
 rwdaily
 
+# Check your Chrome bookmarks
+rwcstats
+
 # Then explore
-rwtag
-rwstats
+rwtag        # Tag articles
+rwchrome     # Review bookmarks
 
 # Make it a daily habit! 🎯
 ```

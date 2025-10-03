@@ -10,7 +10,7 @@ from pathlib import Path
 # Add module to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from readwise_basb.workflows import setup, daily, tagging, stats
+from readwise_basb.workflows import setup, daily, tagging, stats, chrome_review
 from readwise_basb.ui import ui
 
 
@@ -20,13 +20,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  rwsetup              Run initial setup wizard
-  rwdaily              Morning BASB review routine
-  rwtag                Interactive article tagging
-  rwtag <article-id>   Tag specific article
-  rwstats              Show knowledge metrics
-  rwstats --tfp        TFP coverage report only
-  rwstats --weekly     This week's metrics
+  rwsetup                     Run initial setup wizard
+  rwdaily                     Morning BASB review routine
+  rwtag                       Interactive article tagging
+  rwtag <article-id>          Tag specific article
+  rwstats                     Show knowledge metrics
+  rwstats --tfp               TFP coverage report only
+  rwstats --weekly            This week's metrics
+  rwchrome                    Review Chrome bookmarks
+  rwchrome --stats            Show bookmark statistics
+  rwchrome --folder GTD       Review specific folder
+  rwchrome --limit 10         Limit review session
 
 For more information, visit: https://github.com/yourusername/nixos-config
         """
@@ -35,7 +39,7 @@ For more information, visit: https://github.com/yourusername/nixos-config
     parser.add_argument(
         'command',
         nargs='?',
-        choices=['setup', 'daily', 'tag', 'stats', 'help'],
+        choices=['setup', 'daily', 'tag', 'stats', 'chrome', 'help'],
         help='Command to run'
     )
 
@@ -55,6 +59,25 @@ For more information, visit: https://github.com/yourusername/nixos-config
         '--weekly',
         action='store_true',
         help='Show this week\'s metrics (for stats command)'
+    )
+
+    parser.add_argument(
+        '--stats',
+        action='store_true',
+        help='Show statistics only (for chrome command)'
+    )
+
+    parser.add_argument(
+        '--folder',
+        type=str,
+        help='Review specific folder (for chrome command)'
+    )
+
+    parser.add_argument(
+        '--limit',
+        type=int,
+        default=20,
+        help='Limit bookmarks per session (for chrome command)'
     )
 
     args = parser.parse_args()
@@ -78,6 +101,13 @@ For more information, visit: https://github.com/yourusername/nixos-config
 
         elif args.command == 'stats':
             stats.run_stats_dashboard(tfp_only=args.tfp, weekly=args.weekly)
+
+        elif args.command == 'chrome':
+            chrome_review.run_bookmark_review(
+                folder=args.folder,
+                limit=args.limit,
+                stats_only=args.stats
+            )
 
         elif args.command == 'help':
             parser.print_help()
