@@ -2,14 +2,13 @@
 
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Dict, List
 
-from ..ui import ui
 from ..api import api
 from ..config import config
+from ..ui import ui
 
 
-def calculate_tfp_coverage(articles: List[Dict]) -> Dict[str, int]:
+def calculate_tfp_coverage(articles: list[dict]) -> dict[str, int]:
     """Calculate article coverage for each TFP."""
     tfp_counts = defaultdict(int)
 
@@ -28,7 +27,7 @@ def calculate_tfp_coverage(articles: List[Dict]) -> Dict[str, int]:
     return dict(tfp_counts)
 
 
-def calculate_layer_distribution(articles: List[Dict]) -> Dict[str, int]:
+def calculate_layer_distribution(articles: list[dict]) -> dict[str, int]:
     """Calculate distribution across progressive summarization layers."""
     layer_counts = {
         "layer1-captured": 0,
@@ -52,7 +51,7 @@ def calculate_layer_distribution(articles: List[Dict]) -> Dict[str, int]:
     return layer_counts
 
 
-def calculate_actionability(articles: List[Dict]) -> Dict[str, int]:
+def calculate_actionability(articles: list[dict]) -> dict[str, int]:
     """Calculate actionability distribution."""
     action_counts = defaultdict(int)
 
@@ -82,9 +81,7 @@ def show_progress_bar(label: str, count: int, total: int, width: int = 20):
         filled = int((count / total) * width)
 
     bar = "█" * filled + "░" * (width - filled)
-    ui.style(
-        f"{label:<30} {bar} {count:>3} articles ({percentage:>3}%)", foreground="147"
-    )
+    ui.style(f"{label:<30} {bar} {count:>3} articles ({percentage:>3}%)", foreground="147")
 
 
 def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
@@ -105,9 +102,7 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
             response = api.list_all_documents()
             period = "All Time"
 
-        articles = (
-            response if isinstance(response, list) else response.get("results", [])
-        )
+        articles = response if isinstance(response, list) else response.get("results", [])
         total_articles = len(articles)
 
         ui.success(f"Loaded {total_articles} articles\n")
@@ -129,9 +124,7 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
             count = tfp_coverage.get(tfp_code, 0)
             # Truncate question if too long
             short_question = question[:45] + "..." if len(question) > 45 else question
-            show_progress_bar(
-                f"{tfp_code.upper()} - {short_question}", count, total_articles
-            )
+            show_progress_bar(f"{tfp_code.upper()} - {short_question}", count, total_articles)
 
         # Identify attention gaps
         ui.style("\n⚠️  ATTENTION NEEDED:", foreground="yellow", bold=True)
@@ -144,9 +137,7 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
 
         if low_coverage_tfps:
             for tfp_code, count in sorted(low_coverage_tfps, key=lambda x: x[1]):
-                percentage = (
-                    int((count / total_articles) * 100) if total_articles > 0 else 0
-                )
+                percentage = int((count / total_articles) * 100) if total_articles > 0 else 0
                 ui.style(
                     f"  • {tfp_code.upper()} - only {percentage}% coverage",
                     foreground="yellow",
@@ -158,9 +149,7 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
         ui.style("\n💡 SUGGESTIONS:", foreground="blue", bold=True)
         if low_coverage_tfps:
             ui.info("  • Search for content in neglected TFP areas")
-            ui.info(
-                "  • Review your Twelve Favorite Problems - are they still relevant?"
-            )
+            ui.info("  • Review your Twelve Favorite Problems - are they still relevant?")
 
     # Progressive Summarization Pipeline
     if not tfp_only:
@@ -203,25 +192,17 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
         if layer1 > 0:
             conversion_rate = int((layer4 / layer1) * 100) if layer1 > 0 else 0
             if conversion_rate >= 10:
-                ui.success(
-                    f"  ✓ {conversion_rate}% Layer 1→4 conversion rate (excellent!)"
-                )
+                ui.success(f"  ✓ {conversion_rate}% Layer 1→4 conversion rate (excellent!)")
             elif conversion_rate >= 5:
                 ui.info(f"  → {conversion_rate}% Layer 1→4 conversion rate (good)")
             else:
-                ui.warning(
-                    f"  ⚠ {conversion_rate}% Layer 1→4 conversion rate (needs improvement)"
-                )
+                ui.warning(f"  ⚠ {conversion_rate}% Layer 1→4 conversion rate (needs improvement)")
 
             # Recommendations
             if layer1 - layer2 > 10:
-                ui.info(
-                    f"  • {layer1 - layer2} articles waiting for Layer 2 processing"
-                )
+                ui.info(f"  • {layer1 - layer2} articles waiting for Layer 2 processing")
             if layer2 - layer3 > 5:
-                ui.info(
-                    f"  • {layer2 - layer3} articles ready for Layer 3 highlighting"
-                )
+                ui.info(f"  • {layer2 - layer3} articles ready for Layer 3 highlighting")
 
     # Actionability Breakdown
     if not tfp_only:

@@ -1,9 +1,9 @@
 """Readwise Reader API client."""
 
-import subprocess
 import json
+import subprocess
 import time
-from typing import Dict, List, Optional, Any
+from typing import Any
 
 from .config import config
 
@@ -22,7 +22,7 @@ class ReadwiseAPI:
         }
         self.rate_limit_delay = 60 / 20  # 20 requests per minute
 
-    def _request(self, method: str, endpoint: str, **kwargs) -> Dict[str, Any]:
+    def _request(self, method: str, endpoint: str, **kwargs) -> dict[str, Any]:
         """Make an API request with rate limiting using httpie."""
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
@@ -70,7 +70,7 @@ class ReadwiseAPI:
             if "429" in e.stderr:
                 time.sleep(60)
                 return self._request(method, endpoint, **kwargs)
-            raise Exception(f"API request failed: {e.stderr}")
+            raise Exception(f"API request failed: {e.stderr}") from e
 
     def test_auth(self) -> bool:
         """Test API authentication."""
@@ -83,12 +83,12 @@ class ReadwiseAPI:
 
     def list_documents(
         self,
-        updated_after: Optional[str] = None,
-        location: Optional[str] = None,
-        category: Optional[str] = None,
-        tag: Optional[str] = None,
-        page_cursor: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        updated_after: str | None = None,
+        location: str | None = None,
+        category: str | None = None,
+        tag: str | None = None,
+        page_cursor: str | None = None,
+    ) -> dict[str, Any]:
         """List documents with optional filters."""
         params = {}
         if updated_after:
@@ -104,7 +104,7 @@ class ReadwiseAPI:
 
         return self._request("GET", "/list/", params=params)
 
-    def get_document(self, document_id: str) -> Dict[str, Any]:
+    def get_document(self, document_id: str) -> dict[str, Any]:
         """Get a single document by ID."""
         # Note: The API doesn't have a single document endpoint
         # We'll use list with filter instead
@@ -117,12 +117,12 @@ class ReadwiseAPI:
     def update_document(
         self,
         document_id: str,
-        title: Optional[str] = None,
-        author: Optional[str] = None,
-        location: Optional[str] = None,
-        tags: Optional[List[str]] = None,
-        notes: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        title: str | None = None,
+        author: str | None = None,
+        location: str | None = None,
+        tags: list[str] | None = None,
+        notes: str | None = None,
+    ) -> dict[str, Any]:
         """Update a document."""
         data = {}
         if title:
@@ -146,7 +146,7 @@ class ReadwiseAPI:
         except Exception:
             return False
 
-    def list_tags(self) -> List[str]:
+    def list_tags(self) -> list[str]:
         """List all tags."""
         response = self._request("GET", "/tags/")
         return response.get("tags", [])
@@ -154,12 +154,12 @@ class ReadwiseAPI:
     def save_document(
         self,
         url: str,
-        html: Optional[str] = None,
-        title: Optional[str] = None,
-        author: Optional[str] = None,
-        tags: Optional[List[str]] = None,
-        location: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        html: str | None = None,
+        title: str | None = None,
+        author: str | None = None,
+        tags: list[str] | None = None,
+        location: str | None = None,
+    ) -> dict[str, Any]:
         """Save a new document."""
         data = {"url": url}
         if html:
@@ -175,7 +175,7 @@ class ReadwiseAPI:
 
         return self._request("POST", "/save/", json=data)
 
-    def list_all_documents(self) -> List[Dict[str, Any]]:
+    def list_all_documents(self) -> list[dict[str, Any]]:
         """List all documents with pagination."""
         all_documents = []
         page_cursor = None

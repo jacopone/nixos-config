@@ -1,13 +1,11 @@
 """Interactive article tagging workflow."""
 
-from typing import Optional
-
-from ..ui import ui
 from ..api import api
 from ..config import config
+from ..ui import ui
 
 
-def run_tagging_wizard(article_id: Optional[str] = None):
+def run_tagging_wizard(article_id: str | None = None):
     """Run interactive tagging wizard for an article."""
 
     # Load tag mapping
@@ -28,8 +26,7 @@ def run_tagging_wizard(article_id: Optional[str] = None):
                 return
 
             article_options = [
-                f"{a.get('title', 'Untitled')} ({len(a.get('tags', []))} tags)"
-                for a in articles
+                f"{a.get('title', 'Untitled')} ({len(a.get('tags', []))} tags)" for a in articles
             ]
 
             selected = ui.filter_list(
@@ -75,7 +72,7 @@ def run_tagging_wizard(article_id: Optional[str] = None):
     para_categories = config.get_para_categories()
 
     para_options = []
-    for category_type, items in para_categories.items():
+    for _category_type, items in para_categories.items():
         for item in items:
             para_options.append(f"{item['code']} - {item['name']}")
 
@@ -146,9 +143,7 @@ def run_tagging_wizard(article_id: Optional[str] = None):
     for tag in current_tags:
         # Remove old BASB tags, layer tags, and action tags
         if not (
-            tag.startswith(
-                ("p1-", "p2-", "p3-", "a1-", "a2-", "a3-", "r2-", "r3-", "x2-", "x3-")
-            )
+            tag.startswith(("p1-", "p2-", "p3-", "a1-", "a2-", "a3-", "r2-", "r3-", "x2-", "x3-"))
             or tag.startswith("layer")
             or tag.startswith("actionable-")
             or tag.startswith("tfp")

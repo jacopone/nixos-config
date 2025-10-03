@@ -38,7 +38,49 @@ This directory contains the complete **Building a Second Brain (BASB)** system i
 - ✅ **Phase 1:** Foundation setup and taxonomy design
 - ✅ **Phase 2:** Workflows and platform integration
 - ✅ **Phase 2.5:** Readwise Reader API Integration (Gum-powered CLI) 🎉
+- ✅ **Phase 2.6:** Chrome Bookmarks Integration (Deferred deletion, URL filtering) 🎉
+- ✅ **Phase 2.7:** Proper project structure with testing (devenv + pytest) 🎉
 - ⏳ **Phase 3:** Optimization and automation (planned)
+
+## 🧪 Development
+
+The project now has a proper Python structure with testing:
+
+```
+basb-system/
+├── src/readwise_basb/       # Main package
+│   ├── cli.py               # CLI entry point with logging
+│   ├── chrome.py            # Chrome bookmarks parser
+│   ├── api.py               # Readwise API client
+│   ├── workflows/           # Interactive workflows
+│   └── ui.py                # Gum-powered UI components
+├── tests/
+│   ├── unit/                # Unit tests
+│   ├── integration/         # Integration tests (planned)
+│   └── conftest.py          # Pytest fixtures
+├── scripts/readwise-basb    # Entry point script
+├── pyproject.toml           # Project config
+└── devenv.nix               # Dev environment (pytest, ruff)
+```
+
+**Running Tests:**
+```bash
+# Enter dev environment and run tests
+devenv shell
+pytest tests/           # All tests
+pytest tests/unit/      # Unit tests only
+
+# Or run directly
+bash -c 'source <(devenv print-dev-env) && pytest tests/ -v'
+```
+
+**Linting:**
+```bash
+devenv shell
+ruff check src/         # Check code
+```
+
+**Current test coverage:** 8 unit tests for Chrome bookmarks functionality
 
 ## 🆕 NEW: Readwise API Integration
 
@@ -74,7 +116,6 @@ rwstats    # Knowledge pipeline metrics
 ```bash
 rwcstats    # Show bookmark statistics
 rwchrome    # Start reviewing bookmarks (20/session)
-rwcgtd      # Review GTD folder first
 ```
 
 **Features:**

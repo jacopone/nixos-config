@@ -2,8 +2,8 @@
 
 from datetime import datetime, timedelta
 
-from ..ui import ui
 from ..api import api
+from ..ui import ui
 
 
 def run_daily_routine():
@@ -36,7 +36,7 @@ def run_daily_routine():
     article_options = []
     article_map = {}
 
-    for i, article in enumerate(new_articles):
+    for _i, article in enumerate(new_articles):
         title = article.get("title", "Untitled")
         tags = article.get("tags", {})
 
@@ -46,9 +46,7 @@ def run_daily_routine():
         else:
             tag_list = tags if tags else []
 
-        tag_str = (
-            " ".join([f"#{tag}" for tag in tag_list]) if tag_list else "(untagged)"
-        )
+        tag_str = " ".join([f"#{tag}" for tag in tag_list]) if tag_list else "(untagged)"
 
         display = f"{title} {tag_str}"
         article_options.append(display)
@@ -96,9 +94,7 @@ def run_daily_routine():
 
         # Add inbox tag if not already tagged
         has_basb_tag = any(
-            tag.startswith(
-                ("p1-", "p2-", "p3-", "a1-", "a2-", "a3-", "r2-", "r3-", "x2-", "x3-")
-            )
+            tag.startswith(("p1-", "p2-", "p3-", "a1-", "a2-", "a3-", "r2-", "r3-", "x2-", "x3-"))
             for tag in current_tags
         )
 
@@ -148,11 +144,7 @@ def run_daily_routine():
     actionable = []
     for a in selected_articles:
         tags = a.get("tags", {})
-        tag_list = (
-            list(tags.keys())
-            if isinstance(tags, dict)
-            else (list(tags) if tags else [])
-        )
+        tag_list = list(tags.keys()) if isinstance(tags, dict) else (list(tags) if tags else [])
         if "actionable-now" in tag_list:
             actionable.append(a)
 

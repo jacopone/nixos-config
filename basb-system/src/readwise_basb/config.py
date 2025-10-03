@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 
 class Config:
@@ -10,18 +10,15 @@ class Config:
 
     def __init__(self):
         self.config_path = Path.home() / ".config" / "readwise" / "config.json"
-        self.tag_mapping_path = (
-            Path(__file__).parent.parent.parent / "config" / "tag-mapping.json"
-        )
+        self.tag_mapping_path = Path(__file__).parent.parent.parent / "config" / "tag-mapping.json"
         self._config = None
         self._tag_mapping = None
 
-    def load(self) -> Dict[str, Any]:
+    def load(self) -> dict[str, Any]:
         """Load configuration from file."""
         if not self.config_path.exists():
             raise FileNotFoundError(
-                f"Configuration file not found: {self.config_path}\n"
-                "Run 'rwsetup' to create it."
+                f"Configuration file not found: {self.config_path}\n" "Run 'rwsetup' to create it."
             )
 
         with open(self.config_path) as f:
@@ -29,7 +26,7 @@ class Config:
 
         return self._config
 
-    def load_tag_mapping(self) -> Dict[str, Any]:
+    def load_tag_mapping(self) -> dict[str, Any]:
         """Load tag mapping configuration."""
         if not self.tag_mapping_path.exists():
             raise FileNotFoundError(f"Tag mapping not found: {self.tag_mapping_path}")
@@ -69,31 +66,31 @@ class Config:
             self.load()
         return Path(self._config["export"]["drive_path"]).expanduser()
 
-    def get_tfps(self) -> Dict[str, str]:
+    def get_tfps(self) -> dict[str, str]:
         """Get Twelve Favorite Problems."""
         if not self._tag_mapping:
             self.load_tag_mapping()
         return self._tag_mapping["tfps"]
 
-    def get_domains(self) -> Dict[str, str]:
+    def get_domains(self) -> dict[str, str]:
         """Get domain codes."""
         if not self._tag_mapping:
             self.load_tag_mapping()
         return self._tag_mapping["domains"]
 
-    def get_para_categories(self) -> Dict[str, list]:
+    def get_para_categories(self) -> dict[str, list]:
         """Get PARA categories."""
         if not self._tag_mapping:
             self.load_tag_mapping()
         return self._tag_mapping["para_categories"]
 
-    def get_layers(self) -> Dict[str, str]:
+    def get_layers(self) -> dict[str, str]:
         """Get progressive summarization layers."""
         if not self._tag_mapping:
             self.load_tag_mapping()
         return self._tag_mapping["layers"]
 
-    def get_action_levels(self) -> Dict[str, str]:
+    def get_action_levels(self) -> dict[str, str]:
         """Get action levels."""
         if not self._tag_mapping:
             self.load_tag_mapping()

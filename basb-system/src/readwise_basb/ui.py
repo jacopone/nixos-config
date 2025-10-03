@@ -1,7 +1,6 @@
 """Beautiful UI components using Gum."""
 
 import subprocess
-from typing import List, Optional
 
 
 class GumUI:
@@ -10,17 +9,17 @@ class GumUI:
     @staticmethod
     def style(
         text: str,
-        foreground: Optional[str] = None,
-        background: Optional[str] = None,
-        border: Optional[str] = None,
-        border_foreground: Optional[str] = None,
-        padding: Optional[str] = None,
-        margin: Optional[str] = None,
+        foreground: str | None = None,
+        background: str | None = None,
+        border: str | None = None,
+        border_foreground: str | None = None,
+        padding: str | None = None,
+        margin: str | None = None,
         bold: bool = False,
         italic: bool = False,
-        align: Optional[str] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        align: str | None = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> None:
         """Display styled text."""
         args = ["gum", "style"]
@@ -72,12 +71,12 @@ class GumUI:
 
     @staticmethod
     def choose(
-        options: List[str],
+        options: list[str],
         prompt: str = "",
         multiple: bool = False,
         limit: int = 10,
         height: int = 10,
-    ) -> Optional[str | List[str]]:
+    ) -> str | list[str] | None:
         """Let user choose from options."""
         if not options:
             return [] if multiple else None
@@ -93,8 +92,34 @@ class GumUI:
 
         args.extend(options)
 
-        result = subprocess.run(args, capture_output=True, text=True)
-        output = result.stdout.strip()
+        # IMPORTANT: Gum needs full terminal access
+        # We need to let gum inherit stdin for user input
+        # - stdin: inherit from parent process (the terminal)
+        # - stdout: capture to get the user's selection
+        # - stderr: inherit for rendering the interactive UI
+        import sys
+
+        try:
+            result = subprocess.run(
+                args,
+                stdin=sys.stdin,  # Inherit stdin from parent process
+                stdout=subprocess.PIPE,  # Capture selection
+                stderr=sys.stderr,  # Inherit stderr for UI rendering
+                text=True,
+            )
+
+            # Check if gum exited successfully
+            if result.returncode != 0:
+                # User cancelled (Ctrl+C) or other error
+                return [] if multiple else None
+
+            output = result.stdout.strip() if result.stdout else ""
+        except Exception as e:
+            # Gum failed for some reason
+            import logging
+
+            logging.error(f"gum choose failed: {e}")
+            return [] if multiple else None
 
         if not output:
             return [] if multiple else None
@@ -105,11 +130,11 @@ class GumUI:
 
     @staticmethod
     def filter_list(
-        options: List[str],
+        options: list[str],
         placeholder: str = "Filter...",
         prompt: str = "> ",
         limit: int = 10,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Interactive fuzzy filter."""
         if not options:
             return None
@@ -147,9 +172,7 @@ class GumUI:
         return subprocess.run(args)
 
     @staticmethod
-    def table(
-        headers: List[str], rows: List[List[str]], widths: Optional[List[int]] = None
-    ) -> None:
+    def table(headers: list[str], rows: list[list[str]], widths: list[int] | None = None) -> None:
         """Display a table."""
         # Gum doesn't have native table support, so we'll format it ourselves
         if not rows:
@@ -158,15 +181,12 @@ class GumUI:
         # Calculate column widths if not provided
         if not widths:
             widths = [
-                max(len(str(row[i])) for row in [headers] + rows)
-                for i in range(len(headers))
+                max(len(str(row[i])) for row in [headers] + rows) for i in range(len(headers))
             ]
 
         # Format header
         header_line = (
-            "│ "
-            + " │ ".join(str(headers[i]).ljust(widths[i]) for i in range(len(headers)))
-            + " │"
+            "│ " + " │ ".join(str(headers[i]).ljust(widths[i]) for i in range(len(headers))) + " │"
         )
 
         separator = "├" + "┼".join("─" * (w + 2) for w in widths) + "┤"
@@ -180,9 +200,7 @@ class GumUI:
 
         for row in rows:
             row_line = (
-                "│ "
-                + " │ ".join(str(row[i]).ljust(widths[i]) for i in range(len(row)))
-                + " │"
+                "│ " + " │ ".join(str(row[i]).ljust(widths[i]) for i in range(len(row))) + " │"
             )
             GumUI.style(row_line, foreground="147")
 

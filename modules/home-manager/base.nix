@@ -387,10 +387,17 @@
       
       # New tool aliases
       alias lintpy='ruff check'
-      alias formatpy='ruff format'  
+      alias formatpy='ruff format'
       alias yamlfmt='yq -P .'
       alias jsonpp='jq .'
       alias yamlpp='yq -P .'
+
+      # Fix for atuin 18.8.0 deprecated bind -k syntax
+      # This runs after atuin init to override the problematic binding
+      # Suppress the error by redirecting stderr for this specific fix
+      if bind -M insert > /dev/null 2>&1
+          bind -M insert up _atuin_bind_up 2>/dev/null
+      end
     '';
 
     # Fish abbreviations (persistent across sessions)
@@ -406,7 +413,6 @@
       # Chrome Bookmarks Review
       rwchrome = "~/nixos-config/basb-system/scripts/readwise-basb chrome";
       rwcstats = "~/nixos-config/basb-system/scripts/readwise-basb chrome --stats";
-      rwcgtd = "~/nixos-config/basb-system/scripts/readwise-basb chrome --folder GTD";
     };
 
     # Fish completions and integrations
@@ -446,6 +452,9 @@
         "^clear$"     # Skip clear commands
       ];
     };
+    # Fix for deprecated bind -k syntax in atuin 18.8.0
+    # This overrides the problematic bind command after atuin init
+    package = pkgs.atuin;
   };
 
   # Enable broot for interactive directory navigation

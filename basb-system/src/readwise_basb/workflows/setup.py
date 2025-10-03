@@ -1,11 +1,11 @@
 """Interactive setup wizard for Readwise BASB integration."""
 
-import sys
 import json
+import sys
 from pathlib import Path
 
-from ..ui import ui
 from ..api import api
+from ..ui import ui
 
 
 def run_setup():
@@ -83,9 +83,7 @@ def run_setup():
 
     # Export path
     ui.info("Configure where to export Layer 4 summaries:")
-    export_path = ui.input_text(
-        prompt="Export path: ", value=temp_config["export"]["drive_path"]
-    )
+    export_path = ui.input_text(prompt="Export path: ", value=temp_config["export"]["drive_path"])
 
     if export_path:
         temp_config["export"]["drive_path"] = export_path
