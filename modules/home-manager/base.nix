@@ -392,11 +392,86 @@
       alias jsonpp='jq .'
       alias yamlpp='yq -P .'
 
-      # Fix for atuin 18.8.0 deprecated bind -k syntax
-      # This runs after atuin init to override the problematic binding
-      # Suppress the error by redirecting stderr for this specific fix
+      # Manual atuin integration with fixed bind syntax (replaces enableFishIntegration)
+      # Atuin 18.8.0 has a bug using deprecated "bind -k" syntax
+      set -gx ATUIN_SESSION (atuin uuid)
+      set --erase ATUIN_HISTORY_ID
+
+      function _atuin_preexec --on-event fish_preexec
+          if not test -n "$fish_private_mode"
+              set -g ATUIN_HISTORY_ID (atuin history start -- "$argv[1]")
+          end
+      end
+
+      function _atuin_postexec --on-event fish_postexec
+          set -l s $status
+          if test -n "$ATUIN_HISTORY_ID"
+              ATUIN_LOG=error atuin history end --exit $s -- $ATUIN_HISTORY_ID &>/dev/null &
+              disown
+          end
+          set --erase ATUIN_HISTORY_ID
+      end
+
+      function _atuin_search
+          set -l keymap_mode
+          switch $fish_key_bindings
+              case fish_vi_key_bindings
+                  switch $fish_bind_mode
+                      case default
+                          set keymap_mode vim-normal
+                      case insert
+                          set keymap_mode vim-insert
+                  end
+              case '*'
+                  set keymap_mode emacs
+          end
+
+          set -l ATUIN_H (ATUIN_SHELL_FISH=t ATUIN_LOG=error ATUIN_QUERY=(commandline -b) atuin search --keymap-mode=$keymap_mode $argv -i 3>&1 1>&2 2>&3 | string collect)
+
+          if test -n "$ATUIN_H"
+              if string match --quiet '__atuin_accept__:*' "$ATUIN_H"
+                  set -l ATUIN_HIST (string replace "__atuin_accept__:" "" -- "$ATUIN_H" | string collect)
+                  commandline -r "$ATUIN_HIST"
+                  commandline -f repaint
+                  commandline -f execute
+                  return
+              else if string match --quiet '__atuin_chain_command__:*' "$ATUIN_H"
+                  set -l new_command (string replace "__atuin_chain_command__:" "" -- "$ATUIN_H" | string collect)
+                  set -l current_command (commandline -b)
+                  commandline -r "$current_command $new_command"
+              else
+                  commandline -r "$ATUIN_H"
+              end
+          end
+
+          commandline -f repaint
+      end
+
+      function _atuin_bind_up
+          if commandline --search-mode; or commandline --paging-mode
+              up-or-search
+              return
+          end
+
+          set -l lineno (commandline --line)
+          switch $lineno
+              case 1
+                  _atuin_search --shell-up-key-binding
+              case '*'
+                  up-or-search
+          end
+      end
+
+      # Bind atuin commands (FIXED: using new syntax instead of deprecated -k)
+      bind \cr _atuin_search
+      bind \eOA _atuin_bind_up
+      bind \e\[A _atuin_bind_up
+
+      # Vi mode bindings (if applicable) - FIXED syntax
       if bind -M insert > /dev/null 2>&1
-          bind -M insert up _atuin_bind_up 2>/dev/null
+          bind -M insert \cr _atuin_search
+          bind -M insert \eOA _atuin_bind_up
+          bind -M insert \e\[A _atuin_bind_up
       end
     '';
 
@@ -435,7 +510,7 @@
   # Configure atuin for intelligent shell history
   programs.atuin = {
     enable = true;
-    enableFishIntegration = true;
+    enableFishIntegration = false;  # Disabled to fix bind -k deprecation warning
     settings = {
       # AI workflow optimizations
       auto_sync = true;
@@ -452,9 +527,6 @@
         "^clear$"     # Skip clear commands
       ];
     };
-    # Fix for deprecated bind -k syntax in atuin 18.8.0
-    # This overrides the problematic bind command after atuin init
-    package = pkgs.atuin;
   };
 
   # Enable broot for interactive directory navigation

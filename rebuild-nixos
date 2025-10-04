@@ -25,8 +25,13 @@ sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure
 echo "--> Updating Claude Code configurations..."
 
 # Run automation from the claude-nixos-automation flake (must be run from nixos-config directory)
+# This now includes user policies management (user file + example template)
 if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all); then
     echo "    ✅ Claude Code configurations updated"
+    echo "       - User policies: ~/.claude/CLAUDE-USER-POLICIES.md (preserved)"
+    echo "       - Example policies: ~/.claude/CLAUDE-USER-POLICIES.md.example (updated)"
+    echo "       - System CLAUDE.md: ~/.claude/CLAUDE.md (updated)"
+    echo "       - Project CLAUDE.md: ./CLAUDE.md (updated)"
 else
     echo "    ⚠️  Failed to update Claude configs (continuing anyway)"
 fi
