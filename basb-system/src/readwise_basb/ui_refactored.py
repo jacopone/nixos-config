@@ -26,12 +26,21 @@ class ModernUI:
         style_str = ""
 
         if foreground:
-            # Convert ANSI color codes to Rich color names
-            style_str += f"#{foreground} " if len(foreground) == 6 else f"color({foreground}) "
+            # Support hex (#ff0000), 256-color codes (147), and named colors (red, yellow)
+            if len(foreground) == 6 and all(c in "0123456789abcdefABCDEF" for c in foreground):
+                style_str += f"#{foreground} "  # Hex color
+            elif foreground.isdigit():
+                style_str += f"color({foreground}) "  # 256-color code
+            else:
+                style_str += f"{foreground} "  # Named color
         if background:
-            style_str += (
-                f"on #{background} " if len(background) == 6 else f"on color({background}) "
-            )
+            # Same logic for background colors
+            if len(background) == 6 and all(c in "0123456789abcdefABCDEF" for c in background):
+                style_str += f"on #{background} "
+            elif background.isdigit():
+                style_str += f"on color({background}) "
+            else:
+                style_str += f"on {background} "
         if bold:
             style_str += "bold "
         if italic:
