@@ -300,36 +300,61 @@ def _show_session_summary(
     )
 
 
-def _handle_batch_deletion(chrome: ChromeBookmarks) -> None:
+def _handle_batch_deletion(chrome: ChromeBookmarks, session_deleted_count: int = 0) -> None:
     """Handle batch deletion of marked bookmarks."""
     deletion_queue = chrome.get_deletion_queue()
     if not deletion_queue:
         return
 
+    # Show clearer breakdown
     ui.style("\n" + "─" * 60, foreground="147")
-    ui.style(
-        f"\n🗑️  {len(deletion_queue)} bookmarks marked for deletion",
-        foreground="red",
-        bold=True,
-    )
+    ui.style("\n🗑️  DELETION QUEUE", foreground="red", bold=True)
 
-    if not ui.confirm("\nProceed with deletion? (Chrome must be closed)", default=True):
-        ui.info("\nDeletion postponed. Bookmarks remain marked for deletion")
+    if session_deleted_count > 0:
+        ui.info(f"   • This session: {session_deleted_count} bookmarks")
+
+    queue_total = len(deletion_queue)
+    from_previous = queue_total - session_deleted_count
+    if from_previous > 0:
+        ui.warning(f"   • From previous sessions: {from_previous} bookmarks")
+
+    ui.style(f"   • Total to delete: {queue_total} bookmarks", foreground="red", bold=True)
+
+    # Check Chrome status FIRST (before asking) - use verbose mode for debugging
+    if chrome.is_chrome_running(verbose=True):
+        ui.warning("\n⚠️  Chrome appears to be running")
+        ui.info("📋 Options:")
+        ui.info("   1. Close Chrome and press Enter")
+        ui.info("   2. Type 'force' if Chrome is actually closed (will bypass check)")
+        ui.info("   3. Press Ctrl+C to cancel\n")
+
+        user_input = input("Your choice: ").strip().lower()
+
+        if user_input == "force":
+            ui.warning("\n⚠️  Forcing deletion (bypassing Chrome check)")
+            ui.warning("⚠️  This may corrupt bookmarks if Chrome is actually running!")
+            if not ui.confirm("Are you SURE Chrome is closed?", default=False):
+                ui.info("\n✅ Deletion cancelled for safety")
+                return
+            ui.info("✓ Proceeding with forced deletion...")
+        else:
+            # Check again after user presses Enter
+            if chrome.is_chrome_running(verbose=True):
+                ui.error("\n✗ Chrome still appears to be running")
+                ui.info("Bookmarks will remain marked for deletion")
+                ui.info("Run 'rwchrome' again after closing Chrome\n")
+                ui.info("\n💡 Debug info logged above - check what processes were found")
+                return
+
+            ui.success("\n✓ Chrome confirmed closed!")
+
+    # Now ask for final confirmation
+    if not ui.confirm(
+        f"\n⚠️  Delete {queue_total} bookmarks from Chrome permanently?", default=True
+    ):
+        ui.info("\n✅ Deletion cancelled. Bookmarks remain in queue.")
         ui.info("Run 'rwchrome' again later to complete deletion")
         return
-
-    # Check if Chrome is running
-    if chrome.is_chrome_running():
-        ui.warning("\n⚠️  Chrome is currently running")
-        ui.info("Please close Chrome to proceed with deletion...\n")
-
-        ui.style("⏳ Waiting for Chrome to close (60 second timeout)...", foreground="147")
-        if not chrome.wait_for_chrome_close(timeout=60):
-            ui.error("\n✗ Timeout waiting for Chrome to close")
-            ui.info("Bookmarks will remain marked for deletion")
-            ui.info("Run 'rwchrome' again later to complete deletion\n")
-            return
-        ui.success("\n✓ Chrome closed!")
 
     # Delete the bookmarks
     ui.style("\n⠋ Deleting bookmarks from Chrome...", foreground="147")
@@ -373,6 +398,9 @@ def run_bookmark_review(
 
     # Limit bookmarks for this session
     session_bookmarks = bookmarks[:limit]
+
+    # Track deletion queue size before session (to calculate session additions later)
+    initial_deletion_queue_size = len(chrome.get_deletion_queue())
 
     # Filter broken URLs
     if filter_broken:
@@ -432,8 +460,10 @@ def run_bookmark_review(
         len(session_bookmarks),
     )
 
-    # Handle batch deletion
-    _handle_batch_deletion(chrome)
+    # Handle batch deletion (calculate total session deletions: broken URLs + manual deletions)
+    current_deletion_queue_size = len(chrome.get_deletion_queue())
+    session_deleted_count = current_deletion_queue_size - initial_deletion_queue_size
+    _handle_batch_deletion(chrome, session_deleted_count=session_deleted_count)
 
     # Show remaining
     remaining = len(bookmarks) - total_processed

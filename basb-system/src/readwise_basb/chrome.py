@@ -1,10 +1,13 @@
 """Chrome bookmarks parser and integration."""
 
 import json
+import logging
 import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class ChromeBookmarks:
@@ -59,15 +62,81 @@ class ChromeBookmarks:
         """Get list of bookmark IDs marked for deletion."""
         return list(self._to_delete)
 
-    def is_chrome_running(self) -> bool:
-        """Check if Chrome is currently running."""
+    def is_chrome_running(self, verbose: bool = False) -> bool:
+        """
+        Check if Chrome main browser process is currently running.
+
+        Args:
+            verbose: If True, log detailed process information
+
+        Returns:
+            True if main Chrome browser is running, False otherwise
+        """
         try:
+            # Method 1: Check if Bookmarks file is locked (most reliable!)
+            # Chrome locks the Bookmarks file when running
+            if self.bookmarks_path.exists():
+                try:
+                    # Try to open in exclusive mode - will fail if Chrome has it open
+                    import fcntl
+
+                    with open(self.bookmarks_path) as f:
+                        try:
+                            fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                            logger.debug("Bookmarks file is not locked - Chrome is NOT running")
+                            if verbose:
+                                logger.info("✓ Bookmarks file check: Chrome is NOT running")
+                            return False
+                        except BlockingIOError:
+                            logger.debug("Bookmarks file is locked - Chrome IS running")
+                            if verbose:
+                                logger.info("⚠️  Bookmarks file is locked - Chrome IS running")
+                            return True
+                except Exception as e:
+                    logger.debug(f"File lock check failed: {e}, falling back to process check")
+
+            # Method 2: Fallback - check for main Chrome process (not helpers)
+            # Look for the main browser process specifically
             result = subprocess.run(
-                ["pgrep", "-f", "google-chrome"], capture_output=True, text=True
+                ["pgrep", "-x", "chrome"],  # -x = exact match, not substring
+                capture_output=True,
+                text=True,
             )
-            return result.returncode == 0
+
+            if result.returncode == 0:
+                pids = result.stdout.strip().split("\n")
+                logger.debug(f"Found Chrome processes (exact match): {pids}")
+                if verbose:
+                    logger.info(f"⚠️  Found {len(pids)} Chrome process(es): {pids}")
+                return True
+
+            # Also try google-chrome exact match
+            result2 = subprocess.run(
+                ["pgrep", "-x", "google-chrome"], capture_output=True, text=True
+            )
+
+            if result2.returncode == 0:
+                pids2 = result2.stdout.strip().split("\n")
+                logger.debug(f"Found google-chrome processes (exact match): {pids2}")
+                if verbose:
+                    logger.info(f"⚠️  Found {len(pids2)} google-chrome process(es): {pids2}")
+                return True
+
+            logger.debug("No Chrome processes found")
+            if verbose:
+                logger.info("✓ Process check: Chrome is NOT running")
+            return False
+
         except FileNotFoundError:
-            # pgrep not available, assume Chrome is not running
+            logger.warning("pgrep not available, cannot check if Chrome is running")
+            if verbose:
+                logger.info("⚠️  Cannot check Chrome status (pgrep not found)")
+            return False
+        except Exception as e:
+            logger.error(f"Error checking if Chrome is running: {e}")
+            if verbose:
+                logger.info(f"⚠️  Error checking Chrome status: {e}")
             return False
 
     def wait_for_chrome_close(self, timeout: int = 60) -> bool:
@@ -92,36 +161,39 @@ class ChromeBookmarks:
         WARNING: Chrome must be closed for this to work!
         Returns: (success: bool, message: str)
         """
-        # Check if Chrome is running
-        try:
-            result = subprocess.run(
-                ["pgrep", "-f", "google-chrome"], capture_output=True, text=True
+        # Check if Chrome is running using our improved detection
+        logger.debug("Checking if Chrome is running before deleting bookmarks...")
+        if self.is_chrome_running(verbose=True):
+            logger.warning("Chrome detected as running during delete_bookmarks")
+            return (
+                False,
+                "Chrome is running! Please close Chrome first, then run this command again.",
             )
-            if result.returncode == 0:
-                return (
-                    False,
-                    "Chrome is running! Please close Chrome first, then run this command again.",
-                )
-        except FileNotFoundError:
-            pass  # pgrep not available, continue anyway
 
         # Create backup
         backup_path = self.bookmarks_path.with_suffix(".json.backup")
+        logger.info(f"Creating backup at {backup_path}")
         try:
             import shutil
 
             shutil.copy2(self.bookmarks_path, backup_path)
+            logger.info("✓ Backup created successfully")
         except Exception as e:
+            logger.error(f"Failed to create backup: {e}")
             return False, f"Failed to create backup: {e}"
 
         # Load current bookmarks
+        logger.info(f"Loading bookmarks from {self.bookmarks_path}")
         try:
             with open(self.bookmarks_path) as f:
                 data = json.load(f)
+            logger.info("✓ Loaded bookmarks file successfully")
         except Exception as e:
+            logger.error(f"Failed to read bookmarks: {e}")
             return False, f"Failed to read bookmarks: {e}"
 
         # Remove bookmarks recursively
+        logger.info(f"Starting deletion of {len(bookmark_ids)} bookmarks")
         deleted_count = 0
 
         def remove_bookmark_recursive(node, bookmark_ids_set):
@@ -155,16 +227,21 @@ class ChromeBookmarks:
                 remove_bookmark_recursive(root, bookmark_ids_set)
 
         # Write back
+        logger.info(f"Writing updated bookmarks (deleted {deleted_count} bookmarks)")
         try:
             with open(self.bookmarks_path, "w") as f:
                 json.dump(data, f, indent=3)
+            logger.info("✓ Successfully wrote updated bookmarks file")
         except Exception as e:
             # Restore backup
+            logger.error(f"Failed to write bookmarks: {e}, restoring backup...")
             import shutil
 
             shutil.copy2(backup_path, self.bookmarks_path)
+            logger.info("✓ Backup restored")
             return False, f"Failed to write bookmarks (restored backup): {e}"
 
+        logger.info(f"✅ Deletion complete! Deleted {deleted_count} bookmarks")
         return (
             True,
             f"Successfully deleted {deleted_count} bookmarks. Backup saved to {backup_path}",
