@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from ..api import api
 from ..config import config
-from ..ui import ui
+from ..ui_refactored import ui
 
 
 def calculate_tfp_coverage(articles: list[dict]) -> dict[str, int]:
@@ -84,16 +84,11 @@ def show_progress_bar(label: str, count: int, total: int, width: int = 20):
     ui.style(f"{label:<30} {bar} {count:>3} articles ({percentage:>3}%)", foreground="147")
 
 
-def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
-    """Display beautiful stats dashboard."""
-
-    ui.header("Knowledge Pipeline Metrics", "📊")
-
-    # Load data
+def _load_stats_data(weekly: bool) -> tuple[list[dict], int, str] | None:
+    """Load articles data. Returns (articles, total, period) or None on error."""
     ui.style("\n⠋ Loading data...", foreground="147")
 
     try:
-        # Get all documents or filter by date
         if weekly:
             week_ago = (datetime.now() - timedelta(days=7)).isoformat()
             response = api.list_documents(updated_after=week_ago)
@@ -106,140 +101,122 @@ def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
         total_articles = len(articles)
 
         ui.success(f"Loaded {total_articles} articles\n")
+        return articles, total_articles, period
 
     except Exception as e:
         ui.error(f"Failed to load data: {e}")
+        return None
+
+
+def _show_tfp_coverage_report(articles: list[dict], total_articles: int, period: str) -> None:
+    """Display TFP coverage report with attention gaps."""
+    ui.style("─" * 70, foreground="212")
+    ui.style(f"TFP COVERAGE REPORT - {period.upper()}", foreground="212", bold=True)
+    ui.style("─" * 70, foreground="212")
+
+    tfps = config.get_tfps()
+    tfp_coverage = calculate_tfp_coverage(articles)
+
+    for tfp_code, question in tfps.items():
+        count = tfp_coverage.get(tfp_code, 0)
+        short_question = question[:45] + "..." if len(question) > 45 else question
+        show_progress_bar(f"{tfp_code.upper()} - {short_question}", count, total_articles)
+
+    # Identify attention gaps
+    ui.style("\n⚠️  ATTENTION NEEDED:", foreground="yellow", bold=True)
+
+    low_coverage_tfps = [
+        (code, count)
+        for code, count in tfp_coverage.items()
+        if total_articles > 0 and (count / total_articles) < 0.05
+    ]
+
+    if low_coverage_tfps:
+        for tfp_code, count in sorted(low_coverage_tfps, key=lambda x: x[1]):
+            percentage = int((count / total_articles) * 100) if total_articles > 0 else 0
+            ui.style(
+                f"  • {tfp_code.upper()} - only {percentage}% coverage",
+                foreground="yellow",
+            )
+    else:
+        ui.style("  ✓ All TFPs have good coverage!", foreground="green")
+
+    # Suggestions
+    ui.style("\n💡 SUGGESTIONS:", foreground="blue", bold=True)
+    if low_coverage_tfps:
+        ui.info("  • Search for content in neglected TFP areas")
+        ui.info("  • Review your Twelve Favorite Problems - are they still relevant?")
+
+
+def _show_layer_pipeline(articles: list[dict]) -> None:
+    """Display progressive summarization pipeline stats."""
+    ui.style("\n" + "─" * 70, foreground="212")
+    ui.style("PROGRESSIVE SUMMARIZATION PIPELINE", foreground="212", bold=True)
+    ui.style("─" * 70, foreground="212")
+
+    layer_dist = calculate_layer_distribution(articles)
+
+    layer1 = layer_dist.get("layer1-captured", 0)
+    layer2 = layer_dist.get("layer2-bolded", 0)
+    layer3 = layer_dist.get("layer3-highlighted", 0)
+    layer4 = layer_dist.get("layer4-summary", 0)
+
+    ui.style(f"\n📥 Layer 1 - Captured:     {layer1}", foreground="147")
+    ui.style(f"✨ Layer 2 - Bolded:       {layer2}", foreground="yellow")
+    ui.style(f"🎯 Layer 3 - Highlighted:  {layer3}", foreground="green")
+    ui.style(f"📝 Layer 4 - Summarized:   {layer4}", foreground="blue")
+
+    # Progression funnel
+    if layer1 > 0:
+        l2_pct = int((layer2 / layer1) * 100)
+        l3_pct = int((layer3 / layer1) * 100)
+        l4_pct = int((layer4 / layer1) * 100)
+
+        ui.style("\n📊 Progression Funnel:", foreground="212", bold=True)
+        ui.style(f"  Layer 1 → Layer 2: {l2_pct}%", foreground="yellow")
+        ui.style(f"  Layer 1 → Layer 3: {l3_pct}%", foreground="green")
+        ui.style(f"  Layer 1 → Layer 4: {l4_pct}%", foreground="blue")
+
+
+def _show_actionability_stats(articles: list[dict]) -> None:
+    """Display actionability distribution."""
+    ui.style("\n" + "─" * 70, foreground="212")
+    ui.style("ACTIONABILITY DISTRIBUTION", foreground="212", bold=True)
+    ui.style("─" * 70, foreground="212")
+
+    action_dist = calculate_actionability(articles)
+
+    inspirational = action_dist.get("inspirational", 0)
+    actionable = action_dist.get("actionable", 0)
+
+    ui.style(f"\n💡 Inspirational:  {inspirational}", foreground="yellow")
+    ui.style(f"🎯 Actionable:     {actionable}", foreground="green")
+
+    total = inspirational + actionable
+    if total > 0:
+        actionable_pct = int((actionable / total) * 100)
+        ui.style(f"\n✓ {actionable_pct}% of content is immediately actionable", foreground="green")
+
+
+def run_stats_dashboard(tfp_only: bool = False, weekly: bool = False):
+    """Display beautiful stats dashboard."""
+    ui.header("Knowledge Pipeline Metrics", "📊")
+
+    # Load data
+    data = _load_stats_data(weekly)
+    if data is None:
         return
+
+    articles, total_articles, period = data
 
     # TFP Coverage Report
     if tfp_only or not weekly:
-        ui.style("─" * 70, foreground="212")
-        ui.style(f"TFP COVERAGE REPORT - {period.upper()}", foreground="212", bold=True)
-        ui.style("─" * 70, foreground="212")
-
-        tfps = config.get_tfps()
-        tfp_coverage = calculate_tfp_coverage(articles)
-
-        for tfp_code, question in tfps.items():
-            count = tfp_coverage.get(tfp_code, 0)
-            # Truncate question if too long
-            short_question = question[:45] + "..." if len(question) > 45 else question
-            show_progress_bar(f"{tfp_code.upper()} - {short_question}", count, total_articles)
-
-        # Identify attention gaps
-        ui.style("\n⚠️  ATTENTION NEEDED:", foreground="yellow", bold=True)
-
-        low_coverage_tfps = [
-            (code, count)
-            for code, count in tfp_coverage.items()
-            if total_articles > 0 and (count / total_articles) < 0.05
-        ]
-
-        if low_coverage_tfps:
-            for tfp_code, count in sorted(low_coverage_tfps, key=lambda x: x[1]):
-                percentage = int((count / total_articles) * 100) if total_articles > 0 else 0
-                ui.style(
-                    f"  • {tfp_code.upper()} - only {percentage}% coverage",
-                    foreground="yellow",
-                )
-        else:
-            ui.style("  ✓ All TFPs have good coverage!", foreground="green")
-
-        # Suggestions
-        ui.style("\n💡 SUGGESTIONS:", foreground="blue", bold=True)
-        if low_coverage_tfps:
-            ui.info("  • Search for content in neglected TFP areas")
-            ui.info("  • Review your Twelve Favorite Problems - are they still relevant?")
+        _show_tfp_coverage_report(articles, total_articles, period)
 
     # Progressive Summarization Pipeline
     if not tfp_only:
-        ui.style("\n" + "─" * 70, foreground="212")
-        ui.style("PROGRESSIVE SUMMARIZATION PIPELINE", foreground="212", bold=True)
-        ui.style("─" * 70, foreground="212")
-
-        layer_dist = calculate_layer_distribution(articles)
-
-        layer1 = layer_dist.get("layer1-captured", 0)
-        layer2 = layer_dist.get("layer2-bolded", 0)
-        layer3 = layer_dist.get("layer3-highlighted", 0)
-        layer4 = layer_dist.get("layer4-summary", 0)
-
-        ui.style(f"Layer 1 (Captured)     →  {layer1:>3} articles", foreground="147")
-
-        if layer1 > 0:
-            l2_pct = int((layer2 / layer1) * 100)
-            ui.style(
-                f"Layer 2 (Bolded)       →  {layer2:>3} articles  ({l2_pct}%)",
-                foreground="147",
-            )
-
-            if layer2 > 0:
-                l3_pct = int((layer3 / layer2) * 100)
-                ui.style(
-                    f"Layer 3 (Highlighted)  →  {layer3:>3} articles  ({l3_pct}%)",
-                    foreground="147",
-                )
-
-                if layer3 > 0:
-                    l4_pct = int((layer4 / layer3) * 100)
-                    ui.style(
-                        f"Layer 4 (Summary)      →  {layer4:>3} articles  ({l4_pct}%)",
-                        foreground="147",
-                    )
-
-        # Pipeline health
-        ui.style("\n📈 PIPELINE HEALTH:", foreground="blue", bold=True)
-        if layer1 > 0:
-            conversion_rate = int((layer4 / layer1) * 100) if layer1 > 0 else 0
-            if conversion_rate >= 10:
-                ui.success(f"  ✓ {conversion_rate}% Layer 1→4 conversion rate (excellent!)")
-            elif conversion_rate >= 5:
-                ui.info(f"  → {conversion_rate}% Layer 1→4 conversion rate (good)")
-            else:
-                ui.warning(f"  ⚠ {conversion_rate}% Layer 1→4 conversion rate (needs improvement)")
-
-            # Recommendations
-            if layer1 - layer2 > 10:
-                ui.info(f"  • {layer1 - layer2} articles waiting for Layer 2 processing")
-            if layer2 - layer3 > 5:
-                ui.info(f"  • {layer2 - layer3} articles ready for Layer 3 highlighting")
-
-    # Actionability Breakdown
-    if not tfp_only:
-        ui.style("\n" + "─" * 70, foreground="212")
-        ui.style("ACTIONABILITY BREAKDOWN", foreground="212", bold=True)
-        ui.style("─" * 70, foreground="212")
-
-        action_dist = calculate_actionability(articles)
-
-        now_count = action_dist.get("now", 0)
-        soon_count = action_dist.get("soon", 0)
-        maybe_count = action_dist.get("maybe", 0)
-        ref_count = action_dist.get("ref", 0)
-
-        show_progress_bar("Actionable Now (today)", now_count, total_articles)
-        show_progress_bar("Actionable Soon (this week)", soon_count, total_articles)
-        show_progress_bar("Maybe Someday", maybe_count, total_articles)
-        show_progress_bar("Reference Only", ref_count, total_articles)
-
-        if now_count > 0:
-            ui.style(
-                f"\n💡 You have {now_count} items ready for immediate action!",
-                foreground="green",
-                bold=True,
-            )
-            ui.info("   Run 'rwactions' to convert them to Sunsama tasks.")
-
-    # Footer
-    ui.style("\n" + "─" * 70, foreground="212")
-    ui.success(f"✓ Analyzed {total_articles} articles from {period}")
-
-    # Next steps
-    if not tfp_only and not weekly:
-        ui.style("\n📋 NEXT STEPS:", foreground="blue", bold=True)
-        ui.info("  • Run 'rwstats --weekly' for this week's metrics")
-        ui.info("  • Run 'rwdaily' for morning review workflow")
-        ui.info("  • Run 'rwactions' to generate Sunsama tasks")
+        _show_layer_pipeline(articles)
+        _show_actionability_stats(articles)
 
 
 if __name__ == "__main__":

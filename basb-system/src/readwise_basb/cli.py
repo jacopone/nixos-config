@@ -5,7 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
-from readwise_basb.ui import ui
+from readwise_basb.ui_refactored import ui
 from readwise_basb.workflows import chrome_review, daily, setup, stats, tagging
 
 # Configure logging

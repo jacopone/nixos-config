@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 
 from ..api import api
-from ..ui import ui
+from ..ui_refactored import ui
 
 
 def run_daily_routine():

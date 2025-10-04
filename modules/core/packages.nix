@@ -59,6 +59,7 @@
     nodejs_20           # Node.js 20.19.4 with npm - eliminates devenv activation overhead
     python3             # Python for build scripts and native modules
     python312Packages.pymupdf4llm  # PyMuPDF for LLM-optimized PDF processing
+    python312Packages.rich          # Rich - Python terminal UI library (for BASB system)
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
     ninja               # Build system for faster compilation (required by numpy/aider)

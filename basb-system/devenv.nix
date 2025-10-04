@@ -1,20 +1,12 @@
 { pkgs, ... }:
 {
-  # Minimal devenv for BASB system testing/development
-  # Runtime has NO Python dependencies - uses system tools (httpie, curl, gum)
-  # This environment is ONLY for testing, linting, and type checking
+  # BASB Development Environment
+  # Note: Rich (Python UI library) is installed system-wide
+  # This environment is for testing and linting only
 
   packages = with pkgs; [
-    # Python runtime
-    python311
-
-    # Testing (minimal - just pytest)
-    python311Packages.pytest
-    python311Packages.pytest-mock
-
-    # Linting & Formatting
-    python311Packages.ruff
-    # Note: black, mypy, pytest-cov excluded due to tkinter/GUI dependency issues
+    python3           # Python runtime (uses system python)
+    python312Packages.ruff  # Linter
   ];
 
   env.PYTHONPATH = "${toString ./.}/src";
@@ -22,11 +14,13 @@
   enterShell = ''
     echo "🧪 BASB Development Environment"
     echo "   Python: $(python --version)"
-    echo "   Pytest: $(pytest --version | head -1)"
+    echo "   PYTHONPATH: $PYTHONPATH"
+    echo ""
+    echo "Note: Rich UI library is available system-wide"
+    echo "      Devenv intentionally minimal to avoid tkinter build issues"
     echo ""
     echo "Commands:"
-    echo "  pytest tests/           - Run all tests"
-    echo "  pytest tests/unit/      - Run unit tests only"
+    echo "  python -c 'from readwise_basb.ui_refactored import ui' - Test UI import"
     echo "  ruff check src/         - Lint code"
     echo ""
   '';

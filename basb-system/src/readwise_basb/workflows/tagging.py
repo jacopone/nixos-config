@@ -2,7 +2,7 @@
 
 from ..api import api
 from ..config import config
-from ..ui import ui
+from ..ui_refactored import ui
 
 
 def run_tagging_wizard(article_id: str | None = None):

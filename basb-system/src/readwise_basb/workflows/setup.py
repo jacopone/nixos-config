@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from ..api import api
-from ..ui import ui
+from ..ui_refactored import ui
 
 
 def run_setup():

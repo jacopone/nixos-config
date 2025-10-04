@@ -1,10 +1,13 @@
 """Chrome bookmarks review workflow."""
 
+import logging
 from datetime import datetime
 
 from ..api import api
 from ..chrome import ChromeBookmarks, suggest_tags_for_bookmark
-from ..ui import ui
+from ..ui_refactored import ui
+
+logger = logging.getLogger(__name__)
 
 
 def show_bookmark_stats():
@@ -54,27 +57,8 @@ def show_bookmark_stats():
         ui.error(f"Error loading statistics: {e}")
 
 
-def run_bookmark_review(
-    folder: str | None = None,
-    limit: int = 20,
-    stats_only: bool = False,
-    filter_broken: bool = True,
-):
-    """Run interactive bookmark review workflow."""
-
-    if stats_only:
-        show_bookmark_stats()
-        return
-
-    ui.header("Chrome Bookmarks Review", "🔖")
-
-    try:
-        chrome = ChromeBookmarks()
-    except Exception as e:
-        ui.error(f"Failed to initialize Chrome bookmarks: {e}")
-        return
-
-    # Load bookmarks
+def _load_bookmarks(chrome: ChromeBookmarks, folder: str | None) -> list[dict] | None:
+    """Load unreviewed bookmarks from Chrome."""
     ui.style("\n⠋ Loading Chrome bookmarks...", foreground="147")
 
     try:
@@ -84,250 +68,218 @@ def run_bookmark_review(
         else:
             bookmarks = chrome.get_all_bookmarks(include_reviewed=False)
             ui.success(f"Loaded {len(bookmarks)} unreviewed bookmarks\n")
-
+        return bookmarks
     except Exception as e:
         ui.error(f"Failed to load bookmarks: {e}")
-        return
+        return None
 
-    if not bookmarks:
-        ui.info("No unreviewed bookmarks found!")
-        ui.success("\n✓ You're all caught up!")
-        return
 
-    # Limit bookmarks for this session
-    session_bookmarks = bookmarks[:limit]
+def _check_broken_urls(
+    chrome: ChromeBookmarks, session_bookmarks: list[dict]
+) -> tuple[list[dict], list[dict]]:
+    """Check URLs for accessibility and return (accessible, broken) lists."""
+    ui.style(
+        f"\n⠋ Checking {len(session_bookmarks)} URLs for accessibility...",
+        foreground="147",
+    )
+    accessible_bookmarks = []
+    broken_bookmarks = []
 
-    # Filter broken URLs from session only (faster than filtering all bookmarks)
-    if filter_broken:
-        ui.style(
-            f"\n⠋ Checking {len(session_bookmarks)} URLs for accessibility...",
-            foreground="147",
-        )
-        accessible_bookmarks = []
-        broken_bookmarks = []
-
-        try:
-            for _i, bookmark in enumerate(session_bookmarks):
-                url = bookmark.get("url", "")
-                if not url:
-                    broken_bookmarks.append(bookmark)
-                    continue
-
-                if chrome._is_url_accessible(url):
-                    accessible_bookmarks.append(bookmark)
-                else:
-                    broken_bookmarks.append(bookmark)
-        except Exception as e:
-            ui.error(f"Error checking URLs: {e}")
-            # Continue with all bookmarks if URL checking fails
-            session_bookmarks = session_bookmarks
-            accessible_bookmarks = session_bookmarks
-            broken_bookmarks = []
-
-        if broken_bookmarks:
-            ui.warning(f"\n⚠ Found {len(broken_bookmarks)} broken/inaccessible URLs")
-            ui.info("These bookmarks appear to be dead links (404, timeout, etc.)\n")
-
-            # Show broken URLs
-            for bookmark in broken_bookmarks[:5]:  # Show first 5
-                title = bookmark.get("name", bookmark.get("title", "Untitled"))
-                url = bookmark.get("url", "No URL")
-                ui.style(f"  • {title}", foreground="red")
-                ui.style(f"    {url}", foreground="147")
-
-            if len(broken_bookmarks) > 5:
-                ui.style(f"  ... and {len(broken_bookmarks) - 5} more", foreground="147")
-
-            # Ask user what to do
-            ui.style(
-                "\n❓ What would you like to do with broken URLs?", foreground="212", bold=True
-            )
-            action = ui.choose(
-                [
-                    "🗑️  Delete from Chrome permanently",
-                    "✅ Mark as reviewed (skip in future sessions)",
-                    "⏭️  Keep in queue (check again next time)",
-                    "👁️  Show me each one to decide",
-                ]
-            )
-
-            # Debug: show what action was selected
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.debug(f"Broken URLs action selected: {repr(action)}")
-
-            if not action:
-                # User cancelled or gum failed
-                ui.warning("\n⚠️  No action selected - keeping broken URLs in queue")
-                ui.info("They will be checked again next session\n")
-                session_bookmarks = accessible_bookmarks
-
-            elif "Delete from Chrome" in action:
-                # Mark all broken bookmarks for deletion
-                ui.warning("\n🗑️  Marked for deletion")
-                ui.info(f"   {len(broken_bookmarks)} broken URLs will be deleted at session end")
-                ui.info("   (You'll be prompted to close Chrome before deletion)\n")
-
-                for bookmark in broken_bookmarks:
-                    chrome.mark_for_deletion(bookmark["id"])
-                    chrome.save_reviewed(bookmark["id"])
-
-                ui.success(f"✓ {len(broken_bookmarks)} bookmarks queued for deletion\n")
-                session_bookmarks = accessible_bookmarks
-
-            elif "Mark as reviewed" in action:
-                for bookmark in broken_bookmarks:
-                    chrome.save_reviewed(bookmark["id"])
-                ui.success(f"✓ Marked {len(broken_bookmarks)} broken URLs as reviewed")
-                ui.info("   They won't appear in future sessions\n")
-                session_bookmarks = accessible_bookmarks
-
-            elif "Keep in queue" in action:
-                # Explicitly keep in queue
-                ui.info(f"⏭️  Kept {len(broken_bookmarks)} broken URLs in queue")
-                ui.info("   They will be checked again next session\n")
-                session_bookmarks = accessible_bookmarks
-
-            elif "Show me each one" in action:
-                # Add broken bookmarks to session for manual review
-                ui.info(f"👁️  Added {len(broken_bookmarks)} broken URLs to review queue")
-                ui.info("   You'll review each one individually\n")
-                session_bookmarks = accessible_bookmarks + broken_bookmarks
-
-            else:
-                # Unknown action - shouldn't happen but be safe
-                ui.warning(f"\n⚠️  Unknown action: {action}")
-                ui.info("   Keeping broken URLs in queue for next session\n")
-                session_bookmarks = accessible_bookmarks
-        else:
-            ui.success("✓ All URLs are accessible\n")
-
-    ui.info(f"Reviewing {len(session_bookmarks)} bookmarks (limit: {limit})")
-    ui.info(f"{len(bookmarks) - len(session_bookmarks)} remaining for later\n")
-
-    # Review statistics
-    saved_to_readwise = 0
-    deleted_count = 0
-    kept_count = 0
-    skipped_count = 0
-    stopped_early = False
-
-    # Process each bookmark
-    for i, bookmark in enumerate(session_bookmarks, 1):
-        ui.style("\n" + "═" * 60, foreground="212")
-        ui.style(f"Bookmark {i}/{len(session_bookmarks)}", foreground="212", bold=True)
-        ui.style("═" * 60, foreground="212")
-
-        # Display bookmark info
-        title = bookmark["title"]
-        url = bookmark["url"]
-        folder = bookmark["folder"]
-        date_added = bookmark["date_added"]
-
-        ui.style(f"\n📄 {title}", foreground="147", bold=True)
-        ui.style(f"🔗 {url}", foreground="blue")
-        ui.style(f"📁 {folder}", foreground="yellow")
-
-        if date_added:
-            age_days = (datetime.now() - date_added).days
-            age_str = f"{age_days} days ago" if age_days < 365 else f"{age_days // 365} years ago"
-            ui.style(f"📅 Added {age_str}", foreground="147")
-
-        # Suggest tags
-        suggested_tags = suggest_tags_for_bookmark(bookmark)
-        ui.style(f"\n💡 Suggested tags: {suggested_tags['basb_tag']}", foreground="green")
-        if suggested_tags["tfp_tags"]:
-            ui.style(f"   TFPs: {', '.join(suggested_tags['tfp_tags'])}", foreground="green")
-        ui.style(f"   Source: {suggested_tags['source']}", foreground="147")
-
-        # Action menu (gum choose will display the options interactively)
-        actions = [
-            "💾 Save to Readwise & tag with BASB",
-            "🗑️  Delete (remove from Chrome)",
-            "✅ Keep in Chrome (mark reviewed)",
-            "⏭️  Skip for now",
-            "🛑 Stop review session",
-        ]
-
-        action = ui.choose(actions)
-
-        # Handle no action (user cancelled or gum failed)
-        if not action:
-            ui.warning("\n⚠️  No action selected")
-
-            # Ask if user wants to stop or continue
-            should_continue = ui.confirm("Continue to next bookmark?", default=True)
-            if not should_continue:
-                ui.warning("\n🛑 Stopping review session...")
-                stopped_early = True
-                break
-            else:
-                ui.info("⏭️  Skipping this bookmark...\n")
-                skipped_count += 1
+    try:
+        for bookmark in session_bookmarks:
+            url = bookmark.get("url", "")
+            if not url:
+                broken_bookmarks.append(bookmark)
                 continue
 
-        # Debug: show selected action (only in debug mode)
-        import logging
-
-        logger = logging.getLogger(__name__)
-        logger.debug(f"Bookmark action selected: {repr(action)}")
-
-        if "Save to Readwise" in action:
-            # Save to Readwise
-            try:
-                ui.style("\n⠋ Saving to Readwise...", foreground="147")
-
-                # Build tags
-                tags = [suggested_tags["basb_tag"]]
-                tags.extend(suggested_tags["tfp_tags"])
-                tags.append(suggested_tags["layer_tag"])
-                tags.append(suggested_tags["action_tag"])
-                tags.append("source-chrome")
-
-                # Save to Readwise
-                api.save_document(
-                    url=url,
-                    title=title,
-                    tags=tags,
-                    location="later",  # Add to "Later" list
-                )
-
-                chrome.save_reviewed(bookmark["id"])
-                saved_to_readwise += 1
-                ui.success(f"✓ Saved to Readwise with tags: {', '.join(tags)}")
-
-            except Exception as e:
-                ui.error(f"✗ Failed to save: {e}")
-
-        elif "Delete" in action:
-            # Confirm deletion
-            if ui.confirm(f"⚠️  Mark '{title}' for deletion?", default=False):
-                # Mark for deletion (will delete at end of session)
-                chrome.mark_for_deletion(bookmark["id"])
-                chrome.save_reviewed(bookmark["id"])
-                deleted_count += 1
-                ui.success("✓ Marked for deletion (will delete at end of session)")
+            if chrome._is_url_accessible(url):
+                accessible_bookmarks.append(bookmark)
             else:
-                ui.info("Delete cancelled")
+                broken_bookmarks.append(bookmark)
+    except Exception as e:
+        ui.error(f"Error checking URLs: {e}")
+        # Continue with all bookmarks if URL checking fails
+        return session_bookmarks, []
 
-        elif "Keep in Chrome" in action:
-            # Just mark as reviewed
+    return accessible_bookmarks, broken_bookmarks
+
+
+def _show_broken_urls(broken_bookmarks: list[dict]) -> None:
+    """Display broken URLs preview."""
+    ui.warning(f"\n⚠ Found {len(broken_bookmarks)} broken/inaccessible URLs")
+    ui.info("These bookmarks appear to be dead links (404, timeout, etc.)\n")
+
+    # Show first 5
+    for bookmark in broken_bookmarks[:5]:
+        title = bookmark.get("name", bookmark.get("title", "Untitled"))
+        url = bookmark.get("url", "No URL")
+        ui.style(f"  • {title}", foreground="red")
+        ui.style(f"    {url}", foreground="147")
+
+    if len(broken_bookmarks) > 5:
+        ui.style(f"  ... and {len(broken_bookmarks) - 5} more", foreground="147")
+
+
+def _handle_broken_urls(
+    chrome: ChromeBookmarks,
+    broken_bookmarks: list[dict],
+    accessible_bookmarks: list[dict],
+) -> list[dict]:
+    """Handle broken URLs based on user choice. Returns final session bookmark list."""
+    _show_broken_urls(broken_bookmarks)
+
+    ui.style("\n❓ What would you like to do with broken URLs?", foreground="212", bold=True)
+    action = ui.choose(
+        [
+            "🗑️  Delete from Chrome permanently",
+            "✅ Mark as reviewed (skip in future sessions)",
+            "⏭️  Keep in queue (check again next time)",
+            "👁️  Show me each one to decide",
+        ]
+    )
+
+    logger.debug(f"Broken URLs action selected: {repr(action)}")
+
+    if not action:
+        ui.warning("\n⚠️  No action selected - keeping broken URLs in queue")
+        ui.info("They will be checked again next session\n")
+        return accessible_bookmarks
+
+    if "Delete from Chrome" in action:
+        ui.warning("\n🗑️  Marked for deletion")
+        ui.info(f"   {len(broken_bookmarks)} broken URLs will be deleted at session end")
+        ui.info("   (You'll be prompted to close Chrome before deletion)\n")
+
+        for bookmark in broken_bookmarks:
+            chrome.mark_for_deletion(bookmark["id"])
             chrome.save_reviewed(bookmark["id"])
-            kept_count += 1
-            ui.success("✓ Marked as reviewed, keeping in Chrome")
 
-        elif "Skip" in action:
-            skipped_count += 1
-            ui.info("⏭️  Skipped for later")
+        ui.success(f"✓ {len(broken_bookmarks)} bookmarks queued for deletion\n")
+        return accessible_bookmarks
 
-        elif "Stop" in action:
-            # User explicitly chose to stop
-            ui.info("\n🛑 Session stopped by user\n")
-            stopped_early = True
-            break
+    if "Mark as reviewed" in action:
+        for bookmark in broken_bookmarks:
+            chrome.save_reviewed(bookmark["id"])
+        ui.success(f"✓ Marked {len(broken_bookmarks)} broken URLs as reviewed")
+        ui.info("   They won't appear in future sessions\n")
+        return accessible_bookmarks
 
-    # Session summary
+    if "Keep in queue" in action:
+        ui.info(f"⏭️  Kept {len(broken_bookmarks)} broken URLs in queue")
+        ui.info("   They will be checked again next session\n")
+        return accessible_bookmarks
+
+    if "Show me each one" in action:
+        ui.info(f"👁️  Added {len(broken_bookmarks)} broken URLs to review queue")
+        ui.info("   You'll review each one individually\n")
+        return accessible_bookmarks + broken_bookmarks
+
+    # Unknown action - shouldn't happen
+    ui.warning(f"\n⚠️  Unknown action: {action}")
+    ui.info("   Keeping broken URLs in queue for next session\n")
+    return accessible_bookmarks
+
+
+def _display_bookmark_info(bookmark: dict) -> None:
+    """Display bookmark details."""
+    title = bookmark["title"]
+    url = bookmark["url"]
+    folder = bookmark["folder"]
+    date_added = bookmark["date_added"]
+
+    ui.style(f"\n📄 {title}", foreground="147", bold=True)
+    ui.style(f"🔗 {url}", foreground="blue")
+    ui.style(f"📁 {folder}", foreground="yellow")
+
+    if date_added:
+        age_days = (datetime.now() - date_added).days
+        age_str = f"{age_days} days ago" if age_days < 365 else f"{age_days // 365} years ago"
+        ui.style(f"📅 Added {age_str}", foreground="147")
+
+    suggested_tags = suggest_tags_for_bookmark(bookmark)
+    ui.style(f"\n💡 Suggested tags: {suggested_tags['basb_tag']}", foreground="green")
+    if suggested_tags["tfp_tags"]:
+        ui.style(f"   TFPs: {', '.join(suggested_tags['tfp_tags'])}", foreground="green")
+    ui.style(f"   Source: {suggested_tags['source']}", foreground="147")
+
+
+def _handle_bookmark_action(
+    action: str | None, bookmark: dict, chrome: ChromeBookmarks
+) -> tuple[str, bool]:
+    """
+    Handle bookmark action.
+    Returns (action_type, should_stop) where action_type is one of:
+    'saved', 'deleted', 'kept', 'skipped', 'stopped'
+    """
+    if not action:
+        ui.warning("\n⚠️  No action selected")
+        should_continue = ui.confirm("Continue to next bookmark?", default=True)
+        if not should_continue:
+            ui.warning("\n🛑 Stopping review session...")
+            return "stopped", True
+        ui.info("⏭️  Skipping this bookmark...\n")
+        return "skipped", False
+
+    logger.debug(f"Bookmark action selected: {repr(action)}")
+
+    if "Save to Readwise" in action:
+        try:
+            ui.style("\n⠋ Saving to Readwise...", foreground="147")
+            suggested_tags = suggest_tags_for_bookmark(bookmark)
+            tags = [suggested_tags["basb_tag"]]
+            tags.extend(suggested_tags["tfp_tags"])
+            tags.append(suggested_tags["layer_tag"])
+            tags.append(suggested_tags["action_tag"])
+            tags.append("source-chrome")
+
+            api.save_document(
+                url=bookmark["url"],
+                title=bookmark["title"],
+                tags=tags,
+                location="later",
+            )
+            chrome.save_reviewed(bookmark["id"])
+            ui.success(f"✓ Saved to Readwise with tags: {', '.join(tags)}")
+            return "saved", False
+        except Exception as e:
+            ui.error(f"✗ Failed to save: {e}")
+            return "skipped", False
+
+    if "Delete" in action:
+        if ui.confirm(f"⚠️  Mark '{bookmark['title']}' for deletion?", default=False):
+            chrome.mark_for_deletion(bookmark["id"])
+            chrome.save_reviewed(bookmark["id"])
+            ui.success("✓ Marked for deletion (will delete at end of session)")
+            return "deleted", False
+        ui.info("Delete cancelled")
+        return "skipped", False
+
+    if "Keep in Chrome" in action:
+        chrome.save_reviewed(bookmark["id"])
+        ui.success("✓ Marked as reviewed, keeping in Chrome")
+        return "kept", False
+
+    if "Skip" in action:
+        ui.info("⏭️  Skipped for later")
+        return "skipped", False
+
+    if "Stop" in action:
+        ui.info("\n🛑 Session stopped by user\n")
+        return "stopped", True
+
+    return "skipped", False
+
+
+def _show_session_summary(
+    stopped_early: bool,
+    saved_to_readwise: int,
+    deleted_count: int,
+    kept_count: int,
+    skipped_count: int,
+    total_processed: int,
+    session_size: int,
+) -> None:
+    """Display session summary."""
     ui.style("\n" + "═" * 60, foreground="212")
 
     if stopped_early:
@@ -342,52 +294,148 @@ def run_bookmark_review(
     ui.style(f"  • Kept in Chrome: {kept_count}", foreground="blue")
     ui.style(f"  • Skipped: {skipped_count}", foreground="yellow")
 
-    total_processed = saved_to_readwise + deleted_count + kept_count
     ui.style(
-        f"\n✓ Processed {total_processed}/{len(session_bookmarks)} bookmarks",
+        f"\n✓ Processed {total_processed}/{session_size} bookmarks",
         foreground="green",
     )
 
-    # Handle batch deletion of marked bookmarks
+
+def _handle_batch_deletion(chrome: ChromeBookmarks) -> None:
+    """Handle batch deletion of marked bookmarks."""
     deletion_queue = chrome.get_deletion_queue()
-    if deletion_queue:
-        ui.style("\n" + "─" * 60, foreground="147")
-        ui.style(
-            f"\n🗑️  {len(deletion_queue)} bookmarks marked for deletion",
-            foreground="red",
-            bold=True,
+    if not deletion_queue:
+        return
+
+    ui.style("\n" + "─" * 60, foreground="147")
+    ui.style(
+        f"\n🗑️  {len(deletion_queue)} bookmarks marked for deletion",
+        foreground="red",
+        bold=True,
+    )
+
+    if not ui.confirm("\nProceed with deletion? (Chrome must be closed)", default=True):
+        ui.info("\nDeletion postponed. Bookmarks remain marked for deletion")
+        ui.info("Run 'rwchrome' again later to complete deletion")
+        return
+
+    # Check if Chrome is running
+    if chrome.is_chrome_running():
+        ui.warning("\n⚠️  Chrome is currently running")
+        ui.info("Please close Chrome to proceed with deletion...\n")
+
+        ui.style("⏳ Waiting for Chrome to close (60 second timeout)...", foreground="147")
+        if not chrome.wait_for_chrome_close(timeout=60):
+            ui.error("\n✗ Timeout waiting for Chrome to close")
+            ui.info("Bookmarks will remain marked for deletion")
+            ui.info("Run 'rwchrome' again later to complete deletion\n")
+            return
+        ui.success("\n✓ Chrome closed!")
+
+    # Delete the bookmarks
+    ui.style("\n⠋ Deleting bookmarks from Chrome...", foreground="147")
+    success, message = chrome.delete_bookmarks(deletion_queue)
+
+    if success:
+        ui.success(f"\n✓ {message}")
+        chrome.clear_deletion_queue()
+        ui.info("\n💡 You can now reopen Chrome")
+    else:
+        ui.error(f"\n✗ {message}")
+
+
+def run_bookmark_review(
+    folder: str | None = None,
+    limit: int = 20,
+    stats_only: bool = False,
+    filter_broken: bool = True,
+):
+    """Run interactive bookmark review workflow."""
+    if stats_only:
+        show_bookmark_stats()
+        return
+
+    ui.header("Chrome Bookmarks Review", "🔖")
+
+    try:
+        chrome = ChromeBookmarks()
+    except Exception as e:
+        ui.error(f"Failed to initialize Chrome bookmarks: {e}")
+        return
+
+    bookmarks = _load_bookmarks(chrome, folder)
+    if bookmarks is None:
+        return
+
+    if not bookmarks:
+        ui.info("No unreviewed bookmarks found!")
+        ui.success("\n✓ You're all caught up!")
+        return
+
+    # Limit bookmarks for this session
+    session_bookmarks = bookmarks[:limit]
+
+    # Filter broken URLs
+    if filter_broken:
+        accessible_bookmarks, broken_bookmarks = _check_broken_urls(chrome, session_bookmarks)
+        if broken_bookmarks:
+            session_bookmarks = _handle_broken_urls(chrome, broken_bookmarks, accessible_bookmarks)
+        else:
+            ui.success("✓ All URLs are accessible\n")
+
+    ui.info(f"Reviewing {len(session_bookmarks)} bookmarks (limit: {limit})")
+    ui.info(f"{len(bookmarks) - len(session_bookmarks)} remaining for later\n")
+
+    # Review statistics
+    counters = {
+        "saved": 0,
+        "deleted": 0,
+        "kept": 0,
+        "skipped": 0,
+        "stopped": False,
+    }
+
+    # Process each bookmark
+    for i, bookmark in enumerate(session_bookmarks, 1):
+        ui.style("\n" + "═" * 60, foreground="212")
+        ui.style(f"Bookmark {i}/{len(session_bookmarks)}", foreground="212", bold=True)
+        ui.style("═" * 60, foreground="212")
+
+        _display_bookmark_info(bookmark)
+
+        # Action menu
+        action = ui.choose(
+            [
+                "💾 Save to Readwise & tag with BASB",
+                "🗑️  Delete (remove from Chrome)",
+                "✅ Keep in Chrome (mark reviewed)",
+                "⏭️  Skip for now",
+                "🛑 Stop review session",
+            ]
         )
 
-        if ui.confirm("\nProceed with deletion? (Chrome must be closed)", default=True):
-            # Check if Chrome is running
-            if chrome.is_chrome_running():
-                ui.warning("\n⚠️  Chrome is currently running")
-                ui.info("Please close Chrome to proceed with deletion...\n")
+        action_type, should_stop = _handle_bookmark_action(action, bookmark, chrome)
+        counters[action_type] += 1
 
-                # Wait for Chrome to close (with timeout)
-                ui.style("⏳ Waiting for Chrome to close (60 second timeout)...", foreground="147")
-                if chrome.wait_for_chrome_close(timeout=60):
-                    ui.success("\n✓ Chrome closed!")
-                else:
-                    ui.error("\n✗ Timeout waiting for Chrome to close")
-                    ui.info("Bookmarks will remain marked for deletion")
-                    ui.info("Run 'rwchrome' again later to complete deletion\n")
-                    return
+        if should_stop:
+            counters["stopped"] = True
+            break
 
-            # Delete the bookmarks
-            ui.style("\n⠋ Deleting bookmarks from Chrome...", foreground="147")
-            success, message = chrome.delete_bookmarks(deletion_queue)
+    # Session summary
+    total_processed = counters["saved"] + counters["deleted"] + counters["kept"]
+    _show_session_summary(
+        counters["stopped"],
+        counters["saved"],
+        counters["deleted"],
+        counters["kept"],
+        counters["skipped"],
+        total_processed,
+        len(session_bookmarks),
+    )
 
-            if success:
-                ui.success(f"\n✓ {message}")
-                chrome.clear_deletion_queue()
-                ui.info("\n💡 You can now reopen Chrome")
-            else:
-                ui.error(f"\n✗ {message}")
-        else:
-            ui.info("\nDeletion postponed. Bookmarks remain marked for deletion")
-            ui.info("Run 'rwchrome' again later to complete deletion")
+    # Handle batch deletion
+    _handle_batch_deletion(chrome)
 
+    # Show remaining
     remaining = len(bookmarks) - total_processed
     if remaining > 0:
         ui.info(f"\n💡 {remaining} bookmarks remaining for next session")
