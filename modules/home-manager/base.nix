@@ -20,6 +20,12 @@
   # Configure Fish shell with smart command system (matching documentation)
   programs.fish = {
     enable = true;
+
+    # Add ~/.local/bin to PATH for TDD Guard control scripts
+    shellInit = ''
+      set -gx PATH $HOME/.local/bin $PATH
+    '';
+
     interactiveShellInit = ''
       # Context detection function - determines if running in automated context
       function _is_automated_context
@@ -212,6 +218,7 @@
       abbr -a sk 'skim'
       abbr -a ai 'aider'
       abbr -a aicode 'aider --dark-mode --model anthropic/claude-3-5-sonnet-20241022'
+      abbr -a aitui 'python3 -m ai_orchestrator_tui'
       abbr -a br 'broot'
       abbr -a record 'vhs'
       abbr -a yamlcat 'yq .'
@@ -295,6 +302,7 @@
           echo "🤖 AI Development Tools:"
           echo "  ai        → aider (AI pair programming)"
           echo "  aicode    → aider with Claude Sonnet"
+          echo "  aitui     → AI Project Orchestration TUI (Rich interface)"
           echo "  br        → broot (interactive tree navigation)"
           echo "  cm        → chezmoi (dotfile management)"
           echo "  record    → vhs (terminal session recording)"
