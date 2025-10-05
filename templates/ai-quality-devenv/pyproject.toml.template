@@ -1,0 +1,86 @@
+# Python Project Configuration Template
+# Copy this to pyproject.toml and customize for your project
+
+[project]
+name = "your-project-name"
+version = "0.1.0"
+description = "Your project description"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    # Add your runtime dependencies here
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "black>=24.0.0",
+    "tdd-guard-pytest>=0.1.0",  # TDD enforcement for AI-assisted coding
+]
+
+[project.scripts]
+# your-cli = "your_package.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ============================================================================
+# Code Quality Tools Configuration
+# ============================================================================
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = []
+
+[tool.black]
+line-length = 100
+target-version = ["py313"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=term-missing"
+
+# ============================================================================
+# TDD Guard Configuration
+# ============================================================================
+# Enforces Test-Driven Development workflow with RED/GREEN/REFACTOR phases
+# Integrated with Claude Code hooks for automatic TDD enforcement
+#
+# How it works:
+# - Blocks implementation code without failing tests (RED phase)
+# - Validates tests pass after implementation (GREEN phase)
+# - Allows refactoring with passing tests (REFACTOR phase)
+#
+# To use:
+# 1. This template includes tdd-guard-pytest in dev dependencies
+# 2. Update project_root below to your project path
+# 3. Enter devenv shell (dependencies auto-install)
+# 4. Claude Code hooks automatically enforce TDD workflow
+#
+# See: ~/.claude/TDD-GUARD-SETUP.md for full documentation
+# ============================================================================
+
+[tool.tdd-guard]
+project_root = "."  # Will be resolved to absolute path by tdd-guard

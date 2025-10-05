@@ -30,6 +30,14 @@ Quality gates run automatically via pre-commit hooks on each commit.
 
 **Important**: Git hooks run inside `devenv shell` automatically. This ensures all quality tools (ls-lint, markdownlint, gitleaks, etc.) are available when you commit, even from outside the devenv shell.
 
+### 🧪 TDD Enforcement (Test-Driven Development)
+- **TDD Guard**: Automated TDD workflow enforcement integrated with Claude Code
+- **RED/GREEN/REFACTOR**: Enforces proper TDD cycle automatically
+- **Test-First**: Blocks implementation code without failing tests
+- **Test Validation**: Ensures tests pass after implementation
+- **Pre-configured**: Integrated with Claude Code hooks (system-wide)
+- **Project-Ready**: Template includes tdd-guard-pytest for Python projects
+
 ## Quick Start
 
 ```bash
@@ -46,12 +54,67 @@ devenv shell         # Manual activation
 # Interactive AI tools setup
 init-ai-tools        # Choose Claude Code, Cursor AI, or both
 
+# For Python projects: Setup TDD Guard
+cp pyproject.toml.template pyproject.toml
+# Edit pyproject.toml with your project name and details
+# TDD Guard is pre-configured - just update project_root if needed
+
 # Git hooks are installed automatically on first devenv shell
 # Verify installation:
 ls -la .git/hooks/pre-commit
 
 # Verify setup
 quality-report
+```
+
+### TDD Guard Setup (Python Projects)
+
+TDD Guard is **pre-configured** system-wide via Claude Code hooks. For Python projects:
+
+1. **Copy the template**:
+   ```bash
+   cp pyproject.toml.template pyproject.toml
+   ```
+
+2. **Customize** your project details (name, version, dependencies)
+
+3. **TDD Guard is ready!** It's already included in dev dependencies:
+   ```toml
+   [project.optional-dependencies]
+   dev = [
+       "pytest>=8.0.0",
+       "tdd-guard-pytest>=0.1.0",  # Already configured!
+       # ... other dev tools
+   ]
+   ```
+
+4. **Enter devenv** and dependencies auto-install:
+   ```bash
+   devenv shell  # or direnv allow
+   ```
+
+5. **TDD workflow is enforced** automatically:
+   - Write test first → Allowed ✅
+   - Test must fail (RED) → Validated
+   - Write implementation → Allowed when tests exist
+   - Tests must pass (GREEN) → Validated
+   - Refactor with green tests → Allowed ✅
+
+See `~/.claude/TDD-GUARD-SETUP.md` for full documentation.
+
+### JavaScript/TypeScript Projects
+
+For JS/TS projects, install the appropriate reporter:
+
+```bash
+# Vitest
+npm install --save-dev tdd-guard-vitest
+
+# Jest
+npm install --save-dev tdd-guard-jest
+```
+
+Then configure in `vitest.config.ts` or `jest.config.js` (see TDD-GUARD-SETUP.md).
 ```
 
 ## Available Scripts
