@@ -77,3 +77,4 @@ venv/
 
 # UV Python package manager
 .uv-cache/
+.aider*

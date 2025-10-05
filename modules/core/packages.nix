@@ -7,7 +7,6 @@
     zed-editor          # A high-performance, multiplayer code editor - https://zed.dev/
     vscode-fhs          # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
     inputs.code-cursor-nix.packages.${pkgs.system}.cursor   # Cursor - Auto-updating AI Code Editor - https://cursor.com/
-    plandex             # An open-source, terminal-based AI coding agent - https://plandex.ai/
     inputs.claude-code-nix.packages.${pkgs.system}.default  # A code-generation tool using Anthropic's Claude model (better packaged)
     # Claude Flow - AI orchestration platform (alpha version via npx)
     (pkgs.writeShellScriptBin "claude-flow" ''
@@ -18,6 +17,7 @@
 
     # AI Development Enhancement Tools
     (pkgs.writeShellScriptBin "aider" ''
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from aider-chat aider "$@"
     '')
     # Serena MCP Server - Semantic code analysis toolkit for coding agents
