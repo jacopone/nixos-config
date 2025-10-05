@@ -24,6 +24,15 @@
     (pkgs.writeShellScriptBin "serena" ''
       exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"
     '')
+    # TDD Guard - TDD enforcement for AI-assisted coding
+    (pkgs.writeShellScriptBin "tdd-guard" ''
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
+      exec ${pkgs.nodejs_20}/bin/npx tdd-guard "$@"
+    '')
+    # Spec-Kit - GitHub's Spec-Driven Development workflow
+    (pkgs.writeShellScriptBin "specify" ''
+      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from git+https://github.com/github/spec-kit.git specify "$@"
+    '')
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search
 
