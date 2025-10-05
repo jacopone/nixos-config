@@ -9,12 +9,14 @@
 ## ✨ Features
 
 ### 🏗️ **Modern Modular Architecture**
+
 - 🎯 **Flake-based configuration** for reproducible builds
-- 🏠 **Home Manager integration** for user-specific configurations  
+- 🏠 **Home Manager integration** for user-specific configurations
 - 📦 **Modular structure** inspired by [ZaneyOS](https://gitlab.com/Zaney/zaneyos)
 - 🔧 **Interactive rebuild script** with safety checks and rollback capability
 
 ### 🖥️ **Desktop Environment**
+
 - 🌟 **GNOME Desktop** with curated application selection and Wayland optimization
 - 🎨 **Kitty Terminal** with 35+ advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
 - 📁 **Yazi File Manager** with rich preview support for 40+ file types (markdown, JSON, CSV, images, PDFs)
@@ -24,8 +26,9 @@
 - 🔧 **Helix Editor** as system default with modern modal editing
 
 ### 🛠️ **Enhanced CLI Experience**
+
 - 🚀 **Visual Git Integration** - Real-time branch status in terminal prompt
-- ⚡ **Smart Command Substitutions** - Get enhanced tools automatically  
+- ⚡ **Smart Command Substitutions** - Get enhanced tools automatically
 - 🎨 **Syntax Highlighting** with `bat` instead of `cat`
 - 📊 **Modern File Listing** with `eza` instead of `ls`
 - 🔍 **Blazing Fast Search** with `ripgrep` and `fd`
@@ -33,6 +36,7 @@
 - 🤖 **Agent-Compatible** - Scripts and AI agents get original commands automatically
 
 ### 👨‍💻 **Development Environment**
+
 - 🔨 **Multiple Editors**: Helix, Zed, VSCode, Cursor
 - 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI, Claude Flow (alpha)
 - 🧠 **CCPM-Enhanced AI Orchestration**: Advanced hybrid system with 90%+ performance improvements + structured project management
@@ -42,6 +46,7 @@
 - 🚀 **Build Optimizations**: CPU-limited builds (4 cores, 2 max jobs) for system stability
 
 ### ⚡ **Performance Optimization**
+
 - 🧠 **Memory Management**: Optimized kernel parameters for desktop performance
 - 💾 **Zram Compression**: 25% of RAM with zstd compression for faster swap
 - 🔧 **Kernel Tuning**: Reduced swappiness (10), optimized VFS cache pressure (50)
@@ -51,6 +56,7 @@
 - 📦 **Nix Store Optimization**: Auto-store optimization and download buffering
 
 ### 🤖 AI Tooling & Automation
+
 - 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
 - ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
 - 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 174 installed tools
@@ -79,21 +85,8 @@ nixos-config/
 ├── 📁 users/
 │   └── guyfawkes/
 │       └── home.nix             # User home-manager entry point
-├── 📁 templates/                # Enterprise-grade project templates
-│   ├── ai-quality-devenv/       # Pure DevEnv template with Cursor AI integration and quality gates
-│   │   ├── .cursor/rules/       # AI behavior configuration (MDC format)
-│   │   ├── devenv.nix           # Complete development environment configuration
-│   │   └── README.md            # Complete template documentation
-│   └── README.md                # Template system overview and usage guide
-├── 📁 ai-orchestration/         # Multi-agent AI coordination system
-│   ├── scripts/
-│   │   └── ai-orchestration-universal.sh
-│   ├── docs/
-│   │   ├── AI_ORCHESTRATION.md
-│   │   ├── WORKFLOW_EVOLUTION_PROTOCOL.md
-│   │   ├── USAGE_GUIDE.md
-│   │   └── UNIVERSAL_INSTALLATION.md
-│   └── README.md
+├── 📁 templates/                # Template documentation (templates installed via ai-project-orchestration)
+│   └── README.md                # Template system overview - points to ai-project-orchestration package
 ├── 📁 basb-system/              # Building a Second Brain implementation
 │   ├── README.md                # BASB system overview
 │   ├── BASB-IMPLEMENTATION-GUIDE.md
@@ -137,6 +130,7 @@ nixos-config/
 ## 🚀 Setup Instructions
 
 ### Prerequisites & System Requirements
+
 - **Fresh NixOS installation** (minimal or desktop)
 - **Git** for cloning the repository
 - **Minimum 8GB RAM** (recommended 16GB+ for optimal build performance)
@@ -146,6 +140,7 @@ nixos-config/
 - **Network connection** for package downloads
 
 ### Hardware Compatibility
+
 - **Intel/AMD processors** with KVM support
 - **Intel integrated graphics** or discrete GPU with Linux drivers
 - **Standard USB, SATA, AHCI** storage controllers
@@ -202,6 +197,7 @@ sudo cp /tmp/new-hardware-config.nix hosts/nixos/hardware-configuration.nix
 ```
 
 **Important hardware-specific settings to verify:**
+
 - **File system UUIDs** (will be different on your system)
 - **Boot loader configuration** (EFI vs BIOS)
 - **Available kernel modules** for your hardware
@@ -226,6 +222,7 @@ cp users/guyfawkes/home.nix users/yourusername/home.nix
 ```
 
 **Essential customizations in `hosts/nixos/default.nix`:**
+
 ```nix
 # Update the user account definition:
 users.users.yourusername = {
@@ -272,6 +269,7 @@ chmod +x rebuild-nixos
 ```
 
 **The rebuild script will:**
+
 - ✅ Update flake inputs to latest versions
 - ✅ Test build without activation (catches errors early)
 - ✅ Apply configuration with rollback option
@@ -305,12 +303,14 @@ ls                 # Should use eza with icons
 ### 8. **Optional: Configure Additional Settings**
 
 #### **Set up Git (if not already configured)**
+
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
 #### **Configure locale and timezone**
+
 ```bash
 # Check current timezone
 timedatectl
@@ -320,7 +320,9 @@ sudo timedatectl set-timezone Europe/Rome  # or your timezone
 ```
 
 #### **Install additional fonts (if needed)**
+
 Additional fonts can be added to `modules/core/packages.nix`:
+
 ```nix
 # Add to environment.systemPackages
 nerd-fonts.fira-code
@@ -335,6 +337,7 @@ nerd-fonts.source-code-pro
 ### **Adding Your Own Packages**
 
 #### System-wide packages (`modules/core/packages.nix`):
+
 ```nix
 environment.systemPackages = with pkgs; [
   # Development tools
@@ -351,6 +354,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 #### User-specific packages (`modules/home-manager/base.nix`):
+
 ```nix
 home.packages = with pkgs; [
   your-personal-tools
@@ -360,6 +364,7 @@ home.packages = with pkgs; [
 ### **Modifying Desktop Environment**
 
 #### Remove unwanted GNOME apps (`profiles/desktop/gnome.nix`):
+
 ```nix
 environment.gnome.excludePackages = with pkgs; [
   # Add more GNOME apps to exclude
@@ -369,6 +374,7 @@ environment.gnome.excludePackages = with pkgs; [
 ```
 
 #### Change default editor (`hosts/nixos/default.nix`):
+
 ```nix
 environment.variables.EDITOR = "code";  # Change from "hx"
 ```
@@ -376,6 +382,7 @@ environment.variables.EDITOR = "code";  # Change from "hx"
 ### **Customizing Terminal and Shell**
 
 #### Modify Kitty theme (`modules/home-manager/base.nix`):
+
 ```nix
 programs.kitty.settings = {
   # Change theme colors
@@ -385,6 +392,7 @@ programs.kitty.settings = {
 ```
 
 #### Add Fish abbreviations:
+
 ```nix
 # In programs.fish.interactiveShellInit section
 abbr -a yourabbr 'your-command'
@@ -397,6 +405,7 @@ abbr -a yourabbr 'your-command'
 ### **Common Setup Problems**
 
 #### **1. Hardware Configuration Issues**
+
 ```bash
 # Error: "could not find any boot loader"
 # Solution: Ensure your hardware-configuration.nix has correct boot settings
@@ -411,6 +420,7 @@ boot.loader.grub.device = "/dev/sda";  # Your disk
 ```
 
 #### **2. Flakes Not Working**
+
 ```bash
 # Error: "experimental feature 'flakes' is not enabled"
 # Solution: Enable flakes in current configuration first
@@ -421,6 +431,7 @@ sudo nixos-rebuild switch
 ```
 
 #### **3. Username/UID Conflicts**
+
 ```bash
 # Error: user already exists
 # Solution: Either use different username or remove existing user
@@ -434,6 +445,7 @@ sudo userdel -r existinguser
 ```
 
 #### **4. Build Memory Issues**
+
 ```bash
 # Error: out of memory during build
 # Solution: Temporarily reduce build parallelism
@@ -446,6 +458,7 @@ nix.settings.max-jobs = 1;
 ```
 
 #### **5. Network/DNS Issues**
+
 ```bash
 # Error: cannot fetch packages
 # Solution: Check network and DNS
@@ -458,6 +471,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 ```
 
 #### **6. Permission Issues**
+
 ```bash
 # Error: permission denied for flake operations
 # Solution: Ensure user is in trusted-users
@@ -560,6 +574,7 @@ which code && code --version
 **⚠️ Note for AI Assistants**: `./rebuild-nixos` requires sudo privileges. Use these alternatives:
 
 **AI-Safe Commands (No Sudo Required):**
+
 ```bash
 nix flake check                    # Syntax validation
 nix build .#nixosConfigurations.nixos.config.system.build.toplevel # Test build
@@ -569,28 +584,31 @@ nix-collect-garbage                # Clean nix store (user-level)
 ```
 
 **User Commands (Require Sudo):**
+
 ```bash
 ./rebuild-nixos                    # Interactive rebuild with safety checks
 sudo nixos-rebuild switch --flake . # Direct rebuild
 ```
 
 ### Visual Git Prompt (Always Visible)
+
 ```bash
 # Your terminal prompt now shows (with Nerd Font symbols):
 ~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯
 
 # What you see:
 #  main          = git branch with Nerd Font git icon
-# [✱2✚1⇡3]      = git status: 2 modified, 1 staged, 3 ahead of remote  
+# [✱2✚1⇡3]      = git status: 2 modified, 1 staged, 3 ahead of remote
 # (+15/-3)       = git metrics: 15 lines added, 3 deleted
 # ❯              = prompt character (green for success, red for errors)
 ```
 
 ### Enhanced CLI Tools (Automatic)
+
 ```bash
 cat README.md        # → glow README.md (beautiful markdown)
 cat file.py          # → bat file.py (syntax highlighted code)
-ls                   # → eza --icons --git (with icons)  
+ls                   # → eza --icons --git (with icons)
 ll                   # → eza -la --icons --git --group-directories-first
 grep "pattern"       # → rg "pattern" (faster search)
 cd desktop-assistant/ # → builtin cd (reliable for local paths)
@@ -598,6 +616,7 @@ cd project           # → zoxide smart directory jumping
 ```
 
 ### New Tool Abbreviations (Type + Space)
+
 ```bash
 yamlcat              # → yq . (YAML processing)
 csvcat               # → csvlook (CSV viewing)
@@ -614,6 +633,7 @@ record               # → vhs (terminal session recording)
 ```
 
 ### Fish Shell Help
+
 ```bash
 show_enhanced_tools  # See all enhanced commands
 fish_help           # Quick help overview
@@ -622,6 +642,7 @@ what_runs cat       # See what command will actually run
 ```
 
 ### File Management
+
 ```bash
 yazi                 # Launch modern file manager
 preview file.txt     # Enhanced file preview
@@ -630,78 +651,69 @@ ff pattern          # Find files by name (fd)
 search pattern      # Search text in files (rg)
 ```
 
-## 🧠 AI Orchestration System
+## 🧠 AI Project Orchestration System
 
-### **Universal Multi-Agent Coordination Framework**
-Experience **90%+ performance improvements** through intelligent AI agent coordination:
+### **Complete AI-Driven Project Lifecycle (Installed System-Wide)**
+
+The `ai-project-orchestration` package provides comprehensive workflows for both new and legacy projects:
 
 ```bash
-# Quick Start - Run from any project directory
-~/nixos-config/ai-orchestration/scripts/ai-orchestration-universal.sh
+# Greenfield: New projects with quality from day one
+ai-init-greenfield    # or: ai-init-green
+
+# Brownfield: Legacy rescue with autonomous remediation
+ai-init-brownfield    # or: ai-init-brown or ai-rescue
+
+# Master orchestrator
+ai-project --help
+
+# Spec to PRD bridge
+spec-to-prd my-feature
 ```
 
-### **5-Step Orchestration Workflow**
-1. **Master Coordinator** (Claude Code) - Strategic analysis and task decomposition
-2. **Backend Implementation** (Cursor) - Server-side functionality  
-3. **Frontend Implementation** (v0.dev) - UI/UX development
-4. **Quality Assurance** (Gemini Pro) - Testing and validation
-5. **Integration & Synthesis** (Claude Code) - Final coordination
+### **Two Complete Workflows**
+
+**1. Greenfield (New Projects)**
+
+- Spec-driven development (Constitution → Spec → Plan → Implementation)
+- Quality gates enforced from commit #1
+- 80%+ coverage, CCN < 10, < 5% duplication
+- Multi-agent coordination (Claude Code + Cursor + v0.dev + Gemini)
+
+**2. Brownfield (Legacy Rescue)**
+
+- AI self-assessment of codebase reality
+- Quality baseline establishment
+- Autonomous remediation with supervision
+- Gradual spec adoption after quality achieved
 
 ### **Key Features**
-🧠 **Intelligent Project Detection** - Automatically adapts to any technology stack  
-⚡ **Parallel Processing** - Independent agent contexts prevent interference  
-🔄 **Real-Time Adaptation** - Dynamic strategy refinement during execution  
-🌐 **Cross-Platform Integration** - Works with current AI development platforms  
-📈 **Evolution Protocol** - Built-in system for staying current  
+
+🧠 **Intelligent Project Detection** - Automatically adapts to any technology stack
+⚡ **Parallel Processing** - Independent agent contexts prevent interference
+🔄 **Quality-First** - Baseline gates before features (brownfield) or enforced from start (greenfield)
+🌐 **Complete Workflows** - From inception to production
+📈 **Spec Traceability** - Constitution → Code lineage
 
 ### **Platform Support**
+
 - **Master Coordinator**: Claude Code
-- **Backend Development**: Cursor  
+- **Backend Development**: Cursor
 - **Frontend Development**: v0.dev
 - **Quality Assurance**: Gemini Pro
 
-### **Technology Detection**
-Automatically detects and adapts to:
-- React, Vue, Angular (frontend)
-- Node.js, Python, Rust, Go (backend)  
-- PostgreSQL, MySQL, MongoDB (databases)
-- Vitest, Jest, Playwright (testing)
-- Vite, Next.js, Nuxt (frameworks)
+### **Installation Status**
 
-See **[ai-orchestration/README.md](ai-orchestration/README.md)** for complete documentation.
-
-## 🏗️ **Enterprise Development Templates**
-
-### **AI Quality DevEnv Template**
-
-Pre-configured template with enterprise-grade quality gates and **Cursor AI integration**:
-
-```bash
-# Quick project initialization
-cp -r templates/ai-quality-devenv/* /path/to/new-project/
-cd /path/to/new-project
-
-# Setup development environment
-direnv allow               # Auto-activate environment
-setup-git-hooks           # Install quality gates
-setup-cursor              # Configure AI development
-quality-report             # Verify all systems
-
-# Start AI-enhanced development with quality enforcement
-```
-
-**✅ Includes:**
-- **🤖 Cursor AI Rules**: Complete `.cursor/rules/` system with MDC format
-- **🔒 Quality Gates**: Lizard complexity, JSCPD duplication, Semgrep security
-- **⚡ System Integration**: Uses system-wide quality tools for consistency
-- **🚀 Modern Stack**: Node.js 20, Python 3.13 with uv, Pure DevEnv approach
-- **📋 Git Hooks**: Automated enforcement (gitleaks, eslint, ruff, prettier)
+✅ Installed system-wide via NixOS module (`modules/development/ai-project-orchestration.nix`)
+✅ Commands available: `ai-project`, `ai-init-greenfield`, `ai-init-brownfield`, `spec-to-prd`, `ai-inception`
+✅ Shell aliases configured (fish + bash)
 
 **See [templates/README.md](templates/README.md) for complete template documentation.**
 
 ## 🧰 Installed Tools & Applications
 
 ### Development Tools
+
 - **Editors**: Helix, Zed, VSCode, Cursor
 - **AI Agents**: Claude Code, Plandex, Gemini CLI, Serena (MCP server)
 - **AI Development**: Cursor AI with `.cursor/rules` MDC system, enterprise quality gates integration
@@ -715,7 +727,8 @@ quality-report             # Verify all systems
 - **Database CLI**: `pgcli` (PostgreSQL), `mycli` (MySQL/MariaDB), `usql` (universal database CLI)
 - **API Testing**: `hurl` (file-based HTTP testing), `httpie`/`xh` (interactive HTTP clients)
 
-### CLI Enhancements  
+### CLI Enhancements
+
 - **File Viewing**: `glow` (markdown), `bat` (syntax highlighting), `jless` (large JSON)
 - **File Listing**: `eza` (icons, git status), `dust` (disk usage), `duf` (disk free)
 - **File Finding**: `fd` (fast find), `fzf`/`skim` (fuzzy finders), `choose` (text extraction)
@@ -732,12 +745,14 @@ quality-report             # Verify all systems
 ### System vs Project-Level Architecture
 
 **🔧 System-Level Tools (Universal Utilities)**
+
 - **Database CLI tools**: Always available for any project (`pgcli`, `mycli`, `usql`)
 - **AI development tools**: Universal AI agent support (`aider`, `atuin`, `broot`, `mise`)
 - **API testing**: Generic HTTP utilities (`hurl`, `httpie`, `xh`)
 - **File management**: Universal navigation and processing tools
 
 **📋 Project-Level Tools (Context-Specific)**
+
 - **Code quality**: `gitleaks`, `typos`, `pre-commit` via `devenv.nix` or `package.json`
 - **Formatters/Linters**: `ruff`, `black`, `eslint`, `prettier` with project-specific configs
 - **Testing frameworks**: Project-appropriate versions and configurations
@@ -746,14 +761,16 @@ quality-report             # Verify all systems
 - **Template System**: Enterprise-grade templates in `templates/` with integrated quality gates
 
 **Benefits:**
+
 - ✅ AI agents get consistent, universal tool access
 - ✅ Projects maintain reproducible, team-specific configurations
 - ✅ No version conflicts between system and project requirements
 - ✅ Optimal balance of convenience and precision
 
 ### Productivity Applications
+
 - **Browser**: Google Chrome
-- **Office**: LibreOffice  
+- **Office**: LibreOffice
 - **Notes**: Obsidian
 - **Learning**: Anki
 - **Graphics**: GIMP with plugins
@@ -764,17 +781,21 @@ quality-report             # Verify all systems
 The Fish shell configuration includes **context-aware command substitutions**:
 
 ### 👤 **For You (Interactive)**
+
 - Beautiful markdown rendering with `glow`, syntax highlighting with `bat`
 - Rich icons, git status, and enhanced tools automatically selected
 - Abbreviations for quick typing (`tree` → `eza --tree`, `mdcat` → `glow`)
 
 ### 🤖 **For Agents & Scripts**
+
 - Plain output, no colors or formatting
-- Original commands automatically selected  
+- Original commands automatically selected
 - Full compatibility with automation
 
 ### 🔄 **Automatic Context Detection**
+
 The system detects:
+
 - TTY vs non-TTY usage
 - Environment variables (`CI`, `AUTOMATION`, `AGENT_MODE`)
 - Input/output redirection
@@ -783,20 +804,24 @@ The system detects:
 ## 📚 Documentation
 
 ### Core System Documentation
+
 - **[CLAUDE.md](CLAUDE.md)** - Project-level AI agent instructions (auto-generated)
 - **[CLAUDE_ORCHESTRATION.md](CLAUDE_ORCHESTRATION.md)** - Three-level Claude Code orchestration architecture (System/Project/Template)
 - **[templates/README.md](templates/README.md)** - Enterprise-grade development templates with Cursor AI integration
 
 ### Major Systems
+
 - **[basb-system/README.md](basb-system/README.md)** - Building a Second Brain knowledge management implementation
 - **[stack-management/README.md](stack-management/README.md)** - Technology stack lifecycle management system
-- **[ai-orchestration/README.md](ai-orchestration/README.md)** - Universal multi-agent AI coordination system
+- **AI Project Orchestration** - See `~/ai-project-orchestration/` (installed system-wide, separate repo)
 
 ### AI Development Integration
+
 - **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration guide
 - **[scripts/claude-automation/README.md](scripts/claude-automation/README.md)** - Claude Code auto-generation system (CRITICAL INFRASTRUCTURE)
 
 ### Tools & Configuration Guides
+
 - **[docs/tools/fish-smart-commands.md](docs/tools/fish-smart-commands.md)** - Fish shell documentation and abbreviations
 - **[docs/tools/enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md)** - Modern CLI tools reference
 - **[docs/tools/kitty-optimization-guide.md](docs/tools/kitty-optimization-guide.md)** - Complete Kitty terminal optimization guide
@@ -805,6 +830,7 @@ The system detects:
 ## 🛡️ Safety Features
 
 ### Interactive Rebuild Script
+
 - **Pre-flight validation** with test builds
 - **User confirmation** before applying changes
 - **Automatic rollback** if changes are rejected
@@ -814,6 +840,7 @@ The system detects:
 - **Claude Code tool intelligence update** - automatically updates AI behavior policies for 174 system tools
 
 ### Backup & Recovery
+
 - **System generations** for easy rollback
 - **Configuration versioning** with Git
 - **Hardware configuration** isolation
@@ -822,6 +849,7 @@ The system detects:
 ## 🔧 Advanced Configuration
 
 ### Kitty Terminal Optimizations
+
 - **700+ lines** of advanced terminal configuration
 - **Performance tuning** for AI development workflows (50k scrollback, optimized repaints)
 - **Typography enhancements** with ligature control and advanced text rendering
@@ -830,6 +858,7 @@ The system detects:
 - **35+ keyboard shortcuts** for productivity
 
 ### Yazi File Manager Features
+
 - **Rich preview system** with 40+ file type support
 - **Custom openers** for each file type (Helix, Zed, VSCode, Cursor)
 - **Image viewers** (Eye of GNOME, sxiv, feh)
@@ -838,6 +867,7 @@ The system detects:
 - **Markdown rendering** with Glow integration
 
 ### Fish Shell Intelligence
+
 - **Context detection** for automation vs interactive use
 - **Smart command substitutions** (bat/cat, eza/ls, rg/grep)
 - **50+ abbreviations** for rapid development
@@ -845,6 +875,7 @@ The system detects:
 - **Agent compatibility** with fallback commands
 
 ### System Version Management
+
 - **NixOS System Version**: 25.11 (current running version)
 - **Configuration State Version**: 24.05 (for compatibility, should not be changed)
 - **Automatic distinction** between system updates and state compatibility
@@ -852,19 +883,21 @@ The system detects:
 ## 🎨 Customization
 
 ### Adding Packages
+
 ```nix
 # System packages (modules/core/packages.nix)
 environment.systemPackages = with pkgs; [
   your-package
 ];
 
-# User packages (modules/home-manager/base.nix)  
+# User packages (modules/home-manager/base.nix)
 home.packages = with pkgs; [
   your-user-package
 ];
 ```
 
 ### Desktop Environment
+
 - **GNOME apps** excluded in `profiles/desktop/gnome.nix`
 - **Terminal themes** configured in `modules/home-manager/base.nix`
 - **Window manager** settings in `profiles/desktop/base.nix`
@@ -874,6 +907,7 @@ home.packages = with pkgs; [
 ### Common Issues & Solutions
 
 #### **Insecure Packages (Obsidian/LibSoup)**
+
 ```bash
 # Already configured in the system:
 nixpkgs.config.permittedInsecurePackages = [
@@ -883,10 +917,12 @@ nixpkgs.config.permittedInsecurePackages = [
 ```
 
 #### **Build Memory Issues**
+
 - System is pre-configured with 4 CPU cores and 2 max parallel jobs
 - If builds still fail: temporarily reduce with `--cores 2 --max-jobs 1`
 
 #### **Locale Configuration**
+
 ```bash
 # Current setup: US English with Italian regional settings
 i18n.defaultLocale = "en_US.UTF-8";
@@ -894,11 +930,13 @@ i18n.defaultLocale = "en_US.UTF-8";
 ```
 
 #### **Version Compatibility**
+
 - **System Version**: 25.11 (updates with `nixos-rebuild`)
 - **State Version**: 24.05 (compatibility layer, should NOT be changed)
 - These are different by design for system stability
 
 #### **Hardware Acceleration Issues**
+
 ```bash
 # Check graphics status
 lspci | grep -i gpu
@@ -907,6 +945,7 @@ hardware.graphics.enable = true;
 ```
 
 #### **Fish Shell Not Default**
+
 ```bash
 # Verify Fish is set as default shell
 echo $SHELL  # Should show /run/current-system/sw/bin/fish
@@ -914,6 +953,7 @@ echo $SHELL  # Should show /run/current-system/sw/bin/fish
 ```
 
 #### **Yazi Preview Issues**
+
 ```bash
 # Check required dependencies
 which glow bat file ffmpegthumbnailer
@@ -924,8 +964,9 @@ which glow bat file ffmpegthumbnailer
 ## 🤝 Contributing
 
 This is a personal NixOS configuration, but you're welcome to:
+
 - 🍴 **Fork** and adapt for your setup
-- 🐛 **Report issues** or suggest improvements  
+- 🐛 **Report issues** or suggest improvements
 - 💡 **Share ideas** for better configurations
 - 📖 **Use as reference** for your own NixOS journey
 
@@ -939,6 +980,6 @@ This configuration is provided as-is for educational and reference purposes. Fee
 
 **Built with ❤️ using NixOS, enhanced by AI agents**
 
-*"Reproducible, declarative, and just works!"*
+_"Reproducible, declarative, and just works!"_
 
 </div>

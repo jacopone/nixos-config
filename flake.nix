@@ -35,9 +35,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # AI Project Orchestration - Complete AI-driven project lifecycle
+    ai-project-orchestration = {
+      url = "path:/home/guyfawkes/ai-project-orchestration";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, ai-project-orchestration, ... }@inputs:
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs {

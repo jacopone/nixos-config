@@ -1,11 +1,8 @@
 { pkgs, lib, config, inputs, ... }:
 
 {
-  # Import quality modules from the ai-quality-devenv template
-  imports = [
-    ./templates/ai-quality-devenv/modules/packages.nix
-    ./templates/ai-quality-devenv/modules/git-hooks.nix
-  ];
+  # Quality gates configuration (no longer using template imports)
+  # Git hooks configured inline below
 
   # Environment variables
   env = {
@@ -48,16 +45,16 @@
   scripts = {
     hello.exec = ''
       echo "🏗️  NixOS Configuration Repository"
-      echo "Using ai-quality-devenv template for quality gates"
       echo ""
       echo "Quality tools enabled:"
       echo "  ✅ Gitleaks (secret detection)"
       echo "  ✅ Semgrep (security patterns)"
       echo "  ✅ Commitizen (conventional commits)"
       echo "  ✅ Markdownlint (documentation quality)"
-      echo "  ✅ ls-lint (naming conventions)"
+      echo "  ✅ Prettier (formatting)"
       echo ""
-      echo "📋 Run 'quality-report' to see current status"
+      echo "💡 Templates now available via ai-project-orchestration package"
+      echo "   Run: ai-init-greenfield or ai-init-brownfield"
     '';
 
     # Assess codebase quality
