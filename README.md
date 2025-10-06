@@ -818,7 +818,7 @@ The system detects:
 ### AI Development Integration
 
 - **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration guide
-- **[scripts/claude-automation/README.md](scripts/claude-automation/README.md)** - Claude Code auto-generation system (CRITICAL INFRASTRUCTURE)
+- **[Claude NixOS Automation](https://github.com/jacopone/claude-nixos-automation)** - Claude Code auto-generation system (external flake)
 
 ### Tools & Configuration Guides
 

@@ -25,6 +25,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Fish abbreviations increased to 58
 
+### Documentation
+- Updated CLAUDE_ORCHESTRATION.md to reflect claude-automation extraction (2025-10-03)
+- Updated README.md automation reference to external repository
+- Deprecated docs/automation/claude-automation-system.md with redirect to external repo
+- Created docs/archive/ directory for historical documentation
+- Deleted empty templates/ai-quality-devenv/ directory (superseded by ai-project-orchestration)
+
 ---
 
 ## [2025-10-05]
