@@ -158,6 +158,7 @@
     tcpdump            # Command-line packet analyzer
     strace             # System call tracer
     ltrace             # Library call tracer
+    pass               # Standard Unix password manager
     csvkit             # CSV manipulation tools
     jless              # JSON viewer (better than jq for large files)
     yq-go              # YAML/XML processor (like jq for YAML)

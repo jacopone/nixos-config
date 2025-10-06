@@ -48,6 +48,7 @@
     system = "x86_64-linux";
     pkgs = import nixpkgs {
       inherit system;
+      config.allowUnfree = true;
       overlays = [ self.overlays.default ];
     };
   in
@@ -73,9 +74,10 @@
           # Your main configuration file
           ./hosts/nixos
 
-          # Apply overlays
+          # Apply overlays and allow unfree packages
           {
             nixpkgs.overlays = [ self.overlays.default ];
+            nixpkgs.config.allowUnfree = true;
           }
 
           # Home Manager module (optional)
