@@ -12,7 +12,7 @@
 
 ### For High-Level Architecture
 
-See **[CLAUDE_ORCHESTRATION.md](../../CLAUDE_ORCHESTRATION.md)** for:
+See **[docs/architecture/CLAUDE_ORCHESTRATION.md](../architecture/CLAUDE_ORCHESTRATION.md)** for:
 - Three-level Claude Code orchestration system (System/Project/Template)
 - How auto-generation integrates with `./rebuild-nixos`
 - Manual trigger commands

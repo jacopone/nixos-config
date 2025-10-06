@@ -101,30 +101,33 @@ nixos-config/
 │   ├── deprecated/              # Postmortems and cost savings
 │   ├── automation/              # Cost calculator and review scripts
 │   └── chrome-profiles/         # Chrome multi-profile strategy
-├── 📁 scripts/
-│   ├── claude-automation/       # CRITICAL: Claude Code auto-generation system
-│   │   ├── generators/          # System and project CLAUDE.md generators
-│   │   ├── parsers/             # Nix configuration parsers
-│   │   ├── templates/           # Jinja2 templates for auto-generation
-│   │   ├── validators/          # Content validation
-│   │   └── README.md            # DO NOT DELETE - see CLAUDE_ORCHESTRATION.md
-│   ├── update-system-claude-v2.py   # System-level Claude Code automation engine
-│   ├── update-project-claude-v2.py  # Project-level CLAUDE.md automation
-│   ├── update-claude-configs-v2.sh  # Standalone script for both CLAUDE.md files
-│   └── devenv.nix               # DevEnv automation environment
+├── 📁 overlays/                 # Custom package overlays
+│   └── jules.nix                # Google Jules integration
 ├── 📁 docs/                     # Organized documentation
-│   ├── automation/
-│   │   └── claude-automation-system.md
-│   ├── tools/
-│   │   ├── fish-smart-commands.md
+│   ├── architecture/            # System architecture documentation
+│   │   └── CLAUDE_ORCHESTRATION.md
+│   ├── automation/              # Automation system docs
+│   │   ├── claude-automation-system.md
+│   │   └── REFACTORING_PLAN_USER_POLICIES_MERGE.md
+│   ├── guides/                  # User guides and how-tos
+│   │   └── COMMON_TASKS.md
+│   ├── integrations/            # External system integrations
+│   │   └── CURSOR_AI_QUALITY_INTEGRATION.md
+│   ├── planning/                # Future plans and proposals
+│   │   ├── active/              # Active planning documents
+│   │   │   └── HN_LAUNCH_PLAN.md
+│   │   └── archive/             # Completed plans
+│   ├── tools/                   # Tool-specific guides
 │   │   ├── enhanced-tools-guide.md
+│   │   ├── fish-smart-commands.md
 │   │   ├── kitty-optimization-guide.md
 │   │   └── yazi-file-associations.md
-│   └── CURSOR_AI_QUALITY_INTEGRATION.md
+│   └── archive/                 # Historical documentation
+│       ├── claude-automation-system-OLD.md
+│       └── DOCUMENTATION_AUDIT_2025-10-06.md
 ├── 🔧 rebuild-nixos             # Interactive rebuild script
 ├── 📋 flake.nix                 # Flake configuration
-├── 📚 CLAUDE.md                 # Project-level AI agent instructions (auto-generated)
-└── 🤖 CLAUDE_ORCHESTRATION.md   # Three-level Claude Code orchestration architecture
+└── 📚 CLAUDE.md                 # Project-level AI agent instructions (auto-generated)
 ```
 
 ## 🚀 Setup Instructions
@@ -806,8 +809,12 @@ The system detects:
 ### Core System Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Project-level AI agent instructions (auto-generated)
-- **[CLAUDE_ORCHESTRATION.md](CLAUDE_ORCHESTRATION.md)** - Three-level Claude Code orchestration architecture (System/Project/Template)
+- **[docs/architecture/CLAUDE_ORCHESTRATION.md](docs/architecture/CLAUDE_ORCHESTRATION.md)** - Three-level Claude Code orchestration architecture
 - **[templates/README.md](templates/README.md)** - Enterprise-grade development templates with Cursor AI integration
+
+### User Guides
+
+- **[docs/guides/COMMON_TASKS.md](docs/guides/COMMON_TASKS.md)** - Quick reference for frequent operations
 
 ### Major Systems
 
@@ -817,8 +824,9 @@ The system detects:
 
 ### AI Development Integration
 
-- **[docs/CURSOR_AI_QUALITY_INTEGRATION.md](docs/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration guide
+- **[docs/integrations/CURSOR_AI_QUALITY_INTEGRATION.md](docs/integrations/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration
 - **[Claude NixOS Automation](https://github.com/jacopone/claude-nixos-automation)** - Claude Code auto-generation system (external flake)
+- **[docs/automation/claude-automation-system.md](docs/automation/claude-automation-system.md)** - Integration guide (deprecated, redirects to external repo)
 
 ### Tools & Configuration Guides
 

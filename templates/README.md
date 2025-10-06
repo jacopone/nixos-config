@@ -245,7 +245,7 @@ gitleaks           # Secret detection
 
 - **Main README**: `~/ai-project-orchestration/README.md`
 - **Installation Guide**: `~/ai-project-orchestration/INSTALLATION_COMPLETE.md`
-- **Quality Integration**: `~/nixos-config/docs/CURSOR_AI_QUALITY_INTEGRATION.md`
+- **Quality Integration**: `~/nixos-config/docs/integrations/CURSOR_AI_QUALITY_INTEGRATION.md`
 
 ## 🎯 **Use Cases**
 
