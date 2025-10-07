@@ -14,6 +14,11 @@
     # pkgs.tmux
   ];
 
+  # Command tracking system for tool adoption baseline study
+  home.file.".config/fish/conf.d/command-tracking.fish".text = builtins.readFile ../../config/fish/conf.d/command-tracking.fish;
+  home.file.".config/fish/functions/tracking-analyze.fish".text = builtins.readFile ../../config/fish/functions/tracking-analyze.fish;
+  home.file.".config/fish/functions/tracking-export.fish".text = builtins.readFile ../../config/fish/functions/tracking-export.fish;
+
   # Let home-manager manage my shell configuration.
   programs.bash.enable = true;
 
@@ -216,8 +221,6 @@
       # New tool abbreviations
       abbr -a zz 'zoxide'
       abbr -a sk 'skim'
-      abbr -a ai 'aider'
-      abbr -a aicode 'aider --dark-mode --model anthropic/claude-3-5-sonnet-20241022'
       abbr -a aitui 'python3 -m ai_orchestrator_tui'
       abbr -a br 'broot'
       abbr -a record 'vhs'
@@ -300,8 +303,6 @@
           echo "🚀 Enhanced CLI Tools Available:"
           echo ""
           echo "🤖 AI Development Tools:"
-          echo "  ai        → aider (AI pair programming)"
-          echo "  aicode    → aider with Claude Sonnet"
           echo "  aitui     → AI Project Orchestration TUI (Rich interface)"
           echo "  br        → broot (interactive tree navigation)"
           echo "  cm        → chezmoi (dotfile management)"
