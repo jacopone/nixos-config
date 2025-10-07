@@ -7,7 +7,8 @@
 [![Home Manager](https://img.shields.io/badge/Home-Manager-orange.svg?style=flat-square)](https://github.com/nix-community/home-manager)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-5A67D8.svg?style=flat-square&logo=anthropic)](https://claude.ai)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/nixos-config?style=flat-square)](https://github.com/yourusername/nixos-config/commits/master)
+[![GitHub last commit](https://img.shields.io/github/last-commit/jacopone/nixos-config?style=flat-square)](https://github.com/jacopone/nixos-config/commits/master)
+[![GitHub release](https://img.shields.io/github/v/release/jacopone/nixos-config?style=flat-square)](https://github.com/jacopone/nixos-config/releases)
 
 ## What's This About?
 
@@ -105,7 +106,7 @@ sudo nano /etc/nixos/configuration.nix
 sudo nixos-rebuild switch
 
 # 2. Clone the repository
-git clone https://github.com/yourusername/nixos-config.git ~/nixos-config
+git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
 cd ~/nixos-config
 
 # 3. Generate your hardware configuration
@@ -246,7 +247,7 @@ nix --version
 
 ```bash
 # Clone to home directory
-git clone https://github.com/yourusername/nixos-config.git ~/nixos-config
+git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
 cd ~/nixos-config
 ```
 
@@ -540,6 +541,6 @@ MIT License - Feel free to use, modify, and distribute.
 
 *Declarative system configuration meets AI-assisted development*
 
-[⭐ Star this repo](https://github.com/yourusername/nixos-config) if you find it useful
+[⭐ Star this repo](https://github.com/jacopone/nixos-config) if you find it useful
 
 </div>
