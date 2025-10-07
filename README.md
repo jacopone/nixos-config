@@ -1,136 +1,211 @@
-# 🚀 My NixOS Configuration
+# NixOS Configuration with Auto-Documenting AI Integration
 
-> A modern, modular NixOS configuration featuring GNOME desktop, enhanced CLI tools, and intelligent Fish shell integration
+> A NixOS setup that keeps Claude Code automatically synchronized with your system state
 
 [![NixOS](https://img.shields.io/badge/NixOS-25.11-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
 [![Flakes](https://img.shields.io/badge/Nix-Flakes-informational.svg?style=flat-square&logo=nixos)](https://nixos.wiki/wiki/Flakes)
 [![Home Manager](https://img.shields.io/badge/Home-Manager-orange.svg?style=flat-square)](https://github.com/nix-community/home-manager)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-5A67D8.svg?style=flat-square&logo=anthropic)](https://claude.ai)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/nixos-config?style=flat-square)](https://github.com/yourusername/nixos-config/commits/master)
 
-## ✨ Features
+## What's This About?
 
-### 🏗️ **Modern Modular Architecture**
+I spent 6 months building a NixOS configuration with an interesting feature: **every system rebuild automatically updates Claude Code's knowledge of what tools are available**.
 
-- 🎯 **Flake-based configuration** for reproducible builds
-- 🏠 **Home Manager integration** for user-specific configurations
-- 📦 **Modular structure** inspired by [ZaneyOS](https://gitlab.com/Zaney/zaneyos)
-- 🔧 **Interactive rebuild script** with safety checks and rollback capability
+Here's what happens when you run `./rebuild-nixos`:
 
-### 🖥️ **Desktop Environment**
+```bash
+--> Updating Claude Code configurations...
 
-- 🌟 **GNOME Desktop** with curated application selection and Wayland optimization
-- 🎨 **Kitty Terminal** with 35+ advanced optimizations, JetBrains Mono Nerd Font, and Catppuccin Mocha theme
-- 📁 **Yazi File Manager** with rich preview support for 40+ file types (markdown, JSON, CSV, images, PDFs)
-- 🐟 **Fish Shell** as default with intelligent command enhancements and context-aware automation
-- 🚀 **Starship Prompt** with comprehensive Nerd Font symbols (`~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯`)
-- 🌍 **Multi-locale Support** (US English with Italian regional settings)
-- 🔧 **Helix Editor** as system default with modern modal editing
+# This runs automatically:
+nix run github:jacopone/claude-nixos-automation#update-all
 
-### 🛠️ **Enhanced CLI Experience**
+    ✅ Claude Code configurations updated
+       - System CLAUDE.md: ~/.claude/CLAUDE.md (updated with 122 tools)
+       - Project CLAUDE.md: ./CLAUDE.md (updated)
+```
 
-- 🚀 **Visual Git Integration** - Real-time branch status in terminal prompt
-- ⚡ **Smart Command Substitutions** - Get enhanced tools automatically
-- 🎨 **Syntax Highlighting** with `bat` instead of `cat`
-- 📊 **Modern File Listing** with `eza` instead of `ls`
-- 🔍 **Blazing Fast Search** with `ripgrep` and `fd`
-- 🔤 **Programming Font** with JetBrains Mono Nerd Font ligatures and icons
-- 🤖 **Agent-Compatible** - Scripts and AI agents get original commands automatically
+**The result**: Claude Code knows about every tool on your system and uses them correctly. No more suggesting `find` when you have `fd`, or `cat` when you have `bat`.
 
-### 👨‍💻 **Development Environment**
+<!-- TODO: Add GIF here showing the rebuild process -->
 
-- 🔨 **Multiple Editors**: Helix, Zed, VSCode, Cursor
-- 🤖 **AI Tools**: Claude Code, Plandex, Gemini CLI, Claude Flow (alpha)
-- 🧠 **CCPM-Enhanced AI Orchestration**: Advanced hybrid system with 90%+ performance improvements + structured project management
-- 🎯 **Cursor AI Integration**: Modern `.cursor/rules` system with MDC format and enterprise-grade quality gates
-- 📦 **Node.js & Python** pre-installed for instant development
-- 🏗️ **DevEnv & Direnv** for per-project environments
-- 🚀 **Build Optimizations**: CPU-limited builds (4 cores, 2 max jobs) for system stability
+## How It Works
 
-### ⚡ **Performance Optimization**
+The [rebuild-nixos](rebuild-nixos) script integrates with [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation):
 
-- 🧠 **Memory Management**: Optimized kernel parameters for desktop performance
-- 💾 **Zram Compression**: 25% of RAM with zstd compression for faster swap
-- 🔧 **Kernel Tuning**: Reduced swappiness (10), optimized VFS cache pressure (50)
-- 🏗️ **Build Performance**: Limited parallel builds to prevent memory exhaustion
-- 🗑️ **Automatic Maintenance**: Weekly garbage collection, monthly system updates
-- 💽 **SSD Optimization**: Weekly TRIM, firmware updates, write optimization
-- 📦 **Nix Store Optimization**: Auto-store optimization and download buffering
+1. You declare packages in [`modules/core/packages.nix`](modules/core/packages.nix)
+2. On rebuild, automation parses your configuration
+3. Generates CLAUDE.md with tool inventory and usage policies
+4. Claude Code reads this on every new session
 
-### 🤖 AI Tooling & Automation
+**The closed loop**: System state → auto-documentation → AI knowledge
 
-- 🧠 **Intelligent Claude Code Integration**: Revolutionary automated system that forces Claude Code to use your premium modern CLI tools instead of basic POSIX commands
-- ⚡ **Tool Selection Policy Engine**: Automatically generates mandatory substitution rules (`find` → `fd`, `ls` → `eza`, `cat` → `bat`, etc.)
-- 🔄 **Self-Updating System**: Every `./rebuild-nixos` automatically updates Claude Code's tool knowledge with your latest 174 installed tools
-- 📋 **Behavioral Enforcement**: Claude Code now defaults to advanced tools with specific command examples and usage patterns
-- 🎯 **Expert-Level Optimization**: System declares "EXPERT" optimization level, ensuring Claude Code leverages your sophisticated toolkit
-- 🔧 **Zero Manual Intervention**: Tool inventory, behavioral policies, and command examples stay automatically synchronized
+See [docs/THE_CLOSED_LOOP.md](docs/THE_CLOSED_LOOP.md) for technical details.
 
-## 📂 Repository Structure
+## Why This Helps
+
+**For AI development:**
+- ✅ Claude Code uses modern tools automatically (`fd`, `eza`, `bat`, `rg`)
+- ✅ Tool knowledge stays in sync with system state (zero drift)
+- ✅ No manual documentation of 122+ installed tools
+- ✅ Consistent behavior across sessions
+
+**For system management:**
+- ✅ Declarative NixOS configuration (reproducible builds)
+- ✅ Interactive rebuild script with safety checks
+- ✅ Automatic maintenance (garbage collection, cache cleanup)
+- ✅ Rollback capability for failed changes
+
+## What's Included
+
+### Core System
+- **NixOS 25.11** with Flakes + Home Manager
+- **GNOME Desktop** (Wayland) with Kitty terminal
+- **Fish Shell** with Starship prompt
+- **122 curated tools** selected over 6 months
+
+### Modern CLI Stack
+Replace old POSIX commands with modern alternatives:
+- `fd` instead of `find` - Fast file searching
+- `eza` instead of `ls` - Enhanced listings with git status
+- `bat` instead of `cat` - Syntax-highlighted viewing
+- `rg` instead of `grep` - Blazing fast text search
+- `dust` instead of `du` - Interactive disk usage
+- `procs` instead of `ps` - Modern process viewer
+
+See [docs/tools/enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md) for the complete list.
+
+### AI Development Tools
+- **Claude Code** (Anthropic's official CLI)
+- **Cursor** (AI-powered code editor)
+- **Serena MCP** (semantic code analysis)
+- **Aider** (AI pair programming)
+- **Node.js 20 + Python 3** pre-installed
+
+### Development Environment
+- **DevEnv + Direnv** for per-project environments
+- **Git + GitHub CLI** with enhanced diffs (`delta`)
+- **Multiple editors**: Helix, Zed, VSCode, Cursor
+- **Quality tools**: ShellCheck, Semgrep, Ruff
+
+## Quick Start
+
+### Prerequisites
+- Fresh NixOS installation (minimal or desktop)
+- 8GB RAM minimum (16GB recommended)
+- Nix Flakes enabled
+
+### Installation
+
+```bash
+# 1. Enable flakes (if not already enabled)
+sudo nano /etc/nixos/configuration.nix
+# Add: nix.settings.experimental-features = [ "nix-command" "flakes" ];
+sudo nixos-rebuild switch
+
+# 2. Clone the repository
+git clone https://github.com/yourusername/nixos-config.git ~/nixos-config
+cd ~/nixos-config
+
+# 3. Generate your hardware configuration
+sudo nixos-generate-config --show-hardware-config > hosts/nixos/hardware-configuration.nix
+
+# 4. Update username in configuration
+sed -i 's/guyfawkes/yourusername/g' flake.nix hosts/nixos/default.nix
+
+# 5. Apply the configuration
+./rebuild-nixos
+```
+
+See the [detailed setup guide](#-detailed-setup-guide) below for more options.
+
+## Key Commands
+
+### System Management
+
+```bash
+./rebuild-nixos                    # Interactive rebuild (recommended)
+sudo nixos-rebuild switch --flake . # Direct rebuild
+nix flake check                    # Validate configuration
+```
+
+### Modern CLI Tools (Automatic Substitutions)
+
+```bash
+# These automatically use enhanced tools:
+cat file.py          # → bat (syntax highlighting)
+cat README.md        # → glow (rendered markdown)
+ls                   # → eza (icons + git status)
+grep "pattern"       # → rg (faster search)
+find . -name "*.nix" # → fd (faster find)
+```
+
+### Development
+
+```bash
+devenv shell         # Enter project environment
+ai script.py         # AI pair programming with Aider
+yazi                 # Terminal file manager
+```
+
+## Repository Structure
 
 ```
 nixos-config/
-├── 📁 hosts/
-│   └── nixos/                    # Host-specific configuration
-│       ├── default.nix          # Main host config
-│       └── hardware-configuration.nix
-├── 📁 modules/
+├── flake.nix                      # Main configuration entry
+├── rebuild-nixos                  # Interactive rebuild script
+├── hosts/nixos/                   # Host-specific config
+├── modules/
 │   ├── core/
-│   │   └── packages.nix         # System-wide packages (162 tools)
+│   │   └── packages.nix          # System packages (122 tools)
 │   └── home-manager/
-│       └── base.nix             # User-specific configurations
-├── 📁 profiles/
-│   └── desktop/                 # Desktop environment profiles
-│       ├── default.nix
-│       ├── base.nix             # Common desktop settings
-│       └── gnome.nix            # GNOME configuration
-├── 📁 users/
-│   └── guyfawkes/
-│       └── home.nix             # User home-manager entry point
-├── 📁 templates/                # Template documentation (templates installed via ai-project-orchestration)
-│   └── README.md                # Template system overview - points to ai-project-orchestration package
-├── 📁 basb-system/              # Building a Second Brain implementation
-│   ├── README.md                # BASB system overview
-│   ├── BASB-IMPLEMENTATION-GUIDE.md
-│   ├── BASB-Quick-Reference-Guide.md
-│   ├── BASB-Daily-Routines.md
-│   ├── BASB-Readwise-Setup.md
-│   └── BASB-Sunsama-Integration.md
-├── 📁 stack-management/         # Technology stack lifecycle management
-│   ├── README.md                # Stack management overview
-│   ├── discovery/               # New tool discovery and evaluation
-│   ├── active/                  # Active subscriptions and packages
-│   ├── deprecated/              # Postmortems and cost savings
-│   ├── automation/              # Cost calculator and review scripts
-│   └── chrome-profiles/         # Chrome multi-profile strategy
-├── 📁 overlays/                 # Custom package overlays
-│   └── jules.nix                # Google Jules integration
-├── 📁 docs/                     # Organized documentation
-│   ├── architecture/            # System architecture documentation
-│   │   └── CLAUDE_ORCHESTRATION.md
-│   ├── automation/              # Automation system docs
-│   │   ├── claude-automation-system.md
-│   │   └── REFACTORING_PLAN_USER_POLICIES_MERGE.md
-│   ├── guides/                  # User guides and how-tos
-│   │   └── COMMON_TASKS.md
-│   ├── integrations/            # External system integrations
-│   │   └── CURSOR_AI_QUALITY_INTEGRATION.md
-│   ├── planning/                # Future plans and proposals
-│   │   ├── active/              # Active planning documents
-│   │   │   └── HN_LAUNCH_PLAN.md
-│   │   └── archive/             # Completed plans
-│   ├── tools/                   # Tool-specific guides
-│   │   ├── enhanced-tools-guide.md
-│   │   ├── fish-smart-commands.md
-│   │   ├── kitty-optimization-guide.md
-│   │   └── yazi-file-associations.md
-│   └── archive/                 # Historical documentation
-│       ├── claude-automation-system-OLD.md
-│       └── DOCUMENTATION_AUDIT_2025-10-06.md
-├── 🔧 rebuild-nixos             # Interactive rebuild script
-├── 📋 flake.nix                 # Flake configuration
-└── 📚 CLAUDE.md                 # Project-level AI agent instructions (auto-generated)
+│       └── base.nix              # User configurations
+├── profiles/desktop/              # Desktop environment
+├── docs/
+│   ├── THE_CLOSED_LOOP.md        # Auto-documentation system
+│   ├── guides/                   # User guides
+│   └── tools/                    # Tool-specific docs
+└── CLAUDE.md                     # Auto-generated AI instructions
 ```
 
-## 🚀 Setup Instructions
+## Documentation
+
+### Core System
+- **[THE_CLOSED_LOOP.md](docs/THE_CLOSED_LOOP.md)** - How auto-documentation works
+- **[CLAUDE_ORCHESTRATION.md](docs/architecture/CLAUDE_ORCHESTRATION.md)** - Three-level orchestration architecture
+
+### Guides
+- **[COMMON_TASKS.md](docs/guides/COMMON_TASKS.md)** - Quick reference for frequent operations
+- **[fish-smart-commands.md](docs/tools/fish-smart-commands.md)** - Fish shell features
+- **[enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md)** - Modern CLI tools
+
+### Related Systems
+- **[basb-system/](basb-system/)** - Building a Second Brain implementation
+- **[stack-management/](stack-management/)** - Technology stack lifecycle management
+
+## Safety Features
+
+The [`./rebuild-nixos`](rebuild-nixos) script includes:
+- ✅ Pre-flight validation with test builds
+- ✅ User confirmation before applying changes
+- ✅ Automatic rollback capability
+- ✅ Git integration with commit prompts
+- ✅ Generation cleanup with interactive selection
+- ✅ Cache cleanup (UV, Chrome, development caches)
+
+**Rollback if needed:**
+```bash
+sudo nixos-rebuild list-generations
+sudo nixos-rebuild switch --rollback
+```
+
+---
+
+## 📋 Detailed Setup Guide
+
+<details>
+<summary>Click to expand complete installation instructions</summary>
 
 ### Prerequisites & System Requirements
 
@@ -149,13 +224,9 @@ nixos-config/
 - **Standard USB, SATA, AHCI** storage controllers
 - **ThinkPad-specific optimizations** included but compatible with other laptops
 
----
+### Step-by-Step Setup
 
-## 📋 Step-by-Step Setup Guide
-
-### 1. **Enable Nix Flakes (Required)**
-
-If starting from a fresh NixOS installation, first enable flakes system-wide:
+#### 1. Enable Nix Flakes (Required)
 
 ```bash
 # Edit your current configuration
@@ -168,31 +239,24 @@ nix.settings.experimental-features = [ "nix-command" "flakes" ];
 sudo nixos-rebuild switch
 
 # Verify flakes are enabled
-nix --version  # Should show flake support
+nix --version
 ```
 
-### 2. **Clone the Repository**
+#### 2. Clone the Repository
 
 ```bash
-# Clone to a temporary location first
-cd /tmp
-git clone https://github.com/your-username/nixos-config.git
-cd nixos-config
-
-# Or clone directly if you're confident:
-git clone https://github.com/your-username/nixos-config.git ~/nixos-config
+# Clone to home directory
+git clone https://github.com/yourusername/nixos-config.git ~/nixos-config
 cd ~/nixos-config
 ```
 
-### 3. **Generate Your Hardware Configuration**
-
-Your system needs its own hardware configuration:
+#### 3. Generate Your Hardware Configuration
 
 ```bash
 # Generate new hardware configuration
 sudo nixos-generate-config --show-hardware-config > /tmp/new-hardware-config.nix
 
-# Compare with existing config to see what needs updating
+# Compare with existing config
 diff hosts/nixos/hardware-configuration.nix /tmp/new-hardware-config.nix
 
 # Replace with your hardware configuration
@@ -200,27 +264,22 @@ sudo cp /tmp/new-hardware-config.nix hosts/nixos/hardware-configuration.nix
 ```
 
 **Important hardware-specific settings to verify:**
+- File system UUIDs (will be different on your system)
+- Boot loader configuration (EFI vs BIOS)
+- Available kernel modules for your hardware
+- CPU type (Intel vs AMD microcode)
 
-- **File system UUIDs** (will be different on your system)
-- **Boot loader configuration** (EFI vs BIOS)
-- **Available kernel modules** for your hardware
-- **CPU type** (Intel vs AMD microcode)
-
-### 4. **Customize User Configuration**
-
-Update the configuration for your username and preferences:
+#### 4. Customize User Configuration
 
 ```bash
-# Create your user directory (if your username isn't 'guyfawkes')
-mkdir -p users/yourusername
-
-# Update the main flake.nix with your username
+# Update the main flake with your username
 sed -i 's/guyfawkes/yourusername/g' flake.nix
 
 # Update the host configuration
 sed -i 's/guyfawkes/yourusername/g' hosts/nixos/default.nix
 
-# Copy and customize the user configuration
+# Create your user directory
+mkdir -p users/yourusername
 cp users/guyfawkes/home.nix users/yourusername/home.nix
 ```
 
@@ -232,258 +291,81 @@ users.users.yourusername = {
   isNormalUser = true;
   description = "Your Full Name";
   extraGroups = [ "networkmanager" "wheel" ];
-  packages = with pkgs; [
-    # Your additional packages
-  ];
 };
 ```
 
-### 5. **Review System Settings**
+#### 5. Review System Settings
 
 Before applying, review these key settings in `hosts/nixos/default.nix`:
 
 ```nix
-# Hostname (change if desired)
+# Hostname
 networking.hostName = "nixos";
 
 # Timezone (uncomment and set)
-# time.timeZone = "Europe/Rome";  # Change to your timezone
+time.timeZone = "America/New_York";  # Change to your timezone
 
-# Locale settings (modify for your region)
+# Locale settings
 i18n.defaultLocale = "en_US.UTF-8";
-i18n.extraLocaleSettings = {
-  LC_ADDRESS = "en_US.UTF-8";      # Change from "it_IT.UTF-8" if needed
-  LC_IDENTIFICATION = "en_US.UTF-8";
-  # ... update other locale settings as needed
-};
 ```
 
-### 6. **Apply the Configuration**
-
-Now apply the configuration to your system:
+#### 6. Apply the Configuration
 
 ```bash
-# Method 1: Direct application (experienced users)
-sudo nixos-rebuild switch --flake .
-
-# Method 2: Interactive script with safety checks (recommended)
+# Method 1: Interactive script with safety checks (recommended)
 chmod +x rebuild-nixos
 ./rebuild-nixos
+
+# Method 2: Direct application (experienced users)
+sudo nixos-rebuild switch --flake .
 ```
 
 **The rebuild script will:**
+- Update flake inputs to latest versions
+- Test build without activation (catches errors early)
+- Apply configuration with rollback option
+- **Update Claude Code configurations automatically**
+- Prompt for user confirmation
+- Offer to commit changes to git
 
-- ✅ Update flake inputs to latest versions
-- ✅ Test build without activation (catches errors early)
-- ✅ Apply configuration with rollback option
-- ✅ **Update Claude Code tool intelligence** (forces modern CLI usage)
-- ✅ Prompt for user confirmation
-- ✅ Offer to commit changes to git
-- ✅ Clean up old generations and caches
-
-### 7. **Post-Installation Setup**
-
-After successful installation:
+#### 7. Post-Installation Verification
 
 ```bash
-# Verify Fish shell is working
+# Verify Fish shell
 fish --version
 
 # Check enhanced tools
-show_enhanced_tools
+which eza bat fd rg
 
 # Test file manager
 yazi
 
 # Verify git integration in prompt
-cd ~/nixos-config  # Should show git status in prompt
-
-# Test smart commands
-cat README.md      # Should use glow for markdown
-ls                 # Should use eza with icons
+cd ~/nixos-config  # Should show git status
 ```
 
-### 8. **Optional: Configure Additional Settings**
+### Troubleshooting
 
-#### **Set up Git (if not already configured)**
+#### Hardware Configuration Issues
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
-
-#### **Configure locale and timezone**
-
-```bash
-# Check current timezone
-timedatectl
-
-# Set timezone (if using localtimed)
-sudo timedatectl set-timezone Europe/Rome  # or your timezone
-```
-
-#### **Install additional fonts (if needed)**
-
-Additional fonts can be added to `modules/core/packages.nix`:
-
-```nix
-# Add to environment.systemPackages
-nerd-fonts.fira-code
-nerd-fonts.source-code-pro
-# ... other fonts
-```
-
----
-
-## 🔧 Customization Guide
-
-### **Adding Your Own Packages**
-
-#### System-wide packages (`modules/core/packages.nix`):
-
-```nix
-environment.systemPackages = with pkgs; [
-  # Development tools
-  your-editor
-  your-language-runtime
-
-  # Productivity apps
-  your-browser
-  your-office-suite
-
-  # System utilities
-  your-monitoring-tool
-];
-```
-
-#### User-specific packages (`modules/home-manager/base.nix`):
-
-```nix
-home.packages = with pkgs; [
-  your-personal-tools
-];
-```
-
-### **Modifying Desktop Environment**
-
-#### Remove unwanted GNOME apps (`profiles/desktop/gnome.nix`):
-
-```nix
-environment.gnome.excludePackages = with pkgs; [
-  # Add more GNOME apps to exclude
-  gnome-maps
-  gnome-weather
-];
-```
-
-#### Change default editor (`hosts/nixos/default.nix`):
-
-```nix
-environment.variables.EDITOR = "code";  # Change from "hx"
-```
-
-### **Customizing Terminal and Shell**
-
-#### Modify Kitty theme (`modules/home-manager/base.nix`):
-
-```nix
-programs.kitty.settings = {
-  # Change theme colors
-  background = "#your-color";
-  foreground = "#your-color";
-};
-```
-
-#### Add Fish abbreviations:
-
-```nix
-# In programs.fish.interactiveShellInit section
-abbr -a yourabbr 'your-command'
-```
-
----
-
-## 🛠️ Troubleshooting Setup Issues
-
-### **Common Setup Problems**
-
-#### **1. Hardware Configuration Issues**
-
-```bash
-# Error: "could not find any boot loader"
-# Solution: Ensure your hardware-configuration.nix has correct boot settings
-
 # For EFI systems (most modern computers):
 boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
 
 # For BIOS systems (older computers):
 boot.loader.grub.enable = true;
-boot.loader.grub.device = "/dev/sda";  # Your disk
+boot.loader.grub.device = "/dev/sda";
 ```
 
-#### **2. Flakes Not Working**
+#### Build Memory Issues
 
 ```bash
-# Error: "experimental feature 'flakes' is not enabled"
-# Solution: Enable flakes in current configuration first
-
-sudo nano /etc/nixos/configuration.nix
-# Add: nix.settings.experimental-features = [ "nix-command" "flakes" ];
-sudo nixos-rebuild switch
-```
-
-#### **3. Username/UID Conflicts**
-
-```bash
-# Error: user already exists
-# Solution: Either use different username or remove existing user
-
-# Check existing users
-cat /etc/passwd | grep 1000
-
-# Option 1: Use different username in configuration
-# Option 2: Remove existing user (careful!)
-sudo userdel -r existinguser
-```
-
-#### **4. Build Memory Issues**
-
-```bash
-# Error: out of memory during build
-# Solution: Temporarily reduce build parallelism
-
+# Reduce build parallelism temporarily
 sudo nixos-rebuild switch --flake . --cores 2 --max-jobs 1
-
-# Or edit hosts/nixos/default.nix to permanently reduce:
-nix.settings.cores = 2;
-nix.settings.max-jobs = 1;
 ```
 
-#### **5. Network/DNS Issues**
-
-```bash
-# Error: cannot fetch packages
-# Solution: Check network and DNS
-
-ping 8.8.8.8
-nslookup cache.nixos.org
-
-# If DNS fails, temporarily use public DNS:
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
-```
-
-#### **6. Permission Issues**
-
-```bash
-# Error: permission denied for flake operations
-# Solution: Ensure user is in trusted-users
-
-# Check current setting in hosts/nixos/default.nix:
-nix.settings.trusted-users = [ "root" "yourusername" ];
-```
-
-### **Rollback if Something Goes Wrong**
+#### Rollback if Something Goes Wrong
 
 ```bash
 # List available generations
@@ -491,503 +373,173 @@ sudo nixos-rebuild list-generations
 
 # Rollback to previous generation
 sudo nixos-rebuild switch --rollback
-
-# Or rollback to specific generation
-sudo nixos-rebuild switch --switch-generation 42
 ```
 
-### **Starting Over (Nuclear Option)**
-
-If the configuration is completely broken:
-
-```bash
-# Boot from NixOS installer USB
-# Mount your existing system
-sudo mount /dev/your-root-partition /mnt
-sudo mount /dev/your-boot-partition /mnt/boot
-
-# Restore original configuration
-sudo cp /mnt/etc/nixos/configuration.nix.backup /mnt/etc/nixos/configuration.nix
-
-# Rebuild from installer
-sudo nixos-install --root /mnt
-
-# Reboot and try again
-```
+</details>
 
 ---
 
-## 📋 Pre-Installation Checklist
+## 🤖 AI Tooling Details
 
-Before starting, ensure you have:
+<details>
+<summary>Click to expand AI development features</summary>
 
-- [ ] **Fresh NixOS installation** completed
-- [ ] **Internet connection** working
-- [ ] **Your hardware details** noted (GPU type, CPU type, storage layout)
-- [ ] **Backup** of important data (this config replaces your current setup)
-- [ ] **GitHub account** and SSH keys (for pushing changes)
-- [ ] **Username chosen** (if different from 'guyfawkes')
-- [ ] **Timezone identified** (e.g., "America/New_York", "Europe/London")
-- [ ] **Locale preferences** decided (language, region, keyboard layout)
+### Claude Code Integration
 
-## ⚡ Quick Verification Commands
+The system includes three levels of Claude Code configuration:
 
-After installation, verify everything works:
+1. **User Policies** (`~/.claude/CLAUDE-USER-POLICIES.md`) - Personal preferences
+2. **System Context** (`~/.claude/CLAUDE.md`) - Auto-generated tool inventory
+3. **Project Context** (`./CLAUDE.md`) - Project-specific instructions
 
-```bash
-# System info
-fastfetch
+All updated automatically on `./rebuild-nixos`.
 
-# Package managers
-which nix && nix --version
-which npm && npm --version
-which python3 && python3 --version
+### Tool Selection Policy
 
-# Enhanced CLI tools
-which eza && eza --version
-which bat && bat --version
-which rg && rg --version
+Claude Code is forced to use modern tools through mandatory substitution rules:
 
-# Desktop environment
-echo $XDG_CURRENT_DESKTOP  # Should show "GNOME"
-echo $XDG_SESSION_TYPE     # Should show "wayland"
-
-# Shell integration
-echo $SHELL                # Should show fish path
-fish -c "echo 'Fish works'"
-
-# Development editors
-which hx && hx --version
-which code && code --version
+```markdown
+## MANDATORY Tool Substitutions
+- `find` → `fd` (ALWAYS use fd for file searching)
+- `ls` → `eza` (ALWAYS use eza for directory listing)
+- `cat` → `bat` (ALWAYS use bat for file viewing)
+- `grep` → `rg` (ALWAYS use ripgrep)
 ```
 
-## 🎯 Next Steps After Setup
+### Smart Fish Shell
 
-1. **Explore the enhanced CLI tools**: Run `show_enhanced_tools`
-2. **Set up development projects**: The system includes DevEnv and Direnv
-3. **Configure AI tools**: Claude Code, Plandex, and Gemini CLI are ready
-4. **Customize the configuration**: Add your preferred packages and settings
-5. **Set up the AI orchestration system**: Try the multi-agent coordination
-6. **Join the community**: Share your configuration improvements
+The Fish shell configuration includes context-aware command substitutions:
 
-## 🎯 Key Commands
+**For humans (interactive):**
+- Beautiful markdown rendering, syntax highlighting
+- Rich icons and git status
+- Enhanced tools automatically selected
 
-### System Management
-
-**⚠️ Note for AI Assistants**: `./rebuild-nixos` requires sudo privileges. Use these alternatives:
-
-**AI-Safe Commands (No Sudo Required):**
-
-```bash
-nix flake check                    # Syntax validation
-nix build .#nixosConfigurations.nixos.config.system.build.toplevel # Test build
-nix flake update                   # Update inputs
-scripts/update-claude-configs-v2.sh # Update CLAUDE.md files (modern Jinja2 templates)
-nix-collect-garbage                # Clean nix store (user-level)
-```
-
-**User Commands (Require Sudo):**
-
-```bash
-./rebuild-nixos                    # Interactive rebuild with safety checks
-sudo nixos-rebuild switch --flake . # Direct rebuild
-```
-
-### Visual Git Prompt (Always Visible)
-
-```bash
-# Your terminal prompt now shows (with Nerd Font symbols):
-~/nixos-config  main [✱2✚1⇡3] (+15/-3) ❯
-
-# What you see:
-#  main          = git branch with Nerd Font git icon
-# [✱2✚1⇡3]      = git status: 2 modified, 1 staged, 3 ahead of remote
-# (+15/-3)       = git metrics: 15 lines added, 3 deleted
-# ❯              = prompt character (green for success, red for errors)
-```
-
-### Enhanced CLI Tools (Automatic)
-
-```bash
-cat README.md        # → glow README.md (beautiful markdown)
-cat file.py          # → bat file.py (syntax highlighted code)
-ls                   # → eza --icons --git (with icons)
-ll                   # → eza -la --icons --git --group-directories-first
-grep "pattern"       # → rg "pattern" (faster search)
-cd desktop-assistant/ # → builtin cd (reliable for local paths)
-cd project           # → zoxide smart directory jumping
-```
-
-### New Tool Abbreviations (Type + Space)
-
-```bash
-yamlcat              # → yq . (YAML processing)
-csvcat               # → csvlook (CSV viewing)
-ruffcheck            # → ruff check (Python linting)
-uvrun                # → uv run (fast Python execution)
-dcp                  # → docker-compose
-pods                 # → k9s (Kubernetes dashboard)
-netscan              # → nmap -sn (network discovery)
-trace                # → strace -f (system call tracing)
-ai                   # → aider (AI pair programming)
-aicode               # → aider --dark-mode --model claude-3-5-sonnet
-br                   # → broot (interactive tree navigation)
-record               # → vhs (terminal session recording)
-```
-
-### Fish Shell Help
-
-```bash
-show_enhanced_tools  # See all enhanced commands
-fish_help           # Quick help overview
-check_context       # Check if in automated context
-what_runs cat       # See what command will actually run
-```
-
-### File Management
-
-```bash
-yazi                 # Launch modern file manager
-preview file.txt     # Enhanced file preview
-md file.md          # Enhanced markdown viewer
-ff pattern          # Find files by name (fd)
-search pattern      # Search text in files (rg)
-```
-
-## 🧠 AI Project Orchestration System
-
-### **Complete AI-Driven Project Lifecycle (Installed System-Wide)**
-
-The `ai-project-orchestration` package provides comprehensive workflows for both new and legacy projects:
-
-```bash
-# Greenfield: New projects with quality from day one
-ai-init-greenfield    # or: ai-init-green
-
-# Brownfield: Legacy rescue with autonomous remediation
-ai-init-brownfield    # or: ai-init-brown or ai-rescue
-
-# Master orchestrator
-ai-project --help
-
-# Spec to PRD bridge
-spec-to-prd my-feature
-```
-
-### **Two Complete Workflows**
-
-**1. Greenfield (New Projects)**
-
-- Spec-driven development (Constitution → Spec → Plan → Implementation)
-- Quality gates enforced from commit #1
-- 80%+ coverage, CCN < 10, < 5% duplication
-- Multi-agent coordination (Claude Code + Cursor + v0.dev + Gemini)
-
-**2. Brownfield (Legacy Rescue)**
-
-- AI self-assessment of codebase reality
-- Quality baseline establishment
-- Autonomous remediation with supervision
-- Gradual spec adoption after quality achieved
-
-### **Key Features**
-
-🧠 **Intelligent Project Detection** - Automatically adapts to any technology stack
-⚡ **Parallel Processing** - Independent agent contexts prevent interference
-🔄 **Quality-First** - Baseline gates before features (brownfield) or enforced from start (greenfield)
-🌐 **Complete Workflows** - From inception to production
-📈 **Spec Traceability** - Constitution → Code lineage
-
-### **Platform Support**
-
-- **Master Coordinator**: Claude Code
-- **Backend Development**: Cursor
-- **Frontend Development**: v0.dev
-- **Quality Assurance**: Gemini Pro
-
-### **Installation Status**
-
-✅ Installed system-wide via NixOS module (`modules/development/ai-project-orchestration.nix`)
-✅ Commands available: `ai-project`, `ai-init-greenfield`, `ai-init-brownfield`, `spec-to-prd`, `ai-inception`
-✅ Shell aliases configured (fish + bash)
-
-**See [templates/README.md](templates/README.md) for complete template documentation.**
-
-## 🧰 Installed Tools & Applications
-
-### Development Tools
-
-- **Editors**: Helix, Zed, VSCode, Cursor
-- **AI Agents**: Claude Code, Plandex, Gemini CLI, Serena (MCP server)
-- **AI Development**: Cursor AI with `.cursor/rules` MDC system, enterprise quality gates integration
-- **MCP Servers**: Serena (semantic code analysis), MCP-NixOS (package info)
-- **Version Control**: Git, GitHub CLI, `delta` (enhanced diffs), `gitui`, `lazygit`
-- **Languages**: Node.js 20, Python 3, GCC
-- **Package Managers**: `npm` (Node.js), `uv` (Python package manager)
-- **Environment**: DevEnv, Direnv, Cachix
-- **Containers**: Docker Compose, Podman, K9s (Kubernetes)
-- **Quality**: `shellcheck` (shell scripts), `semgrep` (security)
-- **Database CLI**: `pgcli` (PostgreSQL), `mycli` (MySQL/MariaDB), `usql` (universal database CLI)
-- **API Testing**: `hurl` (file-based HTTP testing), `httpie`/`xh` (interactive HTTP clients)
-
-### CLI Enhancements
-
-- **File Viewing**: `glow` (markdown), `bat` (syntax highlighting), `jless` (large JSON)
-- **File Listing**: `eza` (icons, git status), `dust` (disk usage), `duf` (disk free)
-- **File Finding**: `fd` (fast find), `fzf`/`skim` (fuzzy finders), `choose` (text extraction)
-- **Text Search**: `ripgrep` (fast grep), `ast-grep` (structural search)
-- **System Monitoring**: `htop`, `gtop`, `bottom`, `procs`, `hyperfine` (benchmarking)
-- **File Management**: `yazi` (terminal file manager), `zoxide` (smart directory jumping)
-- **Data Processing**: `jq` (JSON), `yq` (YAML), `csvkit` (CSV), `miller` (multi-format)
-- **Development**: `tmux` (sessions), `entr` (file watching), `just` (task runner)
-- **Network & Security**: `nmap` (network discovery), `wireshark` (protocol analyzer), `tcpdump` (packet capture)
-- **System Analysis**: `strace` (system calls), `ltrace` (library calls), `ast-grep` (structural search)
-- **Python Tools**: `uv` (package management), `ruff` (linting/formatting)
-- **AI Development**: `aider` (pair programming), `atuin` (smart history), `vhs` (session recording), `mcfly` (neural history search)
-
-### System vs Project-Level Architecture
-
-**🔧 System-Level Tools (Universal Utilities)**
-
-- **Database CLI tools**: Always available for any project (`pgcli`, `mycli`, `usql`)
-- **AI development tools**: Universal AI agent support (`aider`, `atuin`, `broot`, `mise`)
-- **API testing**: Generic HTTP utilities (`hurl`, `httpie`, `xh`)
-- **File management**: Universal navigation and processing tools
-
-**📋 Project-Level Tools (Context-Specific)**
-
-- **Code quality**: `gitleaks`, `typos`, `pre-commit` via `devenv.nix` or `package.json`
-- **Formatters/Linters**: `ruff`, `black`, `eslint`, `prettier` with project-specific configs
-- **Testing frameworks**: Project-appropriate versions and configurations
-- **Language tools**: Runtime-specific tools managed via project environments
-- **AI Development**: `.cursor/rules` MDC files for project-specific AI behavior and quality gates
-- **Template System**: Enterprise-grade templates in `templates/` with integrated quality gates
-
-**Benefits:**
-
-- ✅ AI agents get consistent, universal tool access
-- ✅ Projects maintain reproducible, team-specific configurations
-- ✅ No version conflicts between system and project requirements
-- ✅ Optimal balance of convenience and precision
-
-### Productivity Applications
-
-- **Browser**: Google Chrome
-- **Office**: LibreOffice
-- **Notes**: Obsidian
-- **Learning**: Anki
-- **Graphics**: GIMP with plugins
-- **Media**: VLC Player
-
-## 🧠 Smart Fish Shell System
-
-The Fish shell configuration includes **context-aware command substitutions**:
-
-### 👤 **For You (Interactive)**
-
-- Beautiful markdown rendering with `glow`, syntax highlighting with `bat`
-- Rich icons, git status, and enhanced tools automatically selected
-- Abbreviations for quick typing (`tree` → `eza --tree`, `mdcat` → `glow`)
-
-### 🤖 **For Agents & Scripts**
-
-- Plain output, no colors or formatting
-- Original commands automatically selected
+**For AI agents (scripts):**
+- Plain output, no formatting
+- Original commands automatically used
 - Full compatibility with automation
 
-### 🔄 **Automatic Context Detection**
+### AI Development Tools
 
-The system detects:
+- **Claude Code** - Anthropic's official CLI
+- **Cursor** - AI-powered editor with quality gates
+- **Aider** - AI pair programming
+- **Gemini CLI** - Google's Gemini models
+- **Serena MCP** - Semantic code analysis
+- **MCP-NixOS** - NixOS package/option info
 
-- TTY vs non-TTY usage
-- Environment variables (`CI`, `AUTOMATION`, `AGENT_MODE`)
-- Input/output redirection
-- Agent-specific terminal indicators
+</details>
 
-## 📚 Documentation
+---
 
-### Core System Documentation
+## 🛠️ Complete Tool List
 
-- **[CLAUDE.md](CLAUDE.md)** - Project-level AI agent instructions (auto-generated)
-- **[docs/architecture/CLAUDE_ORCHESTRATION.md](docs/architecture/CLAUDE_ORCHESTRATION.md)** - Three-level Claude Code orchestration architecture
-- **[templates/README.md](templates/README.md)** - Enterprise-grade development templates with Cursor AI integration
+<details>
+<summary>Click to expand full list of 122 tools</summary>
 
-### User Guides
+### Modern CLI Tools
+- `bat` - Syntax-highlighted file viewing
+- `eza` - Enhanced directory listing
+- `fd` - Fast file search
+- `ripgrep` - Fast text search
+- `dust` - Disk usage visualization
+- `procs` - Modern process viewer
+- `delta` - Enhanced git diffs
+- `zoxide` - Smart directory jumping
+- `fzf` - Fuzzy finder
 
-- **[docs/guides/COMMON_TASKS.md](docs/guides/COMMON_TASKS.md)** - Quick reference for frequent operations
+### Development
+- `git`, `gh` - Version control
+- `docker-compose`, `k9s` - Containers
+- `nodejs`, `python3` - Runtimes
+- `helix`, `zed`, `vscode` - Editors
+- `devenv`, `direnv` - Environments
 
-### Major Systems
+### Data Processing
+- `jq` - JSON processor
+- `yq` - YAML processor
+- `csvkit` - CSV tools
+- `miller` - Multi-format data processing
 
-- **[basb-system/README.md](basb-system/README.md)** - Building a Second Brain knowledge management implementation
-- **[stack-management/README.md](stack-management/README.md)** - Technology stack lifecycle management system
-- **AI Project Orchestration** - See `~/ai-project-orchestration/` (installed system-wide, separate repo)
+### System Monitoring
+- `htop`, `bottom` - System monitors
+- `hyperfine` - Benchmarking
+- `nmap` - Network scanning
+- `wireshark` - Packet analysis
 
-### AI Development Integration
+### File Management
+- `yazi` - Terminal file manager
+- `glow` - Markdown renderer
+- `jless` - JSON viewer
+- `broot` - Interactive tree navigation
 
-- **[docs/integrations/CURSOR_AI_QUALITY_INTEGRATION.md](docs/integrations/CURSOR_AI_QUALITY_INTEGRATION.md)** - Cursor AI and quality gates integration
-- **[Claude NixOS Automation](https://github.com/jacopone/claude-nixos-automation)** - Claude Code auto-generation system (external flake)
-- **[docs/automation/claude-automation-system.md](docs/automation/claude-automation-system.md)** - Integration guide (deprecated, redirects to external repo)
+See [`modules/core/packages.nix`](modules/core/packages.nix) for the complete list with descriptions.
 
-### Tools & Configuration Guides
+</details>
 
-- **[docs/tools/fish-smart-commands.md](docs/tools/fish-smart-commands.md)** - Fish shell documentation and abbreviations
-- **[docs/tools/enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md)** - Modern CLI tools reference
-- **[docs/tools/kitty-optimization-guide.md](docs/tools/kitty-optimization-guide.md)** - Complete Kitty terminal optimization guide
-- **[docs/tools/yazi-file-associations.md](docs/tools/yazi-file-associations.md)** - Yazi file manager configuration
-
-## 🛡️ Safety Features
-
-### Interactive Rebuild Script
-
-- **Pre-flight validation** with test builds
-- **User confirmation** before applying changes
-- **Automatic rollback** if changes are rejected
-- **Git integration** with commit prompts
-- **Generation cleanup** with interactive selection
-- **Cache cleanup** with size reporting (UV, Chrome, development caches)
-- **Claude Code tool intelligence update** - automatically updates AI behavior policies for 174 system tools
-
-### Backup & Recovery
-
-- **System generations** for easy rollback
-- **Configuration versioning** with Git
-- **Hardware configuration** isolation
-- **Modular design** for selective updates
-
-## 🔧 Advanced Configuration
-
-### Kitty Terminal Optimizations
-
-- **700+ lines** of advanced terminal configuration
-- **Performance tuning** for AI development workflows (50k scrollback, optimized repaints)
-- **Typography enhancements** with ligature control and advanced text rendering
-- **Catppuccin Mocha** theme with enhanced contrast
-- **Powerline tabs** with slanted segments and file path display
-- **35+ keyboard shortcuts** for productivity
-
-### Yazi File Manager Features
-
-- **Rich preview system** with 40+ file type support
-- **Custom openers** for each file type (Helix, Zed, VSCode, Cursor)
-- **Image viewers** (Eye of GNOME, sxiv, feh)
-- **PDF viewers** (Okular with KDE integration)
-- **Office integration** (LibreOffice with CSV support)
-- **Markdown rendering** with Glow integration
-
-### Fish Shell Intelligence
-
-- **Context detection** for automation vs interactive use
-- **Smart command substitutions** (bat/cat, eza/ls, rg/grep)
-- **50+ abbreviations** for rapid development
-- **Git shortcuts** and development aliases
-- **Agent compatibility** with fallback commands
-
-### System Version Management
-
-- **NixOS System Version**: 25.11 (current running version)
-- **Configuration State Version**: 24.05 (for compatibility, should not be changed)
-- **Automatic distinction** between system updates and state compatibility
+---
 
 ## 🎨 Customization
 
 ### Adding Packages
 
 ```nix
-# System packages (modules/core/packages.nix)
+# System-wide (modules/core/packages.nix)
 environment.systemPackages = with pkgs; [
   your-package
 ];
 
-# User packages (modules/home-manager/base.nix)
+# User-specific (modules/home-manager/base.nix)
 home.packages = with pkgs; [
   your-user-package
 ];
 ```
 
-### Desktop Environment
+### Modifying Desktop
 
-- **GNOME apps** excluded in `profiles/desktop/gnome.nix`
-- **Terminal themes** configured in `modules/home-manager/base.nix`
-- **Window manager** settings in `profiles/desktop/base.nix`
-
-## 🔧 Troubleshooting
-
-### Common Issues & Solutions
-
-#### **Insecure Packages (Obsidian/LibSoup)**
-
-```bash
-# Already configured in the system:
-nixpkgs.config.permittedInsecurePackages = [
-  "electron-24.8.6"    # For Obsidian compatibility
-  "libsoup-2.74.3"     # For Google Drive support
+```nix
+# Exclude GNOME apps (profiles/desktop/gnome.nix)
+environment.gnome.excludePackages = with pkgs; [
+  gnome-maps
+  gnome-weather
 ];
+
+# Change default editor (hosts/nixos/default.nix)
+environment.variables.EDITOR = "code";
 ```
 
-#### **Build Memory Issues**
+### Fish Shell Abbreviations
 
-- System is pre-configured with 4 CPU cores and 2 max parallel jobs
-- If builds still fail: temporarily reduce with `--cores 2 --max-jobs 1`
-
-#### **Locale Configuration**
-
-```bash
-# Current setup: US English with Italian regional settings
-i18n.defaultLocale = "en_US.UTF-8";
-# Regional settings for Italy (dates, currency, etc.)
+```nix
+# Add to modules/home-manager/base.nix
+programs.fish.interactiveShellInit = ''
+  abbr -a yourabbr 'your-command'
+'';
 ```
 
-#### **Version Compatibility**
-
-- **System Version**: 25.11 (updates with `nixos-rebuild`)
-- **State Version**: 24.05 (compatibility layer, should NOT be changed)
-- These are different by design for system stability
-
-#### **Hardware Acceleration Issues**
-
-```bash
-# Check graphics status
-lspci | grep -i gpu
-# Hardware acceleration automatically enabled via:
-hardware.graphics.enable = true;
-```
-
-#### **Fish Shell Not Default**
-
-```bash
-# Verify Fish is set as default shell
-echo $SHELL  # Should show /run/current-system/sw/bin/fish
-# If not, run: sudo chsh -s $(which fish) $(whoami)
-```
-
-#### **Yazi Preview Issues**
-
-```bash
-# Check required dependencies
-which glow bat file ffmpegthumbnailer
-# All should be available in PATH
-# Rich preview plugin automatically configured
-```
+---
 
 ## 🤝 Contributing
 
 This is a personal NixOS configuration, but you're welcome to:
-
-- 🍴 **Fork** and adapt for your setup
-- 🐛 **Report issues** or suggest improvements
-- 💡 **Share ideas** for better configurations
-- 📖 **Use as reference** for your own NixOS journey
+- 🍴 Fork and adapt for your setup
+- 🐛 Report issues or suggest improvements
+- 💡 Share ideas for better configurations
+- 📖 Use as reference for your own NixOS journey
 
 ## 📄 License
 
-This configuration is provided as-is for educational and reference purposes. Feel free to use, modify, and distribute according to your needs.
+MIT License - Feel free to use, modify, and distribute.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ using NixOS, enhanced by AI agents**
+**Built over 6 months with NixOS and Claude Code**
 
-_"Reproducible, declarative, and just works!"_
+*Declarative system configuration meets AI-assisted development*
+
+[⭐ Star this repo](https://github.com/yourusername/nixos-config) if you find it useful
 
 </div>
