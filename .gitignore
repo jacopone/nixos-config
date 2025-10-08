@@ -45,6 +45,9 @@ CLAUDE*.backup-*
 docs/automation/backup-strategy.md
 docs/automation/claude-backup-legacy.md
 
+# Claude Code machine-specific context
+.claude/CLAUDE.local.md
+
 # Data and model files
 data/models/**/*.bin
 data/models/**/*.ggml
