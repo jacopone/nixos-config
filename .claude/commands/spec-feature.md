@@ -1,4 +1,9 @@
 ---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
 description: Start spec-driven development for a major feature
 ---
 
