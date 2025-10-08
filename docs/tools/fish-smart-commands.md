@@ -160,6 +160,26 @@ rmd      # → rmdir (remove directory)
 
 ## 🛠 Utility Functions
 
+### Command Tracking & Analysis
+Tool adoption analysis system that logs every command with source attribution (human, Claude Code, scripts):
+
+```bash
+tracking-status      # View tracking status and command count by source
+tracking-analyze     # Generate detailed analysis report
+                     # - Modern vs traditional tools
+                     # - Confidence distribution
+                     # - Usage patterns by source
+tracking-export      # Export monthly baseline data for October 2026 comparison
+tracking-disable     # Emergency kill switch to disable tracking
+tracking-enable      # Re-enable tracking after disable
+```
+
+**Purpose**: Longitudinal study measuring which modern CLI tools are genuinely adopted vs merely installed.
+
+**Data location**: `~/.local/share/fish/command-source.jsonl`
+**Detailed guide**: `docs/analysis/COMMAND_TRACKING_GUIDE.md`
+**Baseline study**: `docs/analysis/tool-adoption-baseline-2025-10.md`
+
 ### File Preview
 ```bash
 preview file.txt    # Enhanced preview with bat/syntax highlighting
