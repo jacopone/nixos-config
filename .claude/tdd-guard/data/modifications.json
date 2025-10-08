@@ -1,11 +1,11 @@
 {
-  "session_id": "2a9ec92c-fc56-4c2c-b8e4-4075280573c6",
-  "transcript_path": "/home/guyfawkes/.claude/projects/-home-guyfawkes-nixos-config/2a9ec92c-fc56-4c2c-b8e4-4075280573c6.jsonl",
+  "session_id": "05235fb0-5b2b-433e-b8c4-d65f878e5f2b",
+  "transcript_path": "/home/guyfawkes/.claude/projects/-home-guyfawkes-nixos-config/05235fb0-5b2b-433e-b8c4-d65f878e5f2b.jsonl",
   "hook_event_name": "PreToolUse",
   "tool_name": "Edit",
   "tool_input": {
-    "file_path": "/home/guyfawkes/nixos-config/flake.nix",
-    "old_string": "          # Apply overlays\n          {\n            nixpkgs.overlays = [ self.overlays.default ];\n          }",
-    "new_string": "          # Apply overlays and allow unfree packages\n          {\n            nixpkgs.overlays = [ self.overlays.default ];\n            nixpkgs.config.allowUnfree = true;\n          }"
+    "file_path": "/home/guyfawkes/nixos-config/modules/core/packages.nix",
+    "old_string": "    vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/\n    libreoffice         # A powerful and free office suite - https://www.libreoffice.org/",
+    "new_string": "    vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/\n    # libreoffice         # A powerful and free office suite - TEMPORARILY DISABLED: building from source (30+ min)"
   }
 }

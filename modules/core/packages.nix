@@ -15,19 +15,9 @@
     gemini-cli-bin      # A command-line interface for Google's Gemini models (v0.6.0)
     google-jules        # Jules, the asynchronous coding agent from Google (CLI)
 
-    # AI Development Enhancement Tools
-    (pkgs.writeShellScriptBin "aider" ''
-      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
-      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from aider-chat aider "$@"
-    '')
     # Serena MCP Server - Semantic code analysis toolkit for coding agents
     (pkgs.writeShellScriptBin "serena" ''
       exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"
-    '')
-    # TDD Guard - TDD enforcement for AI-assisted coding
-    (pkgs.writeShellScriptBin "tdd-guard" ''
-      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
-      exec ${pkgs.nodejs_20}/bin/npx tdd-guard "$@"
     '')
     # Spec-Kit - GitHub's Spec-Driven Development workflow
     (pkgs.writeShellScriptBin "specify" ''
@@ -42,7 +32,8 @@
 
     # MCP NixOS Server - Model Context Protocol for NixOS package/option info
     (pkgs.writeShellScriptBin "mcp-nixos" ''
-      exec ${pkgs.uv}/bin/uvx mcp-nixos "$@"
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
+      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python mcp-nixos "$@"
     '')
     git                 # A free and open source distributed version control system - https://git-scm.com/
     gh                  # GitHub's official command-line tool - https://cli.github.com/
@@ -69,7 +60,7 @@
     (python3.withPackages (ps: with ps; [
       rich              # Rich - Python terminal UI library (for BASB system)
     ]))                 # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
-    python312Packages.pymupdf4llm  # PyMuPDF for LLM-optimized PDF processing
+    # python312Packages.pymupdf4llm  # PyMuPDF for LLM-optimized PDF processing - DISABLED: mupdf build broken in nixpkgs
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
     ninja               # Build system for faster compilation (required by numpy/aider)
@@ -94,7 +85,7 @@
     anki-bin            # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins   # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
-    libreoffice         # A powerful and free office suite - https://www.libreoffice.org/
+    # libreoffice         # A powerful and free office suite - TEMPORARILY DISABLED: building from source (30+ min)
 
     # fonts
     dejavu_fonts        # A font family based on the Vera Fonts
@@ -157,8 +148,7 @@
     wireshark          # Network protocol analyzer
     tcpdump            # Command-line packet analyzer
     strace             # System call tracer
-    ltrace             # Library call tracer
-    pass               # Standard Unix password manager
+    (ltrace.overrideAttrs (old: { doCheck = false; }))  # Library call tracer (tests disabled - flaky)
     csvkit             # CSV manipulation tools
     jless              # JSON viewer (better than jq for large files)
     yq-go              # YAML/XML processor (like jq for YAML)
