@@ -1,3 +1,11 @@
+---
+status: deprecated
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: ephemeral
+---
+
 # Cost Savings from Deprecated Services
 
 *Track savings achieved through smart deprecation decisions*

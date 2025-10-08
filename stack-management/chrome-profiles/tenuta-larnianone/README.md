@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Tenuta Larnianone Business Profile Configuration
 
 **Profile**: Profile 1 (jacopo@tenutalarnianone.com)

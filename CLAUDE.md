@@ -35,24 +35,9 @@
 - `yq` for YAML processing
 - `glow` for markdown rendering
 
-## Fish Shell Functions
-
-### Command Tracking System
-Tool adoption analysis system that logs every command with source attribution (human, Claude Code, scripts). Enables longitudinal study of which modern tools are actually adopted vs installed.
-
-- `tracking-status` - View tracking status and command count by source
-- `tracking-analyze` - Generate detailed analysis report (modern vs traditional tools, confidence distribution)
-- `tracking-export` - Export monthly baseline data for October 2026 comparison
-- `tracking-disable` - Emergency kill switch to disable tracking
-- `tracking-enable` - Re-enable tracking after disable
-
-**Data location**: `~/.local/share/fish/command-source.jsonl`
-**Detailed guide**: `docs/analysis/COMMAND_TRACKING_GUIDE.md`
-**Baseline study**: `docs/analysis/tool-adoption-baseline-2025-10.md`
-
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (116 tools)
+- `modules/core/packages.nix` - System-wide packages (118 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -99,7 +84,7 @@ Tool adoption analysis system that logs every command with source attribution (h
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (116 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (118 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -111,10 +96,10 @@ Tool adoption analysis system that logs every command with source attribution (h
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 2M 0A 4U
-- **Last Updated**: 2025-10-07 23:19:55
+- **Git Status**: 45M 0A 2U
+- **Last Updated**: 2025-10-08 18:39:13
 - **Fish Abbreviations**: 56
-- **Total System Tools**: 116
+- **Total System Tools**: 118
 
 ---
 *Auto-updated by ./rebuild-nixos script*

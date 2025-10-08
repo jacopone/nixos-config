@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-05
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # HN Launch Plan: NixOS + Claude Code Synergy
 
 **Created:** 2025-10-04

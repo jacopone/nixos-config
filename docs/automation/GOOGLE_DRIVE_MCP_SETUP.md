@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-07
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # Google Drive MCP Setup Guide
 
 > For Downloads → Drive sync and document organization automation

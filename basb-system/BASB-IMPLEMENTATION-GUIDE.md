@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # 🧠 BASB + Sunsama Implementation Guide
 *Complete documentation for Jacopo's Building a Second Brain system*
 

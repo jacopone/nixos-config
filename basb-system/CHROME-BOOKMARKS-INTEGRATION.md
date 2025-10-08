@@ -1,3 +1,11 @@
+---
+status: archived
+created: 2025-10-01
+updated: 2025-10-08
+type: session-note
+lifecycle: ephemeral
+---
+
 # Chrome Bookmarks → BASB Integration
 
 **Transform your 1,885 Chrome bookmarks into organized knowledge with BASB.**

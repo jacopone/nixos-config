@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Fish Shell Smart Command System Documentation
 
 This document explains the intelligent command substitution system configured in your Fish shell that automatically provides enhanced tools for interactive use while preserving compatibility for agents and scripts.

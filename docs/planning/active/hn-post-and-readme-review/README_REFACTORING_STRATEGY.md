@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-05
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # README Refactoring Strategy: From Personal Config to Community Project
 
 **Created:** 2025-10-06

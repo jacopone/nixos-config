@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-01-01
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Common Tasks - Quick Reference
 
 Fast answers to "How do I...?" for daily nixos-config operations.

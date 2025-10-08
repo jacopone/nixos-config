@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-06
+updated: 2025-10-08
+type: architecture
+lifecycle: persistent
+---
+
 # The Closed Loop: Self-Documenting AI Infrastructure
 
 **The Innovation:** Every system rebuild automatically updates Claude's knowledge.

@@ -1,3 +1,11 @@
+---
+status: archived
+created: 2025-10-08
+updated: 2025-10-08
+type: session-note
+lifecycle: ephemeral
+---
+
 # Documentation Audit & Reorganization Plan
 
 **Date**: 2025-10-06

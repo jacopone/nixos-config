@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Discovery Item Template
 
 Copy and paste this template when adding new items to backlog.md:

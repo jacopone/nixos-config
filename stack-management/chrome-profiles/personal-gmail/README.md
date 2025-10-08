@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Personal Gmail Profile Configuration
 
 **Profile**: Default (jacopo.anselmi@gmail.com)

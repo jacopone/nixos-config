@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Tool Adoption Baseline Study - October 2025
 
 **Study Period**: September 2024 - October 2025 (13 months)

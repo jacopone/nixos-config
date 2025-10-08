@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # BASB File Processing Workflow
 **Phase 2: Cleaning Up Existing Files**
 

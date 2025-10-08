@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Enhanced Tools Guide - Modern CLI Alternatives
 
 This guide shows you the modern, enhanced alternatives to traditional Unix tools that are installed in your NixOS system, along with their most useful workflows and options. The 109 tools are strategically distributed between system-level (universal access for AI agents) and project-level (context-specific configurations) for optimal productivity.

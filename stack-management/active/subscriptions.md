@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Active Subscriptions
 
 *All paid services currently in use - updated monthly*

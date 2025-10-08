@@ -1,3 +1,11 @@
+---
+status: active
+created: 2024-08-01
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # BASB System Implementation
 
 This directory contains the complete **Building a Second Brain (BASB)** system implementation for managing knowledge across digital platforms.

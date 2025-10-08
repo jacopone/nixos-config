@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-05
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # Documentation Refactoring: From Config to AI Research
 
 **Created:** 2025-10-06

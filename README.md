@@ -1,3 +1,11 @@
+---
+status: active
+created: 2024-06-01
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # NixOS Configuration with Auto-Documenting AI Integration
 
 > A NixOS setup that keeps Claude Code automatically synchronized with your system state

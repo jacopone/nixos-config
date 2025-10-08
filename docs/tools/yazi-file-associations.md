@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Yazi File Associations & Opening Behavior
 
 This document explains how yazi is configured to open different file types with the optimal programs.

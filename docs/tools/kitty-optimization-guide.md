@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # 🚀 Ultimate Kitty Terminal Optimization Guide
 
 This document explains every optimization applied to your Kitty terminal configuration, designed specifically for AI-powered development workflows with Claude Code, Plandex, and modern CLI tools.

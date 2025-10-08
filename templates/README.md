@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # 🏗️ NixOS Development Templates
 
 **Enterprise-grade project templates - now available via ai-project-orchestration package**

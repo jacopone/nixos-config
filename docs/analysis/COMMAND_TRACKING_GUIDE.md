@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Command Source Tracking System - User Guide
 
 **Status**: ✅ Installed and Active

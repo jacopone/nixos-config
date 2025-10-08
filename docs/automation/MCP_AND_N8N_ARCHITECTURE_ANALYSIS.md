@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-07
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # MCP Servers & n8n Architecture Analysis
 
 > **Session Date:** 2025-10-07

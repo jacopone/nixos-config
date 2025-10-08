@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Readwise Reader BASB Integration
 **Phase 2: Setting up article processing with BASB taxonomy**
 

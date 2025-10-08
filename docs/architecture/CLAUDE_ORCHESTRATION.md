@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-03
+updated: 2025-10-08
+type: architecture
+lifecycle: persistent
+---
+
 # Claude Code Orchestration Architecture
 
 **Three-Level Auto-Generation System for Enterprise NixOS Development**

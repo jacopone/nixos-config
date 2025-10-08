@@ -1,3 +1,11 @@
+---
+status: archived
+created: 2025-10-01
+updated: 2025-10-08
+type: session-note
+lifecycle: ephemeral
+---
+
 # Chrome Bookmarks Gum Choose Fix
 
 ## Problem

@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Service Deprecation Postmortem Template
 
 *Copy this template to `deprecated/YYYY-MM-service-name.md` when removing a service*

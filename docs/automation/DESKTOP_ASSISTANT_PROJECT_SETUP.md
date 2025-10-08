@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-07
+updated: 2025-10-08
+type: planning
+lifecycle: ephemeral
+---
+
 # Desktop Assistant Project Setup
 
 > **Purpose:** Personal assistant automation combining WhatsApp and Google Drive integration

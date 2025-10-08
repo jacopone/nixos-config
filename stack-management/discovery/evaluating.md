@@ -1,3 +1,11 @@
+---
+status: draft
+created: 2025-10-08
+updated: 2025-10-08
+type: reference
+lifecycle: ephemeral
+---
+
 # Currently Evaluating
 
 *Services/tools in active trial or deep evaluation phase*

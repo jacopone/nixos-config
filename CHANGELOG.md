@@ -1,3 +1,11 @@
+---
+status: active
+created: 2024-06-01
+updated: 2025-10-08
+type: reference
+lifecycle: persistent
+---
+
 # Changelog
 
 All notable changes to this NixOS configuration.

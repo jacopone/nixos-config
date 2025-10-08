@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # Sunsama + BASB Integration
 **Phase 2: Connecting Knowledge to Action**
 

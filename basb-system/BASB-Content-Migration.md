@@ -1,3 +1,11 @@
+---
+status: active
+created: 2025-10-08
+updated: 2025-10-08
+type: guide
+lifecycle: persistent
+---
+
 # High-Value Content Migration
 **Phase 2: Strategic Transfer of Existing Knowledge Assets**
 
