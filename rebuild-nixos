@@ -242,8 +242,9 @@ else
 
     # Extract important info from logs
     if [ -f "$LOG_FILE.automation" ]; then
-        # Count warnings
-        WARNING_COUNT=$(grep -c "WARNING:" "$LOG_FILE.automation" 2>/dev/null || echo "0")
+        # Count warnings (grep -c returns 0 count on no matches, exit code 1 is expected)
+        WARNING_COUNT=$(grep -c "WARNING:" "$LOG_FILE.automation" 2>/dev/null || true)
+        WARNING_COUNT=${WARNING_COUNT:-0}
         # Extract stats (get only the last number from each line to avoid date/time stamps)
         TOOLS_COUNT=$(grep "Total tools documented:" "$LOG_FILE.automation" | tail -1 | grep -oP '\d+' | tail -1 || echo "?")
         QUALITY_TOOLS=$(grep "Quality tools:" "$LOG_FILE.automation" | tail -1 | grep -oP '\d+' | tail -1 || echo "?")
