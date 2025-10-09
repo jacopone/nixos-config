@@ -27,8 +27,14 @@
     enable = true;
 
     # Add ~/.local/bin to PATH for TDD Guard control scripts
+    # Export GitHub token from gh CLI for automation tools
     shellInit = ''
       set -gx PATH $HOME/.local/bin $PATH
+
+      # Export GitHub token for claude-nixos-automation scraper
+      if command -v gh &> /dev/null
+        set -gx GITHUB_TOKEN (gh auth token 2>/dev/null)
+      end
     '';
 
     interactiveShellInit = ''

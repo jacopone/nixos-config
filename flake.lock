@@ -7,8 +7,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1759932137,
-        "narHash": "sha256-cWnsq3/2ldiusrusRJRdfeM6u5bJLxOLUMzJ5CUnfrw=",
+        "lastModified": 1759969755,
+        "narHash": "sha256-36i1juYK9iRVf9fadJ5d1kFoBDBvEDPLfPfEPv1xOMs=",
         "path": "/home/guyfawkes/ai-project-orchestration",
         "type": "path"
       },
@@ -45,11 +45,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759874517,
-        "narHash": "sha256-p+FOttLtpO55VQezh3dDnYAYlcV4ysjVoq2aFp6+2ks=",
+        "lastModified": 1759957305,
+        "narHash": "sha256-ifBHAssYOE3AWGKwEatt/6kC9QJ9ZSDYQtt2OlJqk9E=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "d4fc7dfe06f5bee08c225f5b9ddaab79578fd8fb",
+        "rev": "7bc80de58696a2d5be4d59b599c4d2ba1b2e78be",
         "type": "github"
       },
       "original": {
