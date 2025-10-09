@@ -59,8 +59,8 @@
     nodejs_20           # Node.js 20.19.4 with npm - eliminates devenv activation overhead
     (python3.withPackages (ps: with ps; [
       rich              # Rich - Python terminal UI library (for BASB system)
+      pymupdf4llm       # PyMuPDF for LLM-optimized PDF processing
     ]))                 # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
-    # python312Packages.pymupdf4llm  # PyMuPDF for LLM-optimized PDF processing - DISABLED: mupdf build broken in nixpkgs
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
     ninja               # Build system for faster compilation (required by numpy/aider)
@@ -85,7 +85,7 @@
     anki-bin            # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins   # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc                 # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
-    # libreoffice         # A powerful and free office suite - TEMPORARILY DISABLED: building from source (30+ min)
+    # libreoffice         # A powerful and free office suite - DISABLED: no binary cache (30+ min build)
 
     # fonts
     dejavu_fonts        # A font family based on the Vera Fonts

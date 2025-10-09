@@ -300,7 +300,7 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
                     fi
                 fi
             else
-                change_indicator=" ${BLUE}new file${NC}"
+                change_indicator=" ${BLUE}untracked${NC}"
             fi
 
             echo -e "  $status $description [$size]$change_indicator"
