@@ -341,19 +341,19 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     # Run MCP usage analytics with session utilization
     log_step "Analyzing MCP server usage and efficiency..."
     if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-mcp-usage-analytics 2>/dev/null); then
-        # Extract MCP stats from the updated CLAUDE.md
-        if [ -f "./CLAUDE.md" ]; then
-            # Extract basic stats
-            MCP_SERVERS=$(grep "### Configured Servers" ./CLAUDE.md 2>/dev/null | grep -oP '\(\K\d+' || echo "0")
-            MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "0")
-            TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' || echo "0")
+        # Extract MCP stats from the detailed analytics file
+        if [ -f "./.claude/mcp-analytics.md" ]; then
+            # Extract basic stats from detailed analytics
+            MCP_SERVERS=$(grep "^### Configured Servers" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "0")
+            MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "0")
+            TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "0")
 
             log_success "MCP server analysis complete"
             echo "  📊 Servers: $MCP_CONNECTED/$MCP_SERVERS connected | Sessions analyzed: $TOTAL_SESSIONS"
             add_stat "MCP: $MCP_CONNECTED/$MCP_SERVERS connected, $TOTAL_SESSIONS sessions"
 
             # Show server utilization (efficiency metrics)
-            if grep -q "### Session Utilization" ./CLAUDE.md 2>/dev/null; then
+            if grep -q "### Session Utilization" ./.claude/mcp-analytics.md 2>/dev/null; then
                 echo ""
                 echo "  🎯 Session Utilization (efficiency):"
 
@@ -373,13 +373,13 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
                         # Get efficiency score from next few lines
                         EFFICIENCY=""
-                        if grep -A2 "^- Utilization rate: $UTIL_RATE" ./CLAUDE.md | grep -q "POOR"; then
+                        if grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "POOR"; then
                             EFFICIENCY="${RED}POOR${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./CLAUDE.md | grep -q "FAIR"; then
+                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "FAIR"; then
                             EFFICIENCY="${YELLOW}FAIR${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./CLAUDE.md | grep -q "GOOD"; then
+                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "GOOD"; then
                             EFFICIENCY="${GREEN}GOOD${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./CLAUDE.md | grep -q "EXCELLENT"; then
+                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "EXCELLENT"; then
                             EFFICIENCY="${GREEN}EXCELLENT${NC}"
                         fi
 
@@ -387,19 +387,19 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
                             echo -e "     • $CURRENT_SERVER: $UTIL_RATE ($SESSIONS) - $EFFICIENCY"
                         fi
                     fi
-                done < <(sed -n '/### Session Utilization/,/### Recommendations/p' ./CLAUDE.md)
+                done < <(sed -n '/### Session Utilization/,/### Recommendations/p' ./.claude/mcp-analytics.md)
 
                 echo ""
 
                 # Count and show high-priority recommendations
-                HIGH_REC=$(grep "^\*\*HIGH\*\*:" ./CLAUDE.md 2>/dev/null | wc -l || echo "0")
-                MEDIUM_REC=$(grep "^\*\*MEDIUM\*\*:" ./CLAUDE.md 2>/dev/null | wc -l || echo "0")
+                HIGH_REC=$(grep "^\*\*HIGH\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | wc -l || echo "0")
+                MEDIUM_REC=$(grep "^\*\*MEDIUM\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | wc -l || echo "0")
 
                 if [ "$HIGH_REC" -gt 0 ] || [ "$MEDIUM_REC" -gt 0 ]; then
                     echo "  💡 Recommendations:"
                     [ "$HIGH_REC" -gt 0 ] && echo -e "     ${RED}•${NC} $HIGH_REC HIGH priority (poor utilization / wasted tokens)"
                     [ "$MEDIUM_REC" -gt 0 ] && echo "     • $MEDIUM_REC MEDIUM priority (optimization opportunities)"
-                    echo "     ↳ See CLAUDE.md for details and suggested actions"
+                    echo "     ↳ See .claude/mcp-analytics.md for details and suggested actions"
                 fi
             fi
         fi
