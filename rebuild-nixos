@@ -350,9 +350,14 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
             MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "0")
             TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "0")
 
+            # Count global vs project servers
+            GLOBAL_SERVERS=$(grep -c "\*\*Location\*\*: global" ./.claude/mcp-analytics.md 2>/dev/null || echo "0")
+            PROJECT_SERVERS=$(grep -c "\*\*Location\*\*: project" ./.claude/mcp-analytics.md 2>/dev/null || echo "0")
+
             log_success "MCP server analysis complete"
             echo "  📊 Servers: $MCP_CONNECTED/$MCP_SERVERS connected | Sessions analyzed: $TOTAL_SESSIONS"
-            add_stat "MCP: $MCP_CONNECTED/$MCP_SERVERS connected, $TOTAL_SESSIONS sessions"
+            echo "     └─ Global: $GLOBAL_SERVERS | Project-level: $PROJECT_SERVERS"
+            add_stat "MCP: $MCP_CONNECTED/$MCP_SERVERS connected ($GLOBAL_SERVERS global, $PROJECT_SERVERS project), $TOTAL_SESSIONS sessions"
 
             # Show server utilization (efficiency metrics)
             if grep -q "### Session Utilization" ./.claude/mcp-analytics.md 2>/dev/null; then
