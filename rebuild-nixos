@@ -240,17 +240,19 @@ else
         AUTOMATION_EXIT=$?
     fi
 
-    # Extract important info from logs
-    if [ -f "$LOG_FILE.automation" ]; then
-        # Count warnings (grep -c returns 0 count on no matches, exit code 1 is expected)
-        WARNING_COUNT=$(grep -c "WARNING:" "$LOG_FILE.automation" 2>/dev/null || true)
-        WARNING_COUNT=${WARNING_COUNT:-0}
-        # Extract stats (get only the last number from each line to avoid date/time stamps)
-        TOOLS_COUNT=$(grep "Total tools documented:" "$LOG_FILE.automation" | tail -1 | grep -oP '\d+' | tail -1 || echo "?")
-        QUALITY_TOOLS=$(grep "Quality tools:" "$LOG_FILE.automation" | tail -1 | grep -oP '\d+' | tail -1 || echo "?")
+    # Extract stats from generated files (automation logs suppress output)
+    if [ -f "./CLAUDE.md" ]; then
+        TOOLS_COUNT=$(grep "\*\*Total System Tools\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' || echo "?")
+        ABBREV_COUNT=$(grep "\*\*Fish Abbreviations\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' || echo "?")
 
         add_stat "System tools: $TOOLS_COUNT"
-        add_stat "Quality tools: $QUALITY_TOOLS"
+        add_stat "Fish abbreviations: $ABBREV_COUNT"
+    fi
+
+    # Check automation log for warnings
+    if [ -f "$LOG_FILE.automation" ]; then
+        WARNING_COUNT=$(grep -c "WARNING:" "$LOG_FILE.automation" 2>/dev/null || true)
+        WARNING_COUNT=${WARNING_COUNT:-0}
 
         if [ "$WARNING_COUNT" -gt 0 ]; then
             log_warning "$WARNING_COUNT warnings during automation (see $LOG_FILE.automation)"
