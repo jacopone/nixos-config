@@ -106,12 +106,12 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 2/2 connected | Last checked: 2025-10-10 19:35:44
+**Status**: 0/2 connected | Last checked: 2025-10-10 20:30:31
 
-**sequential-thinking** ✓ connected
+**sequential-thinking** ? unknown
    - Step-by-step reasoning for complex problems
    - Scope: global (~/.claude.json)
-**serena** ✓ connected
+**serena** ? unknown
    - Semantic code analysis toolkit
    - Scope: global (~/.claude.json)
 

@@ -356,7 +356,28 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
             log_success "MCP server analysis complete"
             echo "  📊 Servers: $MCP_CONNECTED/$MCP_SERVERS connected | Sessions analyzed: $TOTAL_SESSIONS"
-            echo "     └─ Global: $GLOBAL_SERVERS | Project-level: $PROJECT_SERVERS"
+
+            # Show global servers
+            if [ "$GLOBAL_SERVERS" -gt 0 ]; then
+                echo "     ├─ Global: $GLOBAL_SERVERS servers (load in ALL sessions)"
+            else
+                echo "     ├─ Global: none"
+            fi
+
+            # Show project-level servers with their locations
+            if [ "$PROJECT_SERVERS" -gt 0 ]; then
+                echo "     └─ Project-level: $PROJECT_SERVERS servers"
+                # Find all project MCP configs
+                find . -name "mcp.json" -path "*/.claude/*" 2>/dev/null | while read -r config; do
+                    project_dir=$(dirname $(dirname "$config"))
+                    server_count=$(jq -r '.mcpServers | length' "$config" 2>/dev/null || echo "?")
+                    server_names=$(jq -r '.mcpServers | keys | join(", ")' "$config" 2>/dev/null || echo "unknown")
+                    echo "        └─ $project_dir: $server_count servers ($server_names)"
+                done
+            else
+                echo "     └─ Project-level: none (all servers are global)"
+            fi
+
             add_stat "MCP: $MCP_CONNECTED/$MCP_SERVERS connected ($GLOBAL_SERVERS global, $PROJECT_SERVERS project), $TOTAL_SESSIONS sessions"
 
             # Show server utilization (efficiency metrics)
