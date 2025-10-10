@@ -7,8 +7,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1759971442,
-        "narHash": "sha256-zdmU6QhjHyraukH8YcxssXNqUyKYdt+L3w76v+M6jUU=",
+        "lastModified": 1760090419,
+        "narHash": "sha256-xYWkJs2oanzriZpw+qjxUdktiCI8ByK8r+Ox9UfSfLE=",
         "path": "/home/guyfawkes/ai-project-orchestration",
         "type": "path"
       },
@@ -24,11 +24,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759941592,
-        "narHash": "sha256-viqLTg5vZs9okJ1okm7TrL8zRnaiIEPjPjWBBw/QC3I=",
+        "lastModified": 1760104282,
+        "narHash": "sha256-DOTDoWq0ny1UIhmWGvTA4A4m8EXj/SOUoReWo4bYGMw=",
         "owner": "jacopone",
         "repo": "claude-nixos-automation",
-        "rev": "032df3dec523110ed5246dfaeccfa7e7c71710b2",
+        "rev": "cd84acec9c0e3cc85aaea003c3bbf23b6f5075d0",
         "type": "github"
       },
       "original": {
@@ -45,11 +45,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759957305,
-        "narHash": "sha256-ifBHAssYOE3AWGKwEatt/6kC9QJ9ZSDYQtt2OlJqk9E=",
+        "lastModified": 1760032963,
+        "narHash": "sha256-+PAowo8NLOmBgfAlaU0+zVFuPc5qsf8ny6qniIAhyLw=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "7bc80de58696a2d5be4d59b599c4d2ba1b2e78be",
+        "rev": "328d3639401772636673a2b5624b2825f90d0763",
         "type": "github"
       },
       "original": {
@@ -66,11 +66,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759313330,
-        "narHash": "sha256-C6c17y9cgr4g+nogRIxtb1HiXMPe7Oh0+YopvxgY3zU=",
+        "lastModified": 1760086994,
+        "narHash": "sha256-BbyKLx5niuLHtX+4zSRpUB+XkF2EN+26aT13gW6GETY=",
         "owner": "jacopone",
         "repo": "code-cursor-nix",
-        "rev": "201b28600e35fe5b828fc7bac3d9d28e57b964ef",
+        "rev": "68e7b32da13245688333ec6afd106dbf1f7e5914",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1759853171,
-        "narHash": "sha256-uqbhyXtqMbYIiMqVqUhNdSuh9AEEkiasoK3mIPIVRhk=",
+        "lastModified": 1760103600,
+        "narHash": "sha256-R4cltQFceN3POiPhBu7aTKsrwqTiwo6zjzmitrHD80E=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "1a09eb84fa9e33748432a5253102d01251f72d6d",
+        "rev": "bcccb01d0a353c028cc8cb3254cac7ebae32929e",
         "type": "github"
       },
       "original": {
