@@ -106,17 +106,15 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 2/2 connected | Last checked: 2025-10-10 22:20:44
+**Status**: 1/2 connected | Last checked: 2025-10-17 08:50:25
 
 **sequential-thinking** ✓ connected
    - Step-by-step reasoning for complex problems
    - Scope: global (~/.claude.json)
-**serena** ✓ connected
+**serena** ○ disconnected
    - Semantic code analysis toolkit
-   - Scope: global (~/.claude.json)
+   - Scope: project (.claude/mcp.json)
 
-💡 **Action needed**: 1 high-priority recommendations available
-   Run rebuild to see details, or check `.claude/mcp-analytics.md` for full report
 
 ---
 *MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*

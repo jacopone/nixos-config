@@ -340,105 +340,65 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
     echo ""
 
-    # Run MCP usage analytics with session utilization
-    log_step "Analyzing MCP server usage and efficiency..."
+    # Run MCP usage analytics
+    log_step "Analyzing MCP servers and system usage..."
     if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-mcp-usage-analytics 2>/dev/null); then
-        # Extract MCP stats from the detailed analytics file
+        # Show brief MCP status
         if [ -f "./.claude/mcp-analytics.md" ]; then
-            # Extract basic stats from detailed analytics
-            MCP_SERVERS=$(grep "^### Configured Servers" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "0")
-            MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "0")
-            TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "0")
-
-            # Count global vs project servers (grep -c returns 0 on no match, exit 1 - use || true)
-            GLOBAL_SERVERS=$(grep -c "\*\*Location\*\*: global" ./.claude/mcp-analytics.md 2>/dev/null || true)
-            GLOBAL_SERVERS=${GLOBAL_SERVERS:-0}
-            PROJECT_SERVERS=$(grep -c "\*\*Location\*\*: project" ./.claude/mcp-analytics.md 2>/dev/null || true)
-            PROJECT_SERVERS=${PROJECT_SERVERS:-0}
-
-            log_success "MCP server analysis complete"
-            echo "  📊 Servers: $MCP_CONNECTED/$MCP_SERVERS connected | Sessions analyzed: $TOTAL_SESSIONS"
-
-            # Show global servers
-            if [ "$GLOBAL_SERVERS" -gt 0 ]; then
-                echo "     ├─ Global: $GLOBAL_SERVERS servers (load in ALL sessions)"
-            else
-                echo "     ├─ Global: none"
-            fi
-
-            # Show project-level servers with their locations
-            if [ "$PROJECT_SERVERS" -gt 0 ]; then
-                echo "     └─ Project-level: $PROJECT_SERVERS servers"
-                # Find all project MCP configs
-                find . -name "mcp.json" -path "*/.claude/*" 2>/dev/null | while read -r config; do
-                    project_dir=$(dirname $(dirname "$config"))
-                    server_count=$(jq -r '.mcpServers | length' "$config" 2>/dev/null || echo "?")
-                    server_names=$(jq -r '.mcpServers | keys | join(", ")' "$config" 2>/dev/null || echo "unknown")
-                    echo "        └─ $project_dir: $server_count servers ($server_names)"
-                done
-            else
-                echo "     └─ Project-level: none (all servers are global)"
-            fi
-
-            add_stat "MCP: $MCP_CONNECTED/$MCP_SERVERS connected ($GLOBAL_SERVERS global, $PROJECT_SERVERS project), $TOTAL_SESSIONS sessions"
-
-            # Show server utilization (efficiency metrics)
-            if grep -q "### Session Utilization" ./.claude/mcp-analytics.md 2>/dev/null; then
-                echo ""
-                echo "  🎯 Session Utilization (efficiency):"
-
-                # Extract utilization data for each server
-                # Format: "- Utilization rate: 4.2% (15/361 sessions)"
-                while IFS= read -r line; do
-                    # Get server name from heading like "#### serena (global scope)"
-                    if echo "$line" | grep -q "^#### "; then
-                        SERVER_NAME=$(echo "$line" | sed 's/^#### \([^ ]*\).*/\1/')
-                        CURRENT_SERVER="$SERVER_NAME"
-                    fi
-
-                    # Get utilization rate
-                    if echo "$line" | grep -q "^- Utilization rate:"; then
-                        UTIL_RATE=$(echo "$line" | grep -oP '\d+\.\d+%' | head -1)
-                        SESSIONS=$(echo "$line" | grep -oP '\(\K[^)]+')
-
-                        # Get efficiency score from next few lines
-                        EFFICIENCY=""
-                        if grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "POOR"; then
-                            EFFICIENCY="${RED}POOR${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "FAIR"; then
-                            EFFICIENCY="${YELLOW}FAIR${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "GOOD"; then
-                            EFFICIENCY="${GREEN}GOOD${NC}"
-                        elif grep -A2 "^- Utilization rate: $UTIL_RATE" ./.claude/mcp-analytics.md | grep -q "EXCELLENT"; then
-                            EFFICIENCY="${GREEN}EXCELLENT${NC}"
-                        fi
-
-                        if [ -n "$CURRENT_SERVER" ] && [ -n "$UTIL_RATE" ]; then
-                            echo -e "     • $CURRENT_SERVER: $UTIL_RATE ($SESSIONS) - $EFFICIENCY"
-                        fi
-                    fi
-                done < <(sed -n '/### Session Utilization/,/### Recommendations/p' ./.claude/mcp-analytics.md)
-
-                echo ""
-
-                # Count and show high-priority recommendations
-                HIGH_REC=$(grep "^\*\*HIGH\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | wc -l || echo "0")
-                MEDIUM_REC=$(grep "^\*\*MEDIUM\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | wc -l || echo "0")
-
-                if [ "$HIGH_REC" -gt 0 ] || [ "$MEDIUM_REC" -gt 0 ]; then
-                    echo "  💡 Recommendations:"
-                    [ "$HIGH_REC" -gt 0 ] && echo -e "     ${RED}•${NC} $HIGH_REC HIGH priority (poor utilization / wasted tokens)"
-                    [ "$MEDIUM_REC" -gt 0 ] && echo "     • $MEDIUM_REC MEDIUM priority (optimization opportunities)"
-                    echo "     ↳ See .claude/mcp-analytics.md for details and suggested actions"
-                fi
-            fi
+            MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
+            TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
+            log_success "Analyzed $MCP_CONNECTED MCP servers across $TOTAL_SESSIONS sessions"
+            echo "  ↳ Detailed report: .claude/mcp-analytics.md"
+            add_stat "MCP servers: $MCP_CONNECTED analyzed, $TOTAL_SESSIONS sessions"
         fi
     else
         log_warning "MCP analysis had issues (non-critical)"
     fi
-    echo ""
 else
     log_warning "Claude automation had issues (check logs)"
+fi
+
+# === ADAPTIVE LEARNING CYCLE ===
+echo ""
+log_step "Running adaptive learning cycle..."
+AUTOMATION_DIR="$HOME/claude-nixos-automation"
+if [[ -d "$AUTOMATION_DIR" ]]; then
+    # Capture output to temp file for metrics extraction
+    LEARNING_OUTPUT=$(mktemp)
+
+    # Run with timeout and filter verbose devenv output
+    if (cd "$AUTOMATION_DIR" && timeout 60s devenv shell -- python run-adaptive-learning.py --no-interactive 2>&1 | tee "$LEARNING_OUTPUT" | grep -v "Using Cachix\|Building shell\|Entering shell\|Running tasks\|Running \|Succeeded\|devenv 1\.\|Testing Python\|Welcome to\|Python:\|uv:\|Git:\|Available Tools\|Template-based\|Robust Nix\|Automatic content\|Modern dependency\|2025-.*INFO"); then
+        LEARNING_EXIT=0
+    else
+        LEARNING_EXIT=$?
+    fi
+
+    # Check result
+    if [ $LEARNING_EXIT -eq 0 ]; then
+        log_success "Adaptive learning cycle complete"
+
+        # Extract key metrics from output
+        SUGGESTIONS=$(grep "Total suggestions:" "$LEARNING_OUTPUT" 2>/dev/null | grep -oP '\d+' || echo "0")
+        IMPROVEMENTS=$(grep "Estimated improvements:" "$LEARNING_OUTPUT" 2>/dev/null | sed 's/.*Estimated improvements: //' | xargs || echo "none")
+
+        if [ "$SUGGESTIONS" -gt 0 ]; then
+            add_action "Adaptive learning: $SUGGESTIONS suggestion(s) - $IMPROVEMENTS"
+        else
+            add_action "Adaptive learning: system already optimized"
+        fi
+    elif [ $LEARNING_EXIT -eq 124 ]; then
+        log_warning "Adaptive learning timed out (>60s) - skipping (non-critical)"
+    else
+        log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
+        # Show last few lines of output for debugging
+        if [ -s "$LEARNING_OUTPUT" ]; then
+            echo "  Last output lines:"
+            tail -10 "$LEARNING_OUTPUT" | grep -v "Using Cachix\|Building shell" | sed 's/^/  /'
+        fi
+    fi
+    rm -f "$LEARNING_OUTPUT"
+else
+    log_warning "Adaptive learning not available (automation directory not found)"
 fi
 
 echo ""

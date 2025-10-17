@@ -12,6 +12,10 @@
     (pkgs.writeShellScriptBin "claude-flow" ''
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
     '')
+    # BMAD-METHOD - Universal AI agent framework for Agentic Agile Driven Development
+    (pkgs.writeShellScriptBin "bmad-method" ''
+      exec ${pkgs.nodejs_20}/bin/npx bmad-method "$@"
+    '')
     gemini-cli-bin      # A command-line interface for Google's Gemini models (v0.6.0)
     google-jules        # Jules, the asynchronous coding agent from Google (CLI)
 
@@ -22,6 +26,17 @@
     # Spec-Kit - GitHub's Spec-Driven Development workflow
     (pkgs.writeShellScriptBin "specify" ''
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from git+https://github.com/github/spec-kit.git specify "$@"
+    '')
+    # BP-Kit - Business Plan to Constitution (pitch deck → executable MVP specs)
+    (pkgs.writeShellScriptBin "bpkit" ''
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
+      exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/bpkit bpkit "$@"
+    '')
+    # Brownfield-Kit - AI-driven workflow for transitioning brownfield codebases to Speckit-ready state
+    (pkgs.writeShellScriptBin "brownfield" ''
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
+      export PYTHONPATH="/home/guyfawkes/brownfield/src:$PYTHONPATH"
+      exec /home/guyfawkes/brownfield/.venv/bin/python -m brownfield "$@"
     '')
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search

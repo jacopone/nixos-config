@@ -560,6 +560,10 @@
         side-by-side = true;
       };
     };
+    extraConfig = {
+      # Rewrite SSH URLs to HTTPS for GitHub (fixes plugin marketplace cloning)
+      url."https://github.com/".insteadOf = "git@github.com:";
+    };
   };
 
   # Enable and configure Yazi file manager (restored from working commit b25a70e)
