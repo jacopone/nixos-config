@@ -8,22 +8,29 @@
     vscode-fhs          # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
     inputs.code-cursor-nix.packages.${pkgs.system}.cursor   # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.claude-code-nix.packages.${pkgs.system}.default  # A code-generation tool using Anthropic's Claude model (better packaged)
-    # Claude Flow - AI orchestration platform (alpha version via npx)
+    # AI Tools - All use @latest/@alpha for automatic updates (system philosophy: always latest)
+    # Claude Flow - AI orchestration platform (alpha channel)
     (pkgs.writeShellScriptBin "claude-flow" ''
       exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
     '')
     # BMAD-METHOD - Universal AI agent framework for Agentic Agile Driven Development
     (pkgs.writeShellScriptBin "bmad-method" ''
-      exec ${pkgs.nodejs_20}/bin/npx bmad-method "$@"
+      exec ${pkgs.nodejs_20}/bin/npx bmad-method@latest "$@"
     '')
-    gemini-cli-bin      # A command-line interface for Google's Gemini models (v0.6.0)
-    google-jules        # Jules, the asynchronous coding agent from Google (CLI)
+    # Gemini CLI - Always uses latest version via npx (currently v0.9.0+)
+    (pkgs.writeShellScriptBin "gemini-cli" ''
+      exec ${pkgs.nodejs_20}/bin/npx @google/gemini-cli@latest "$@"
+    '')
+    # Jules - Google's asynchronous coding agent CLI (always latest)
+    (pkgs.writeShellScriptBin "jules" ''
+      exec ${pkgs.nodejs_20}/bin/npx @google/jules@latest "$@"
+    '')
 
-    # Serena MCP Server - Semantic code analysis toolkit for coding agents
+    # Serena MCP Server - Semantic code analysis toolkit (tracks GitHub main)
     (pkgs.writeShellScriptBin "serena" ''
       exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"
     '')
-    # Spec-Kit - GitHub's Spec-Driven Development workflow
+    # Spec-Kit - GitHub's Spec-Driven Development workflow (tracks git main)
     (pkgs.writeShellScriptBin "specify" ''
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from git+https://github.com/github/spec-kit.git specify "$@"
     '')
@@ -45,7 +52,7 @@
     inputs.whisper-dictation.packages.${pkgs.system}.default  # Whisper Dictation - local STT with push-to-talk
     whisper-cpp         # High-performance C++ port of OpenAI Whisper for local STT
 
-    # MCP NixOS Server - Model Context Protocol for NixOS package/option info
+    # MCP NixOS Server - Model Context Protocol for NixOS package/option info (uvx auto-updates)
     (pkgs.writeShellScriptBin "mcp-nixos" ''
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python mcp-nixos "$@"
@@ -75,6 +82,9 @@
     (python3.withPackages (ps: with ps; [
       rich              # Rich - Python terminal UI library (for BASB system)
       pymupdf4llm       # PyMuPDF for LLM-optimized PDF processing
+      pytest            # Testing framework for Python
+      pydantic          # Data validation using Python type hints
+      jinja2            # Jinja2 templating engine (for claude-nixos-automation)
     ]))                 # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
     gcc                 # GCC compiler for native dependencies
     gnumake             # GNU Make for build systems
@@ -151,9 +161,9 @@
     # Code Quality & Analysis Tools (Enterprise-grade)
     python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
     python312Packages.radon # Python code metrics and complexity analysis
-    # jscpd - JavaScript/TypeScript clone detection via npm
+    # jscpd - JavaScript/TypeScript clone detection (always latest)
     (pkgs.writeShellScriptBin "jscpd" ''
-      exec ${pkgs.nodejs_20}/bin/npx jscpd "$@"
+      exec ${pkgs.nodejs_20}/bin/npx jscpd@latest "$@"
     '')
     ruff               # Lightning-fast Python linter/formatter
     docker-compose     # Container orchestration

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+# Mark that we're running inside the rebuild-nixos wrapper
+# This allows Claude Code hooks to permit nixos-rebuild calls from within this script
+export NIXOS_REBUILD_WRAPPER=1
+
 # Parse command line arguments
 VERBOSE=false
 if [[ "$1" == "--verbose" ]] || [[ "$1" == "-v" ]]; then
@@ -363,40 +367,23 @@ echo ""
 log_step "Running adaptive learning cycle..."
 AUTOMATION_DIR="$HOME/claude-nixos-automation"
 if [[ -d "$AUTOMATION_DIR" ]]; then
-    # Capture output to temp file for metrics extraction
-    LEARNING_OUTPUT=$(mktemp)
-
-    # Run with timeout and filter verbose devenv output
-    if (cd "$AUTOMATION_DIR" && timeout 60s devenv shell -- python run-adaptive-learning.py --no-interactive 2>&1 | tee "$LEARNING_OUTPUT" | grep -v "Using Cachix\|Building shell\|Entering shell\|Running tasks\|Running \|Succeeded\|devenv 1\.\|Testing Python\|Welcome to\|Python:\|uv:\|Git:\|Available Tools\|Template-based\|Robust Nix\|Automatic content\|Modern dependency\|2025-.*INFO"); then
+    # Run WITHOUT pipes to preserve stdin/stdout for user interaction
+    # Devenv noise is suppressed by redirecting stderr to null
+    # This allows Python's input() to work correctly
+    if (cd "$AUTOMATION_DIR" && timeout 60s devenv shell -- python run-adaptive-learning.py --interactive 2>/dev/null); then
         LEARNING_EXIT=0
+        log_success "Adaptive learning cycle complete"
+        add_action "Adaptive learning: suggestions reviewed interactively"
     else
         LEARNING_EXIT=$?
-    fi
-
-    # Check result
-    if [ $LEARNING_EXIT -eq 0 ]; then
-        log_success "Adaptive learning cycle complete"
-
-        # Extract key metrics from output
-        SUGGESTIONS=$(grep "Total suggestions:" "$LEARNING_OUTPUT" 2>/dev/null | grep -oP '\d+' || echo "0")
-        IMPROVEMENTS=$(grep "Estimated improvements:" "$LEARNING_OUTPUT" 2>/dev/null | sed 's/.*Estimated improvements: //' | xargs || echo "none")
-
-        if [ "$SUGGESTIONS" -gt 0 ]; then
-            add_action "Adaptive learning: $SUGGESTIONS suggestion(s) - $IMPROVEMENTS"
+        if [ $LEARNING_EXIT -eq 124 ]; then
+            log_warning "Adaptive learning timed out (>60s) - skipping (non-critical)"
+        elif [ $LEARNING_EXIT -eq 130 ]; then
+            log_warning "Adaptive learning interrupted by user (Ctrl+C)"
         else
-            add_action "Adaptive learning: system already optimized"
-        fi
-    elif [ $LEARNING_EXIT -eq 124 ]; then
-        log_warning "Adaptive learning timed out (>60s) - skipping (non-critical)"
-    else
-        log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
-        # Show last few lines of output for debugging
-        if [ -s "$LEARNING_OUTPUT" ]; then
-            echo "  Last output lines:"
-            tail -10 "$LEARNING_OUTPUT" | grep -v "Using Cachix\|Building shell" | sed 's/^/  /'
+            log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
         fi
     fi
-    rm -f "$LEARNING_OUTPUT"
 else
     log_warning "Adaptive learning not available (automation directory not found)"
 fi
@@ -455,27 +442,27 @@ log_step "Analyzing disk space for issues..."
 declare -a DISK_WARNINGS=()
 
 # Check for oversized log files (>100MB = problematic)
-LARGE_LOGS=$(find ~ -maxdepth 4 -name "*.log" -type f -size +100M 2>/dev/null | wc -l)
+LARGE_LOGS=$(fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null | wc -l)
 if [ "$LARGE_LOGS" -gt 0 ]; then
-    LARGEST_LOG=$(find ~ -maxdepth 4 -name "*.log" -type f -size +100M 2>/dev/null | xargs du -h 2>/dev/null | sort -rh | head -1)
+    LARGEST_LOG=$(fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null | xargs du -h 2>/dev/null | sort -rh | head -1)
     DISK_WARNINGS+=("$LARGE_LOGS log file(s) >100MB: ${LARGEST_LOG}")
 fi
 
 # Check Claude session files (>5MB = should cleanup)
-LARGE_CLAUDE=$(find ~/.claude/projects -name "*.jsonl" -type f -size +5M 2>/dev/null | wc -l)
+LARGE_CLAUDE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null | wc -l)
 if [ "$LARGE_CLAUDE" -gt 0 ]; then
     CLAUDE_TOTAL=$(du -sh ~/.claude/projects 2>/dev/null | cut -f1)
     DISK_WARNINGS+=("$LARGE_CLAUDE Claude session(s) >5MB (total: ${CLAUDE_TOTAL})")
 fi
 
 # Check for oversized config files (>1MB = investigate)
-LARGE_CONFIGS=$(find ~/.config ~/.claude -maxdepth 3 -name "*.json" -type f -size +1M 2>/dev/null | grep -v "IndexedDB\|chrome" | wc -l)
+LARGE_CONFIGS=$(fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 2>/dev/null | grep -v "IndexedDB\|chrome" | wc -l)
 if [ "$LARGE_CONFIGS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_CONFIGS config file(s) >1MB (should be <100KB)")
 fi
 
 # Check for old backup files (>1MB)
-LARGE_BACKUPS=$(find ~ -maxdepth 3 \( -name "*.bak" -o -name "*.backup" -o -name "*.old" \) -type f -size +1M 2>/dev/null | wc -l)
+LARGE_BACKUPS=$(fd -t f -s +1M -e bak -e backup -e old ~ --max-depth 3 2>/dev/null | wc -l)
 if [ "$LARGE_BACKUPS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_BACKUPS backup file(s) >1MB (should archive/delete)")
 fi
@@ -489,9 +476,9 @@ if [ ${#DISK_WARNINGS[@]} -gt 0 ]; then
     done
     echo ""
     echo "💡 Run these commands to investigate:"
-    [ "$LARGE_LOGS" -gt 0 ] && echo "   find ~ -maxdepth 4 -name '*.log' -size +100M -exec du -h {} \\; | sort -rh"
-    [ "$LARGE_CLAUDE" -gt 0 ] && echo "   find ~/.claude/projects -name '*.jsonl' -size +5M -exec du -h {} \\; | sort -rh"
-    [ "$LARGE_CONFIGS" -gt 0 ] && echo "   find ~/.config ~/.claude -maxdepth 3 -name '*.json' -size +1M | grep -v IndexedDB"
+    [ "$LARGE_LOGS" -gt 0 ] && echo "   fd -t f -s +100M '\.log$' ~ --max-depth 4 -x du -h | sort -rh"
+    [ "$LARGE_CLAUDE" -gt 0 ] && echo "   fd -t f -s +5M '\.jsonl$' ~/.claude/projects -x du -h | sort -rh"
+    [ "$LARGE_CONFIGS" -gt 0 ] && echo "   fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 | rg -v 'IndexedDB|chrome'"
     echo ""
 fi
 
@@ -562,23 +549,23 @@ if [ "$LARGE_CLAUDE" -gt 0 ] && [ -d ~/.claude/projects ]; then
 
     if [[ $REPLY == "1" ]]; then
         # Delete files >5MB regardless of age
-        FREED_SPACE=$(find ~/.claude/projects -name "*.jsonl" -size +5M -exec du -sb {} + 2>/dev/null | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(find ~/.claude/projects -name "*.jsonl" -size +5M 2>/dev/null | wc -l)
-        find ~/.claude/projects -name "*.jsonl" -size +5M -delete 2>/dev/null
+        FREED_SPACE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+        FILE_COUNT=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null | wc -l)
+        fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null -X rm
         log_success "Deleted $FILE_COUNT large sessions (freed ~${FREED_SPACE}MB)"
         add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
     elif [[ $REPLY == "2" ]]; then
         # Delete files >30 days regardless of size
-        FREED_SPACE=$(find ~/.claude/projects -name "*.jsonl" -mtime +30 -exec du -sb {} + 2>/dev/null | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(find ~/.claude/projects -name "*.jsonl" -mtime +30 2>/dev/null | wc -l)
-        find ~/.claude/projects -name "*.jsonl" -mtime +30 -delete 2>/dev/null
+        FREED_SPACE=$(fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+        FILE_COUNT=$(fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null | wc -l)
+        fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -X rm
         log_success "Deleted $FILE_COUNT old sessions (freed ~${FREED_SPACE}MB)"
         add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
     elif [[ $REPLY == "3" ]]; then
         # Delete files that are both >5MB AND >30 days
-        FREED_SPACE=$(find ~/.claude/projects -name "*.jsonl" -size +5M -mtime +30 -exec du -sb {} + 2>/dev/null | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(find ~/.claude/projects -name "*.jsonl" -size +5M -mtime +30 2>/dev/null | wc -l)
-        find ~/.claude/projects -name "*.jsonl" -size +5M -mtime +30 -delete 2>/dev/null
+        FREED_SPACE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+        FILE_COUNT=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null | wc -l)
+        fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -X rm
         log_success "Deleted $FILE_COUNT large+old sessions (freed ~${FREED_SPACE}MB)"
         add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
     else
@@ -588,7 +575,7 @@ fi
 
 # Clean up old Claude backup files
 if [ -d .backups ]; then
-    backup_count=$(find .backups -name "*.backup-*" 2>/dev/null | wc -l)
+    backup_count=$(fd -t f 'backup-' .backups 2>/dev/null | wc -l)
     if [ "$backup_count" -gt 0 ]; then
         echo ""
         log_step "Found $backup_count Claude backup files in .backups/"
@@ -601,15 +588,15 @@ if [ -d .backups ]; then
 
         if [[ $REPLY == "1" ]]; then
             # Delete all backup files
-            FREED_SPACE=$(find .backups -name "*.backup-*" -exec du -sb {} + 2>/dev/null | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-            find .backups -name "*.backup-*" -delete 2>/dev/null
+            FREED_SPACE=$(fd -t f 'backup-' .backups 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+            fd -t f 'backup-' .backups 2>/dev/null -X rm
             log_success "Deleted $backup_count backups (freed ~${FREED_SPACE}MB)"
             add_action "Cleaned $backup_count backup files"
         elif [[ $REPLY == "2" ]]; then
             # Delete only old backups
-            OLD_COUNT=$(find .backups -name "*.backup-*" -mtime +7 2>/dev/null | wc -l)
-            FREED_SPACE=$(find .backups -name "*.backup-*" -mtime +7 -exec du -sb {} + 2>/dev/null | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-            find .backups -name "*.backup-*" -mtime +7 -delete 2>/dev/null
+            OLD_COUNT=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null | wc -l)
+            FREED_SPACE=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+            fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -X rm
             log_success "Deleted $OLD_COUNT old backups (freed ~${FREED_SPACE}MB)"
             add_action "Cleaned $OLD_COUNT old backup files"
         else

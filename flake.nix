@@ -53,16 +53,11 @@
     };
   in
   {
-    # Overlays for custom packages
-    overlays.default = final: prev: {
-      google-jules = final.callPackage ./overlays/jules.nix { };
-    };
+    # Overlays for custom packages (none currently - using npx/@latest for AI tools)
+    overlays.default = final: prev: {};
 
-    # Expose packages for `nix build`
-    packages.${system} = {
-      google-jules = pkgs.google-jules;
-      default = pkgs.google-jules;
-    };
+    # Expose packages for `nix build` (none currently)
+    packages.${system} = {};
 
     # Your NixOS system configuration
     nixosConfigurations = {

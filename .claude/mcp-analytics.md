@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-10-17
-updated: 2025-10-17
+created: 2025-10-20
+updated: 2025-10-20
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-17 08:50:25
+**Last Updated**: 2025-10-20 22:48:57
 **Analysis Period**: 30 days
 
 ### Configured Servers (2)
@@ -32,24 +32,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 1300
-**Total tokens consumed**: 15,111,442
-**Estimated total cost**: $90.3289
+**Total MCP invocations**: 1771
+**Total tokens consumed**: 19,543,766
+**Estimated total cost**: $118.0608
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 934
+- Invocations: 1392
 - Success rate: 0.0%
-- Last used: 2025-10-17 06:47
+- Last used: 2025-10-20 20:27
 
 **Token Consumption:**
-- Total tokens: 10,748,553 (Input: 128,974, Output: 303,588)
-- Cache tokens: 76,812,703 reads, 10,315,991 writes
-- Avg tokens/invocation: 11508
+- Total tokens: 14,893,129 (Input: 156,007, Output: 442,272)
+- Cache tokens: 108,482,124 reads, 14,294,850 writes
+- Avg tokens/invocation: 10699
 
 **Cost Analysis:**
-- Estimated cost: $66.6695
+- Estimated cost: $93.2524
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -107,35 +107,35 @@ lifecycle: persistent
 #### serena.find_symbol (project scope)
 
 **Usage Metrics:**
-- Invocations: 20
+- Invocations: 22
 - Success rate: 0.0%
-- Last used: 2025-10-14 17:38
+- Last used: 2025-10-18 23:13
 
 **Token Consumption:**
-- Total tokens: 283,296 (Input: 147, Output: 3,799)
-- Cache tokens: 990,441 reads, 279,350 writes
-- Avg tokens/invocation: 14165
+- Total tokens: 315,420 (Input: 162, Output: 3,804)
+- Cache tokens: 1,025,034 reads, 311,454 writes
+- Avg tokens/invocation: 14337
 
 **Cost Analysis:**
-- Estimated cost: $1.4021
+- Estimated cost: $1.5330
 - ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.search_for_pattern (project scope)
 
 **Usage Metrics:**
-- Invocations: 17
+- Invocations: 19
 - Success rate: 0.0%
-- Last used: 2025-10-11 23:14
+- Last used: 2025-10-18 20:56
 
 **Token Consumption:**
-- Total tokens: 214,959 (Input: 1,633, Output: 3,223)
-- Cache tokens: 759,269 reads, 210,103 writes
-- Avg tokens/invocation: 12645
+- Total tokens: 279,006 (Input: 1,641, Output: 3,590)
+- Cache tokens: 759,269 reads, 273,775 writes
+- Avg tokens/invocation: 14685
 
 **Cost Analysis:**
-- Estimated cost: $1.0689
-- ROI score: 0.08 invocations per 1K tokens
+- Estimated cost: $1.3132
+- ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.think_about_collected_information (project scope)
@@ -175,18 +175,18 @@ lifecycle: persistent
 #### serena.find_file (project scope)
 
 **Usage Metrics:**
-- Invocations: 15
+- Invocations: 16
 - Success rate: 0.0%
-- Last used: 2025-10-12 18:53
+- Last used: 2025-10-18 21:53
 
 **Token Consumption:**
-- Total tokens: 162,747 (Input: 155, Output: 1,551)
-- Cache tokens: 444,561 reads, 161,041 writes
-- Avg tokens/invocation: 10850
+- Total tokens: 163,224 (Input: 161, Output: 1,712)
+- Cache tokens: 476,507 reads, 161,351 writes
+- Avg tokens/invocation: 10202
 
 **Cost Analysis:**
-- Estimated cost: $0.7610
-- ROI score: 0.09 invocations per 1K tokens
+- Estimated cost: $0.7742
+- ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### chrome-devtools.click (unknown scope)
@@ -223,6 +223,23 @@ lifecycle: persistent
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### whatsapp.retrieve_full_history (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 6
+- Success rate: 0.0%
+- Last used: 2025-10-18 07:41
+
+**Token Consumption:**
+- Total tokens: 151,001 (Input: 33, Output: 715)
+- Cache tokens: 444,595 reads, 150,253 writes
+- Avg tokens/invocation: 25167
+
+**Cost Analysis:**
+- Estimated cost: $0.7077
+- ROI score: 0.04 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### sunsama.get-user (unknown scope)
 
 **Usage Metrics:**
@@ -238,23 +255,6 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.6419
 - ROI score: 0.07 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### whatsapp.retrieve_full_history (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 5
-- Success rate: 0.0%
-- Last used: 2025-10-12 04:07
-
-**Token Consumption:**
-- Total tokens: 135,989 (Input: 23, Output: 711)
-- Cache tokens: 416,865 reads, 135,255 writes
-- Avg tokens/invocation: 27198
-
-**Cost Analysis:**
-- Estimated cost: $0.6430
-- ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### chrome-devtools.list_pages (unknown scope)
@@ -430,18 +430,35 @@ lifecycle: persistent
 #### serena.activate_project (project scope)
 
 **Usage Metrics:**
-- Invocations: 15
+- Invocations: 18
 - Success rate: 0.0%
-- Last used: 2025-10-12 21:53
+- Last used: 2025-10-18 23:13
 
 **Token Consumption:**
-- Total tokens: 51,991 (Input: 134, Output: 918)
-- Cache tokens: 704,320 reads, 50,939 writes
-- Avg tokens/invocation: 3466
+- Total tokens: 53,931 (Input: 159, Output: 1,162)
+- Cache tokens: 802,651 reads, 52,610 writes
+- Avg tokens/invocation: 2996
 
 **Cost Analysis:**
-- Estimated cost: $0.4165
-- ROI score: 0.29 invocations per 1K tokens
+- Estimated cost: $0.4560
+- ROI score: 0.33 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### whatsapp.backend_status (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 5
+- Success rate: 0.0%
+- Last used: 2025-10-18 12:45
+
+**Token Consumption:**
+- Total tokens: 53,724 (Input: 26, Output: 507)
+- Cache tokens: 386,421 reads, 53,191 writes
+- Avg tokens/invocation: 10745
+
+**Cost Analysis:**
+- Estimated cost: $0.3231
+- ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### chrome-devtools.take_snapshot (unknown scope)
@@ -459,6 +476,57 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.6823
 - ROI score: 0.34 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### whatsapp.get_message_statistics (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 5
+- Success rate: 0.0%
+- Last used: 2025-10-18 13:48
+
+**Token Consumption:**
+- Total tokens: 45,601 (Input: 26, Output: 178)
+- Cache tokens: 485,205 reads, 45,397 writes
+- Avg tokens/invocation: 9120
+
+**Cost Analysis:**
+- Estimated cost: $0.3185
+- ROI score: 0.11 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### whatsapp.sync_history_to_database (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 6
+- Success rate: 0.0%
+- Last used: 2025-10-18 13:48
+
+**Token Consumption:**
+- Total tokens: 45,564 (Input: 33, Output: 356)
+- Cache tokens: 556,455 reads, 45,175 writes
+- Avg tokens/invocation: 7594
+
+**Cost Analysis:**
+- Estimated cost: $0.3418
+- ROI score: 0.13 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### whatsapp.get_baileys_sync_status (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 2
+- Success rate: 0.0%
+- Last used: 2025-10-18 12:45
+
+**Token Consumption:**
+- Total tokens: 43,685 (Input: 14, Output: 241)
+- Cache tokens: 71,458 reads, 43,430 writes
+- Avg tokens/invocation: 21842
+
+**Cost Analysis:**
+- Estimated cost: $0.1880
+- ROI score: 0.05 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.send_message (unknown scope)
@@ -563,23 +631,6 @@ lifecycle: persistent
 - ROI score: 0.17 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### whatsapp.backend_status (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 4
-- Success rate: 0.0%
-- Last used: 2025-10-14 21:31
-
-**Token Consumption:**
-- Total tokens: 10,329 (Input: 14, Output: 353)
-- Cache tokens: 386,421 reads, 9,962 writes
-- Avg tokens/invocation: 2582
-
-**Cost Analysis:**
-- Estimated cost: $0.1586
-- ROI score: 0.39 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
 #### chrome-devtools.type (unknown scope)
 
 **Usage Metrics:**
@@ -662,38 +713,6 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.0963
 - ROI score: 1.01 invocations per 1K tokens
-
-#### whatsapp.get_message_statistics (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 4
-- Success rate: 0.0%
-- Last used: 2025-10-12 04:07
-
-**Token Consumption:**
-- Total tokens: 1,922 (Input: 13, Output: 176)
-- Cache tokens: 485,205 reads, 1,733 writes
-- Avg tokens/invocation: 480
-
-**Cost Analysis:**
-- Estimated cost: $0.1547
-- ROI score: 2.08 invocations per 1K tokens
-
-#### whatsapp.sync_history_to_database (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 5
-- Success rate: 0.0%
-- Last used: 2025-10-12 04:07
-
-**Token Consumption:**
-- Total tokens: 1,885 (Input: 20, Output: 354)
-- Cache tokens: 556,455 reads, 1,511 writes
-- Avg tokens/invocation: 377
-
-**Cost Analysis:**
-- Estimated cost: $0.1780
-- ROI score: 2.65 invocations per 1K tokens
 
 #### serena.onboarding (project scope)
 
@@ -872,68 +891,56 @@ lifecycle: persistent
 - Estimated cost: $0.0411
 - ROI score: 2.89 invocations per 1K tokens
 
-#### whatsapp.get_baileys_sync_status (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 1
-- Success rate: 0.0%
-- Last used: 2025-10-11 20:26
-
-**Token Consumption:**
-- Total tokens: 290 (Input: 2, Output: 87)
-- Cache tokens: 71,458 reads, 201 writes
-- Avg tokens/invocation: 290
-
-**Cost Analysis:**
-- Estimated cost: $0.0235
-- ROI score: 3.45 invocations per 1K tokens
-
 
 ### Session Utilization
 
-**Total sessions analyzed**: 404
+**Total sessions analyzed**: 452
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### serena (project scope)
 
 **Session Metrics:**
-- Utilization rate: 6.9% (28/404 sessions)
+- Utilization rate: 6.9% (31/452 sessions)
 - Efficiency: POOR
 
 **Overhead Analysis:**
 - Estimated overhead: ~10,000 tokens per session
-- Total wasted overhead: ~3,760,000 tokens (376 unused sessions)
+- Total wasted overhead: ~4,210,000 tokens (421 unused sessions)
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 10.6% (43/404 sessions)
+- Utilization rate: 14.8% (67/452 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (404 sessions)
+- ⚠️  Loads in ALL sessions (452 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~180,500 tokens (361 unused sessions)
+- Total wasted overhead: ~192,500 tokens (385 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
+**MEDIUM**: sequential-thinking
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1392 invocations for 14,893,129 tokens (est. $93.2524)
+   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
+
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 20 invocations for 283,296 tokens (est. $1.4021)
+   - **Issue**: Server 'serena' has low ROI: 22 invocations for 315,420 tokens (est. $1.5330)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 17 invocations for 214,959 tokens (est. $1.0689)
+   - **Issue**: Server 'serena' has low ROI: 19 invocations for 279,006 tokens (est. $1.3132)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 15 invocations for 51,991 tokens (est. $0.4165)
+   - **Issue**: Server 'serena' has low ROI: 18 invocations for 53,931 tokens (est. $0.4560)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 15 invocations for 162,747 tokens (est. $0.7610)
+   - **Issue**: Server 'serena' has low ROI: 16 invocations for 163,224 tokens (est. $0.7742)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
 
 **MEDIUM**: serena
@@ -943,10 +950,6 @@ This section shows how efficiently each MCP server uses context tokens across se
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 15 invocations for 20,078 tokens (est. $0.3398)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
-
-**MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 934 invocations for 10,748,553 tokens (est. $66.6695)
-   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 7 invocations for 104,887 tokens (est. $0.4552)
@@ -1001,7 +1004,7 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'sunsama' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
-   - **Issue**: Server 'whatsapp' has low ROI: 4 invocations for 10,329 tokens (est. $0.1586)
+   - **Issue**: Server 'whatsapp' has low ROI: 5 invocations for 53,724 tokens (est. $0.3231)
    - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
@@ -1037,11 +1040,23 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
-   - **Issue**: Server 'whatsapp' has low ROI: 3 invocations for 17,722 tokens (est. $0.1358)
+   - **Issue**: Server 'whatsapp' has low ROI: 6 invocations for 151,001 tokens (est. $0.7077)
    - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
-   - **Issue**: Server 'whatsapp' has low ROI: 5 invocations for 135,989 tokens (est. $0.6430)
+   - **Issue**: Server 'whatsapp' has low ROI: 2 invocations for 43,685 tokens (est. $0.1880)
+   - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
+
+**MEDIUM**: whatsapp
+   - **Issue**: Server 'whatsapp' has low ROI: 5 invocations for 45,601 tokens (est. $0.3185)
+   - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
+
+**MEDIUM**: whatsapp
+   - **Issue**: Server 'whatsapp' has low ROI: 6 invocations for 45,564 tokens (est. $0.3418)
+   - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
+
+**MEDIUM**: whatsapp
+   - **Issue**: Server 'whatsapp' has low ROI: 3 invocations for 17,722 tokens (est. $0.1358)
    - **Action**: Review usage patterns. Consider if 'whatsapp' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
@@ -1069,28 +1084,28 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Run 'claude mcp list' to diagnose connection issues
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 10.6% (43/404 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~180,500 tokens across 361 sessions
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 14.8% (67/452 sessions)
+   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~192,500 tokens across 385 sessions
+
+**LOW**: sequential-thinking
+   - **Issue**: Server 'sequential-thinking' consumed 14,893,129 tokens (est. $93.25)
+   - **Action**: Frequent user: 1392 calls, ~10,699 tokens/call (global scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 283,296 tokens (est. $1.40)
-   - **Action**: Frequent user: 20 calls, ~14,164 tokens/call (project scope)
+   - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
+   - **Action**: Frequent user: 22 calls, ~14,337 tokens/call (project scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 214,959 tokens (est. $1.07)
-   - **Action**: Frequent user: 17 calls, ~12,644 tokens/call (project scope)
+   - **Issue**: Server 'serena' consumed 279,006 tokens (est. $1.31)
+   - **Action**: Frequent user: 19 calls, ~14,684 tokens/call (project scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 162,747 tokens (est. $0.76)
-   - **Action**: Frequent user: 15 calls, ~10,849 tokens/call (project scope)
+   - **Issue**: Server 'serena' consumed 163,224 tokens (est. $0.77)
+   - **Action**: Frequent user: 16 calls, ~10,201 tokens/call (project scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 477,176 tokens (est. $2.52)
    - **Action**: Frequent user: 56 calls, ~8,521 tokens/call (project scope)
-
-**LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 10,748,553 tokens (est. $66.67)
-   - **Action**: Frequent user: 934 calls, ~11,508 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 104,887 tokens (est. $0.46)
@@ -1129,8 +1144,8 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Frequent user: 27 calls, ~26,189 tokens/call (unknown scope)
 
 **LOW**: whatsapp
-   - **Issue**: Server 'whatsapp' consumed 135,989 tokens (est. $0.64)
-   - **Action**: Frequent user: 5 calls, ~27,197 tokens/call (unknown scope)
+   - **Issue**: Server 'whatsapp' consumed 151,001 tokens (est. $0.71)
+   - **Action**: Frequent user: 6 calls, ~25,166 tokens/call (unknown scope)
 
 **LOW**: whatsapp
    - **Issue**: Server 'whatsapp' consumed 100,821 tokens (est. $0.38)
