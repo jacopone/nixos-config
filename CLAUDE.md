@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (116 tools)
+- `modules/core/packages.nix` - System-wide packages (122 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -84,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (116 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (122 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,25 +96,32 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 2M 0A 0U
-- **Last Updated**: 2025-10-09 03:04:17
+- **Git Status**: 0M 0A 3U
+- **Last Updated**: 2025-10-21 23:16:20
 - **Fish Abbreviations**: 56
-- **Total System Tools**: 116
+- **Total System Tools**: 122
 
 ---
 *Auto-updated by ./rebuild-nixos script*
 
-## 🔌 MCP Servers
+## 📝 User Memory & Notes
+<!-- USER_MEMORY_START -->
+<!-- This section preserves your personal notes and #memory entries across rebuilds -->
+<!-- Add your content below this line -->
 
-**Status**: 1/2 connected | Last checked: 2025-10-20 22:48:57
+### Quick Reference Commands
+- Update automation: `nix run github:jacopone/claude-nixos-automation#update-all`
+- Deploy hooks: `nix run github:jacopone/claude-nixos-automation#deploy-hooks`
+- Check hook logs: `bat /tmp/*-log.txt`
 
-**sequential-thinking** ✓ connected
-   - Step-by-step reasoning for complex problems
-   - Scope: global (~/.claude.json)
-**serena** ○ disconnected
-   - Semantic code analysis toolkit
-   - Scope: project (.claude/mcp.json)
+### Hook System Notes
+- **Modern CLI Enforcer**: Blocks find/ls/grep/cat/du/ps - use fd/eza/rg/bat/dust/procs
+- **NixOS Safety Guard**: Warns about direct nixos-rebuild, use ./rebuild-nixos instead
+- **Permission Auto-Learner**: Runs every 50 tool invocations, auto-adds high-confidence permissions
 
+**Debug tips:**
+- Hook logs: `/tmp/nixos-safety-guard-log.txt`, `/tmp/modern-cli-enforcer-log.txt`
+- Disable hooks: `export NIXOS_SAFETY_GUARD=0` or `export MODERN_CLI_ENFORCER=0`
+- Permission patterns: `python3 ~/claude-nixos-automation/claude_automation/tools/permission_suggester.py`
 
----
-*MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*
+<!-- USER_MEMORY_END -->

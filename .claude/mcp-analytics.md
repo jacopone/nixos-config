@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-10-20
-updated: 2025-10-20
+created: 2025-10-21
+updated: 2025-10-21
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-20 22:48:57
+**Last Updated**: 2025-10-21 22:29:32
 **Analysis Period**: 30 days
 
 ### Configured Servers (2)
@@ -32,24 +32,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 1771
-**Total tokens consumed**: 19,543,766
-**Estimated total cost**: $118.0608
+**Total MCP invocations**: 1836
+**Total tokens consumed**: 20,091,597
+**Estimated total cost**: $121.7240
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 1392
+- Invocations: 1457
 - Success rate: 0.0%
-- Last used: 2025-10-20 20:27
+- Last used: 2025-10-21 09:59
 
 **Token Consumption:**
-- Total tokens: 14,893,129 (Input: 156,007, Output: 442,272)
-- Cache tokens: 108,482,124 reads, 14,294,850 writes
-- Avg tokens/invocation: 10699
+- Total tokens: 15,440,960 (Input: 166,306, Output: 462,341)
+- Cache tokens: 113,118,008 reads, 14,812,313 writes
+- Avg tokens/invocation: 10598
 
 **Cost Analysis:**
-- Estimated cost: $93.2524
+- Estimated cost: $96.9156
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -894,37 +894,37 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 452
+**Total sessions analyzed**: 457
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### serena (project scope)
 
 **Session Metrics:**
-- Utilization rate: 6.9% (31/452 sessions)
+- Utilization rate: 6.8% (31/457 sessions)
 - Efficiency: POOR
 
 **Overhead Analysis:**
 - Estimated overhead: ~10,000 tokens per session
-- Total wasted overhead: ~4,210,000 tokens (421 unused sessions)
+- Total wasted overhead: ~4,260,000 tokens (426 unused sessions)
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 14.8% (67/452 sessions)
+- Utilization rate: 15.3% (70/457 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (452 sessions)
+- ⚠️  Loads in ALL sessions (457 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~192,500 tokens (385 unused sessions)
+- Total wasted overhead: ~193,500 tokens (387 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1392 invocations for 14,893,129 tokens (est. $93.2524)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1457 invocations for 15,440,960 tokens (est. $96.9156)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
@@ -1084,12 +1084,12 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Run 'claude mcp list' to diagnose connection issues
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 14.8% (67/452 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~192,500 tokens across 385 sessions
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 15.3% (70/457 sessions)
+   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~193,500 tokens across 387 sessions
 
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 14,893,129 tokens (est. $93.25)
-   - **Action**: Frequent user: 1392 calls, ~10,699 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 15,440,960 tokens (est. $96.92)
+   - **Action**: Frequent user: 1457 calls, ~10,597 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
