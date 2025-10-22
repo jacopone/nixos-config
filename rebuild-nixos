@@ -451,11 +451,19 @@ echo ""
 log_step "Checking learning data disk health..."
 
 HEALTH_EXIT_CODE=0
-HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
+# Use local flake (~/claude-nixos-automation) for development
+# Change to github: reference once commits are pushed
+AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+if [ -d "$AUTOMATION_FLAKE" ]; then
+    HEALTH_OUTPUT=$(nix run "$AUTOMATION_FLAKE#check-data-health" 2>&1) || HEALTH_EXIT_CODE=$?
+else
+    # Fallback to GitHub if local not available
+    HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
+fi
 
 # Parse health stats from output
 HEALTH_TOTAL_MB=$(echo "$HEALTH_OUTPUT" | grep "Total:" | grep -oP '\d+(?=MB)' | head -1 || echo "?")
-HEALTH_SESSIONS=$(echo "$HEALTH_OUTPUT" | grep "session" | grep -oP '\d+(?= sessions)' | head -1 || echo "?")
+HEALTH_SESSIONS=$(echo "$HEALTH_OUTPUT" | grep "sessions" | grep -oP '\d+(?= sessions)' | head -1 || echo "?")
 HEALTH_PERCENTAGE=$(echo "$HEALTH_OUTPUT" | grep "Usage:" | grep -oP '[\d.]+(?=% of disk)' || echo "?")
 
 echo "  • Total learning data: ${HEALTH_TOTAL_MB}MB"

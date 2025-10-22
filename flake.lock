@@ -233,8 +233,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1761131322,
-        "narHash": "sha256-knmcjOQTOccCFjXk/buFSDe1y6jcydaLtBzsASxsve0=",
+        "lastModified": 1761134965,
+        "narHash": "sha256-FSqNKV2CBkMxQaqO4Gc8UnAw5WGMz1NqB2/9spHvtk4=",
         "path": "/home/guyfawkes/whisper-dictation",
         "type": "path"
       },

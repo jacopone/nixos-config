@@ -19,6 +19,16 @@
   home.file.".config/fish/functions/tracking-analyze.fish".text = builtins.readFile ../../config/fish/functions/tracking-analyze.fish;
   home.file.".config/fish/functions/tracking-export.fish".text = builtins.readFile ../../config/fish/functions/tracking-export.fish;
 
+  # GitHub issue tracking functions for idea/bug capture across projects
+  home.file.".config/fish/functions/idea.fish".text = builtins.readFile ../../config/fish/functions/idea.fish;
+  home.file.".config/fish/functions/bug.fish".text = builtins.readFile ../../config/fish/functions/bug.fish;
+  home.file.".config/fish/functions/review-ideas.fish".text = builtins.readFile ../../config/fish/functions/review-ideas.fish;
+  home.file.".config/fish/functions/review-bugs.fish".text = builtins.readFile ../../config/fish/functions/review-bugs.fish;
+  home.file.".config/fish/functions/spec-it.fish".text = builtins.readFile ../../config/fish/functions/spec-it.fish;
+  home.file.".config/fish/functions/build-it.fish".text = builtins.readFile ../../config/fish/functions/build-it.fish;
+  home.file.".config/fish/functions/fix-it.fish".text = builtins.readFile ../../config/fish/functions/fix-it.fish;
+  home.file.".config/fish/functions/defer-it.fish".text = builtins.readFile ../../config/fish/functions/defer-it.fish;
+
   # Let home-manager manage my shell configuration.
   programs.bash.enable = true;
 
@@ -269,6 +279,10 @@
       abbr -a portscan 'nmap -sS'
       abbr -a trace 'strace -f'
       abbr -a ltrace 'ltrace -f'
+
+      # GitHub issue tracking workflow abbreviations
+      abbr -a ideas 'review-ideas'
+      abbr -a bugs 'review-bugs'
 
       # Note: Readwise BASB and Chrome abbreviations moved to shellAbbrs for persistence
 
