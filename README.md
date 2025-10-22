@@ -158,6 +158,25 @@ ai script.py         # AI pair programming with Aider
 yazi                 # Terminal file manager
 ```
 
+### GitHub Workflow (Feature & Bug Tracking)
+
+```bash
+# Quick capture (in any repo)
+idea add dark mode toggle    # Log feature idea
+bug search crashes on mobile # Log bug
+
+# Review (from anywhere)
+ideas                        # All ideas across repos
+bugs                         # All bugs across repos
+
+# Decide & implement
+spec-it 42                   # Mark for spec → /spec-feature
+build-it 43                  # Mark ready → /feature-dev
+fix-it 44                    # Start fixing bug
+```
+
+See [docs/guides/GITHUB_WORKFLOW.md](docs/guides/GITHUB_WORKFLOW.md) for complete workflow documentation.
+
 ## Repository Structure
 
 ```
@@ -186,6 +205,7 @@ nixos-config/
 
 ### Guides
 - **[COMMON_TASKS.md](docs/guides/COMMON_TASKS.md)** - Quick reference for frequent operations
+- **[GITHUB_WORKFLOW.md](docs/guides/GITHUB_WORKFLOW.md)** - Feature & bug tracking across projects
 - **[fish-smart-commands.md](docs/tools/fish-smart-commands.md)** - Fish shell features
 - **[enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md)** - Modern CLI tools
 
