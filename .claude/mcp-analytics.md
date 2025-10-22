@@ -8,21 +8,16 @@ lifecycle: persistent
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-22 22:36:14
+**Last Updated**: 2025-10-22 22:45:06
 **Analysis Period**: 30 days
 
-### Configured Servers (2)
+### Configured Servers (1)
 
 **1. sequential-thinking** ✓ CONNECTED
    - **Type**: npm
    - **Command**: `npx @modelcontextprotocol/server-sequential-thinking`
    - **Location**: global (~/.claude.json)
    - **Description**: Step-by-step reasoning for complex problems
-**2. serena** ○ DISCONNECTED
-   - **Type**: binary
-   - **Command**: `serena start-mcp-server --context ide-assistant`
-   - **Location**: project (.claude/mcp.json)
-   - **Description**: Semantic code analysis toolkit
 
 ### Connection Health
 
@@ -32,24 +27,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 1949
-**Total tokens consumed**: 20,694,036
-**Estimated total cost**: $126.6638
+**Total MCP invocations**: 1964
+**Total tokens consumed**: 20,743,317
+**Estimated total cost**: $127.0525
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 1570
+- Invocations: 1585
 - Success rate: 0.0%
-- Last used: 2025-10-22 12:09
+- Last used: 2025-10-22 20:41
 
 **Token Consumption:**
-- Total tokens: 16,043,399 (Input: 174,285, Output: 503,213)
-- Cache tokens: 120,540,830 reads, 15,365,901 writes
-- Avg tokens/invocation: 10219
+- Total tokens: 16,092,680 (Input: 174,429, Output: 506,085)
+- Cache tokens: 121,113,049 reads, 15,412,166 writes
+- Avg tokens/invocation: 10153
 
 **Cost Analysis:**
-- Estimated cost: $101.8554
+- Estimated cost: $102.2441
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -70,7 +65,7 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.list_dir (project scope)
+#### serena.list_dir (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 56
@@ -104,7 +99,7 @@ lifecycle: persistent
 - ROI score: 0.05 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.find_symbol (project scope)
+#### serena.find_symbol (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 22
@@ -121,7 +116,7 @@ lifecycle: persistent
 - ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.search_for_pattern (project scope)
+#### serena.search_for_pattern (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 19
@@ -138,7 +133,7 @@ lifecycle: persistent
 - ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.think_about_collected_information (project scope)
+#### serena.think_about_collected_information (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 9
@@ -172,7 +167,7 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.find_file (project scope)
+#### serena.find_file (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 16
@@ -274,7 +269,7 @@ lifecycle: persistent
 - ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.check_onboarding_performed (project scope)
+#### serena.check_onboarding_performed (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 7
@@ -325,7 +320,7 @@ lifecycle: persistent
 - ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.get_current_config (project scope)
+#### serena.get_current_config (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 4
@@ -342,7 +337,7 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.write_memory (project scope)
+#### serena.write_memory (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 6
@@ -376,7 +371,7 @@ lifecycle: persistent
 - ROI score: 0.12 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.think_about_task_adherence (project scope)
+#### serena.think_about_task_adherence (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 3
@@ -393,7 +388,7 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.list_memories (project scope)
+#### serena.list_memories (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 3
@@ -410,7 +405,7 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.insert_after_symbol (project scope)
+#### serena.insert_after_symbol (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 6
@@ -427,7 +422,7 @@ lifecycle: persistent
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.activate_project (project scope)
+#### serena.activate_project (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 18
@@ -563,7 +558,7 @@ lifecycle: persistent
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.replace_symbol_body (project scope)
+#### serena.replace_symbol_body (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 3
@@ -580,7 +575,7 @@ lifecycle: persistent
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.get_symbols_overview (project scope)
+#### serena.get_symbols_overview (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 15
@@ -665,7 +660,7 @@ lifecycle: persistent
 - ROI score: 0.12 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.think_about_whether_you_are_done (project scope)
+#### serena.think_about_whether_you_are_done (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 3
@@ -714,7 +709,7 @@ lifecycle: persistent
 - Estimated cost: $0.0963
 - ROI score: 1.01 invocations per 1K tokens
 
-#### serena.onboarding (project scope)
+#### serena.onboarding (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 2
@@ -730,7 +725,7 @@ lifecycle: persistent
 - Estimated cost: $0.0238
 - ROI score: 1.25 invocations per 1K tokens
 
-#### serena.insert_before_symbol (project scope)
+#### serena.insert_before_symbol (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 1
@@ -894,26 +889,16 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 468
+**Total sessions analyzed**: 469
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
-
-#### serena (project scope)
-
-**Session Metrics:**
-- Utilization rate: 6.6% (31/468 sessions)
-- Efficiency: POOR
-
-**Overhead Analysis:**
-- Estimated overhead: ~10,000 tokens per session
-- Total wasted overhead: ~4,370,000 tokens (437 unused sessions)
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 16.2% (76/468 sessions)
+- Utilization rate: 16.4% (77/469 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (468 sessions)
+- ⚠️  Loads in ALL sessions (469 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
@@ -924,48 +909,48 @@ This section shows how efficiently each MCP server uses context tokens across se
 ### Recommendations
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1570 invocations for 16,043,399 tokens (est. $101.8554)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1585 invocations for 16,092,680 tokens (est. $102.2441)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 22 invocations for 315,420 tokens (est. $1.5330)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 19 invocations for 279,006 tokens (est. $1.3132)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 18 invocations for 53,931 tokens (est. $0.4560)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 16 invocations for 163,224 tokens (est. $0.7742)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 56 invocations for 477,176 tokens (est. $2.5205)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 15 invocations for 20,078 tokens (est. $0.3398)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 7 invocations for 104,887 tokens (est. $0.4552)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 79,632 tokens (est. $0.3253)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 6 invocations for 69,405 tokens (est. $0.4391)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 9 invocations for 194,435 tokens (est. $0.9600)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: chrome-devtools
    - **Issue**: Server 'chrome-devtools' has low ROI: 7 invocations for 105,704 tokens (est. $0.5440)
@@ -993,7 +978,7 @@ This section shows how efficiently each MCP server uses context tokens across se
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 6 invocations for 83,575 tokens (est. $0.4977)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: sunsama
    - **Issue**: Server 'sunsama' has low ROI: 6 invocations for 169,433 tokens (est. $0.6849)
@@ -1025,11 +1010,11 @@ This section shows how efficiently each MCP server uses context tokens across se
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 1 invocations for 1,494 tokens (est. $0.0517)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 31,170 tokens (est. $0.2198)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: whatsapp
    - **Issue**: Server 'whatsapp' has low ROI: 1 invocations for 40,667 tokens (est. $0.1617)
@@ -1069,51 +1054,47 @@ This section shows how efficiently each MCP server uses context tokens across se
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 4 invocations for 91,970 tokens (est. $0.3611)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 81,034 tokens (est. $0.3354)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 6,805 tokens (est. $0.0927)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (project scope)
-
-**MEDIUM**: serena
-   - **Issue**: Server 'serena' is configured but not connected
-   - **Action**: Run 'claude mcp list' to diagnose connection issues
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.2% (76/468 sessions)
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.4% (77/469 sessions)
    - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~196,000 tokens across 392 sessions
 
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 16,043,399 tokens (est. $101.86)
-   - **Action**: Frequent user: 1570 calls, ~10,218 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 16,092,680 tokens (est. $102.24)
+   - **Action**: Frequent user: 1585 calls, ~10,153 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
-   - **Action**: Frequent user: 22 calls, ~14,337 tokens/call (project scope)
+   - **Action**: Frequent user: 22 calls, ~14,337 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 279,006 tokens (est. $1.31)
-   - **Action**: Frequent user: 19 calls, ~14,684 tokens/call (project scope)
+   - **Action**: Frequent user: 19 calls, ~14,684 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 163,224 tokens (est. $0.77)
-   - **Action**: Frequent user: 16 calls, ~10,201 tokens/call (project scope)
+   - **Action**: Frequent user: 16 calls, ~10,201 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 477,176 tokens (est. $2.52)
-   - **Action**: Frequent user: 56 calls, ~8,521 tokens/call (project scope)
+   - **Action**: Frequent user: 56 calls, ~8,521 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 104,887 tokens (est. $0.46)
-   - **Action**: Frequent user: 7 calls, ~14,983 tokens/call (project scope)
+   - **Action**: Frequent user: 7 calls, ~14,983 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 194,435 tokens (est. $0.96)
-   - **Action**: Frequent user: 9 calls, ~21,603 tokens/call (project scope)
+   - **Action**: Frequent user: 9 calls, ~21,603 tokens/call (unknown scope)
 
 **LOW**: chrome-devtools
    - **Issue**: Server 'chrome-devtools' consumed 105,704 tokens (est. $0.54)

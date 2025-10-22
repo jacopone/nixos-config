@@ -128,14 +128,11 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/2 connected | Last checked: 2025-10-22 22:36:14
+**Status**: 1/1 connected | Last checked: 2025-10-22 22:45:06
 
 **sequential-thinking** ✓ connected
    - Step-by-step reasoning for complex problems
    - Scope: global (~/.claude.json)
-**serena** ○ disconnected
-   - Semantic code analysis toolkit
-   - Scope: project (.claude/mcp.json)
 
 
 ---
