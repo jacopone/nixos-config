@@ -608,8 +608,9 @@ if [ -d ~/.claude/projects ]; then
     echo ""
     log_step "Checking Claude session lifecycle..."
 
-    # Get lifecycle statistics using Python
-    LIFECYCLE_STATS=$(python3 <<'PYTHON_EOF'
+    # Consolidated Python script for lifecycle operations (stats + cleanup)
+    # Saves ~300ms by avoiding second Python interpreter startup
+    LIFECYCLE_OUTPUT=$(python3 <<'PYTHON_EOF'
 import sys
 from pathlib import Path
 
@@ -623,30 +624,46 @@ try:
     stats = tracker.get_lifecycle_stats()
 
     # Print stats in parseable format
-    print(f"TOTAL:{stats.total_sessions}")
-    print(f"RAW:{stats.raw_count}")
-    print(f"ANALYZED:{stats.analyzed_count}")
-    print(f"INSIGHTS_GENERATED:{stats.insights_generated_count}")
-    print(f"IMPLEMENTED:{stats.implemented_count}")
-    print(f"SAFE_TO_CLEANUP:{stats.safe_to_cleanup_count}")
-    print(f"VALUABLE:{stats.valuable_data_count}")
+    print(f"STATS:TOTAL:{stats.total_sessions}")
+    print(f"STATS:RAW:{stats.raw_count}")
+    print(f"STATS:ANALYZED:{stats.analyzed_count}")
+    print(f"STATS:INSIGHTS_GENERATED:{stats.insights_generated_count}")
+    print(f"STATS:IMPLEMENTED:{stats.implemented_count}")
+    print(f"STATS:SAFE_TO_CLEANUP:{stats.safe_to_cleanup_count}")
+    print(f"STATS:VALUABLE:{stats.valuable_data_count}")
+
+    # Pre-load safe sessions list and write to temp file for potential cleanup
+    # This avoids a second Python interpreter startup (saves ~300ms)
+    safe_sessions = tracker.get_safe_to_cleanup_sessions()
+    safe_count = len(safe_sessions)
+    print(f"CLEANUP:READY:{safe_count}")
+
+    if safe_count > 0:
+        import tempfile
+        import json
+        temp_file = Path(tempfile.gettempdir()) / "claude_safe_sessions.json"
+        with open(temp_file, 'w') as f:
+            json.dump([str(p) for p in safe_sessions], f)
+        print(f"CLEANUP:TEMPFILE:{temp_file}")
+
 except Exception as e:
     # Fallback if lifecycle tracking not available
     print(f"ERROR:{e}")
-    print("TOTAL:?")
-    print("SAFE_TO_CLEANUP:0")
-    print("VALUABLE:?")
+    print("STATS:TOTAL:?")
+    print("STATS:SAFE_TO_CLEANUP:0")
+    print("STATS:VALUABLE:?")
+    print("CLEANUP:READY:0")
 PYTHON_EOF
 )
 
-    # Parse lifecycle stats
-    TOTAL_SESSIONS=$(echo "$LIFECYCLE_STATS" | grep "^TOTAL:" | cut -d: -f2)
-    RAW_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^RAW:" | cut -d: -f2)
-    ANALYZED_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^ANALYZED:" | cut -d: -f2)
-    INSIGHTS_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^INSIGHTS_GENERATED:" | cut -d: -f2)
-    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^IMPLEMENTED:" | cut -d: -f2)
-    SAFE_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^SAFE_TO_CLEANUP:" | cut -d: -f2)
-    VALUABLE_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^VALUABLE:" | cut -d: -f2)
+    # Parse lifecycle stats (now with STATS: prefix)
+    TOTAL_SESSIONS=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:TOTAL:" | cut -d: -f3)
+    RAW_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:RAW:" | cut -d: -f3)
+    ANALYZED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:ANALYZED:" | cut -d: -f3)
+    INSIGHTS_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:INSIGHTS_GENERATED:" | cut -d: -f3)
+    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:IMPLEMENTED:" | cut -d: -f3)
+    SAFE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:SAFE_TO_CLEANUP:" | cut -d: -f3)
+    VALUABLE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:VALUABLE:" | cut -d: -f3)
 
     # Display lifecycle statistics
     echo "  📋 Session Lifecycle:"
@@ -668,49 +685,47 @@ PYTHON_EOF
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             log_step "Cleaning up IMPLEMENTED sessions..."
 
-            # Delete using Python script
-            CLEANUP_RESULT=$(python3 <<'PYTHON_EOF'
-import sys
-from pathlib import Path
+            # Extract temp file path from lifecycle output
+            TEMP_FILE=$(echo "$LIFECYCLE_OUTPUT" | grep "^CLEANUP:TEMPFILE:" | cut -d: -f3)
 
-sys.path.insert(0, str(Path.home() / "claude-nixos-automation"))
+            # Delete sessions using bash + jq (saves ~300ms vs Python interpreter startup)
+            if [ -f "$TEMP_FILE" ]; then
+                DELETED_COUNT=0
+                FREED_BYTES=0
 
-try:
-    from claude_automation.analyzers.session_lifecycle_tracker import SessionLifecycleTracker
+                # Read session paths from JSON array
+                while IFS= read -r session_path; do
+                    if [ -f "$session_path" ]; then
+                        # Get size before deleting
+                        SIZE=$(stat -c%s "$session_path" 2>/dev/null || stat -f%z "$session_path" 2>/dev/null || echo "0")
+                        SIZE=${SIZE:-0}
 
-    tracker = SessionLifecycleTracker()
-    safe_sessions = tracker.get_safe_to_cleanup_sessions()
+                        # Delete session file
+                        if rm -f "$session_path" 2>/dev/null; then
+                            FREED_BYTES=$((FREED_BYTES + SIZE))
+                            DELETED_COUNT=$((DELETED_COUNT + 1))
 
-    deleted_count = 0
-    freed_bytes = 0
+                            # Delete sidecar metadata file
+                            METADATA_PATH="${session_path}.lifecycle.json"
+                            rm -f "$METADATA_PATH" 2>/dev/null
+                        fi
+                    fi
+                done < <(jq -r '.[]' "$TEMP_FILE")
 
-    for session_path in safe_sessions:
-        try:
-            # Get size before deleting
-            size = session_path.stat().st_size
+                # Calculate freed MB
+                FREED_MB=$((FREED_BYTES / 1024 / 1024))
 
-            # Delete session file
-            session_path.unlink()
-            freed_bytes += size
+                # Clean up temp file
+                rm -f "$TEMP_FILE"
 
-            # Delete sidecar metadata file
-            metadata_path = session_path.parent / f"{session_path.name}.lifecycle.json"
-            if metadata_path.exists():
-                metadata_path.unlink()
-
-            deleted_count += 1
-        except Exception as e:
-            print(f"WARNING: Could not delete {session_path.name}: {e}", file=sys.stderr)
-
-    freed_mb = freed_bytes // (1024 * 1024)
-    print(f"DELETED:{deleted_count}")
-    print(f"FREED_MB:{freed_mb}")
-except Exception as e:
-    print(f"ERROR:{e}", file=sys.stderr)
-    print("DELETED:0")
-    print("FREED_MB:0")
-PYTHON_EOF
-)
+                # Output in same format for parsing
+                CLEANUP_RESULT="DELETED:${DELETED_COUNT}
+FREED_MB:${FREED_MB}"
+            else
+                # Fallback if temp file not found
+                CLEANUP_RESULT="DELETED:0
+FREED_MB:0"
+            fi
 
             DELETED=$(echo "$CLEANUP_RESULT" | grep "^DELETED:" | cut -d: -f2)
             FREED_MB=$(echo "$CLEANUP_RESULT" | grep "^FREED_MB:" | cut -d: -f2)
