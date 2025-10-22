@@ -8,7 +8,7 @@ lifecycle: persistent
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-22 22:01:43
+**Last Updated**: 2025-10-22 22:36:14
 **Analysis Period**: 30 days
 
 ### Configured Servers (2)
@@ -894,30 +894,30 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 466
+**Total sessions analyzed**: 468
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### serena (project scope)
 
 **Session Metrics:**
-- Utilization rate: 6.7% (31/466 sessions)
+- Utilization rate: 6.6% (31/468 sessions)
 - Efficiency: POOR
 
 **Overhead Analysis:**
 - Estimated overhead: ~10,000 tokens per session
-- Total wasted overhead: ~4,350,000 tokens (435 unused sessions)
+- Total wasted overhead: ~4,370,000 tokens (437 unused sessions)
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 16.3% (76/466 sessions)
+- Utilization rate: 16.2% (76/468 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (466 sessions)
+- ⚠️  Loads in ALL sessions (468 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~195,000 tokens (390 unused sessions)
+- Total wasted overhead: ~196,000 tokens (392 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
@@ -1084,8 +1084,8 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Run 'claude mcp list' to diagnose connection issues
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.3% (76/466 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~195,000 tokens across 390 sessions
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.2% (76/468 sessions)
+   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~196,000 tokens across 392 sessions
 
 **LOW**: sequential-thinking
    - **Issue**: Server 'sequential-thinking' consumed 16,043,399 tokens (est. $101.86)
