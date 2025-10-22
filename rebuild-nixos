@@ -229,19 +229,40 @@ add_action "Switched to new NixOS configuration"
 log_step "Updating Claude Code configurations..."
 echo ""
 
+# Use local flake for automation (development mode)
+AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+
 if [ "$VERBOSE" = true ]; then
     # Verbose mode: show all output
-    if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all 2>&1 | tee -a "$LOG_FILE"); then
-        AUTOMATION_EXIT=0
+    if [ -d "$AUTOMATION_FLAKE" ]; then
+        if (cd ~/nixos-config && nix run "$AUTOMATION_FLAKE#update-all" 2>&1 | tee -a "$LOG_FILE"); then
+            AUTOMATION_EXIT=0
+        else
+            AUTOMATION_EXIT=$?
+        fi
     else
-        AUTOMATION_EXIT=$?
+        # Fallback to GitHub
+        if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all 2>&1 | tee -a "$LOG_FILE"); then
+            AUTOMATION_EXIT=0
+        else
+            AUTOMATION_EXIT=$?
+        fi
     fi
 else
     # Quiet mode: redirect to log, show only summary
-    if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all &>"$LOG_FILE.automation"); then
-        AUTOMATION_EXIT=0
+    if [ -d "$AUTOMATION_FLAKE" ]; then
+        if (cd ~/nixos-config && nix run "$AUTOMATION_FLAKE#update-all" &>"$LOG_FILE.automation"); then
+            AUTOMATION_EXIT=0
+        else
+            AUTOMATION_EXIT=$?
+        fi
     else
-        AUTOMATION_EXIT=$?
+        # Fallback to GitHub
+        if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all &>"$LOG_FILE.automation"); then
+            AUTOMATION_EXIT=0
+        else
+            AUTOMATION_EXIT=$?
+        fi
     fi
 
     # Extract stats from generated files (automation logs suppress output)
@@ -344,14 +365,21 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
     echo ""
 
-    # Run MCP usage analytics
-    log_step "Analyzing MCP servers and system usage..."
-    if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-mcp-usage-analytics 2>/dev/null); then
+    # Run MCP usage analytics (marks sessions as ANALYZED - Phase 2)
+    log_step "Analyzing MCP servers and marking sessions..."
+    if [ -d "$AUTOMATION_FLAKE" ]; then
+        MCP_CMD="nix run $AUTOMATION_FLAKE#update-mcp-usage-analytics"
+    else
+        MCP_CMD="nix run github:jacopone/claude-nixos-automation#update-mcp-usage-analytics"
+    fi
+
+    if (cd ~/nixos-config && $MCP_CMD 2>/dev/null); then
         # Show brief MCP status
         if [ -f "./.claude/mcp-analytics.md" ]; then
             MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
             TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
             log_success "Analyzed $MCP_CONNECTED MCP servers across $TOTAL_SESSIONS sessions"
+            echo "  ↳ Sessions automatically marked as ANALYZED (Phase 2 lifecycle)"
             echo "  ↳ Detailed report: .claude/mcp-analytics.md"
             add_stat "MCP servers: $MCP_CONNECTED analyzed, $TOTAL_SESSIONS sessions"
         fi
@@ -451,9 +479,7 @@ echo ""
 log_step "Checking learning data disk health..."
 
 HEALTH_EXIT_CODE=0
-# Use local flake (~/claude-nixos-automation) for development
-# Change to github: reference once commits are pushed
-AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+# Reuse AUTOMATION_FLAKE from earlier
 if [ -d "$AUTOMATION_FLAKE" ]; then
     HEALTH_OUTPUT=$(nix run "$AUTOMATION_FLAKE#check-data-health" 2>&1) || HEALTH_EXIT_CODE=$?
 else
