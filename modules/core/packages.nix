@@ -6,6 +6,7 @@
     helix               # A post-modern modal text editor - https://helix-editor.com/
     zed-editor          # A high-performance, multiplayer code editor - https://zed.dev/
     vscode-fhs          # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
+    opencode            # AI coding agent built for the terminal
     inputs.code-cursor-nix.packages.${pkgs.system}.cursor   # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.claude-code-nix.packages.${pkgs.system}.default  # A code-generation tool using Anthropic's Claude model (better packaged)
     # AI Tools - All use @latest/@alpha for automatic updates (system philosophy: always latest)

@@ -303,12 +303,12 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
         if [ -f "$file" ]; then
             local size=$(du -h "$file" 2>/dev/null | cut -f1)
-            local size_bytes=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null)
+            local size_bytes=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "0")
             local status="✓"
             local change_indicator=""
 
             # Sanity check: 0 bytes = broken
-            if [ "$size_bytes" -eq 0 ]; then
+            if [ -z "$size_bytes" ] || [ "$size_bytes" -eq 0 ]; then
                 echo -e "  ${RED}✗ $description (BROKEN - 0 bytes!)${NC}"
                 echo "     ↳ $scope"
                 return
@@ -552,27 +552,32 @@ log_step "Cache cleanup options..."
 echo "Large cache directories detected:"
 TOTAL_CACHE_SIZE=0
 if [ -d ~/.cache/uv ]; then
-    SIZE=$(du -sb ~/.cache/uv 2>/dev/null | cut -f1)
+    SIZE=$(du -sb ~/.cache/uv 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - UV Python cache: $(du -sh ~/.cache/uv 2>/dev/null | cut -f1)"
 fi
 if [ -d ~/.cache/google-chrome ]; then
-    SIZE=$(du -sb ~/.cache/google-chrome 2>/dev/null | cut -f1)
+    SIZE=$(du -sb ~/.cache/google-chrome 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - Google Chrome cache: $(du -sh ~/.cache/google-chrome 2>/dev/null | cut -f1)"
 fi
 if [ -d ~/.cache/yarn ]; then
-    SIZE=$(du -sb ~/.cache/yarn 2>/dev/null | cut -f1)
+    SIZE=$(du -sb ~/.cache/yarn 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - Yarn cache: $(du -sh ~/.cache/yarn 2>/dev/null | cut -f1)"
 fi
 if [ -d ~/.cache/ms-playwright ]; then
-    SIZE=$(du -sb ~/.cache/ms-playwright 2>/dev/null | cut -f1)
+    SIZE=$(du -sb ~/.cache/ms-playwright 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - MS Playwright cache: $(du -sh ~/.cache/ms-playwright 2>/dev/null | cut -f1)"
 fi
 if [ -d ~/.cache/pnpm ]; then
-    SIZE=$(du -sb ~/.cache/pnpm 2>/dev/null | cut -f1)
+    SIZE=$(du -sb ~/.cache/pnpm 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - PNPM cache: $(du -sh ~/.cache/pnpm 2>/dev/null | cut -f1)"
 fi
