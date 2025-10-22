@@ -39,11 +39,10 @@
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/bpkit bpkit "$@"
     '')
-    # Brownfield-Kit - AI-driven workflow for transitioning brownfield codebases to Speckit-ready state
+    # BrownKit - AI-driven workflow for transitioning brownfield codebases to Speckit-ready state
     (pkgs.writeShellScriptBin "brownfield" ''
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
-      export PYTHONPATH="/home/guyfawkes/brownfield/src:$PYTHONPATH"
-      exec /home/guyfawkes/brownfield/.venv/bin/python -m brownfield "$@"
+      exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/brownkit brownfield "$@"
     '')
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search

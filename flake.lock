@@ -24,11 +24,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1760997713,
-        "narHash": "sha256-SO+pNzR5zNlsIL2PJ8jH0qUqxKsM9dXuvze0WhuRZCw=",
+        "lastModified": 1761081356,
+        "narHash": "sha256-eyejjL2THMU/bRGf2OCXbioFwUtWsadVlahgssWplQo=",
         "owner": "jacopone",
         "repo": "claude-nixos-automation",
-        "rev": "710f4bff2eefc45cca7ff7c478b05679e1868e31",
+        "rev": "e74757d955060324aa9d4ef674a6785972c79875",
         "type": "github"
       },
       "original": {
@@ -45,11 +45,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1760990516,
-        "narHash": "sha256-fuNJCjQ4VZu+E0BkRkxHP0PPtFsHGQZxvDjvqwqfx8s=",
+        "lastModified": 1761084137,
+        "narHash": "sha256-TnwqkQX1k2dTWtdO8TXqQPY2h+f4Hs+nz2LvCRzENDw=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "cd630019c910d622e739bb8768cc08115deae3fe",
+        "rev": "32717b29890ae8933bc43e520725d076112e574a",
         "type": "github"
       },
       "original": {
@@ -140,11 +140,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761066098,
-        "narHash": "sha256-Fd65ryxzMRsNQ0MqaiT/b3TdinUOKUJ4PyCwnoKcvF0=",
+        "lastModified": 1761081701,
+        "narHash": "sha256-IwpfaKg5c/WWQiy8b5QGaVPMvoEQ2J6kpwRFdpVpBNQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "13b2744e117993dc5066c1710585dcb99877684f",
+        "rev": "9b4a2a7c4fbd75b422f00794af02d6edb4d9d315",
         "type": "github"
       },
       "original": {
@@ -233,8 +233,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1759416736,
-        "narHash": "sha256-YC30EU9HJgAAso9WVm1DczS98Zyp0z2jCWmiChKlSLY=",
+        "lastModified": 1761131322,
+        "narHash": "sha256-knmcjOQTOccCFjXk/buFSDe1y6jcydaLtBzsASxsve0=",
         "path": "/home/guyfawkes/whisper-dictation",
         "type": "path"
       },

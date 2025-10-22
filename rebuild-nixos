@@ -448,11 +448,35 @@ if [ "$LARGE_LOGS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_LOGS log file(s) >100MB: ${LARGEST_LOG}")
 fi
 
-# Check Claude session files (>5MB = should cleanup)
+# Check learning data disk health (Phase 1.5)
+echo ""
+log_step "Checking learning data disk health..."
+
+HEALTH_EXIT_CODE=0
+HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
+
+# Parse health stats from output
+HEALTH_TOTAL_MB=$(echo "$HEALTH_OUTPUT" | grep "Total:" | grep -oP '\d+(?=MB)' | head -1 || echo "?")
+HEALTH_SESSIONS=$(echo "$HEALTH_OUTPUT" | grep "session" | grep -oP '\d+(?= sessions)' | head -1 || echo "?")
+HEALTH_PERCENTAGE=$(echo "$HEALTH_OUTPUT" | grep "Usage:" | grep -oP '[\d.]+(?=% of disk)' || echo "?")
+
+echo "  • Total learning data: ${HEALTH_TOTAL_MB}MB"
+echo "  • Claude sessions: ${HEALTH_SESSIONS}"
+echo "  • Disk usage: ${HEALTH_PERCENTAGE}% of total disk"
+
+if [ $HEALTH_EXIT_CODE -eq 2 ]; then
+    echo -e "${RED}  🔴 URGENT: Learning data disk usage critical!${NC}"
+    DISK_WARNINGS+=("Learning data usage critical - run adaptive learning to extract insights, then cleanup")
+elif [ $HEALTH_EXIT_CODE -eq 1 ]; then
+    echo -e "${YELLOW}  🟡 Learning data growing - consider cleanup after insights extracted${NC}"
+else
+    echo -e "${GREEN}  ✅ Learning data disk health is good${NC}"
+fi
+
+# Still check for very large individual session files (may indicate stuck sessions)
 LARGE_CLAUDE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null | wc -l)
 if [ "$LARGE_CLAUDE" -gt 0 ]; then
-    CLAUDE_TOTAL=$(du -sh ~/.claude/projects 2>/dev/null | cut -f1)
-    DISK_WARNINGS+=("$LARGE_CLAUDE Claude session(s) >5MB (total: ${CLAUDE_TOTAL})")
+    DISK_WARNINGS+=("$LARGE_CLAUDE Claude session(s) >5MB (may indicate stuck sessions)")
 fi
 
 # Check for oversized config files (>1MB = investigate)
@@ -534,42 +558,129 @@ else
     log_warning "Cache cleanup skipped"
 fi
 
-# Clean up large Claude session files
-if [ "$LARGE_CLAUDE" -gt 0 ] && [ -d ~/.claude/projects ]; then
+# Clean up Claude session files (Phase 2: Lifecycle-based cleanup)
+if [ -d ~/.claude/projects ]; then
     echo ""
-    log_step "Found $LARGE_CLAUDE Claude session files >5MB (total: ${CLAUDE_TOTAL})"
-    echo "💡 These are old conversation logs that can be safely deleted"
-    echo "Options:"
-    echo "  1) Delete files >5MB (the ones detected above)"
-    echo "  2) Delete files older than 30 days (any size)"
-    echo "  3) Delete files >5MB AND older than 30 days"
-    echo "  4) Skip cleanup"
-    read -p "Choose option (1-4): " -n 1 -r
-    echo
+    log_step "Checking Claude session lifecycle..."
 
-    if [[ $REPLY == "1" ]]; then
-        # Delete files >5MB regardless of age
-        FREED_SPACE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null | wc -l)
-        fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null -X rm
-        log_success "Deleted $FILE_COUNT large sessions (freed ~${FREED_SPACE}MB)"
-        add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
-    elif [[ $REPLY == "2" ]]; then
-        # Delete files >30 days regardless of size
-        FREED_SPACE=$(fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null | wc -l)
-        fd -t f '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -X rm
-        log_success "Deleted $FILE_COUNT old sessions (freed ~${FREED_SPACE}MB)"
-        add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
-    elif [[ $REPLY == "3" ]]; then
-        # Delete files that are both >5MB AND >30 days
-        FREED_SPACE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
-        FILE_COUNT=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null | wc -l)
-        fd -t f -s +5M '\.jsonl$' ~/.claude/projects --changed-before 30d 2>/dev/null -X rm
-        log_success "Deleted $FILE_COUNT large+old sessions (freed ~${FREED_SPACE}MB)"
-        add_action "Cleaned ${FREED_SPACE}MB of Claude sessions"
+    # Get lifecycle statistics using Python
+    LIFECYCLE_STATS=$(python3 <<'PYTHON_EOF'
+import sys
+from pathlib import Path
+
+# Add claude-nixos-automation to path
+sys.path.insert(0, str(Path.home() / "claude-nixos-automation"))
+
+try:
+    from claude_automation.analyzers.session_lifecycle_tracker import SessionLifecycleTracker
+
+    tracker = SessionLifecycleTracker()
+    stats = tracker.get_lifecycle_stats()
+
+    # Print stats in parseable format
+    print(f"TOTAL:{stats.total_sessions}")
+    print(f"RAW:{stats.raw_count}")
+    print(f"ANALYZED:{stats.analyzed_count}")
+    print(f"INSIGHTS_GENERATED:{stats.insights_generated_count}")
+    print(f"IMPLEMENTED:{stats.implemented_count}")
+    print(f"SAFE_TO_CLEANUP:{stats.safe_to_cleanup_count}")
+    print(f"VALUABLE:{stats.valuable_data_count}")
+except Exception as e:
+    # Fallback if lifecycle tracking not available
+    print(f"ERROR:{e}")
+    print("TOTAL:?")
+    print("SAFE_TO_CLEANUP:0")
+    print("VALUABLE:?")
+PYTHON_EOF
+)
+
+    # Parse lifecycle stats
+    TOTAL_SESSIONS=$(echo "$LIFECYCLE_STATS" | grep "^TOTAL:" | cut -d: -f2)
+    RAW_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^RAW:" | cut -d: -f2)
+    ANALYZED_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^ANALYZED:" | cut -d: -f2)
+    INSIGHTS_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^INSIGHTS_GENERATED:" | cut -d: -f2)
+    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^IMPLEMENTED:" | cut -d: -f2)
+    SAFE_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^SAFE_TO_CLEANUP:" | cut -d: -f2)
+    VALUABLE_COUNT=$(echo "$LIFECYCLE_STATS" | grep "^VALUABLE:" | cut -d: -f2)
+
+    # Display lifecycle statistics
+    echo "  📋 Session Lifecycle:"
+    echo "     • Total sessions: ${TOTAL_SESSIONS}"
+    echo "     • RAW (not analyzed): ${RAW_COUNT}"
+    echo "     • ANALYZED: ${ANALYZED_COUNT}"
+    echo "     • INSIGHTS_GENERATED: ${INSIGHTS_COUNT}"
+    echo "     • IMPLEMENTED (safe to cleanup): ${IMPLEMENTED_COUNT}"
+    echo "     • Still valuable: ${VALUABLE_COUNT}"
+    echo ""
+
+    # Only offer cleanup if there are IMPLEMENTED sessions
+    if [ "$SAFE_COUNT" -gt 0 ]; then
+        echo "  💡 ${SAFE_COUNT} sessions marked as IMPLEMENTED can be safely deleted"
+        echo "     (Insights have been extracted and applied to system config)"
+        read -p "  Delete ${SAFE_COUNT} IMPLEMENTED sessions? [y/N]: " -n 1 -r
+        echo
+
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            log_step "Cleaning up IMPLEMENTED sessions..."
+
+            # Delete using Python script
+            CLEANUP_RESULT=$(python3 <<'PYTHON_EOF'
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path.home() / "claude-nixos-automation"))
+
+try:
+    from claude_automation.analyzers.session_lifecycle_tracker import SessionLifecycleTracker
+
+    tracker = SessionLifecycleTracker()
+    safe_sessions = tracker.get_safe_to_cleanup_sessions()
+
+    deleted_count = 0
+    freed_bytes = 0
+
+    for session_path in safe_sessions:
+        try:
+            # Get size before deleting
+            size = session_path.stat().st_size
+
+            # Delete session file
+            session_path.unlink()
+            freed_bytes += size
+
+            # Delete sidecar metadata file
+            metadata_path = session_path.parent / f"{session_path.name}.lifecycle.json"
+            if metadata_path.exists():
+                metadata_path.unlink()
+
+            deleted_count += 1
+        except Exception as e:
+            print(f"WARNING: Could not delete {session_path.name}: {e}", file=sys.stderr)
+
+    freed_mb = freed_bytes // (1024 * 1024)
+    print(f"DELETED:{deleted_count}")
+    print(f"FREED_MB:{freed_mb}")
+except Exception as e:
+    print(f"ERROR:{e}", file=sys.stderr)
+    print("DELETED:0")
+    print("FREED_MB:0")
+PYTHON_EOF
+)
+
+            DELETED=$(echo "$CLEANUP_RESULT" | grep "^DELETED:" | cut -d: -f2)
+            FREED_MB=$(echo "$CLEANUP_RESULT" | grep "^FREED_MB:" | cut -d: -f2)
+
+            log_success "Deleted ${DELETED} IMPLEMENTED sessions (freed ~${FREED_MB}MB)"
+            add_action "Cleaned ${FREED_MB}MB of Claude sessions (lifecycle-based)"
+        else
+            log_warning "Claude session cleanup skipped"
+        fi
+    elif [ "$VALUABLE_COUNT" -gt 0 ]; then
+        echo -e "${YELLOW}  ⚠️  No sessions marked as IMPLEMENTED yet${NC}"
+        echo "     Run MCP usage analytics to mark sessions as ANALYZED"
+        echo "     Then extract insights and mark as IMPLEMENTED before cleanup"
     else
-        log_warning "Claude session cleanup skipped"
+        echo -e "${GREEN}  ✅ No Claude sessions found${NC}"
     fi
 fi
 

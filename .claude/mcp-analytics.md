@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-10-21
-updated: 2025-10-21
+created: 2025-10-22
+updated: 2025-10-22
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-21 22:29:32
+**Last Updated**: 2025-10-22 13:13:41
 **Analysis Period**: 30 days
 
 ### Configured Servers (2)
@@ -32,25 +32,25 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 1836
-**Total tokens consumed**: 20,091,597
-**Estimated total cost**: $121.7240
+**Total MCP invocations**: 1934
+**Total tokens consumed**: 20,678,510
+**Estimated total cost**: $126.3809
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 1457
+- Invocations: 1555
 - Success rate: 0.0%
-- Last used: 2025-10-21 09:59
+- Last used: 2025-10-22 10:50
 
 **Token Consumption:**
-- Total tokens: 15,440,960 (Input: 166,306, Output: 462,341)
-- Cache tokens: 113,118,008 reads, 14,812,313 writes
-- Avg tokens/invocation: 10598
+- Total tokens: 16,027,873 (Input: 174,141, Output: 498,197)
+- Cache tokens: 119,979,477 reads, 15,355,535 writes
+- Avg tokens/invocation: 10307
 
 **Cost Analysis:**
-- Estimated cost: $96.9156
-- ROI score: 0.09 invocations per 1K tokens
+- Estimated cost: $101.5725
+- ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.list_chats (unknown scope)
@@ -894,37 +894,37 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 457
+**Total sessions analyzed**: 465
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### serena (project scope)
 
 **Session Metrics:**
-- Utilization rate: 6.8% (31/457 sessions)
+- Utilization rate: 6.7% (31/465 sessions)
 - Efficiency: POOR
 
 **Overhead Analysis:**
 - Estimated overhead: ~10,000 tokens per session
-- Total wasted overhead: ~4,260,000 tokens (426 unused sessions)
+- Total wasted overhead: ~4,340,000 tokens (434 unused sessions)
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 15.3% (70/457 sessions)
+- Utilization rate: 16.1% (75/465 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (457 sessions)
+- ⚠️  Loads in ALL sessions (465 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~193,500 tokens (387 unused sessions)
+- Total wasted overhead: ~195,000 tokens (390 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1457 invocations for 15,440,960 tokens (est. $96.9156)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1555 invocations for 16,027,873 tokens (est. $101.5725)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
@@ -1084,12 +1084,12 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Run 'claude mcp list' to diagnose connection issues
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 15.3% (70/457 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~193,500 tokens across 387 sessions
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.1% (75/465 sessions)
+   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~195,000 tokens across 390 sessions
 
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 15,440,960 tokens (est. $96.92)
-   - **Action**: Frequent user: 1457 calls, ~10,597 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 16,027,873 tokens (est. $101.57)
+   - **Action**: Frequent user: 1555 calls, ~10,307 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
