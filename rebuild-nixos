@@ -368,17 +368,15 @@ log_step "Running adaptive learning cycle..."
 AUTOMATION_DIR="$HOME/claude-nixos-automation"
 if [[ -d "$AUTOMATION_DIR" ]]; then
     # Run WITHOUT pipes to preserve stdin/stdout for user interaction
-    # Devenv noise is suppressed by redirecting stderr to null
-    # This allows Python's input() to work correctly
-    if (cd "$AUTOMATION_DIR" && timeout 60s devenv shell -- python run-adaptive-learning.py --interactive 2>/dev/null); then
+    # No timeout for interactive mode (user needs time to review and respond)
+    # Suppress devenv startup noise but preserve Python output for user
+    if (cd "$AUTOMATION_DIR" && devenv shell -- python run-adaptive-learning.py --interactive 2> >(grep -v "Building shell" >&2)); then
         LEARNING_EXIT=0
         log_success "Adaptive learning cycle complete"
         add_action "Adaptive learning: suggestions reviewed interactively"
     else
         LEARNING_EXIT=$?
-        if [ $LEARNING_EXIT -eq 124 ]; then
-            log_warning "Adaptive learning timed out (>60s) - skipping (non-critical)"
-        elif [ $LEARNING_EXIT -eq 130 ]; then
+        if [ $LEARNING_EXIT -eq 130 ]; then
             log_warning "Adaptive learning interrupted by user (Ctrl+C)"
         else
             log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
