@@ -376,12 +376,20 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     if (cd ~/nixos-config && $MCP_CMD 2>/dev/null); then
         # Show brief MCP status
         if [ -f "./.claude/mcp-analytics.md" ]; then
-            MCP_CONNECTED=$(grep "✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
+            # Extract stats from mcp-analytics.md (match actual template format)
+            TOTAL_CONFIGURED=$(grep "^### Configured Servers" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "?")
+            MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
             TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
-            log_success "Analyzed $MCP_CONNECTED MCP servers across $TOTAL_SESSIONS sessions"
+
+            # Display with clearer format
+            if [ "$MCP_CONNECTED" != "?" ] && [ "$TOTAL_CONFIGURED" != "?" ]; then
+                log_success "MCP analysis: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions analyzed"
+            else
+                log_success "MCP analysis completed"
+            fi
             echo "  ↳ Sessions automatically marked as ANALYZED (Phase 2 lifecycle)"
             echo "  ↳ Detailed report: .claude/mcp-analytics.md"
-            add_stat "MCP servers: $MCP_CONNECTED analyzed, $TOTAL_SESSIONS sessions"
+            add_stat "MCP servers: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions"
         fi
     else
         log_warning "MCP analysis had issues (non-critical)"
@@ -709,8 +717,8 @@ PYTHON_EOF
         fi
     elif [ "$VALUABLE_COUNT" -gt 0 ]; then
         echo -e "${YELLOW}  ⚠️  No sessions marked as IMPLEMENTED yet${NC}"
-        echo "     Run MCP usage analytics to mark sessions as ANALYZED"
-        echo "     Then extract insights and mark as IMPLEMENTED before cleanup"
+        echo "     All $ANALYZED_COUNT sessions have been analyzed"
+        echo "     Next: Review insights → Implement changes → Mark sessions as IMPLEMENTED"
     else
         echo -e "${GREEN}  ✅ No Claude sessions found${NC}"
     fi
