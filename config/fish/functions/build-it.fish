@@ -11,11 +11,21 @@ function build-it --description "Mark issue as ready to build"
         set repo_flag "--repo $argv[2]"
     end
 
-    gh issue edit $issue_num $repo_flag \
-        --remove-label "status:idea" \
-        --add-label "status:ready"
+    if test -n "$repo_flag"
+        gh issue edit $issue_num $repo_flag \
+            --remove-label "status:idea" \
+            --add-label "status:ready"
+    else
+        gh issue edit $issue_num \
+            --remove-label "status:idea" \
+            --add-label "status:ready"
+    end
 
     echo "✅ Issue #$issue_num ready to build"
-    echo "Next: View with 'gh issue view $issue_num $repo_flag'"
+    if test -n "$repo_flag"
+        echo "Next: View with 'gh issue view $issue_num $repo_flag'"
+    else
+        echo "Next: View with 'gh issue view $issue_num'"
+    end
     echo "      Then run /feature-dev:feature-dev in Claude Code"
 end

@@ -12,11 +12,11 @@ function fix-it --description "Start fixing a bug"
     end
 
     # Create branch and start work (only works in current repo)
-    if test -z "$repo_flag"
-        gh issue develop $issue_num
-    else
+    if test -n "$repo_flag"
         echo "⚠️  Multi-repo bug fixing requires manual clone/checkout"
         echo "Run: gh issue view $issue_num $repo_flag"
+    else
+        gh issue develop $issue_num
     end
 
     echo "🔧 Ready to fix bug #$issue_num"

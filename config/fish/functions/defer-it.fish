@@ -11,9 +11,18 @@ function defer-it --description "Defer issue for later"
         set repo_flag "--repo $argv[2]"
     end
 
-    gh issue edit $issue_num $repo_flag --add-label "status:deferred"
-    gh issue close $issue_num $repo_flag --reason "not planned"
+    if test -n "$repo_flag"
+        gh issue edit $issue_num $repo_flag --add-label "status:deferred"
+        gh issue close $issue_num $repo_flag --reason "not planned"
+    else
+        gh issue edit $issue_num --add-label "status:deferred"
+        gh issue close $issue_num --reason "not planned"
+    end
 
     echo "💤 Issue #$issue_num deferred"
-    echo "Reopen anytime: gh issue reopen $issue_num $repo_flag"
+    if test -n "$repo_flag"
+        echo "Reopen anytime: gh issue reopen $issue_num $repo_flag"
+    else
+        echo "Reopen anytime: gh issue reopen $issue_num"
+    end
 end
