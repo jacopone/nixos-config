@@ -581,6 +581,12 @@ if [ -d ~/.cache/pnpm ]; then
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
     echo "  - PNPM cache: $(du -sh ~/.cache/pnpm 2>/dev/null | cut -f1)"
 fi
+if [ -d ~/.npm ]; then
+    SIZE=$(du -sb ~/.npm 2>/dev/null | cut -f1 || echo "0")
+    SIZE=${SIZE:-0}
+    TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
+    echo "  - npm cache: $(du -sh ~/.npm 2>/dev/null | cut -f1)"
+fi
 
 TOTAL_CACHE_MB=$((TOTAL_CACHE_SIZE / 1024 / 1024))
 if [ $TOTAL_CACHE_MB -gt 0 ]; then
@@ -596,6 +602,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     [ -d ~/.cache/yarn ] && rm -rf ~/.cache/yarn && echo "  ✓ Yarn cache"
     [ -d ~/.cache/ms-playwright ] && rm -rf ~/.cache/ms-playwright && echo "  ✓ Playwright cache"
     [ -d ~/.cache/pnpm ] && rm -rf ~/.cache/pnpm && echo "  ✓ PNPM cache"
+    [ -d ~/.npm ] && npm cache clean --force 2>/dev/null && echo "  ✓ npm cache"
     [ -d ~/.cache/chromium ] && rm -rf ~/.cache/chromium && echo "  ✓ Chromium cache"
     log_success "Cache cleanup complete (freed ~${TOTAL_CACHE_MB}MB)"
     add_action "Cleared ${TOTAL_CACHE_MB}MB of cache"

@@ -1,22 +1,5 @@
 {
   "nodes": {
-    "ai-project-orchestration": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1760090419,
-        "narHash": "sha256-xYWkJs2oanzriZpw+qjxUdktiCI8ByK8r+Ox9UfSfLE=",
-        "path": "/home/guyfawkes/ai-project-orchestration",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/guyfawkes/ai-project-orchestration",
-        "type": "path"
-      }
-    },
     "claude-automation": {
       "inputs": {
         "nixpkgs": [
@@ -171,7 +154,6 @@
     },
     "root": {
       "inputs": {
-        "ai-project-orchestration": "ai-project-orchestration",
         "claude-automation": "claude-automation",
         "claude-code-nix": "claude-code-nix",
         "code-cursor-nix": "code-cursor-nix",

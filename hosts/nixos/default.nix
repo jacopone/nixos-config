@@ -10,7 +10,6 @@
       ./hardware-configuration.nix
       ../../modules/core/packages.nix
       ../../profiles/desktop
-      ../../modules/development/ai-project-orchestration.nix
     ];
 
   # Bootloader.
