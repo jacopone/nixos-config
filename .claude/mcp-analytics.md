@@ -8,7 +8,7 @@ lifecycle: persistent
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-23 10:57:38
+**Last Updated**: 2025-10-23 11:10:35
 **Analysis Period**: 30 days
 
 ### Configured Servers (1)
@@ -27,24 +27,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 1994
-**Total tokens consumed**: 20,889,208
-**Estimated total cost**: $128.0609
+**Total MCP invocations**: 1995
+**Total tokens consumed**: 20,889,888
+**Estimated total cost**: $128.0897
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 1615
+- Invocations: 1616
 - Success rate: 0.0%
-- Last used: 2025-10-22 21:31
+- Last used: 2025-10-23 08:59
 
 **Token Consumption:**
-- Total tokens: 16,238,571 (Input: 174,584, Output: 512,198)
-- Cache tokens: 122,421,840 reads, 15,551,789 writes
-- Avg tokens/invocation: 10055
+- Total tokens: 16,239,251 (Input: 174,593, Output: 512,564)
+- Cache tokens: 122,495,747 reads, 15,552,094 writes
+- Avg tokens/invocation: 10049
 
 **Cost Analysis:**
-- Estimated cost: $103.2525
+- Estimated cost: $103.2813
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -909,7 +909,7 @@ This section shows how efficiently each MCP server uses context tokens across se
 ### Recommendations
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1615 invocations for 16,238,571 tokens (est. $103.2525)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1616 invocations for 16,239,251 tokens (est. $103.2813)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
@@ -1069,8 +1069,8 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~196,500 tokens across 393 sessions
 
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 16,238,571 tokens (est. $103.25)
-   - **Action**: Frequent user: 1615 calls, ~10,054 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 16,239,251 tokens (est. $103.28)
+   - **Action**: Frequent user: 1616 calls, ~10,049 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
