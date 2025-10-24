@@ -145,7 +145,7 @@
 **Top 5 tools**:
 - **devenv**: 37 uses (H:37 C:0)
 - **git**: 27 uses (H:27 C:0)
-- **glow**: 19 uses (H:19 C:0)
+- **glow**: 20 uses (H:20 C:0)
 - **bpkit**: 10 uses (H:10 C:0)
 - **bat**: 8 uses (H:8 C:0)
 

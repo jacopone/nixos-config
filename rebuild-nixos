@@ -157,6 +157,10 @@ fi
 echo "🔐 This rebuild requires sudo privileges for system activation."
 sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
 
+# === PHASE 1: Update Flake Inputs ===
+# Updates nix flake lock file to get latest package versions
+# Side effects: Modifies flake.lock, may pull in breaking changes
+# Exit on failure: Yes (can't build without valid inputs)
 # Update the flake inputs
 log_step "Updating flake inputs..."
 if [ "$VERBOSE" = true ]; then
@@ -167,6 +171,10 @@ fi
 log_success "Flake inputs updated"
 add_action "Updated flake.lock"
 
+# === PHASE 2: Test Build ===
+# Builds new configuration WITHOUT activating it (safe to fail)
+# This catches build errors before touching running system
+# Exit on failure: Yes (don't activate broken config)
 # Perform a test build
 log_step "Performing test build..."
 
@@ -194,6 +202,11 @@ fi
 
 log_success "Test build successful"
 
+# === PHASE 3: Activate Configuration ===
+# Switches running system to new configuration (requires sudo)
+# This is the critical step - system state changes here
+# Exit on failure: Yes (activation failed, system unchanged)
+# Rollback available: Use 'sudo nixos-rebuild switch --rollback'
 # Activate the new configuration
 log_step "Activating new configuration..."
 
@@ -225,6 +238,10 @@ echo ""  # Ensure we're on a new line after progress indicator
 log_success "Configuration activated"
 add_action "Switched to new NixOS configuration"
 
+# === PHASE 4: Update Claude Code Configurations ===
+# Regenerates 5 Claude context files (CLAUDE.md, permissions, MCP, etc.)
+# Uses claude-nixos-automation flake (local if available, GitHub fallback)
+# Exit on failure: No (continue with warnings - not critical to system)
 # Update Claude Code configurations
 log_step "Updating Claude Code configurations..."
 echo ""
@@ -365,6 +382,11 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
     echo ""
 
+    # === PHASE 5: MCP Usage Analytics ===
+    # Analyzes MCP server utilization across all sessions
+    # Marks sessions as ANALYZED (Phase 2 lifecycle)
+    # Generates .claude/mcp-analytics.md report
+    # Exit on failure: No (non-critical analytics)
     # Run MCP usage analytics (marks sessions as ANALYZED - Phase 2)
     log_step "Analyzing MCP servers and marking sessions..."
     if [ -d "$AUTOMATION_FLAKE" ]; then
@@ -394,6 +416,10 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
         fi
     fi
 
+    # === PHASE 6: Tool Usage Analytics ===
+    # Tracks which system tools are actually used vs merely installed
+    # Enables data-driven decisions on tool adoption
+    # Exit on failure: No (non-critical analytics)
     # Run tool usage analytics (Phase 1)
     log_step "Analyzing system tool usage..."
     if [ -d "$AUTOMATION_FLAKE" ]; then
@@ -426,6 +452,17 @@ else
     log_warning "Claude automation had issues (check logs)"
 fi
 
+# === PHASE 7: Adaptive Learning Cycle ===
+# Runs 7 parallel ML analyzers to detect optimization opportunities:
+# - Permission patterns (auto-approve repeated commands)
+# - MCP server utilization (move to project-level if low usage)
+# - Context optimization (remove unused CLAUDE.md sections)
+# - Workflow patterns (bundle repeated command sequences)
+# - Instruction effectiveness (improve low-compliance policies)
+# - Cross-project transfers (apply patterns from similar projects)
+# - Meta-learning (calibrate detection thresholds)
+# Exit on failure: No (learning is optional, system already activated)
+# User interaction: Yes (interactive approval of suggestions)
 # === ADAPTIVE LEARNING CYCLE ===
 echo ""
 log_step "Running adaptive learning cycle..."
@@ -450,6 +487,10 @@ else
     log_warning "Adaptive learning not available (automation directory not found)"
 fi
 
+# === PHASE 8: User Acceptance ===
+# User tests the activated configuration
+# Offers rollback if issues found
+# Creates git commit if changes accepted
 echo ""
 log_step "Configuration activated. Please test the changes now."
 read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
@@ -479,6 +520,11 @@ else
     exit 0
 fi
 
+# === PHASE 9: Generation Cleanup ===
+# Deletes old NixOS generations to free disk space
+# User selects which generations to delete
+# Runs garbage collection after deletion
+# Exit on failure: No (cleanup is optional)
 # Clean up old generations
 echo ""
 log_step "Listing system generations..."
@@ -498,6 +544,14 @@ else
     log_warning "No generations selected for deletion"
 fi
 
+# === PHASE 10: Disk Space Analysis ===
+# Scans for problematic disk usage patterns:
+# - Oversized logs (>100MB = investigate)
+# - Large Claude sessions (>5MB = stuck session?)
+# - Bloated configs (>1MB = corruption?)
+# - Old backups (cleanup candidates)
+# Checks learning data health (GREEN/YELLOW/RED risk levels)
+# Exit on failure: No (analysis only, no changes made)
 # Disk space analysis for problematic areas
 echo ""
 log_step "Analyzing disk space for issues..."
@@ -574,6 +628,12 @@ if [ ${#DISK_WARNINGS[@]} -gt 0 ]; then
     echo ""
 fi
 
+# === PHASE 11: Cache Cleanup ===
+# Offers to clean large cache directories:
+# - UV Python cache, Chrome cache, Yarn/npm/pnpm caches
+# User confirms before deletion
+# Safe to delete (caches regenerate on demand)
+# Exit on failure: No (cleanup is optional)
 # Clean up cache directories
 echo ""
 log_step "Cache cleanup options..."
@@ -638,6 +698,11 @@ else
     log_warning "Cache cleanup skipped"
 fi
 
+# === PHASE 12: Claude Session Lifecycle Cleanup ===
+# Deletes sessions marked as IMPLEMENTED (insights already extracted)
+# Session lifecycle: RAW → ANALYZED → INSIGHTS_GENERATED → IMPLEMENTED
+# Only IMPLEMENTED sessions are safe to delete (value captured)
+# Exit on failure: No (cleanup is optional)
 # Clean up Claude session files (Phase 2: Lifecycle-based cleanup)
 if [ -d ~/.claude/projects ]; then
     echo ""
@@ -779,6 +844,10 @@ FREED_MB:0"
     fi
 fi
 
+# === PHASE 13: Claude Backup Cleanup ===
+# Cleans .backups/ directory (old Claude Code backup files)
+# Options: delete all, delete >7 days old, or skip
+# Exit on failure: No (cleanup is optional)
 # Clean up old Claude backup files
 if [ -d .backups ]; then
     backup_count=$(fd -t f 'backup-' .backups 2>/dev/null | wc -l)
@@ -811,6 +880,10 @@ if [ -d .backups ]; then
     fi
 fi
 
+# === PHASE 14: Git Push ===
+# Pushes committed changes to remote repository
+# Only runs if user accepted changes in Phase 8
+# Exit on failure: No (user can manually push later)
 echo ""
 read -p "Do you want to push the changes? (y/n) " -n 1 -r
 echo

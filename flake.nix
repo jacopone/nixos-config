@@ -19,7 +19,7 @@
 
     # Cursor - AI Code Editor (you are the maintainer)
     code-cursor-nix = {
-      url = "github:jacopone/code-cursor-nix";
+      url = "path:/home/guyfawkes/cursor-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

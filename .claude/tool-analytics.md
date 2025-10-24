@@ -8,9 +8,9 @@ lifecycle: persistent
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-10-24 12:50:21
+**Last Updated**: 2025-10-24 14:52:14
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 131
+**Total Commands Tracked**: 132
 
 ## Summary
 
@@ -35,11 +35,11 @@ lifecycle: persistent
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-22
-3. **glow**: 19 total
-   - Human: 19 (100%)
+3. **glow**: 20 total
+   - Human: 20 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-23
+   - Last used: 2025-10-24
 4. **bpkit**: 10 total
    - Human: 10 (100%)
    - Claude: 0 (0%)
@@ -104,7 +104,7 @@ lifecycle: persistent
 ### Human-Preferred Tools (Top 15)
 1. **devenv**: 37 uses
 2. **git**: 27 uses
-3. **glow**: 19 uses
+3. **glow**: 20 uses
 4. **bpkit**: 10 uses
 5. **bat**: 8 uses
 6. **specify**: 5 uses
@@ -217,10 +217,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 71 in packages.nix
 
-**glow** - 19 uses- Markdown renderer
-- Human: 19 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-23
-   - Adoption score: 1.3 uses/day
+**glow** - 20 uses- Markdown renderer
+- Human: 20 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-24
+   - Adoption score: 1.2 uses/day
 
 **mcfly** - 🔴 **DORMANT**- Smart command history search with neural networks
 - ⚠️ Never used in last 30 days
@@ -677,7 +677,7 @@ lifecycle: persistent
 15 tools used only by humans:
 - **devenv**: 37 uses
 - **git**: 27 uses
-- **glow**: 19 uses
+- **glow**: 20 uses
 - **bpkit**: 10 uses
 - **bat**: 8 uses
 - **specify**: 5 uses
@@ -1143,7 +1143,7 @@ lifecycle: persistent
 ## Usage Trends by Category
 
 - **Other**: 73 invocations
-- **Modern Cli**: 31 invocations
+- **Modern Cli**: 32 invocations
 - **Ai Tools**: 26 invocations
 - **System Tools**: 1 invocations
 
@@ -1152,7 +1152,7 @@ lifecycle: persistent
 
 | Tool | Oct 2025 Baseline | Current | Change | Status |
 |------|-------------------|---------|--------|--------|
-| glow | 32 | 19 | -13 | ⚠️ Declining |
+| glow | 32 | 20 | -12 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
 | eza | 19 | 4 | -15 | ⚠️ Declining |
 | bat | 7 | 8 | +1 | ✅ Growing |
