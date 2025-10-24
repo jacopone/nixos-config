@@ -374,25 +374,53 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     fi
 
     if (cd ~/nixos-config && $MCP_CMD 2>/dev/null); then
-        # Show brief MCP status
-        if [ -f "./.claude/mcp-analytics.md" ]; then
-            # Extract stats from mcp-analytics.md (match actual template format)
-            TOTAL_CONFIGURED=$(grep "^### Configured Servers" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "?")
-            MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
-            TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ./.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
-
-            # Display with clearer format
-            if [ "$MCP_CONNECTED" != "?" ] && [ "$TOTAL_CONFIGURED" != "?" ]; then
-                log_success "MCP analysis: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions analyzed"
-            else
-                log_success "MCP analysis completed"
-            fi
-            echo "  ↳ Sessions automatically marked as ANALYZED (Phase 2 lifecycle)"
-            echo "  ↳ Detailed report: .claude/mcp-analytics.md"
-            add_stat "MCP servers: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions"
-        fi
+        log_success "MCP analysis completed"
+        echo "  ↳ Sessions automatically marked as ANALYZED (Phase 2 lifecycle)"
     else
         log_warning "MCP analysis had issues (non-critical)"
+    fi
+
+    # Extract MCP stats (even if command failed, use existing file)
+    if [ -f ~/nixos-config/.claude/mcp-analytics.md ]; then
+        # Extract stats from mcp-analytics.md (match actual template format)
+        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "?")
+        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
+        TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
+
+        # Add to statistics if we have valid data
+        if [ "$MCP_CONNECTED" != "?" ] && [ "$TOTAL_CONFIGURED" != "?" ]; then
+            add_stat "MCP: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions"
+            echo "  ↳ MCP stats from: .claude/mcp-analytics.md"
+        fi
+    fi
+
+    # Run tool usage analytics (Phase 1)
+    log_step "Analyzing system tool usage..."
+    if [ -d "$AUTOMATION_FLAKE" ]; then
+        TOOL_CMD="python3 $AUTOMATION_FLAKE/update-tool-usage-analytics.py"
+    else
+        TOOL_CMD="python3 ~/claude-nixos-automation/update-tool-usage-analytics.py"
+    fi
+
+    if (cd ~/nixos-config && $TOOL_CMD 2>/dev/null); then
+        # Show brief tool usage status
+        if [ -f "./CLAUDE.md" ]; then
+            # Extract stats from CLAUDE.md - look for the Tool Usage section
+            TOOL_TOTAL=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Installed" | grep -oP '\*\*Installed\*\*: \K\d+' || echo "?")
+            TOOL_USED=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Used" | grep -oP '\*\*Used\*\*: \K\d+' || echo "?")
+            TOOL_ADOPTION=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Used" | grep -oP '\(\K\d+' || echo "?")
+
+            # Display with clearer format
+            if [ "$TOOL_USED" != "?" ] && [ "$TOOL_TOTAL" != "?" ]; then
+                log_success "Tool usage: $TOOL_USED/$TOOL_TOTAL tools used (${TOOL_ADOPTION}% adoption)"
+            else
+                log_success "Tool usage analysis completed"
+            fi
+            echo "  ↳ Detailed report: .claude/tool-analytics.md"
+            add_stat "Tools: $TOOL_USED/$TOOL_TOTAL used | ${TOOL_ADOPTION}% adoption"
+        fi
+    else
+        log_warning "Tool usage analysis had issues (non-critical)"
     fi
 else
     log_warning "Claude automation had issues (check logs)"
@@ -487,12 +515,12 @@ echo ""
 log_step "Checking learning data disk health..."
 
 HEALTH_EXIT_CODE=0
-# Reuse AUTOMATION_FLAKE from earlier
-if [ -d "$AUTOMATION_FLAKE" ]; then
-    HEALTH_OUTPUT=$(nix run "$AUTOMATION_FLAKE#check-data-health" 2>&1) || HEALTH_EXIT_CODE=$?
+# Run health check directly (avoid nix wrapper issues with new files)
+if [ -f ~/claude-nixos-automation/check-data-health.py ]; then
+    HEALTH_OUTPUT=$(python3 ~/claude-nixos-automation/check-data-health.py 2>&1) || HEALTH_EXIT_CODE=$?
 else
-    # Fallback to GitHub if local not available
-    HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
+    HEALTH_OUTPUT="Health check script not found"
+    HEALTH_EXIT_CODE=1
 fi
 
 # Parse health stats from output

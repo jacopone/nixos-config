@@ -8,7 +8,7 @@ lifecycle: persistent
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-23 15:04:36
+**Last Updated**: 2025-10-23 22:22:10
 **Analysis Period**: 30 days
 
 ### Configured Servers (1)
@@ -27,24 +27,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 2007
-**Total tokens consumed**: 20,915,974
-**Estimated total cost**: $128.5548
+**Total MCP invocations**: 2048
+**Total tokens consumed**: 21,274,909
+**Estimated total cost**: $130.9116
 
 #### sequential-thinking.sequentialthinking (global scope)
 
 **Usage Metrics:**
-- Invocations: 1628
+- Invocations: 1669
 - Success rate: 0.0%
-- Last used: 2025-10-23 09:27
+- Last used: 2025-10-23 17:03
 
 **Token Consumption:**
-- Total tokens: 16,265,337 (Input: 174,713, Output: 515,207)
-- Cache tokens: 123,621,271 reads, 15,575,417 writes
-- Avg tokens/invocation: 9991
+- Total tokens: 16,624,272 (Input: 175,018, Output: 528,791)
+- Cache tokens: 126,481,822 reads, 15,920,463 writes
+- Avg tokens/invocation: 9961
 
 **Cost Analysis:**
-- Estimated cost: $103.7464
+- Estimated cost: $106.1032
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -889,27 +889,27 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 470
+**Total sessions analyzed**: 477
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### sequential-thinking (global scope)
 
 **Session Metrics:**
-- Utilization rate: 16.4% (77/470 sessions)
+- Utilization rate: 16.6% (79/477 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (470 sessions)
+- ⚠️  Loads in ALL sessions (477 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~196,500 tokens (393 unused sessions)
+- Total wasted overhead: ~199,000 tokens (398 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1628 invocations for 16,265,337 tokens (est. $103.7464)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1669 invocations for 16,624,272 tokens (est. $106.1032)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
 
 **MEDIUM**: serena
@@ -1065,12 +1065,12 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.4% (77/470 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~196,500 tokens across 393 sessions
+   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.6% (79/477 sessions)
+   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~199,000 tokens across 398 sessions
 
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 16,265,337 tokens (est. $103.75)
-   - **Action**: Frequent user: 1628 calls, ~9,990 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 16,624,272 tokens (est. $106.10)
+   - **Action**: Frequent user: 1669 calls, ~9,960 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
