@@ -49,14 +49,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1761310169,
-        "narHash": "sha256-hLDxiQRjr/BljfkKpqr5TizInerKF9NVJTHbMGhOctg=",
-        "path": "/home/guyfawkes/cursor-nix",
-        "type": "path"
+        "lastModified": 1761299273,
+        "narHash": "sha256-WV1wagdqpEanpcMaiE23s+RQ57kAytQCMeFcgCaZ1QA=",
+        "owner": "jacopone",
+        "repo": "code-cursor-nix",
+        "rev": "72da26fa33fe2155ca9fbdf8333039c6e76df092",
+        "type": "github"
       },
       "original": {
-        "path": "/home/guyfawkes/cursor-nix",
-        "type": "path"
+        "owner": "jacopone",
+        "repo": "code-cursor-nix",
+        "type": "github"
       }
     },
     "flake-utils": {
