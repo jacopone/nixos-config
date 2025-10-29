@@ -128,12 +128,14 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-10-23 22:22:10
+**Status**: 1/1 connected | Last checked: 2025-10-30 00:12:37
 
-**sequential-thinking** ✓ connected
-   - Step-by-step reasoning for complex problems
+**playwright** ✓ connected
+   - unknown server
    - Scope: global (~/.claude.json)
 
+💡 **Action needed**: 1 high-priority recommendations available
+   Run rebuild to see details, or check `.claude/mcp-analytics.md` for full report
 
 ---
 *MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*
@@ -143,10 +145,10 @@
 **Installed**: 130 tools | **Used**: 16 (12%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
+- **git**: 57 uses (H:57 C:0)
 - **devenv**: 43 uses (H:43 C:0)
-- **git**: 39 uses (H:39 C:0)
 - **brownfield**: 27 uses (H:27 C:0)
-- **glow**: 22 uses (H:22 C:0)
+- **glow**: 24 uses (H:24 C:0)
 - **bpkit**: 10 uses (H:10 C:0)
 
 ⚠️ **113 dormant tools** found (unused in last 30 days)

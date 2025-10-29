@@ -24,6 +24,7 @@
     };
 
     # Cursor - AI Code Editor (you are the maintainer)
+    # Now includes Chrome for Browser Automation support
     code-cursor-nix = {
       url = "github:jacopone/code-cursor-nix";
       inputs.nixpkgs.follows = "nixpkgs";

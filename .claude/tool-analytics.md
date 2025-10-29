@@ -1,16 +1,16 @@
 ---
 status: active
-created: 2025-10-28
-updated: 2025-10-28
+created: 2025-10-30
+updated: 2025-10-30
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-10-28 12:45:45
+**Last Updated**: 2025-10-30 00:12:38
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 180
+**Total Commands Tracked**: 200
 
 ## Summary
 
@@ -25,13 +25,13 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **devenv**: 43 total
-   - Human: 43 (100%)
+1. **git**: 57 total
+   - Human: 57 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-28
-2. **git**: 39 total
-   - Human: 39 (100%)
+   - Last used: 2025-10-29
+2. **devenv**: 43 total
+   - Human: 43 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-28
@@ -40,11 +40,11 @@ lifecycle: persistent
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-27
-4. **glow**: 22 total
-   - Human: 22 (100%)
+4. **glow**: 24 total
+   - Human: 24 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-27
+   - Last used: 2025-10-29
 5. **bpkit**: 10 total
    - Human: 10 (100%)
    - Claude: 0 (0%)
@@ -102,10 +102,10 @@ lifecycle: persistent
    - Last used: 2025-10-09
 
 ### Human-Preferred Tools (Top 15)
-1. **devenv**: 43 uses
-2. **git**: 39 uses
+1. **git**: 57 uses
+2. **devenv**: 43 uses
 3. **brownfield**: 27 uses
-4. **glow**: 22 uses
+4. **glow**: 24 uses
 5. **bpkit**: 10 uses
 6. **bat**: 8 uses
 7. **specify**: 5 uses
@@ -217,10 +217,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 71 in packages.nix
 
-**glow** - 22 uses- Markdown renderer
-- Human: 22 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-27
-   - Adoption score: 1.2 uses/day
+**glow** - 24 uses- Markdown renderer
+- Human: 24 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-29
+   - Adoption score: 1.1 uses/day
 
 **mcfly** - 🔴 **DORMANT**- Smart command history search with neural networks
 - ⚠️ Never used in last 30 days
@@ -510,10 +510,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 61 in packages.nix
 
-**git** - 39 uses- A free and open source distributed version control system
-- Human: 39 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-28
-   - Adoption score: 1.9 uses/day
+**git** - 57 uses- A free and open source distributed version control system
+- Human: 57 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-29
+   - Adoption score: 2.6 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -676,10 +676,10 @@ lifecycle: persistent
 ### Human-Only Tools
 
 16 tools used only by humans:
+- **git**: 57 uses
 - **devenv**: 43 uses
-- **git**: 39 uses
 - **brownfield**: 27 uses
-- **glow**: 22 uses
+- **glow**: 24 uses
 - **bpkit**: 10 uses
 - **bat**: 8 uses
 - **specify**: 5 uses
@@ -1126,17 +1126,17 @@ lifecycle: persistent
 **Issue**: 4 database-tools tools unused in last 90 days
 **Action**: Consider removing: sqlite, pgcli, mycli, usql
 
+### 💚 LOW PRIORITY: git
+
+**Type**: Highlight Value
+**Issue**: Highly used: 57 invocations (human: 57, Claude: 0)
+**Action**: Keep git - provides excellent value
+
 ### 💚 LOW PRIORITY: devenv
 
 **Type**: Highlight Value
 **Issue**: Highly used: 43 invocations (human: 43, Claude: 0)
 **Action**: Keep devenv - provides excellent value
-
-### 💚 LOW PRIORITY: git
-
-**Type**: Highlight Value
-**Issue**: Highly used: 39 invocations (human: 39, Claude: 0)
-**Action**: Keep git - provides excellent value
 
 ### 💚 LOW PRIORITY: brownfield
 
@@ -1147,9 +1147,9 @@ lifecycle: persistent
 
 ## Usage Trends by Category
 
-- **Other**: 92 invocations
+- **Other**: 110 invocations
 - **Ai Tools**: 53 invocations
-- **Modern Cli**: 34 invocations
+- **Modern Cli**: 36 invocations
 - **System Tools**: 1 invocations
 
 ## Comparison with October 2025 Baseline
@@ -1157,7 +1157,7 @@ lifecycle: persistent
 
 | Tool | Oct 2025 Baseline | Current | Change | Status |
 |------|-------------------|---------|--------|--------|
-| glow | 32 | 22 | -10 | ⚠️ Declining |
+| glow | 32 | 24 | -8 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
 | eza | 19 | 4 | -15 | ⚠️ Declining |
 | bat | 7 | 8 | +1 | ✅ Growing |
@@ -1169,7 +1169,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2025-11-27
+**Scheduled**: 2025-11-29
 
 **Action items for next review**:
 1. Check if dormant tools are still unused

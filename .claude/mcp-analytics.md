@@ -1,50 +1,49 @@
 ---
 status: active
-created: 2025-10-23
-updated: 2025-10-23
+created: 2025-10-30
+updated: 2025-10-30
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-10-23 22:22:10
+**Last Updated**: 2025-10-30 00:12:37
 **Analysis Period**: 30 days
 
 ### Configured Servers (1)
 
-**1. sequential-thinking** ✓ CONNECTED
-   - **Type**: npm
-   - **Command**: `npx @modelcontextprotocol/server-sequential-thinking`
+**1. playwright** ✓ CONNECTED
+   - **Type**: unknown
+   - **Command**: `bash -c cd ~/birthday-manager && devenv shell -- mcp-server-playwright --extension --browser chrome --executable-path /run/current-system/sw/bin/google-chrome-stable`
    - **Location**: global (~/.claude.json)
-   - **Description**: Step-by-step reasoning for complex problems
 
 ### Connection Health
 
 - ✅ **Connected**: 1 server(s)
-  - sequential-thinking
+  - playwright
 
 
 ### Usage Analytics
 
-**Total MCP invocations**: 2048
-**Total tokens consumed**: 21,274,909
-**Estimated total cost**: $130.9116
+**Total MCP invocations**: 2331
+**Total tokens consumed**: 23,150,248
+**Estimated total cost**: $142.7854
 
-#### sequential-thinking.sequentialthinking (global scope)
+#### sequential-thinking.sequentialthinking (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 1669
+- Invocations: 1834
 - Success rate: 0.0%
-- Last used: 2025-10-23 17:03
+- Last used: 2025-10-28 10:44
 
 **Token Consumption:**
-- Total tokens: 16,624,272 (Input: 175,018, Output: 528,791)
-- Cache tokens: 126,481,822 reads, 15,920,463 writes
-- Avg tokens/invocation: 9961
+- Total tokens: 17,846,717 (Input: 190,213, Output: 580,281)
+- Cache tokens: 134,403,825 reads, 17,076,223 writes
+- Avg tokens/invocation: 9731
 
 **Cost Analysis:**
-- Estimated cost: $106.1032
+- Estimated cost: $113.6318
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -79,6 +78,23 @@ lifecycle: persistent
 
 **Cost Analysis:**
 - Estimated cost: $2.5205
+- ROI score: 0.12 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_navigate (global scope)
+
+**Usage Metrics:**
+- Invocations: 53
+- Success rate: 0.0%
+- Last used: 2025-10-28 14:27
+
+**Token Consumption:**
+- Total tokens: 451,941 (Input: 528, Output: 9,911)
+- Cache tokens: 2,126,098 reads, 441,502 writes
+- Avg tokens/invocation: 8527
+
+**Cost Analysis:**
+- Estimated cost: $2.4437
 - ROI score: 0.12 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -250,6 +266,23 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.6419
 - ROI score: 0.07 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_snapshot (global scope)
+
+**Usage Metrics:**
+- Invocations: 17
+- Success rate: 0.0%
+- Last used: 2025-10-28 11:20
+
+**Token Consumption:**
+- Total tokens: 126,641 (Input: 163, Output: 2,325)
+- Cache tokens: 703,875 reads, 124,153 writes
+- Avg tokens/invocation: 7449
+
+**Cost Analysis:**
+- Estimated cost: $0.7121
+- ROI score: 0.13 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### chrome-devtools.list_pages (unknown scope)
@@ -541,6 +574,23 @@ lifecycle: persistent
 - ROI score: 0.02 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### playwright.browser_take_screenshot (global scope)
+
+**Usage Metrics:**
+- Invocations: 15
+- Success rate: 0.0%
+- Last used: 2025-10-28 11:25
+
+**Token Consumption:**
+- Total tokens: 35,751 (Input: 147, Output: 1,095)
+- Cache tokens: 892,744 reads, 34,509 writes
+- Avg tokens/invocation: 2383
+
+**Cost Analysis:**
+- Estimated cost: $0.4141
+- ROI score: 0.42 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### whatsapp.get_community_groups (unknown scope)
 
 **Usage Metrics:**
@@ -573,6 +623,23 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.2198
 - ROI score: 0.10 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_evaluate (global scope)
+
+**Usage Metrics:**
+- Invocations: 5
+- Success rate: 0.0%
+- Last used: 2025-10-28 11:27
+
+**Token Consumption:**
+- Total tokens: 24,276 (Input: 64, Output: 494)
+- Cache tokens: 418,384 reads, 23,718 writes
+- Avg tokens/invocation: 4855
+
+**Cost Analysis:**
+- Estimated cost: $0.2221
+- ROI score: 0.21 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.get_symbols_overview (unknown scope)
@@ -677,6 +744,39 @@ lifecycle: persistent
 - ROI score: 0.44 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### playwright.browser_install (global scope)
+
+**Usage Metrics:**
+- Invocations: 16
+- Success rate: 0.0%
+- Last used: 2025-10-28 13:30
+
+**Token Consumption:**
+- Total tokens: 6,003 (Input: 178, Output: 1,036)
+- Cache tokens: 608,848 reads, 4,789 writes
+- Avg tokens/invocation: 375
+
+**Cost Analysis:**
+- Estimated cost: $0.2167
+- ROI score: 2.67 invocations per 1K tokens
+
+#### playwright.browser_close (global scope)
+
+**Usage Metrics:**
+- Invocations: 2
+- Success rate: 0.0%
+- Last used: 2025-10-28 11:22
+
+**Token Consumption:**
+- Total tokens: 4,424 (Input: 26, Output: 867)
+- Cache tokens: 146,944 reads, 3,531 writes
+- Avg tokens/invocation: 2212
+
+**Cost Analysis:**
+- Estimated cost: $0.0704
+- ROI score: 0.45 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### whatsapp.query_synced_messages (unknown scope)
 
 **Usage Metrics:**
@@ -708,6 +808,22 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.0963
 - ROI score: 1.01 invocations per 1K tokens
+
+#### playwright.browser_tabs (global scope)
+
+**Usage Metrics:**
+- Invocations: 9
+- Success rate: 0.0%
+- Last used: 2025-10-28 09:30
+
+**Token Consumption:**
+- Total tokens: 2,975 (Input: 79, Output: 646)
+- Cache tokens: 665,806 reads, 2,250 writes
+- Avg tokens/invocation: 331
+
+**Cost Analysis:**
+- Estimated cost: $0.2181
+- ROI score: 3.03 invocations per 1K tokens
 
 #### serena.onboarding (unknown scope)
 
@@ -742,21 +858,38 @@ lifecycle: persistent
 - ROI score: 0.67 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### playwright.browser_install (unknown scope)
+#### playwright.browser_navigate_back (global scope)
 
 **Usage Metrics:**
 - Invocations: 1
 - Success rate: 0.0%
-- Last used: 2025-10-15 14:03
+- Last used: 2025-10-28 11:21
 
 **Token Consumption:**
-- Total tokens: 841 (Input: 7, Output: 61)
-- Cache tokens: 36,872 reads, 773 writes
-- Avg tokens/invocation: 841
+- Total tokens: 1,162 (Input: 12, Output: 120)
+- Cache tokens: 72,252 reads, 1,030 writes
+- Avg tokens/invocation: 1162
 
 **Cost Analysis:**
-- Estimated cost: $0.0149
-- ROI score: 1.19 invocations per 1K tokens
+- Estimated cost: $0.0274
+- ROI score: 0.86 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_click (global scope)
+
+**Usage Metrics:**
+- Invocations: 2
+- Success rate: 0.0%
+- Last used: 2025-10-28 11:26
+
+**Token Consumption:**
+- Total tokens: 1,016 (Input: 25, Output: 16)
+- Cache tokens: 149,432 reads, 975 writes
+- Avg tokens/invocation: 508
+
+**Cost Analysis:**
+- Estimated cost: $0.0488
+- ROI score: 1.97 invocations per 1K tokens
 
 #### sunsama.create-task (unknown scope)
 
@@ -774,21 +907,21 @@ lifecycle: persistent
 - Estimated cost: $0.0184
 - ROI score: 1.31 invocations per 1K tokens
 
-#### playwright.browser_snapshot (unknown scope)
+#### playwright.browser_press_key (global scope)
 
 **Usage Metrics:**
 - Invocations: 1
 - Success rate: 0.0%
-- Last used: 2025-10-15 14:03
+- Last used: 2025-10-28 11:25
 
 **Token Consumption:**
-- Total tokens: 698 (Input: 6, Output: 1)
-- Cache tokens: 36,181 reads, 691 writes
-- Avg tokens/invocation: 698
+- Total tokens: 656 (Input: 13, Output: 115)
+- Cache tokens: 91,827 reads, 528 writes
+- Avg tokens/invocation: 656
 
 **Cost Analysis:**
-- Estimated cost: $0.0135
-- ROI score: 1.43 invocations per 1K tokens
+- Estimated cost: $0.0313
+- ROI score: 1.52 invocations per 1K tokens
 
 #### network-monitor.start_monitor (unknown scope)
 
@@ -854,22 +987,6 @@ lifecycle: persistent
 - Estimated cost: $0.0161
 - ROI score: 2.38 invocations per 1K tokens
 
-#### playwright.browser_navigate (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 1
-- Success rate: 0.0%
-- Last used: 2025-10-08 17:13
-
-**Token Consumption:**
-- Total tokens: 412 (Input: 13, Output: 238)
-- Cache tokens: 89,683 reads, 161 writes
-- Avg tokens/invocation: 412
-
-**Cost Analysis:**
-- Estimated cost: $0.0311
-- ROI score: 2.43 invocations per 1K tokens
-
 #### chrome-devtools.evaluate (unknown scope)
 
 **Usage Metrics:**
@@ -889,28 +1006,32 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 477
+**Total sessions analyzed**: 612
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
-#### sequential-thinking (global scope)
+#### playwright (global scope)
 
 **Session Metrics:**
-- Utilization rate: 16.6% (79/477 sessions)
+- Utilization rate: 3.1% (19/612 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (477 sessions)
+- ⚠️  Loads in ALL sessions (612 sessions)
 
 **Overhead Analysis:**
-- Estimated overhead: ~500 tokens per session
-- Total wasted overhead: ~199,000 tokens (398 unused sessions)
+- Estimated overhead: ~4,000 tokens per session
+- Total wasted overhead: ~2,372,000 tokens (593 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
+**HIGH**: playwright
+   - **Issue**: Server 'playwright' loads in all sessions but only used in 3.1% (19/612 sessions)
+   - **Action**: Consider moving 'playwright' to project-level config. Wasted overhead: ~2,372,000 tokens across 593 sessions
+
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1669 invocations for 16,624,272 tokens (est. $106.1032)
-   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (global scope)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1834 invocations for 17,846,717 tokens (est. $113.6318)
+   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 22 invocations for 315,420 tokens (est. $1.5330)
@@ -948,9 +1069,33 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Issue**: Server 'serena' has low ROI: 6 invocations for 69,405 tokens (est. $0.4391)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 53 invocations for 451,941 tokens (est. $2.4437)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 9 invocations for 194,435 tokens (est. $0.9600)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 17 invocations for 126,641 tokens (est. $0.7121)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 15 invocations for 35,751 tokens (est. $0.4141)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 2 invocations for 4,424 tokens (est. $0.0704)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 5 invocations for 24,276 tokens (est. $0.2221)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 1 invocations for 1,162 tokens (est. $0.0274)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: chrome-devtools
    - **Issue**: Server 'chrome-devtools' has low ROI: 7 invocations for 105,704 tokens (est. $0.5440)
@@ -1064,13 +1209,9 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 6,805 tokens (est. $0.0927)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
-**MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' loads in all sessions but only used in 16.6% (79/477 sessions)
-   - **Action**: Consider moving 'sequential-thinking' to project-level config. Wasted overhead: ~199,000 tokens across 398 sessions
-
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 16,624,272 tokens (est. $106.10)
-   - **Action**: Frequent user: 1669 calls, ~9,960 tokens/call (global scope)
+   - **Issue**: Server 'sequential-thinking' consumed 17,846,717 tokens (est. $113.63)
+   - **Action**: Frequent user: 1834 calls, ~9,731 tokens/call (unknown scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
@@ -1092,9 +1233,17 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Issue**: Server 'serena' consumed 104,887 tokens (est. $0.46)
    - **Action**: Frequent user: 7 calls, ~14,983 tokens/call (unknown scope)
 
+**LOW**: playwright
+   - **Issue**: Server 'playwright' consumed 451,941 tokens (est. $2.44)
+   - **Action**: Frequent user: 53 calls, ~8,527 tokens/call (global scope)
+
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 194,435 tokens (est. $0.96)
    - **Action**: Frequent user: 9 calls, ~21,603 tokens/call (unknown scope)
+
+**LOW**: playwright
+   - **Issue**: Server 'playwright' consumed 126,641 tokens (est. $0.71)
+   - **Action**: Frequent user: 17 calls, ~7,449 tokens/call (global scope)
 
 **LOW**: chrome-devtools
    - **Issue**: Server 'chrome-devtools' consumed 105,704 tokens (est. $0.54)
