@@ -1,0 +1,131 @@
+---
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'  # Weekly, Monday at 4 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: update-deps
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Update Flake Inputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+
+      - name: Update flake inputs
+        id: update
+        run: |
+          echo "Updating flake inputs..."
+
+          # Create backup
+          cp flake.lock flake.lock.backup
+
+          # Update inputs
+          nix flake update
+
+          # Check what changed
+          if git diff --quiet flake.lock; then
+            echo "No updates available"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+          # Count updates
+          CHANGES=$(git diff flake.lock | grep '^+' | grep -c 'rev = ' || true)
+          echo "changed_packages=$CHANGES" >> "$GITHUB_OUTPUT"
+
+      - name: Validate updated config
+        if: steps.update.outputs.has_changes == 'true'
+        run: |
+          echo "Validating updated configuration..."
+          nix flake check --no-build
+
+      - name: Generate changelog entry
+        if: steps.update.outputs.has_changes == 'true'
+        run: |
+          {
+            echo "## Dependency Updates"
+            echo ""
+            echo "Updated flake inputs automatically."
+            echo ""
+            echo "**Changes**: See flake.lock diff in PR"
+            echo ""
+            echo "**Next steps**:"
+            echo "1. Review changes"
+            echo "2. Merge PR"
+            echo "3. System will auto-deploy updated config"
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Create pull request
+        if: steps.update.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update flake inputs'
+          title: 'chore: update flake dependencies'
+          body: |
+            ## Automated Dependency Update
+
+            Flake inputs have been updated to latest versions.
+
+            **Before merging**:
+            1. Review flake.lock changes
+            2. Check for breaking changes in changelogs
+            3. Allow automated tests to pass
+
+            **After merging**:
+            - Automated deployment will update system configuration
+          branch: chore/update-flake
+          delete-branch: true
+          labels: dependencies, automated
+
+      - name: Restore on failure
+        if: failure()
+        run: |
+          if [ -f flake.lock.backup ]; then
+            mv flake.lock.backup flake.lock
+            echo "Restored flake.lock from backup"
+          fi
+
+  cleanup:
+    name: Cleanup stale branches
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove stale update branches
+        continue-on-error: true
+        run: |
+          # Remove branches that are >30 days old and merged
+          git fetch --prune origin
+
+          # Delete local branches tracking deleted remote branches
+          git branch -vv | grep 'origin/.*: gone' | awk '{print $1}' | xargs -r git branch -D
+
+          echo "✅ Cleaned up stale branches"

@@ -1,0 +1,161 @@
+---
+name: Deploy on Master
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+
+      - name: Flake syntax check
+        run: nix flake check --no-build
+
+      - name: Security scan
+        continue-on-error: true
+        run: |
+          nix shell nixpkgs#gitleaks --command \
+            gitleaks detect --source . --report-path /tmp/gitleaks.json || true
+
+  build:
+    name: Build Configuration
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+          extra-conf: |
+            extra-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypQtVcp/p3crupQmIabrEh0W0
+
+      - name: Build system derivation
+        run: |
+          nix build --no-link --print-out-paths \
+            --option use-http-compression true \
+            .#nixosConfigurations.nixos.config.system.build.toplevel \
+            2>&1 | tee /tmp/build-output.log
+
+      - name: Extract build metrics
+        id: metrics
+        run: |
+          # Calculate closure size
+          CLOSURE_SIZE=$(nix path-info -S -r \
+            ./result 2>/dev/null | tail -1 | awk '{print int($1/1024/1024/1024)}' || echo "?")
+
+          echo "closure_size=${CLOSURE_SIZE}GB" >> "$GITHUB_OUTPUT"
+          echo "✅ Build complete - Closure: ${CLOSURE_SIZE}GB"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: /tmp/build-output.log
+          retention-days: 7
+
+  notify:
+    name: Notify Deployment Ready
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+
+    permissions:
+      deployments: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create deployment notification
+        uses: actions/github-script@v7
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = process.env.COMMIT_SHA;
+
+            await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: sha,
+              environment: 'production',
+              description: 'Ready for manual deployment',
+              auto_merge: false,
+              required_contexts: []
+            }).catch(() => {
+              // Continue on error
+            });
+
+  deploy-approved:
+    name: Deploy (Manual Approval)
+    needs: notify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: false  # Requires manual workflow_dispatch
+
+    environment:
+      name: production
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trigger remote deployment
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          TARGET_HOST: ${{ secrets.TARGET_HOST }}
+          TARGET_USER: ${{ secrets.TARGET_USER }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ] || [ -z "$TARGET_HOST" ] || [ -z "$TARGET_USER" ]; then
+            echo "⚠️  Deployment secrets not configured"
+            echo "Skipping remote deployment"
+            exit 0
+          fi
+
+          # Save SSH key
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # Deploy via SSH
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=accept-new \
+            -o UserKnownHostsFile=/dev/null \
+            "${TARGET_USER}@${TARGET_HOST}" \
+            'cd ~/nixos-config && git pull && ./rebuild-nixos' || {
+              echo "⚠️  Remote deployment skipped or failed"
+              exit 0
+            }
+
+      - name: Clean up SSH key
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+          rm -rf ~/.ssh

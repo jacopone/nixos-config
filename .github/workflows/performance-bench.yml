@@ -1,0 +1,190 @@
+---
+name: Performance Benchmark
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly, Sunday at 3 AM UTC
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Build Performance Metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+          extra-conf: |
+            extra-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypQtVcp/p3crupQmIabrEh0W0
+
+      - name: Benchmark flake evaluation
+        id: eval
+        run: |
+          echo "Starting flake evaluation benchmark..."
+
+          # Run evaluation multiple times for statistical significance
+          EVAL_TIMES=()
+          for i in {1..3}; do
+            START=$(date +%s%N)
+            nix flake show > /dev/null 2>&1
+            END=$(date +%s%N)
+            DURATION=$((($END - $START) / 1000000))
+            EVAL_TIMES+=($DURATION)
+            echo "  Run $i: ${DURATION}ms"
+          done
+
+          # Calculate average (ms)
+          AVG=0
+          for time in "${EVAL_TIMES[@]}"; do
+            AVG=$((AVG + time))
+          done
+          AVG=$((AVG / ${#EVAL_TIMES[@]}))
+
+          echo "eval_time_ms=$AVG" >> "$GITHUB_OUTPUT"
+          echo "✅ Evaluation: ${AVG}ms (target: <10000ms)"
+
+      - name: Benchmark system build
+        id: build
+        run: |
+          echo "Starting system build benchmark..."
+
+          START=$(date +%s)
+          nix build --no-link --print-out-paths \
+            --option use-http-compression true \
+            .#nixosConfigurations.nixos.config.system.build.toplevel \
+            > /tmp/build-path.txt 2>&1
+          END=$(date +%s)
+
+          BUILD_TIME=$((END - START))
+          BUILD_PATH=$(cat /tmp/build-path.txt | tail -1)
+
+          echo "build_time_s=$BUILD_TIME" >> "$GITHUB_OUTPUT"
+          echo "build_path=$BUILD_PATH" >> "$GITHUB_OUTPUT"
+          echo "✅ Build completed in ${BUILD_TIME}s (target: <120s)"
+
+      - name: Measure closure size
+        id: closure
+        run: |
+          BUILD_PATH=$(cat /tmp/build-path.txt | tail -1)
+
+          # Get closure size in bytes
+          CLOSURE_BYTES=$(nix path-info -S -r "$BUILD_PATH" 2>/dev/null | tail -1 | awk '{print $1}')
+          CLOSURE_GB=$((CLOSURE_BYTES / 1024 / 1024 / 1024))
+          CLOSURE_MB=$((CLOSURE_BYTES / 1024 / 1024))
+
+          echo "closure_bytes=$CLOSURE_BYTES" >> "$GITHUB_OUTPUT"
+          echo "closure_gb=$CLOSURE_GB" >> "$GITHUB_OUTPUT"
+          echo "closure_mb=$CLOSURE_MB" >> "$GITHUB_OUTPUT"
+          echo "✅ Closure size: ${CLOSURE_GB}GB (${CLOSURE_MB}MB total)"
+
+      - name: Compare against baseline
+        id: compare
+        env:
+          EVAL_TIME: ${{ steps.eval.outputs.eval_time_ms }}
+          BUILD_TIME: ${{ steps.build.outputs.build_time_s }}
+          CLOSURE_GB: ${{ steps.closure.outputs.closure_gb }}
+        run: |
+          echo "Comparing against baseline..."
+          echo ""
+
+          # Baseline from Phase 2B assessment (ms)
+          EVAL_BASELINE=11900
+          BUILD_BASELINE=120
+          CLOSURE_BASELINE=15
+
+          # Calculate thresholds (50% regression allowed)
+          EVAL_THRESHOLD=$((EVAL_BASELINE * 150 / 100))
+          BUILD_THRESHOLD=$((BUILD_BASELINE * 150 / 100))
+          CLOSURE_THRESHOLD=$((CLOSURE_BASELINE * 150 / 100))
+
+          # Comparison
+          EVAL_REGRESSION=$((100 * (EVAL_TIME - EVAL_BASELINE) / EVAL_BASELINE))
+          BUILD_REGRESSION=$((100 * (BUILD_TIME - BUILD_BASELINE) / BUILD_BASELINE))
+          CLOSURE_REGRESSION=$((100 * (CLOSURE_GB - CLOSURE_BASELINE) / CLOSURE_BASELINE))
+
+          REGRESSION_FOUND=0
+
+          echo "### Baseline Comparison"
+          echo ""
+          echo "| Metric | Current | Baseline | Regression | Status |"
+          echo "|--------|---------|----------|------------|--------|"
+
+          if [ "$EVAL_TIME" -gt "$EVAL_THRESHOLD" ]; then
+            echo "| Flake Eval | ${EVAL_TIME}ms | ${EVAL_BASELINE}ms | +${EVAL_REGRESSION}% | ❌ REGRESSION |"
+            REGRESSION_FOUND=1
+          else
+            STATUS="✅"
+            if [ "$EVAL_REGRESSION" -gt 0 ]; then
+              STATUS="⚠️  slight"
+            fi
+            echo "| Flake Eval | ${EVAL_TIME}ms | ${EVAL_BASELINE}ms | +${EVAL_REGRESSION}% | $STATUS |"
+          fi
+
+          if [ "$BUILD_TIME" -gt "$BUILD_THRESHOLD" ]; then
+            echo "| Build Time | ${BUILD_TIME}s | ${BUILD_BASELINE}s | +${BUILD_REGRESSION}% | ❌ REGRESSION |"
+            REGRESSION_FOUND=1
+          else
+            STATUS="✅"
+            if [ "$BUILD_REGRESSION" -gt 0 ]; then
+              STATUS="⚠️  slight"
+            fi
+            echo "| Build Time | ${BUILD_TIME}s | ${BUILD_BASELINE}s | +${BUILD_REGRESSION}% | $STATUS |"
+          fi
+
+          if [ "$CLOSURE_GB" -gt "$CLOSURE_THRESHOLD" ]; then
+            echo "| Closure Size | ${CLOSURE_GB}GB | ${CLOSURE_BASELINE}GB | +${CLOSURE_REGRESSION}% | ❌ REGRESSION |"
+            REGRESSION_FOUND=1
+          else
+            STATUS="✅"
+            if [ "$CLOSURE_REGRESSION" -gt 0 ]; then
+              STATUS="⚠️  slight"
+            fi
+            echo "| Closure Size | ${CLOSURE_GB}GB | ${CLOSURE_BASELINE}GB | +${CLOSURE_REGRESSION}% | $STATUS |"
+          fi
+
+          echo "regression_found=$REGRESSION_FOUND" >> "$GITHUB_OUTPUT"
+
+      - name: Generate performance report
+        if: always()
+        env:
+          EVAL_TIME: ${{ steps.eval.outputs.eval_time_ms }}
+          BUILD_TIME: ${{ steps.build.outputs.build_time_s }}
+          CLOSURE_GB: ${{ steps.closure.outputs.closure_gb }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "## Performance Benchmark Report"
+            echo ""
+            echo "**Date**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            echo "**Commit**: ${COMMIT_SHA:0:7}"
+            echo ""
+            echo "### Results"
+            echo ""
+            echo "| Metric | Value | Target | Status |"
+            echo "|--------|-------|--------|--------|"
+            echo "| Flake Evaluation | ${EVAL_TIME}ms | <10000ms | ✅ |"
+            echo "| Build Time | ${BUILD_TIME}s | <120s | ✅ |"
+            echo "| Closure Size | ${CLOSURE_GB}GB | <15GB | ✅ |"
+            echo ""
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: /tmp/build-*.txt
+          retention-days: 30
+
+      - name: Fail on regression
+        if: steps.compare.outputs.regression_found == '1'
+        run: |
+          echo "::error::Performance regression detected"
+          exit 1

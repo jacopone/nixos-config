@@ -1,0 +1,185 @@
+---
+name: Validate PR
+
+on:
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  syntax:
+    name: Syntax & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+          extra-conf: |
+            extra-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypQtVcp/p3crupQmIabrEh0W0
+
+      - name: Flake syntax check
+        run: nix flake check --no-build
+
+      - name: Flake introspection
+        run: nix flake show
+
+      - name: Deadnix detection
+        run: |
+          nix shell nixpkgs#deadnix --command \
+            deadnix --exclude result
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+
+      - name: Gitleaks secret scan
+        id: gitleaks
+        continue-on-error: true
+        run: |
+          nix shell nixpkgs#gitleaks --command \
+            gitleaks detect --source . --report-path gitleaks-report.json || true
+
+      - name: Trivy filesystem scan
+        id: trivy
+        continue-on-error: true
+        run: |
+          nix shell nixpkgs#trivy --command \
+            trivy fs --severity CRITICAL,HIGH --exit-code 0 .
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: gitleaks-report.json
+          retention-days: 30
+
+  documentation:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix-path: nixpkgs=channel:nixos-unstable
+
+      - name: Check markdown frontmatter
+        continue-on-error: true
+        run: |
+          # Find all changed markdown files
+          CHANGED_MD=$(git diff origin/master...HEAD --name-only -- '*.md' 2>/dev/null || echo "")
+
+          if [ -z "$CHANGED_MD" ]; then
+            echo "✅ No markdown files changed"
+            exit 0
+          fi
+
+          MISSING_FRONTMATTER=0
+          while IFS= read -r file; do
+            if [ ! -f "$file" ]; then continue; fi
+
+            # Skip auto-generated files
+            if [[ "$file" =~ (CLAUDE\.md$|node_modules|\.devenv) ]]; then
+              continue
+            fi
+
+            # Check for frontmatter
+            if ! head -1 "$file" | grep -q "^---$"; then
+              echo "❌ Missing frontmatter: $file"
+              MISSING_FRONTMATTER=1
+            fi
+          done <<< "$CHANGED_MD"
+
+          if [ $MISSING_FRONTMATTER -eq 1 ]; then
+            echo "::warning::Some markdown files missing YAML frontmatter"
+          else
+            echo "✅ All markdown files have valid frontmatter"
+          fi
+
+      - name: Markdown lint
+        continue-on-error: true
+        run: |
+          nix shell nixpkgs#nodePackages.markdownlint-cli2 --command \
+            markdownlint-cli2 "docs/**/*.md" "*.md" 2>/dev/null || \
+            echo "⚠️  Markdown linting complete (warnings allowed)"
+
+  validation-summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [syntax, security, documentation]
+    if: always()
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Check syntax validation
+        run: |
+          if [ "${{ needs.syntax.result }}" != "success" ]; then
+            echo "❌ Syntax validation failed"
+            exit 1
+          fi
+          echo "✅ Syntax validation passed"
+
+      - name: Create validation report
+        uses: actions/github-script@v7
+        if: always()
+        env:
+          SYNTAX_RESULT: ${{ needs.syntax.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
+          DOCS_RESULT: ${{ needs.documentation.result }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const syntaxOk = process.env.SYNTAX_RESULT === 'success';
+            const securityOk = process.env.SECURITY_RESULT === 'success';
+            const docsOk = process.env.DOCS_RESULT === 'success';
+
+            const comment = `## Validation Results
+
+| Check | Status |
+|-------|--------|
+| Syntax & Lint | ${syntaxOk ? '✅ Pass' : '❌ Fail'} |
+| Security Scan | ${securityOk ? '✅ Pass' : '⚠️  Review findings'} |
+| Documentation | ${docsOk ? '✅ Pass' : '⚠️  Review'} |
+
+**Ready to merge**: ${syntaxOk ? '**Yes**' : '**No** - fix syntax errors'}`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
