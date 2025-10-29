@@ -159,17 +159,41 @@ sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
 
 # === PHASE 1: Update Flake Inputs ===
 # Updates nix flake lock file to get latest package versions
+# SMART UPDATE: Uses --refresh for locally-maintained repos to bypass cache
 # Side effects: Modifies flake.lock, may pull in breaking changes
 # Exit on failure: Yes (can't build without valid inputs)
-# Update the flake inputs
+
 log_step "Updating flake inputs..."
+
+# Define locally-maintained inputs that need cache bypass
+LOCAL_INPUTS=(
+    "code-cursor-nix"
+    "whisper-dictation"
+    "claude-automation"
+    "claude-code-nix"  # Also locally maintained by you
+)
+
 if [ "$VERBOSE" = true ]; then
-    nix flake update 2>&1 | tee -a "$LOG_FILE"
+    echo "📦 Updating external inputs (using cache)..."
+    nix flake update nixpkgs home-manager 2>&1 | tee -a "$LOG_FILE"
+
+    echo "🚀 Updating local inputs (bypassing cache with --refresh)..."
+    for input in "${LOCAL_INPUTS[@]}"; do
+        echo "   - Updating $input..."
+        nix flake update "$input" --refresh 2>&1 | tee -a "$LOG_FILE"
+    done
 else
-    nix flake update &>"$LOG_FILE"
+    # Quiet mode: Update external inputs first (cached)
+    nix flake update nixpkgs home-manager &>>"$LOG_FILE"
+
+    # Update local inputs with --refresh to bypass cache
+    for input in "${LOCAL_INPUTS[@]}"; do
+        nix flake update "$input" --refresh &>>"$LOG_FILE"
+    done
 fi
-log_success "Flake inputs updated"
-add_action "Updated flake.lock"
+
+log_success "Flake inputs updated (local repos refreshed)"
+add_action "Updated flake.lock with cache bypass for local repos"
 
 # === PHASE 2: Test Build ===
 # Builds new configuration WITHOUT activating it (safe to fail)
