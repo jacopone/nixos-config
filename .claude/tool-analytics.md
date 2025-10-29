@@ -1,23 +1,23 @@
 ---
 status: active
-created: 2025-10-24
-updated: 2025-10-24
+created: 2025-10-28
+updated: 2025-10-28
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-10-24 14:52:14
+**Last Updated**: 2025-10-28 12:45:45
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 132
+**Total Commands Tracked**: 180
 
 ## Summary
 
 - **Total Tools Installed**: 130
-- **Tools Used**: 15 (11.5%)
-- **Dormant Tools**: 114
-- **Human-Used Tools**: 15
+- **Tools Used**: 16 (12.3%)
+- **Dormant Tools**: 113
+- **Human-Used Tools**: 16
 - **Claude-Used Tools**: 0
 
 ⚠️ **Low adoption rate**: Less than half of installed tools are being used
@@ -25,98 +25,98 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **devenv**: 37 total
-   - Human: 37 (100%)
+1. **devenv**: 43 total
+   - Human: 43 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-22
-2. **git**: 27 total
+   - Last used: 2025-10-28
+2. **git**: 39 total
+   - Human: 39 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-10-28
+3. **brownfield**: 27 total
    - Human: 27 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-22
-3. **glow**: 20 total
-   - Human: 20 (100%)
+   - Last used: 2025-10-27
+4. **glow**: 22 total
+   - Human: 22 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-24
-4. **bpkit**: 10 total
+   - Last used: 2025-10-27
+5. **bpkit**: 10 total
    - Human: 10 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-21
-5. **bat**: 8 total
+6. **bat**: 8 total
    - Human: 8 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-23
-6. **specify**: 5 total
+7. **specify**: 5 total
    - Human: 5 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-21
-7. **nix**: 5 total
+8. **nix**: 5 total
    - Human: 5 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-11
-8. **direnv**: 4 total
+9. **direnv**: 4 total
    - Human: 4 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-08
-9. **eza**: 4 total
+10. **eza**: 4 total
    - Human: 4 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-23
-10. **gemini-cli**: 4 total
+11. **gemini-cli**: 4 total
    - Human: 4 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-20
-11. **opencode**: 4 total
+12. **opencode**: 4 total
    - Human: 4 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-22
-12. **jules**: 1 total
+13. **claude-flow**: 2 total
+   - Human: 2 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-10-26
+14. **jules**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-08
-13. **claude-flow**: 1 total
-   - Human: 1 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-10-08
-14. **nmap**: 1 total
+15. **nmap**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-09
-15. **brownfield**: 1 total
-   - Human: 1 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-10-21
 
 ### Human-Preferred Tools (Top 15)
-1. **devenv**: 37 uses
-2. **git**: 27 uses
-3. **glow**: 20 uses
-4. **bpkit**: 10 uses
-5. **bat**: 8 uses
-6. **specify**: 5 uses
-7. **nix**: 5 uses
-8. **direnv**: 4 uses
-9. **eza**: 4 uses
-10. **gemini-cli**: 4 uses
-11. **opencode**: 4 uses
-12. **jules**: 1 uses
-13. **claude-flow**: 1 uses
-14. **nmap**: 1 uses
-15. **brownfield**: 1 uses
+1. **devenv**: 43 uses
+2. **git**: 39 uses
+3. **brownfield**: 27 uses
+4. **glow**: 22 uses
+5. **bpkit**: 10 uses
+6. **bat**: 8 uses
+7. **specify**: 5 uses
+8. **nix**: 5 uses
+9. **direnv**: 4 uses
+10. **eza**: 4 uses
+11. **gemini-cli**: 4 uses
+12. **opencode**: 4 uses
+13. **claude-flow**: 2 uses
+14. **jules**: 1 uses
+15. **nmap**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
 
@@ -132,13 +132,13 @@ lifecycle: persistent
    - Last used: 2025-10-21
    - Adoption score: 1.1 uses/day
 
-**brownfield** - 1 uses- Human: 1 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-21
-   - Adoption score: 1.0 uses/day
+**brownfield** - 27 uses- Human: 27 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-27
+   - Adoption score: 5.4 uses/day
 
-**claude-flow** - 1 uses- Human: 1 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-08
-   - Adoption score: 1.0 uses/day
+**claude-flow** - 2 uses- Human: 2 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-26
+   - Adoption score: 0.1 uses/day
 
 **gemini-cli** - 4 uses- Human: 4 | Claude: 0 | Scripts: 0
    - Last used: 2025-10-20
@@ -217,9 +217,9 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 71 in packages.nix
 
-**glow** - 20 uses- Markdown renderer
-- Human: 20 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-24
+**glow** - 22 uses- Markdown renderer
+- Human: 22 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-27
    - Adoption score: 1.2 uses/day
 
 **mcfly** - 🔴 **DORMANT**- Smart command history search with neural networks
@@ -484,10 +484,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 138 in packages.nix
 
-**devenv** - 37 uses- Fast, declarative development environments - instant service commands
-- Human: 37 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-22
-   - Adoption score: 2.6 uses/day
+**devenv** - 43 uses- Fast, declarative development environments - instant service commands
+- Human: 43 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-28
+   - Adoption score: 2.1 uses/day
 
 **direnv** - 4 uses- Automatic per-directory environment activation - enables .envrc
 - Human: 4 | Claude: 0 | Scripts: 0
@@ -510,10 +510,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 61 in packages.nix
 
-**git** - 27 uses- A free and open source distributed version control system
-- Human: 27 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-22
-   - Adoption score: 1.8 uses/day
+**git** - 39 uses- A free and open source distributed version control system
+- Human: 39 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-28
+   - Adoption score: 1.9 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -601,9 +601,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 86 in packages.nix
 
-**pytest** - 🔴 **DORMANT**- Testing framework for Python
-- ⚠️ Never used in last 30 days
-   - Location: line 85 in packages.nix
+**pytest** - 1 uses- Testing framework for Python
+- Human: 1 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-27
+   - Adoption score: 1.0 uses/day
 
 **rich** - 🔴 **DORMANT**- Rich - Python terminal UI library (for BASB system)
 - ⚠️ Never used in last 30 days
@@ -674,10 +675,11 @@ lifecycle: persistent
 
 ### Human-Only Tools
 
-15 tools used only by humans:
-- **devenv**: 37 uses
-- **git**: 27 uses
-- **glow**: 20 uses
+16 tools used only by humans:
+- **devenv**: 43 uses
+- **git**: 39 uses
+- **brownfield**: 27 uses
+- **glow**: 22 uses
 - **bpkit**: 10 uses
 - **bat**: 8 uses
 - **specify**: 5 uses
@@ -686,10 +688,10 @@ lifecycle: persistent
 - **eza**: 4 uses
 - **gemini-cli**: 4 uses
 - **opencode**: 4 uses
+- **claude-flow**: 2 uses
 - **jules**: 1 uses
-- **claude-flow**: 1 uses
 - **nmap**: 1 uses
-- **brownfield**: 1 uses
+- **pytest**: 1 uses
 
 💡 **Insight**: These tools solve human-specific needs or Claude is not aware of them.
 
@@ -698,7 +700,7 @@ lifecycle: persistent
 
 ## Dormant Tools (Candidates for Removal)
 
-114 tools unused in last 30 days:
+113 tools unused in last 30 days:
 
 **bmad-method**   - Category: ai-tools
    - Location: line 18 in packages.nix
@@ -893,9 +895,6 @@ lifecycle: persistent
 **rich** - Rich - Python terminal UI library (for BASB system)   - Category: other
    - Location: line 83 in packages.nix
 
-**pytest** - Testing framework for Python   - Category: other
-   - Location: line 85 in packages.nix
-
 **pydantic** - Data validation using Python type hints   - Category: other
    - Location: line 86 in packages.nix
 
@@ -1082,8 +1081,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 46 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 41 more
+**Issue**: 45 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 40 more
 
 ### 🟡 MEDIUM PRIORITY: modern-cli tools
 
@@ -1130,21 +1129,27 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: devenv
 
 **Type**: Highlight Value
-**Issue**: Highly used: 37 invocations (human: 37, Claude: 0)
+**Issue**: Highly used: 43 invocations (human: 43, Claude: 0)
 **Action**: Keep devenv - provides excellent value
 
 ### 💚 LOW PRIORITY: git
 
 **Type**: Highlight Value
-**Issue**: Highly used: 27 invocations (human: 27, Claude: 0)
+**Issue**: Highly used: 39 invocations (human: 39, Claude: 0)
 **Action**: Keep git - provides excellent value
+
+### 💚 LOW PRIORITY: brownfield
+
+**Type**: Highlight Value
+**Issue**: Highly used: 27 invocations (human: 27, Claude: 0)
+**Action**: Keep brownfield - provides excellent value
 
 
 ## Usage Trends by Category
 
-- **Other**: 73 invocations
-- **Modern Cli**: 32 invocations
-- **Ai Tools**: 26 invocations
+- **Other**: 92 invocations
+- **Ai Tools**: 53 invocations
+- **Modern Cli**: 34 invocations
 - **System Tools**: 1 invocations
 
 ## Comparison with October 2025 Baseline
@@ -1152,7 +1157,7 @@ lifecycle: persistent
 
 | Tool | Oct 2025 Baseline | Current | Change | Status |
 |------|-------------------|---------|--------|--------|
-| glow | 32 | 20 | -12 | ⚠️ Declining |
+| glow | 32 | 22 | -10 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
 | eza | 19 | 4 | -15 | ⚠️ Declining |
 | bat | 7 | 8 | +1 | ✅ Growing |
@@ -1164,7 +1169,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2025-11-23
+**Scheduled**: 2025-11-27
 
 **Action items for next review**:
 1. Check if dormant tools are still unused

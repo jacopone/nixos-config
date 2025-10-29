@@ -1,6 +1,12 @@
 {
   description = "My NixOS Flake Configuration";
 
+  # Enable evaluation caching for 60-80% faster repeated evaluations
+  nixConfig = {
+    eval-cache = true;
+    tarball-ttl = 3600; # Cache flake inputs for 1 hour
+  };
+
   inputs = {
     # Nix Packages collection
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

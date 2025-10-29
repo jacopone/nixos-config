@@ -6,7 +6,7 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "brownkit";
-  version = "0.1.0";
+  version = "0.2.1";
   format = "pyproject";
 
   # Use local source directory
@@ -19,6 +19,9 @@ python3Packages.buildPythonApplication rec {
 
   propagatedBuildInputs = with python3Packages; [
     click
+    pyyaml
+    jinja2
+    rich
   ];
 
   # Skip tests during build (can be enabled later)

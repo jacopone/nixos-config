@@ -140,19 +140,19 @@
 
 ## 📦 System Tool Usage
 
-**Installed**: 130 tools | **Used**: 15 (12%) | **Analysis period**: 30 days
+**Installed**: 130 tools | **Used**: 16 (12%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **devenv**: 37 uses (H:37 C:0)
-- **git**: 27 uses (H:27 C:0)
-- **glow**: 20 uses (H:20 C:0)
+- **devenv**: 43 uses (H:43 C:0)
+- **git**: 39 uses (H:39 C:0)
+- **brownfield**: 27 uses (H:27 C:0)
+- **glow**: 22 uses (H:22 C:0)
 - **bpkit**: 10 uses (H:10 C:0)
-- **bat**: 8 uses (H:8 C:0)
 
-⚠️ **114 dormant tools** found (unused in last 30 days)
+⚠️ **113 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
-- 15 tools used by humans
+- 16 tools used by humans
 - 0 tools used by Claude
 - ⚠️ Claude using significantly fewer tools than humans
 

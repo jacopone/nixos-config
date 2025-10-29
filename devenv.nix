@@ -27,6 +27,9 @@
     python313Packages.jinja2
     python313Packages.pydantic
     python313Packages.pytest
+
+    # Playwright MCP for browser automation
+    playwright-mcp
   ];
 
   # Languages configuration
