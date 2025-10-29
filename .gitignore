@@ -47,6 +47,9 @@ docs/automation/claude-backup-legacy.md
 
 # Claude Code machine-specific context
 .claude/CLAUDE.local.md
+.claude/sessions/
+.claude.json
+.mcp.json
 
 # Data and model files
 data/models/**/*.bin
