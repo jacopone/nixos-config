@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761778207,
-        "narHash": "sha256-a/4ci8QdwsbQL9OPlJoTZcRuo1O4c+kJwCVKVEYbpOc=",
+        "lastModified": 1761299273,
+        "narHash": "sha256-WV1wagdqpEanpcMaiE23s+RQ57kAytQCMeFcgCaZ1QA=",
         "owner": "jacopone",
         "repo": "code-cursor-nix",
-        "rev": "dc3d1f7c97e035bad8f45f69d050ef1b728e0bd7",
+        "rev": "72da26fa33fe2155ca9fbdf8333039c6e76df092",
         "type": "github"
       },
       "original": {
