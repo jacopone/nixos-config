@@ -201,7 +201,7 @@
     # Essential dependencies for yazi preview functionality
     file                # File type detection (essential for yazi)
     ffmpegthumbnailer   # Video thumbnails for yazi
-    poppler_utils       # PDF preview utilities
+    poppler-utils       # PDF preview utilities
     imagemagick         # Image processing for previews
     
     # File viewers and openers for yazi

@@ -532,8 +532,17 @@ then
 
     if [ -n "$commit_message" ]; then
       log_step "Committing changes..."
-      git commit -m "$commit_message"
-      add_action "Created git commit"
+      # Use PRE_COMMIT_ALLOW_NO_CONFIG=1 to bypass pre-commit config warning
+      # Wrap in error handling so script continues even if commit fails
+      if PRE_COMMIT_ALLOW_NO_CONFIG=1 git commit -m "$commit_message" 2>&1; then
+        log_success "Created git commit"
+        add_action "Created git commit"
+      else
+        log_warning "Git commit failed (likely pre-commit hook issue)"
+        log_warning "Changes are staged but not committed"
+        log_warning "You can commit manually later with: git commit -m \"your message\""
+        add_action "Staged changes (commit failed - manual commit needed)"
+      fi
     else
       log_warning "No commit message provided. Skipping commit."
     fi
@@ -914,9 +923,15 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     log_step "Pushing to remote..."
-    git push
-    log_success "Changes pushed to remote"
-    add_action "Pushed to git remote"
+    # Wrap git push in error handling to prevent script exit
+    if git push 2>&1; then
+        log_success "Changes pushed to remote"
+        add_action "Pushed to git remote"
+    else
+        log_warning "Git push failed (check your network/authentication)"
+        log_warning "You can push manually later with: git push"
+        add_action "Push failed (manual push needed)"
+    fi
 fi
 
 # Print summary

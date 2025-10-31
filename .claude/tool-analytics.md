@@ -1,16 +1,16 @@
 ---
 status: active
-created: 2025-10-30
-updated: 2025-10-30
+created: 2025-10-31
+updated: 2025-10-31
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-10-30 00:46:43
+**Last Updated**: 2025-10-31 21:22:42
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 205
+**Total Commands Tracked**: 208
 
 ## Summary
 
@@ -25,11 +25,11 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **git**: 62 total
-   - Human: 62 (100%)
+1. **git**: 65 total
+   - Human: 65 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-10-29
+   - Last used: 2025-10-31
 2. **devenv**: 43 total
    - Human: 43 (100%)
    - Claude: 0 (0%)
@@ -102,7 +102,7 @@ lifecycle: persistent
    - Last used: 2025-10-09
 
 ### Human-Preferred Tools (Top 15)
-1. **git**: 62 uses
+1. **git**: 65 uses
 2. **devenv**: 43 uses
 3. **brownfield**: 27 uses
 4. **glow**: 24 uses
@@ -277,7 +277,7 @@ lifecycle: persistent
    - Location: line 150 in packages.nix
 
 
-### File Management (18 tools)
+### File Management (17 tools)
 
 **eog** - 🔴 **DORMANT**- Eye of GNOME - default GNOME image viewer
 - ⚠️ Never used in last 30 days
@@ -322,10 +322,6 @@ lifecycle: persistent
 **peco** - 🔴 **DORMANT**- Simplistic interactive filtering tool
 - ⚠️ Never used in last 30 days
    - Location: line 67 in packages.nix
-
-**poppler_utils** - 🔴 **DORMANT**- PDF preview utilities
-- ⚠️ Never used in last 30 days
-   - Location: line 204 in packages.nix
 
 **rich-cli** - 🔴 **DORMANT**- Rich command-line interface for rich preview
 - ⚠️ Never used in last 30 days
@@ -466,7 +462,7 @@ lifecycle: persistent
    - Location: line 117 in packages.nix
 
 
-### Other (50 tools)
+### Other (51 tools)
 
 **ast-grep** - 🔴 **DORMANT**- Structural search and replace for code
 - ⚠️ Never used in last 30 days
@@ -510,10 +506,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 61 in packages.nix
 
-**git** - 62 uses- A free and open source distributed version control system
-- Human: 62 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-29
-   - Adoption score: 2.8 uses/day
+**git** - 65 uses- A free and open source distributed version control system
+- Human: 65 | Claude: 0 | Scripts: 0
+   - Last used: 2025-10-31
+   - Adoption score: 2.7 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -597,6 +593,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 171 in packages.nix
 
+**poppler-utils** - 🔴 **DORMANT**- PDF preview utilities
+- ⚠️ Never used in last 30 days
+   - Location: line 204 in packages.nix
+
 **pydantic** - 🔴 **DORMANT**- Data validation using Python type hints
 - ⚠️ Never used in last 30 days
    - Location: line 86 in packages.nix
@@ -676,7 +676,7 @@ lifecycle: persistent
 ### Human-Only Tools
 
 16 tools used only by humans:
-- **git**: 62 uses
+- **git**: 65 uses
 - **devenv**: 43 uses
 - **brownfield**: 27 uses
 - **glow**: 24 uses
@@ -763,9 +763,6 @@ lifecycle: persistent
 
 **ffmpegthumbnailer** - Video thumbnails for yazi   - Category: file-management
    - Location: line 203 in packages.nix
-
-**poppler_utils** - PDF preview utilities   - Category: file-management
-   - Location: line 204 in packages.nix
 
 **imagemagick** - Image processing for previews   - Category: file-management
    - Location: line 205 in packages.nix
@@ -991,6 +988,9 @@ lifecycle: persistent
 **shfmt** - Shell formatter   - Category: other
    - Location: line 186 in packages.nix
 
+**poppler-utils** - PDF preview utilities   - Category: other
+   - Location: line 204 in packages.nix
+
 **kdePackages.okular** - Full-featured PDF viewer with annotations   - Category: other
    - Location: line 213 in packages.nix
 
@@ -1081,8 +1081,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 45 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 40 more
+**Issue**: 46 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 41 more
 
 ### 🟡 MEDIUM PRIORITY: modern-cli tools
 
@@ -1093,8 +1093,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: file-management tools
 
 **Type**: Remove Dormant
-**Issue**: 18 file-management tools unused in last 90 days
-**Action**: Consider removing: peco, p7zip, fzf, gum, yazi, and 13 more
+**Issue**: 17 file-management tools unused in last 90 days
+**Action**: Consider removing: peco, p7zip, fzf, gum, yazi, and 12 more
 
 ### 🟡 MEDIUM PRIORITY: system-tools tools
 
@@ -1129,7 +1129,7 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: git
 
 **Type**: Highlight Value
-**Issue**: Highly used: 62 invocations (human: 62, Claude: 0)
+**Issue**: Highly used: 65 invocations (human: 65, Claude: 0)
 **Action**: Keep git - provides excellent value
 
 ### 💚 LOW PRIORITY: devenv
@@ -1147,7 +1147,7 @@ lifecycle: persistent
 
 ## Usage Trends by Category
 
-- **Other**: 115 invocations
+- **Other**: 118 invocations
 - **Ai Tools**: 53 invocations
 - **Modern Cli**: 36 invocations
 - **System Tools**: 1 invocations
@@ -1169,7 +1169,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2025-11-29
+**Scheduled**: 2025-11-30
 
 **Action items for next review**:
 1. Check if dormant tools are still unused

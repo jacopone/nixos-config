@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-10-30 00:46:42
+**Status**: 1/1 connected | Last checked: 2025-10-31 21:22:41
 
 **playwright** ✓ connected
    - unknown server
@@ -145,7 +145,7 @@
 **Installed**: 130 tools | **Used**: 16 (12%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 62 uses (H:62 C:0)
+- **git**: 65 uses (H:65 C:0)
 - **devenv**: 43 uses (H:43 C:0)
 - **brownfield**: 27 uses (H:27 C:0)
 - **glow**: 24 uses (H:24 C:0)
