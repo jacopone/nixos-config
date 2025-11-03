@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-10-31 21:22:41
+**Status**: 1/1 connected | Last checked: 2025-11-03 22:57:27
 
 **playwright** ✓ connected
    - unknown server
@@ -142,19 +142,19 @@
 
 ## 📦 System Tool Usage
 
-**Installed**: 130 tools | **Used**: 16 (12%) | **Analysis period**: 30 days
+**Installed**: 133 tools | **Used**: 20 (15%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 65 uses (H:65 C:0)
+- **git**: 67 uses (H:67 C:0)
 - **devenv**: 43 uses (H:43 C:0)
 - **brownfield**: 27 uses (H:27 C:0)
 - **glow**: 24 uses (H:24 C:0)
 - **bpkit**: 10 uses (H:10 C:0)
 
-⚠️ **113 dormant tools** found (unused in last 30 days)
+⚠️ **112 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
-- 16 tools used by humans
+- 20 tools used by humans
 - 0 tools used by Claude
 - ⚠️ Claude using significantly fewer tools than humans
 

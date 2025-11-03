@@ -1,0 +1,102 @@
+CLAUDE CODE CONFIGURATION ANALYSIS - QUICK SUMMARY
+===================================================
+
+ANALYSIS DATE: 2025-11-02
+SYSTEM: NixOS Configuration + claude-nixos-automation
+OVERALL GRADE: B+ (Good intent, structural problems)
+
+CRITICAL FINDINGS
+=================
+
+1. THREE CONFLICTING CLAUDE.MD FILES
+   Location: /home/guyfawkes/.claude/CLAUDE.md (598 lines)
+             /home/guyfawkes/nixos-config/CLAUDE.md (162 lines)
+             /home/guyfawkes/claude-nixos-automation/CLAUDE.md (217 lines)
+   Problem: Overlapping content, unclear hierarchy, unclear loading order
+   Impact: System CLAUDE.md with critical policies may not be loaded
+
+2. HOOK SYSTEM NOT INTEGRATED
+   Hooks exist: modern_cli_enforcer.py, nixos_safety_guard.py, permission_auto_learner.py
+   Status: Scripts implemented but NOT active in Claude Code
+   Evidence: Tool analytics show 0% Claude usage, 100% human usage
+   Impact: Hooks designed to prevent legacy commands aren't triggering
+
+3. EMPHATIC LANGUAGE CONFLICTS WITH ANTHROPIC BEST PRACTICES
+   Examples: "NEVER", "MANDATORY", "ALL CAPS", "MUST"
+   Risk: Emphatic enforcement can trigger override behavior
+   Recommendation: Change to guidance-based approach with rationale
+
+4. DOCUMENTATION GOVERNANCE - TWO SYSTEMS
+   System 1: Git pre-commit hook enforcement (system CLAUDE.md)
+   System 2: Python scripts (automation repo)
+   Problem: Both exist, conflict unclear, neither fully implemented
+   Evidence: Markdown files exist without frontmatter despite enforcement claims
+
+5. INSTRUCTION CONTEXT NOT PROPERLY LOADED
+   Global CLAUDE.md: Not loaded by Claude Code
+   Config: No explicit instruction context path registered
+   Result: Critical policies may not be available during sessions
+
+RECOMMENDATIONS SUMMARY
+=======================
+
+WEEK 1 (Critical Priority):
+  [ ] Consolidate 3 CLAUDE.md files into unified structure
+  [ ] Remove emphatic language, add rationale
+  [ ] Test hook integration in Claude Code
+
+WEEK 2 (High Priority):
+  [ ] Create instruction context map
+  [ ] Pick ONE authoritative documentation governance system
+  [ ] Separate tool intelligence from policy files
+
+MONTH 1 (Medium Priority):
+  [ ] Create hook deployment test suite
+  [ ] Verify permission learning system is working
+  [ ] Create analytics dashboard
+
+SUCCESS CRITERIA
+================
+✅ Single, clear instruction hierarchy (550 lines total, not 977)
+✅ Non-emphatic policies with clear rationale
+✅ Hook system verified and documented
+✅ Documentation governance consistent and enforced
+✅ Permission learning observable with visible results
+
+DETAILED ANALYSIS
+=================
+See: /home/guyfawkes/nixos-config/.claude/CLAUDE_CODE_ANALYSIS.md
+     (1200+ lines of comprehensive findings and recommendations)
+
+FILES TO REVIEW
+===============
+System-level: /home/guyfawkes/.claude/CLAUDE.md
+Project-level: /home/guyfawkes/nixos-config/CLAUDE.md
+Automation: /home/guyfawkes/claude-nixos-automation/CLAUDE.md
+Configuration: /home/guyfawkes/.claude.json
+Tool analytics: /home/guyfawkes/nixos-config/.claude/tool-analytics.md
+MCP analytics: /home/guyfawkes/nixos-config/.claude/mcp-analytics.md
+
+HYPOTHESIS TO VERIFY
+====================
+1. Are hooks actually deployed and active?
+   Test: Run 'ls /tmp' and see if Modern CLI Enforcer suggests 'eza'
+   
+2. Is permission auto-learner recording approvals?
+   Check: ~/.claude/learning/permission_approvals.jsonl
+   
+3. Why is global CLAUDE.md not loading?
+   Check: ~/.claude.json configuration for instruction_context_path
+   
+4. Are pre-commit hooks enforcing frontmatter?
+   Test: Add .md file without frontmatter and try to commit
+   
+5. Is MCP playwright server actually working?
+   Issue: Shows 0% success rate despite 2324 invocations
+
+NEXT STEP
+=========
+Review /home/guyfawkes/nixos-config/.claude/CLAUDE_CODE_ANALYSIS.md
+to understand the full scope of issues and priorities.
+
+Start with Priority 1.1: Consolidate CLAUDE.md files

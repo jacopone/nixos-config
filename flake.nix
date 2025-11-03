@@ -50,13 +50,9 @@
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
-      overlays = [ self.overlays.default ];
     };
   in
   {
-    # Overlays for custom packages (none currently - using npx/@latest for AI tools)
-    overlays.default = final: prev: {};
-
     # Expose packages for `nix build` (none currently)
     packages.${system} = {};
 
@@ -70,9 +66,8 @@
           # Your main configuration file
           ./hosts/nixos
 
-          # Apply overlays and allow unfree packages
+          # Allow unfree packages
           {
-            nixpkgs.overlays = [ self.overlays.default ];
             nixpkgs.config.allowUnfree = true;
           }
 

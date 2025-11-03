@@ -45,6 +45,101 @@
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/brownkit brownfield "$@"
     '')
+    # Droid - Factory.ai's #1 Terminal-Bench AI development agent (always latest)
+    (pkgs.writeShellScriptBin "droid" ''
+      #!${pkgs.stdenv.shell}
+      set -e
+
+      # Factory.ai Droid CLI wrapper for NixOS
+      # This wrapper ensures Droid is installed and properly configured
+
+      DROID_VERSION="latest"
+      DROID_HOME="''${DROID_HOME:-$HOME/.droid}"
+      DROID_CONFIG="''${DROID_CONFIG:-$HOME/.config/factory}"
+
+      # Ensure required directories exist
+      mkdir -p "$DROID_HOME"
+      mkdir -p "$DROID_CONFIG"
+
+      # Function to check if Droid is installed
+      check_installation() {
+        if [ -f "$DROID_HOME/bin/droid" ]; then
+          return 0
+        elif [ -f "$HOME/.local/bin/droid" ]; then
+          # Move to standard location
+          mkdir -p "$DROID_HOME/bin"
+          mv "$HOME/.local/bin/droid" "$DROID_HOME/bin/droid" 2>/dev/null || true
+          return 0
+        fi
+        return 1
+      }
+
+      # Function to install Droid
+      install_droid() {
+        echo "🤖 Installing Factory.ai Droid CLI..."
+        echo "This is a one-time setup process."
+        echo ""
+
+        # Ensure we have the required tools
+        export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_20 pkgs.xdg-utils pkgs.curl ]}:$PATH"
+        export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+
+        # Create temp directory for installation
+        INSTALL_TMP=$(mktemp -d)
+        cd "$INSTALL_TMP"
+
+        # Download and run the installer
+        echo "Downloading Droid installer..."
+        if curl -fsSL https://app.factory.ai/cli -o installer.sh; then
+          # Modify installer to use our preferred directory
+          sed -i "s|~/.local/bin|$DROID_HOME/bin|g" installer.sh 2>/dev/null || true
+
+          # Run the installer
+          chmod +x installer.sh
+          DROID_INSTALL_DIR="$DROID_HOME" bash installer.sh || {
+            echo "❌ Installation failed. Please try again or install manually."
+            rm -rf "$INSTALL_TMP"
+            exit 1
+          }
+        else
+          echo "❌ Failed to download Droid installer."
+          rm -rf "$INSTALL_TMP"
+          exit 1
+        fi
+
+        # Clean up
+        rm -rf "$INSTALL_TMP"
+
+        echo "✅ Droid installation complete!"
+        echo ""
+      }
+
+      # Main execution
+      if ! check_installation; then
+        echo "🔍 Droid is not installed."
+        read -p "Would you like to install it now? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          install_droid
+        else
+          echo "Installation cancelled. Run 'droid' again when you're ready to install."
+          exit 0
+        fi
+      fi
+
+      # Ensure environment is properly set
+      export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_20 pkgs.xdg-utils ]}:$PATH"
+      export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+
+      # Execute Droid with all arguments
+      if [ -f "$DROID_HOME/bin/droid" ]; then
+        exec "$DROID_HOME/bin/droid" "$@"
+      else
+        echo "❌ Droid executable not found at $DROID_HOME/bin/droid"
+        echo "Please run 'droid' again to reinstall."
+        exit 1
+      fi
+    '')
     atuin               # Neural network-powered shell history
     broot               # Interactive tree navigation with fuzzy search
 
