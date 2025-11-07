@@ -84,3 +84,6 @@ venv/
 # UV Python package manager
 .uv-cache/
 .aider*
+
+# Playwright MCP browser automation artifacts
+.playwright-mcp/

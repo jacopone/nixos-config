@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2025-10-23
+updated: 2025-11-07
 type: reference
 lifecycle: persistent
 ---
@@ -224,6 +224,9 @@ Replace old POSIX commands automatically:
 ### System Monitoring
 `procs`, `bottom`, `htop`, `hyperfine`, `nmap`, `wireshark`
 
+### VPN & Network Security
+`wgnord`, `wireguard-tools`, `openresolv`, `nmap`, `wireshark`, `tcpdump`
+
 ### Quality Tools
 `shellcheck`, `shfmt`, `ruff`, `semgrep`, `tokei`, `lizard`
 
@@ -253,6 +256,11 @@ cat README.md                      # → glow (rendered markdown)
 ls                                 # → eza (icons + git status)
 grep "pattern"                     # → rg (faster search)
 find . -name "*.nix"              # → fd (faster find)
+
+# VPN (NordVPN via wgnord)
+sudo wgnord c Germany             # Connect to NordVPN
+sudo wgnord d                     # Disconnect
+sudo wgnord list                  # List servers
 
 # GitHub Workflow
 idea add dark mode toggle          # Capture feature idea
@@ -325,6 +333,47 @@ environment.gnome.excludePackages = with pkgs; [
 # Change default editor (hosts/nixos/default.nix)
 environment.variables.EDITOR = "code";
 ```
+
+</details>
+
+<details>
+<summary>NordVPN Setup (wgnord)</summary>
+
+The system includes **wgnord**, a WireGuard-based NordVPN client that's faster than OpenVPN.
+
+**Initial Setup:**
+
+```bash
+# After rebuilding, create required directories
+sudo mkdir -p /etc/wireguard
+sudo mkdir -p /var/lib/wgnord
+
+# Get your NordVPN access token from:
+# https://my.nordaccount.com/dashboard/nordvpn/manual-configuration/
+
+# Initialize wgnord (one-time setup)
+sudo wgnord l "your-nordvpn-token-here"
+```
+
+**Daily Usage:**
+
+```bash
+# Connect to NordVPN (specify location)
+sudo wgnord c Germany
+sudo wgnord c "United States"
+
+# Disconnect
+sudo wgnord d
+
+# List available servers
+sudo wgnord list
+```
+
+**Notes:**
+- Access token is different from your regular login credentials
+- Find token under Services → NordVPN → Manual setup in your NordVPN dashboard
+- Uses WireGuard (NordLynx) protocol for better performance
+- Alternative browser extension already configured in Chrome
 
 </details>
 

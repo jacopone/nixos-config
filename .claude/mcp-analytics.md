@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-11-03
-updated: 2025-11-03
+created: 2025-11-07
+updated: 2025-11-07
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-11-03 22:57:27
+**Last Updated**: 2025-11-07 19:04:10
 **Analysis Period**: 30 days
 
 ### Configured Servers (1)
@@ -26,24 +26,24 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 2321
-**Total tokens consumed**: 22,773,244
-**Estimated total cost**: $141.2063
+**Total MCP invocations**: 2259
+**Total tokens consumed**: 21,849,075
+**Estimated total cost**: $136.4317
 
 #### sequential-thinking.sequentialthinking (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 1834
+- Invocations: 1789
 - Success rate: 0.0%
-- Last used: 2025-10-28 10:44
+- Last used: 2025-11-06 08:04
 
 **Token Consumption:**
-- Total tokens: 17,846,717 (Input: 190,213, Output: 580,281)
-- Cache tokens: 134,403,825 reads, 17,076,223 writes
-- Avg tokens/invocation: 9731
+- Total tokens: 17,443,197 (Input: 184,683, Output: 571,234)
+- Cache tokens: 129,645,841 reads, 16,687,280 writes
+- Avg tokens/invocation: 9750
 
 **Cost Analysis:**
-- Estimated cost: $113.6318
+- Estimated cost: $110.5936
 - ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
@@ -67,86 +67,69 @@ lifecycle: persistent
 #### playwright.browser_navigate (global scope)
 
 **Usage Metrics:**
-- Invocations: 53
+- Invocations: 58
 - Success rate: 0.0%
-- Last used: 2025-10-28 14:27
+- Last used: 2025-11-07 01:01
 
 **Token Consumption:**
-- Total tokens: 451,941 (Input: 528, Output: 9,911)
-- Cache tokens: 2,126,098 reads, 441,502 writes
-- Avg tokens/invocation: 8527
+- Total tokens: 575,804 (Input: 579, Output: 10,601)
+- Cache tokens: 2,545,554 reads, 564,624 writes
+- Avg tokens/invocation: 9928
 
 **Cost Analysis:**
-- Estimated cost: $2.4437
-- ROI score: 0.12 invocations per 1K tokens
+- Estimated cost: $3.0418
+- ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### chrome-devtools.navigate_page (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 17
+- Invocations: 13
 - Success rate: 0.0%
 - Last used: 2025-10-08 18:36
 
 **Token Consumption:**
-- Total tokens: 359,142 (Input: 205, Output: 2,860)
-- Cache tokens: 1,477,850 reads, 356,077 writes
-- Avg tokens/invocation: 21126
+- Total tokens: 317,968 (Input: 159, Output: 2,311)
+- Cache tokens: 1,129,562 reads, 315,498 writes
+- Avg tokens/invocation: 24459
 
 **Cost Analysis:**
-- Estimated cost: $1.8222
-- ROI score: 0.05 invocations per 1K tokens
+- Estimated cost: $1.5571
+- ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.list_dir (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 51
+- Invocations: 41
 - Success rate: 0.0%
 - Last used: 2025-10-12 17:02
 
 **Token Consumption:**
-- Total tokens: 355,812 (Input: 3,297, Output: 5,912)
-- Cache tokens: 1,963,093 reads, 346,603 writes
-- Avg tokens/invocation: 6977
+- Total tokens: 261,592 (Input: 3,027, Output: 5,049)
+- Cache tokens: 1,619,256 reads, 253,516 writes
+- Avg tokens/invocation: 6380
 
 **Cost Analysis:**
-- Estimated cost: $1.9873
-- ROI score: 0.14 invocations per 1K tokens
+- Estimated cost: $1.5213
+- ROI score: 0.16 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.find_symbol (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 22
+- Invocations: 19
 - Success rate: 0.0%
 - Last used: 2025-10-18 23:13
 
 **Token Consumption:**
-- Total tokens: 315,420 (Input: 162, Output: 3,804)
-- Cache tokens: 1,025,034 reads, 311,454 writes
-- Avg tokens/invocation: 14337
+- Total tokens: 251,959 (Input: 146, Output: 3,546)
+- Cache tokens: 868,177 reads, 248,267 writes
+- Avg tokens/invocation: 13261
 
 **Cost Analysis:**
-- Estimated cost: $1.5330
-- ROI score: 0.07 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### serena.search_for_pattern (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 19
-- Success rate: 0.0%
-- Last used: 2025-10-18 20:56
-
-**Token Consumption:**
-- Total tokens: 279,006 (Input: 1,641, Output: 3,590)
-- Cache tokens: 759,269 reads, 273,775 writes
-- Avg tokens/invocation: 14685
-
-**Cost Analysis:**
-- Estimated cost: $1.3132
-- ROI score: 0.07 invocations per 1K tokens
+- Estimated cost: $1.2451
+- ROI score: 0.08 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### sunsama.get-tasks-by-day (unknown scope)
@@ -166,21 +149,21 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### chrome-devtools.click (unknown scope)
+#### serena.search_for_pattern (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 15
+- Invocations: 12
 - Success rate: 0.0%
-- Last used: 2025-10-08 18:36
+- Last used: 2025-10-18 20:56
 
 **Token Consumption:**
-- Total tokens: 157,289 (Input: 181, Output: 2,481)
-- Cache tokens: 1,207,329 reads, 154,627 writes
-- Avg tokens/invocation: 10486
+- Total tokens: 168,932 (Input: 143, Output: 3,000)
+- Cache tokens: 523,814 reads, 165,789 writes
+- Avg tokens/invocation: 14078
 
 **Cost Analysis:**
-- Estimated cost: $0.9798
-- ROI score: 0.10 invocations per 1K tokens
+- Estimated cost: $0.8243
+- ROI score: 0.07 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.list_messages (unknown scope)
@@ -217,23 +200,6 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.find_file (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 15
-- Success rate: 0.0%
-- Last used: 2025-10-18 21:53
-
-**Token Consumption:**
-- Total tokens: 137,688 (Input: 151, Output: 1,705)
-- Cache tokens: 471,216 reads, 135,832 writes
-- Avg tokens/invocation: 9179
-
-**Cost Analysis:**
-- Estimated cost: $0.6768
-- ROI score: 0.11 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
 #### sunsama.get-user (unknown scope)
 
 **Usage Metrics:**
@@ -254,35 +220,18 @@ lifecycle: persistent
 #### playwright.browser_snapshot (global scope)
 
 **Usage Metrics:**
-- Invocations: 17
+- Invocations: 18
 - Success rate: 0.0%
-- Last used: 2025-10-28 11:20
+- Last used: 2025-11-06 22:52
 
 **Token Consumption:**
-- Total tokens: 126,641 (Input: 163, Output: 2,325)
-- Cache tokens: 703,875 reads, 124,153 writes
-- Avg tokens/invocation: 7449
+- Total tokens: 127,329 (Input: 176, Output: 2,469)
+- Cache tokens: 782,639 reads, 124,684 writes
+- Avg tokens/invocation: 7074
 
 **Cost Analysis:**
-- Estimated cost: $0.7121
-- ROI score: 0.13 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### chrome-devtools.list_pages (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 7
-- Success rate: 0.0%
-- Last used: 2025-10-09 14:02
-
-**Token Consumption:**
-- Total tokens: 105,704 (Input: 78, Output: 1,410)
-- Cache tokens: 439,187 reads, 104,216 writes
-- Avg tokens/invocation: 15101
-
-**Cost Analysis:**
-- Estimated cost: $0.5440
-- ROI score: 0.07 invocations per 1K tokens
+- Estimated cost: $0.7399
+- ROI score: 0.14 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.check_onboarding_performed (unknown scope)
@@ -319,6 +268,23 @@ lifecycle: persistent
 - ROI score: 0.01 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### playwright.browser_take_screenshot (global scope)
+
+**Usage Metrics:**
+- Invocations: 31
+- Success rate: 0.0%
+- Last used: 2025-11-06 23:07
+
+**Token Consumption:**
+- Total tokens: 98,938 (Input: 313, Output: 4,227)
+- Cache tokens: 2,504,543 reads, 94,398 writes
+- Avg tokens/invocation: 3192
+
+**Cost Analysis:**
+- Estimated cost: $1.1697
+- ROI score: 0.31 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### whatsapp.list_communities (unknown scope)
 
 **Usage Metrics:**
@@ -353,23 +319,6 @@ lifecycle: persistent
 - ROI score: 0.04 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.write_memory (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 6
-- Success rate: 0.0%
-- Last used: 2025-10-11 14:37
-
-**Token Consumption:**
-- Total tokens: 83,575 (Input: 64, Output: 6,742)
-- Cache tokens: 361,595 reads, 76,769 writes
-- Avg tokens/invocation: 13929
-
-**Cost Analysis:**
-- Estimated cost: $0.4977
-- ROI score: 0.07 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
 #### whatsapp.mark_chat_read_v2 (unknown scope)
 
 **Usage Metrics:**
@@ -387,21 +336,21 @@ lifecycle: persistent
 - ROI score: 0.12 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.think_about_task_adherence (unknown scope)
+#### chrome-devtools.click (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 3
+- Invocations: 10
 - Success rate: 0.0%
-- Last used: 2025-10-12 19:47
+- Last used: 2025-10-08 18:36
 
 **Token Consumption:**
-- Total tokens: 81,034 (Input: 15, Output: 116)
-- Cache tokens: 100,704 reads, 80,903 writes
-- Avg tokens/invocation: 27011
+- Total tokens: 78,539 (Input: 117, Output: 1,460)
+- Cache tokens: 934,885 reads, 76,962 writes
+- Avg tokens/invocation: 7854
 
 **Cost Analysis:**
-- Estimated cost: $0.3354
-- ROI score: 0.04 invocations per 1K tokens
+- Estimated cost: $0.5913
+- ROI score: 0.13 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### serena.insert_after_symbol (unknown scope)
@@ -421,21 +370,21 @@ lifecycle: persistent
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.activate_project (unknown scope)
+#### playwright.browser_evaluate (global scope)
 
 **Usage Metrics:**
-- Invocations: 18
+- Invocations: 16
 - Success rate: 0.0%
-- Last used: 2025-10-18 23:13
+- Last used: 2025-11-06 23:03
 
 **Token Consumption:**
-- Total tokens: 53,931 (Input: 159, Output: 1,162)
-- Cache tokens: 802,651 reads, 52,610 writes
-- Avg tokens/invocation: 2996
+- Total tokens: 65,342 (Input: 174, Output: 660)
+- Cache tokens: 1,559,700 reads, 64,508 writes
+- Avg tokens/invocation: 4084
 
 **Cost Analysis:**
-- Estimated cost: $0.4560
-- ROI score: 0.33 invocations per 1K tokens
+- Estimated cost: $0.7202
+- ROI score: 0.24 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.backend_status (unknown scope)
@@ -455,38 +404,38 @@ lifecycle: persistent
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.think_about_collected_information (unknown scope)
+#### serena.activate_project (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 7
+- Invocations: 17
 - Success rate: 0.0%
-- Last used: 2025-10-11 14:32
+- Last used: 2025-10-18 23:13
 
 **Token Consumption:**
-- Total tokens: 47,566 (Input: 5,478, Output: 1,015)
-- Cache tokens: 579,111 reads, 41,073 writes
-- Avg tokens/invocation: 6795
+- Total tokens: 51,444 (Input: 145, Output: 1,160)
+- Cache tokens: 760,284 reads, 50,139 writes
+- Avg tokens/invocation: 3026
 
 **Cost Analysis:**
-- Estimated cost: $0.3594
-- ROI score: 0.15 invocations per 1K tokens
+- Estimated cost: $0.4339
+- ROI score: 0.33 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### chrome-devtools.take_snapshot (unknown scope)
+#### serena.find_file (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 16
+- Invocations: 11
 - Success rate: 0.0%
-- Last used: 2025-10-08 18:37
+- Last used: 2025-10-18 21:53
 
 **Token Consumption:**
-- Total tokens: 47,456 (Input: 192, Output: 1,517)
-- Cache tokens: 1,624,823 reads, 45,747 writes
-- Avg tokens/invocation: 2966
+- Total tokens: 47,434 (Input: 103, Output: 1,687)
+- Cache tokens: 377,495 reads, 45,644 writes
+- Avg tokens/invocation: 4312
 
 **Cost Analysis:**
-- Estimated cost: $0.6823
-- ROI score: 0.34 invocations per 1K tokens
+- Estimated cost: $0.3100
+- ROI score: 0.23 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.get_message_statistics (unknown scope)
@@ -557,23 +506,6 @@ lifecycle: persistent
 - ROI score: 0.02 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### playwright.browser_take_screenshot (global scope)
-
-**Usage Metrics:**
-- Invocations: 15
-- Success rate: 0.0%
-- Last used: 2025-10-28 11:25
-
-**Token Consumption:**
-- Total tokens: 35,751 (Input: 147, Output: 1,095)
-- Cache tokens: 892,744 reads, 34,509 writes
-- Avg tokens/invocation: 2383
-
-**Cost Analysis:**
-- Estimated cost: $0.4141
-- ROI score: 0.42 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
 #### whatsapp.get_community_groups (unknown scope)
 
 **Usage Metrics:**
@@ -591,6 +523,57 @@ lifecycle: persistent
 - ROI score: 0.09 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### chrome-devtools.take_snapshot (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 12
+- Success rate: 0.0%
+- Last used: 2025-10-08 18:37
+
+**Token Consumption:**
+- Total tokens: 31,006 (Input: 143, Output: 1,348)
+- Cache tokens: 1,251,124 reads, 29,515 writes
+- Avg tokens/invocation: 2584
+
+**Cost Analysis:**
+- Estimated cost: $0.5067
+- ROI score: 0.39 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### serena.think_about_task_adherence (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 2
+- Success rate: 0.0%
+- Last used: 2025-10-12 19:47
+
+**Token Consumption:**
+- Total tokens: 27,406 (Input: 11, Output: 69)
+- Cache tokens: 78,130 reads, 27,326 writes
+- Avg tokens/invocation: 13703
+
+**Cost Analysis:**
+- Estimated cost: $0.1270
+- ROI score: 0.07 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### chrome-devtools.list_pages (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 5
+- Success rate: 0.0%
+- Last used: 2025-10-09 14:02
+
+**Token Consumption:**
+- Total tokens: 27,172 (Input: 58, Output: 1,099)
+- Cache tokens: 383,565 reads, 26,015 writes
+- Avg tokens/invocation: 5434
+
+**Cost Analysis:**
+- Estimated cost: $0.2293
+- ROI score: 0.18 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### serena.replace_symbol_body (unknown scope)
 
 **Usage Metrics:**
@@ -606,40 +589,6 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.1688
 - ROI score: 0.08 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### playwright.browser_evaluate (global scope)
-
-**Usage Metrics:**
-- Invocations: 5
-- Success rate: 0.0%
-- Last used: 2025-10-28 11:27
-
-**Token Consumption:**
-- Total tokens: 24,276 (Input: 64, Output: 494)
-- Cache tokens: 418,384 reads, 23,718 writes
-- Avg tokens/invocation: 4855
-
-**Cost Analysis:**
-- Estimated cost: $0.2221
-- ROI score: 0.21 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### serena.get_symbols_overview (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 15
-- Success rate: 0.0%
-- Last used: 2025-10-11 23:15
-
-**Token Consumption:**
-- Total tokens: 20,078 (Input: 541, Output: 1,146)
-- Cache tokens: 840,208 reads, 18,391 writes
-- Avg tokens/invocation: 1339
-
-**Cost Analysis:**
-- Estimated cost: $0.3398
-- ROI score: 0.75 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### whatsapp.mark_community_as_read (unknown scope)
@@ -676,6 +625,40 @@ lifecycle: persistent
 - ROI score: 0.17 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
+#### serena.get_symbols_overview (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 13
+- Success rate: 0.0%
+- Last used: 2025-10-11 23:15
+
+**Token Consumption:**
+- Total tokens: 17,199 (Input: 102, Output: 1,137)
+- Cache tokens: 717,500 reads, 15,960 writes
+- Avg tokens/invocation: 1323
+
+**Cost Analysis:**
+- Estimated cost: $0.2925
+- ROI score: 0.76 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### serena.write_memory (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 4
+- Success rate: 0.0%
+- Last used: 2025-10-11 14:37
+
+**Token Consumption:**
+- Total tokens: 10,293 (Input: 12, Output: 5,557)
+- Cache tokens: 305,612 reads, 4,724 writes
+- Avg tokens/invocation: 2573
+
+**Cost Analysis:**
+- Estimated cost: $0.1928
+- ROI score: 0.39 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
 #### chrome-devtools.type (unknown scope)
 
 **Usage Metrics:**
@@ -692,6 +675,22 @@ lifecycle: persistent
 - Estimated cost: $0.0710
 - ROI score: 0.11 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_install (global scope)
+
+**Usage Metrics:**
+- Invocations: 17
+- Success rate: 0.0%
+- Last used: 2025-11-07 00:57
+
+**Token Consumption:**
+- Total tokens: 8,308 (Input: 191, Output: 1,114)
+- Cache tokens: 714,668 reads, 7,003 writes
+- Avg tokens/invocation: 489
+
+**Cost Analysis:**
+- Estimated cost: $0.2579
+- ROI score: 2.05 invocations per 1K tokens
 
 #### chrome-devtools.select_page (unknown scope)
 
@@ -726,22 +725,6 @@ lifecycle: persistent
 - Estimated cost: $0.0927
 - ROI score: 0.44 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### playwright.browser_install (global scope)
-
-**Usage Metrics:**
-- Invocations: 16
-- Success rate: 0.0%
-- Last used: 2025-10-28 13:30
-
-**Token Consumption:**
-- Total tokens: 6,003 (Input: 178, Output: 1,036)
-- Cache tokens: 608,848 reads, 4,789 writes
-- Avg tokens/invocation: 375
-
-**Cost Analysis:**
-- Estimated cost: $0.2167
-- ROI score: 2.67 invocations per 1K tokens
 
 #### playwright.browser_close (global scope)
 
@@ -858,21 +841,38 @@ lifecycle: persistent
 - ROI score: 0.86 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### serena.list_memories (unknown scope)
+#### serena.think_about_collected_information (unknown scope)
 
 **Usage Metrics:**
 - Invocations: 2
 - Success rate: 0.0%
+- Last used: 2025-10-11 14:32
+
+**Token Consumption:**
+- Total tokens: 1,067 (Input: 18, Output: 126)
+- Cache tokens: 142,609 reads, 923 writes
+- Avg tokens/invocation: 534
+
+**Cost Analysis:**
+- Estimated cost: $0.0482
+- ROI score: 1.87 invocations per 1K tokens
+
+#### serena.list_memories (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 1
+- Success rate: 0.0%
 - Last used: 2025-10-12 12:46
 
 **Token Consumption:**
-- Total tokens: 1,110 (Input: 17, Output: 7)
-- Cache tokens: 80,626 reads, 1,086 writes
-- Avg tokens/invocation: 555
+- Total tokens: 1,042 (Input: 7, Output: 1)
+- Cache tokens: 48,705 reads, 1,034 writes
+- Avg tokens/invocation: 1042
 
 **Cost Analysis:**
-- Estimated cost: $0.0284
-- ROI score: 1.80 invocations per 1K tokens
+- Estimated cost: $0.0185
+- ROI score: 0.96 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_click (global scope)
 
@@ -1005,59 +1005,67 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 617
+**Total sessions analyzed**: 385
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### playwright (global scope)
 
 **Session Metrics:**
-- Utilization rate: 3.1% (19/617 sessions)
+- Utilization rate: 5.2% (20/385 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (617 sessions)
+- ⚠️  Loads in ALL sessions (385 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~4,000 tokens per session
-- Total wasted overhead: ~2,392,000 tokens (598 unused sessions)
+- Total wasted overhead: ~1,460,000 tokens (365 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
 **HIGH**: playwright
-   - **Issue**: Server 'playwright' loads in all sessions but only used in 3.1% (19/617 sessions)
-   - **Action**: Consider moving 'playwright' to project-level config. Wasted overhead: ~2,392,000 tokens across 598 sessions
+   - **Issue**: Server 'playwright' loads in all sessions but only used in 5.2% (20/385 sessions)
+   - **Action**: Consider moving 'playwright' to project-level config. Wasted overhead: ~1,460,000 tokens across 365 sessions
 
 **MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 1834 invocations for 17,846,717 tokens (est. $113.6318)
+   - **Issue**: Server 'sequential-thinking' has low ROI: 1789 invocations for 17,443,197 tokens (est. $110.5936)
    - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 22 invocations for 315,420 tokens (est. $1.5330)
+   - **Issue**: Server 'serena' has low ROI: 19 invocations for 251,959 tokens (est. $1.2451)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 19 invocations for 279,006 tokens (est. $1.3132)
+   - **Issue**: Server 'serena' has low ROI: 12 invocations for 168,932 tokens (est. $0.8243)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 18 invocations for 53,931 tokens (est. $0.4560)
+   - **Issue**: Server 'serena' has low ROI: 17 invocations for 51,444 tokens (est. $0.4339)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 15 invocations for 137,688 tokens (est. $0.6768)
+   - **Issue**: Server 'serena' has low ROI: 11 invocations for 47,434 tokens (est. $0.3100)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 51 invocations for 355,812 tokens (est. $1.9873)
+   - **Issue**: Server 'serena' has low ROI: 41 invocations for 261,592 tokens (est. $1.5213)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 15 invocations for 20,078 tokens (est. $0.3398)
+   - **Issue**: Server 'serena' has low ROI: 13 invocations for 17,199 tokens (est. $0.2925)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 58 invocations for 575,804 tokens (est. $3.0418)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 7 invocations for 104,887 tokens (est. $0.4552)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
+
+**MEDIUM**: serena
+   - **Issue**: Server 'serena' has low ROI: 1 invocations for 1,042 tokens (est. $0.0185)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
@@ -1065,19 +1073,11 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 53 invocations for 451,941 tokens (est. $2.4437)
-   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
-
-**MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 7 invocations for 47,566 tokens (est. $0.3594)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
-
-**MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 17 invocations for 126,641 tokens (est. $0.7121)
+   - **Issue**: Server 'playwright' has low ROI: 18 invocations for 127,329 tokens (est. $0.7399)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 15 invocations for 35,751 tokens (est. $0.4141)
+   - **Issue**: Server 'playwright' has low ROI: 31 invocations for 98,938 tokens (est. $1.1697)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
@@ -1085,7 +1085,7 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 5 invocations for 24,276 tokens (est. $0.2221)
+   - **Issue**: Server 'playwright' has low ROI: 16 invocations for 65,342 tokens (est. $0.7202)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
@@ -1093,19 +1093,19 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' has low ROI: 7 invocations for 105,704 tokens (est. $0.5440)
+   - **Issue**: Server 'chrome-devtools' has low ROI: 13 invocations for 317,968 tokens (est. $1.5571)
    - **Action**: Review usage patterns. Consider if 'chrome-devtools' is cost-effective (unknown scope)
 
 **MEDIUM**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' has low ROI: 17 invocations for 359,142 tokens (est. $1.8222)
+   - **Issue**: Server 'chrome-devtools' has low ROI: 12 invocations for 31,006 tokens (est. $0.5067)
    - **Action**: Review usage patterns. Consider if 'chrome-devtools' is cost-effective (unknown scope)
 
 **MEDIUM**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' has low ROI: 16 invocations for 47,456 tokens (est. $0.6823)
+   - **Issue**: Server 'chrome-devtools' has low ROI: 10 invocations for 78,539 tokens (est. $0.5913)
    - **Action**: Review usage patterns. Consider if 'chrome-devtools' is cost-effective (unknown scope)
 
 **MEDIUM**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' has low ROI: 15 invocations for 157,289 tokens (est. $0.9798)
+   - **Issue**: Server 'chrome-devtools' has low ROI: 5 invocations for 27,172 tokens (est. $0.2293)
    - **Action**: Review usage patterns. Consider if 'chrome-devtools' is cost-effective (unknown scope)
 
 **MEDIUM**: chrome-devtools
@@ -1115,10 +1115,6 @@ This section shows how efficiently each MCP server uses context tokens across se
 **MEDIUM**: chrome-devtools
    - **Issue**: Server 'chrome-devtools' has low ROI: 1 invocations for 8,959 tokens (est. $0.0710)
    - **Action**: Review usage patterns. Consider if 'chrome-devtools' is cost-effective (unknown scope)
-
-**MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 6 invocations for 83,575 tokens (est. $0.4977)
-   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: sunsama
    - **Issue**: Server 'sunsama' has low ROI: 6 invocations for 169,433 tokens (est. $0.6849)
@@ -1197,56 +1193,48 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
-   - **Issue**: Server 'serena' has low ROI: 3 invocations for 81,034 tokens (est. $0.3354)
+   - **Issue**: Server 'serena' has low ROI: 2 invocations for 27,406 tokens (est. $0.1270)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
 **MEDIUM**: serena
    - **Issue**: Server 'serena' has low ROI: 3 invocations for 6,805 tokens (est. $0.0927)
    - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
 
+**MEDIUM**: serena
+   - **Issue**: Server 'serena' has low ROI: 4 invocations for 10,293 tokens (est. $0.1928)
+   - **Action**: Review usage patterns. Consider if 'serena' is cost-effective (unknown scope)
+
 **LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 17,846,717 tokens (est. $113.63)
-   - **Action**: Frequent user: 1834 calls, ~9,731 tokens/call (unknown scope)
+   - **Issue**: Server 'sequential-thinking' consumed 17,443,197 tokens (est. $110.59)
+   - **Action**: Frequent user: 1789 calls, ~9,750 tokens/call (unknown scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 315,420 tokens (est. $1.53)
-   - **Action**: Frequent user: 22 calls, ~14,337 tokens/call (unknown scope)
+   - **Issue**: Server 'serena' consumed 251,959 tokens (est. $1.25)
+   - **Action**: Frequent user: 19 calls, ~13,261 tokens/call (unknown scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 279,006 tokens (est. $1.31)
-   - **Action**: Frequent user: 19 calls, ~14,684 tokens/call (unknown scope)
+   - **Issue**: Server 'serena' consumed 168,932 tokens (est. $0.82)
+   - **Action**: Frequent user: 12 calls, ~14,077 tokens/call (unknown scope)
 
 **LOW**: serena
-   - **Issue**: Server 'serena' consumed 137,688 tokens (est. $0.68)
-   - **Action**: Frequent user: 15 calls, ~9,179 tokens/call (unknown scope)
+   - **Issue**: Server 'serena' consumed 261,592 tokens (est. $1.52)
+   - **Action**: Frequent user: 41 calls, ~6,380 tokens/call (unknown scope)
 
-**LOW**: serena
-   - **Issue**: Server 'serena' consumed 355,812 tokens (est. $1.99)
-   - **Action**: Frequent user: 51 calls, ~6,976 tokens/call (unknown scope)
+**LOW**: playwright
+   - **Issue**: Server 'playwright' consumed 575,804 tokens (est. $3.04)
+   - **Action**: Frequent user: 58 calls, ~9,927 tokens/call (global scope)
 
 **LOW**: serena
    - **Issue**: Server 'serena' consumed 104,887 tokens (est. $0.46)
    - **Action**: Frequent user: 7 calls, ~14,983 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 451,941 tokens (est. $2.44)
-   - **Action**: Frequent user: 53 calls, ~8,527 tokens/call (global scope)
-
-**LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 126,641 tokens (est. $0.71)
-   - **Action**: Frequent user: 17 calls, ~7,449 tokens/call (global scope)
+   - **Issue**: Server 'playwright' consumed 127,329 tokens (est. $0.74)
+   - **Action**: Frequent user: 18 calls, ~7,073 tokens/call (global scope)
 
 **LOW**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' consumed 105,704 tokens (est. $0.54)
-   - **Action**: Frequent user: 7 calls, ~15,100 tokens/call (unknown scope)
-
-**LOW**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' consumed 359,142 tokens (est. $1.82)
-   - **Action**: Frequent user: 17 calls, ~21,126 tokens/call (unknown scope)
-
-**LOW**: chrome-devtools
-   - **Issue**: Server 'chrome-devtools' consumed 157,289 tokens (est. $0.98)
-   - **Action**: Frequent user: 15 calls, ~10,485 tokens/call (unknown scope)
+   - **Issue**: Server 'chrome-devtools' consumed 317,968 tokens (est. $1.56)
+   - **Action**: Frequent user: 13 calls, ~24,459 tokens/call (unknown scope)
 
 **LOW**: sunsama
    - **Issue**: Server 'sunsama' consumed 169,433 tokens (est. $0.68)
