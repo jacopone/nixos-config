@@ -9,6 +9,7 @@
     opencode            # AI coding agent built for the terminal
     inputs.code-cursor-nix.packages.${pkgs.system}.cursor   # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.claude-code-nix.packages.${pkgs.system}.default  # A code-generation tool using Anthropic's Claude model (better packaged)
+    inputs.antigravity-nix.packages.${pkgs.system}.default  # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
     # AI Tools - All use @latest/@alpha for automatic updates (system philosophy: always latest)
     # Claude Flow - AI orchestration platform (alpha channel)
     (pkgs.writeShellScriptBin "claude-flow" ''
@@ -158,7 +159,6 @@
     wget                # A free software package for retrieving files using HTTP, HTTPS, FTP and FTPS - https://www.gnu.org/software/wget/
     fish                # A smart and user-friendly command line shell - https://fishshell.com/
     fishPlugins.z       # A z-like directory jumping plugin for fish
-    warp-terminal       # A blazingly fast, Rust-based terminal reimagined from the ground up - https://www.warp.dev/
     eza                 # A modern replacement for ls - https://eza.rocks/
     peco                # Simplistic interactive filtering tool
     gedit               # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
@@ -178,6 +178,7 @@
     (python3.withPackages (ps: with ps; [
       rich              # Rich - Python terminal UI library (for BASB system)
       pymupdf4llm       # PyMuPDF for LLM-optimized PDF processing
+      markitdown        # Microsoft's multi-format to Markdown converter
       pytest            # Testing framework for Python
       pydantic          # Data validation using Python type hints
       jinja2            # Jinja2 templating engine (for claude-nixos-automation)
@@ -297,6 +298,13 @@
     rich-cli            # Rich command-line interface for rich preview
     glow                # Markdown renderer
     pandoc              # Universal document converter (MD to PPTX/PDF/HTML)
+
+    # PDF to Markdown converters (AI-optimized document processing)
+    # Marker - High-accuracy PDF to Markdown with table/formula support (uses uvx for latest)
+    (pkgs.writeShellScriptBin "marker" ''
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
+      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python marker-pdf "$@"
+    '')
     ueberzugpp          # Successor to ueberzug for image previews
     bat                 # A cat clone with wings
     

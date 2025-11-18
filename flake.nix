@@ -42,9 +42,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Google Antigravity - Next-generation agentic IDE
+    antigravity-nix = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs {

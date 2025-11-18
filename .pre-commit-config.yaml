@@ -1,0 +1,12 @@
+# Pre-commit configuration
+# Minimal config to satisfy framework - actual validation done by custom hooks
+repos:
+  - repo: local
+    hooks:
+      - id: markdown-validation
+        name: Markdown Policy Validation
+        entry: .git/hooks/pre-commit
+        language: system
+        pass_filenames: false
+        always_run: false
+        stages: [pre-commit]
