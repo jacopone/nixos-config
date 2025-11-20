@@ -44,7 +44,7 @@
 
     # Google Antigravity - Next-generation agentic IDE
     antigravity-nix = {
-      url = "github:jacopone/antigravity-nix";
+      url = "path:/home/guyfawkes/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

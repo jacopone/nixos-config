@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-11-19 01:20:52
+**Status**: 1/1 connected | Last checked: 2025-11-20 17:47:52
 
 **playwright** ✓ connected
    - unknown server
@@ -151,7 +151,7 @@
 - **bat**: 13 uses (H:13 C:0)
 - **glow**: 11 uses (H:11 C:0)
 
-⚠️ **119 dormant tools** found (unused in last 30 days)
+⚠️ **120 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
 - 19 tools used by humans

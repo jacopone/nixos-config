@@ -8,17 +8,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1763510937,
-        "narHash": "sha256-kGaliopgchoCYd3WR7WgWl0IEJEXiI0R4LrOA8GgXlM=",
-        "owner": "jacopone",
-        "repo": "antigravity-nix",
-        "rev": "f4cd2c28a185759050cc7a1b7c4808b9ccaf8636",
-        "type": "github"
+        "lastModified": 1763654652,
+        "narHash": "sha256-98QxLAod90NwBvDJbVL0mok/jT1EYqgOdjUNboKVnec=",
+        "path": "/home/guyfawkes/antigravity-nix",
+        "type": "path"
       },
       "original": {
-        "owner": "jacopone",
-        "repo": "antigravity-nix",
-        "type": "github"
+        "path": "/home/guyfawkes/antigravity-nix",
+        "type": "path"
       }
     },
     "claude-automation": {
@@ -49,11 +46,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763485374,
-        "narHash": "sha256-jGvkMSJrHGrqJD3MQztbVIqAAfUkfy3Sz9ycWzCWGIk=",
+        "lastModified": 1763596996,
+        "narHash": "sha256-7cFIOus5SL7+2eNgzsJdZpXuAbAbjdGGaRUYbdAOQ0E=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "b28f4829295edb7707e96f0b88f75a9b197dcba6",
+        "rev": "c06fdde903bed1e0b74528b34c12293b4e406ec5",
         "type": "github"
       },
       "original": {
@@ -70,11 +67,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763111301,
-        "narHash": "sha256-d7Sj0b7GkhnRVMBKtIqeu48Yt17/fhJJ0IegNASH+oM=",
+        "lastModified": 1763580264,
+        "narHash": "sha256-WJwUyPtVSZkuiKmf1oZnj6VjPwlxM8Q93IoVai7rEYc=",
         "owner": "jacopone",
         "repo": "code-cursor-nix",
-        "rev": "f4891ee8d84740d5757431b2bf45d1823ca3d454",
+        "rev": "cbe5b8b946e48f665937b02a46e0846e31647dca",
         "type": "github"
       },
       "original": {

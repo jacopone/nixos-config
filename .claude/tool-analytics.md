@@ -1,22 +1,22 @@
 ---
 status: active
-created: 2025-11-19
-updated: 2025-11-19
+created: 2025-11-20
+updated: 2025-11-20
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-11-19 01:20:52
+**Last Updated**: 2025-11-20 17:47:53
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 154
+**Total Commands Tracked**: 151
 
 ## Summary
 
 - **Total Tools Installed**: 139
 - **Tools Used**: 19 (13.7%)
-- **Dormant Tools**: 119
+- **Dormant Tools**: 120
 - **Human-Used Tools**: 19
 - **Claude-Used Tools**: 0
 
@@ -29,7 +29,7 @@ lifecycle: persistent
    - Human: 49 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-11-18
+   - Last used: 2025-11-19
 2. **devenv**: 29 total
    - Human: 29 (100%)
    - Claude: 0 (0%)
@@ -50,56 +50,56 @@ lifecycle: persistent
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-18
-6. **gemini-cli**: 4 total
-   - Human: 4 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-10-20
-7. **opencode**: 4 total
+6. **opencode**: 4 total
    - Human: 4 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-22
-8. **bpkit**: 2 total
+7. **bpkit**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-21
-9. **eza**: 2 total
+8. **eza**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-23
-10. **claude-flow**: 2 total
+9. **claude-flow**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-03
-11. **atuin**: 2 total
+10. **atuin**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-02
-12. **droid**: 2 total
+11. **droid**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-03
-13. **specify**: 1 total
+12. **specify**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-21
-14. **pytest**: 1 total
+13. **pytest**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-10-27
-15. **broot**: 1 total
+14. **broot**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-02
+15. **bmad-method**: 1 total
+   - Human: 1 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-11-03
 
 ### Human-Preferred Tools (Top 15)
 1. **git**: 49 uses
@@ -107,16 +107,16 @@ lifecycle: persistent
 3. **brownfield**: 27 uses
 4. **bat**: 13 uses
 5. **glow**: 11 uses
-6. **gemini-cli**: 4 uses
-7. **opencode**: 4 uses
-8. **bpkit**: 2 uses
-9. **eza**: 2 uses
-10. **claude-flow**: 2 uses
-11. **atuin**: 2 uses
-12. **droid**: 2 uses
-13. **specify**: 1 uses
-14. **pytest**: 1 uses
-15. **broot**: 1 uses
+6. **opencode**: 4 uses
+7. **bpkit**: 2 uses
+8. **eza**: 2 uses
+9. **claude-flow**: 2 uses
+10. **atuin**: 2 uses
+11. **droid**: 2 uses
+12. **specify**: 1 uses
+13. **pytest**: 1 uses
+14. **broot**: 1 uses
+15. **bmad-method**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
 
@@ -141,9 +141,8 @@ lifecycle: persistent
    - Last used: 2025-11-03
    - Adoption score: 0.2 uses/day
 
-**gemini-cli** - 4 uses- Human: 4 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-20
-   - Adoption score: 4.0 uses/day
+**gemini-cli** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
+   - Location: line 23 in packages.nix
 
 **jules** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 27 in packages.nix
@@ -513,8 +512,8 @@ lifecycle: persistent
 
 **git** - 49 uses- A free and open source distributed version control system
 - Human: 49 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-18
-   - Adoption score: 1.7 uses/day
+   - Last used: 2025-11-19
+   - Adoption score: 1.8 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -716,7 +715,6 @@ lifecycle: persistent
 - **brownfield**: 27 uses
 - **bat**: 13 uses
 - **glow**: 11 uses
-- **gemini-cli**: 4 uses
 - **opencode**: 4 uses
 - **bpkit**: 2 uses
 - **eza**: 2 uses
@@ -730,6 +728,7 @@ lifecycle: persistent
 - **nix**: 1 uses
 - **tmux**: 1 uses
 - **bottom**: 1 uses
+- **cursor**: 1 uses
 
 💡 **Insight**: These tools solve human-specific needs or Claude is not aware of them.
 
@@ -738,7 +737,10 @@ lifecycle: persistent
 
 ## Dormant Tools (Candidates for Removal)
 
-119 tools unused in last 30 days:
+120 tools unused in last 30 days:
+
+**gemini-cli**   - Category: ai-tools
+   - Location: line 23 in packages.nix
 
 **jules**   - Category: ai-tools
    - Location: line 27 in packages.nix
@@ -1166,8 +1168,8 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: ai-tools tools
 
 **Type**: Remove Dormant
-**Issue**: 4 ai-tools tools unused in last 90 days
-**Action**: Consider removing: jules, serena, whisper-cpp, mcp-nixos
+**Issue**: 5 ai-tools tools unused in last 90 days
+**Action**: Consider removing: gemini-cli, jules, serena, whisper-cpp, mcp-nixos
 
 ### 💚 LOW PRIORITY: productivity tools
 
@@ -1209,7 +1211,7 @@ lifecycle: persistent
 ## Usage Trends by Category
 
 - **Other**: 82 invocations
-- **Ai Tools**: 41 invocations
+- **Ai Tools**: 38 invocations
 - **Modern Cli**: 30 invocations
 - **System Tools**: 1 invocations
 
@@ -1230,7 +1232,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2025-12-19
+**Scheduled**: 2025-12-20
 
 **Action items for next review**:
 1. Check if dormant tools are still unused
