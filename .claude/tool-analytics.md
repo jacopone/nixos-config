@@ -8,16 +8,16 @@ lifecycle: persistent
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-11-20 18:52:50
+**Last Updated**: 2025-11-20 19:39:13
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 151
+**Total Commands Tracked**: 152
 
 ## Summary
 
 - **Total Tools Installed**: 141
-- **Tools Used**: 19 (13.5%)
-- **Dormant Tools**: 122
-- **Human-Used Tools**: 19
+- **Tools Used**: 20 (14.2%)
+- **Dormant Tools**: 121
+- **Human-Used Tools**: 20
 - **Claude-Used Tools**: 0
 
 ⚠️ **Low adoption rate**: Less than half of installed tools are being used
@@ -486,9 +486,10 @@ lifecycle: persistent
    - Last used: 2025-11-14
    - Adoption score: 1.3 uses/day
 
-**direnv** - 🔴 **DORMANT**- Automatic per-directory environment activation - enables .envrc
-- ⚠️ Never used in last 30 days
-   - Location: line 195 in packages.nix
+**direnv** - 1 uses- Automatic per-directory environment activation - enables .envrc
+- Human: 1 | Claude: 0 | Scripts: 0
+   - Last used: 2025-11-20
+   - Adoption score: 1.0 uses/day
 
 **docker-compose** - 🔴 **DORMANT**- Container orchestration
 - ⚠️ Never used in last 30 days
@@ -717,7 +718,7 @@ lifecycle: persistent
 
 ### Human-Only Tools
 
-19 tools used only by humans:
+20 tools used only by humans:
 - **git**: 49 uses
 - **devenv**: 29 uses
 - **brownfield**: 27 uses
@@ -737,6 +738,7 @@ lifecycle: persistent
 - **tmux**: 1 uses
 - **bottom**: 1 uses
 - **cursor**: 1 uses
+- **direnv**: 1 uses
 
 💡 **Insight**: These tools solve human-specific needs or Claude is not aware of them.
 
@@ -745,7 +747,7 @@ lifecycle: persistent
 
 ## Dormant Tools (Candidates for Removal)
 
-122 tools unused in last 30 days:
+121 tools unused in last 30 days:
 
 **gemini-cli**   - Category: ai-tools
    - Location: line 23 in packages.nix
@@ -961,9 +963,6 @@ lifecycle: persistent
 **pkg-config** - Package config tool for native module builds   - Category: other
    - Location: line 192 in packages.nix
 
-**direnv** - Automatic per-directory environment activation - enables .envrc   - Category: other
-   - Location: line 195 in packages.nix
-
 **cachix** - Binary cache for faster Nix builds - system-wide availability   - Category: other
    - Location: line 197 in packages.nix
 
@@ -1158,8 +1157,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 58 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 53 more
+**Issue**: 57 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, system, nodejs_20, and 52 more
 
 ### 🟡 MEDIUM PRIORITY: file-management tools
 
@@ -1224,7 +1223,7 @@ lifecycle: persistent
 
 ## Usage Trends by Category
 
-- **Other**: 82 invocations
+- **Other**: 83 invocations
 - **Ai Tools**: 38 invocations
 - **Modern Cli**: 30 invocations
 - **System Tools**: 1 invocations

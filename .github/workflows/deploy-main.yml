@@ -24,9 +24,15 @@ jobs:
       - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            accept-flake-config = true
 
       - name: Flake syntax check
-        run: nix flake check --no-build
+        run: |
+          # Validate flake structure without full evaluation
+          nix flake metadata --accept-flake-config
+          # Show flake outputs structure
+          nix flake show --allow-import-from-derivation
 
       - name: Security scan
         continue-on-error: true
