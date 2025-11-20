@@ -13,33 +13,43 @@
     interactiveShellInit = builtins.readFile (
       pkgs.writeText "fish-interactive-init.fish" ''
         # Context detection function - determines if running in automated context
+        # Uses multiple heuristics for reliability across different environments
         function _is_automated_context
-            # Check for automation environment variables
-            if set -q CI; or set -q AUTOMATION; or set -q AGENT_MODE
+            # PRIORITY 1: Explicit automation flags (most reliable)
+            if set -q CLAUDE_CODE_SESSION; or set -q CI; or set -q AUTOMATION; or set -q AGENT_MODE
                 return 0  # true - automated
             end
 
-            # Check if input/output is redirected (non-interactive)
-            if not isatty stdin; or not isatty stdout
+            # PRIORITY 2: Check full process tree (not just immediate parent)
+            # This catches cases where AI tools spawn bash → fish
+            set -l process_tree (ps -o comm= -p $fish_pid -p (ps -o ppid= -p $fish_pid 2>/dev/null) 2>/dev/null || echo "")
+            if string match -qr '(claude|cursor|vscode|agent|copilot)' $process_tree
                 return 0  # true - automated
             end
 
-            # Check for agent indicators in TERM
-            if string match -q "*agent*" $TERM; or string match -q "*script*" $TERM
-                return 0  # true - automated
+            # PRIORITY 3: Check for piped/redirected input (allows tmux/screen)
+            # Only check stdin for pipes, allow pty pseudo-terminals
+            if not test -t 0; and test -p /dev/stdin
+                return 0  # true - piped input
             end
 
-            # Check for dumb terminal (often used by AI tools)
-            if test "$TERM" = "dumb"
-                return 0  # true - automated
+            # PRIORITY 4: Check for non-interactive output
+            if not test -t 1
+                return 0  # true - output redirected
             end
 
-            # Check parent process for AI tools (Claude, Cursor, etc.)
-            set -l parent_cmd (ps -o comm= -p $fish_pid 2>/dev/null || echo "")
-            if string match -q "*cursor*" $parent_cmd; or string match -q "*claude*" $parent_cmd; or string match -q "*vscode*" $parent_cmd
-                return 0  # true - automated
+            # PRIORITY 5: Terminal environment indicators
+            if test "$TERM" = "dumb"; or string match -q "*agent*" $TERM; or string match -q "*script*" $TERM
+                return 0  # true - automated terminal
             end
 
+            # PRIORITY 6: Check for SSH sessions without X forwarding (edge case)
+            if set -q SSH_CONNECTION; and not set -q DISPLAY
+                # SSH but no X11 = likely automated/headless
+                return 0
+            end
+
+            # Default: assume interactive (safer for user experience)
             return 1  # false - interactive
         end
 

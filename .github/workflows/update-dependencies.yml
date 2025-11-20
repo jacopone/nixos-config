@@ -27,7 +27,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Update flake inputs
         id: update

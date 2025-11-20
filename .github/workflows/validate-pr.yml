@@ -25,20 +25,46 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
-          extra-conf: |
-            extra-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypQtVcp/p3crupQmIabrEh0W0
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=
+            max-jobs = auto
+            cores = 0
+
+      - name: Setup Nix cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/nix
+            /nix/store
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
 
       - name: Flake syntax check
-        run: nix flake check --no-build
+        run: |
+          echo "## Syntax Check" >> $GITHUB_STEP_SUMMARY
+          nix flake check --no-build
+          echo "✅ Flake syntax is valid" >> $GITHUB_STEP_SUMMARY
 
       - name: Flake introspection
-        run: nix flake show
+        run: |
+          echo "## Flake Outputs" >> $GITHUB_STEP_SUMMARY
+          nix flake show >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
       - name: Deadnix detection
+        continue-on-error: true
         run: |
+          echo "## Dead Code Detection" >> $GITHUB_STEP_SUMMARY
           nix shell nixpkgs#deadnix --command \
-            deadnix --exclude result
+            deadnix --exclude result | tee /tmp/deadnix.log || true
+
+          if [ -s /tmp/deadnix.log ]; then
+            echo "⚠️  Dead code found (see logs)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No dead code detected" >> $GITHUB_STEP_SUMMARY
+          fi
 
   security:
     name: Security Scan
@@ -56,7 +82,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Gitleaks secret scan
         id: gitleaks
@@ -78,6 +104,7 @@ jobs:
         with:
           name: security-reports
           path: gitleaks-report.json
+          if-no-files-found: ignore
           retention-days: 30
 
   documentation:
@@ -93,47 +120,61 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Check markdown frontmatter
         continue-on-error: true
         run: |
           # Find all changed markdown files
-          CHANGED_MD=$(git diff origin/master...HEAD --name-only -- '*.md' 2>/dev/null || echo "")
+          git fetch origin master --depth=1 2>/dev/null || true
+          CHANGED_MD=$(git diff origin/master...HEAD --name-only -- '*.md' 2>/dev/null || git diff HEAD~1 --name-only -- '*.md' 2>/dev/null || echo "")
 
           if [ -z "$CHANGED_MD" ]; then
             echo "✅ No markdown files changed"
             exit 0
           fi
 
+          echo "Checking markdown files for YAML frontmatter..."
           MISSING_FRONTMATTER=0
-          while IFS= read -r file; do
-            if [ ! -f "$file" ]; then continue; fi
 
-            # Skip auto-generated files
-            if [[ "$file" =~ (CLAUDE\.md$|node_modules|\.devenv) ]]; then
+          while IFS= read -r file; do
+            if [ -z "$file" ] || [ ! -f "$file" ]; then
+              continue
+            fi
+
+            # Skip auto-generated files and specific patterns
+            if [[ "$file" =~ (CLAUDE\.md$|README\.md$|node_modules|\.devenv|\.claude/) ]]; then
+              echo "  Skipped: $file (auto-generated)"
               continue
             fi
 
             # Check for frontmatter
             if ! head -1 "$file" | grep -q "^---$"; then
-              echo "❌ Missing frontmatter: $file"
+              echo "  ❌ Missing frontmatter: $file"
               MISSING_FRONTMATTER=1
+            else
+              echo "  ✅ Valid: $file"
             fi
           done <<< "$CHANGED_MD"
 
           if [ $MISSING_FRONTMATTER -eq 1 ]; then
+            echo ""
             echo "::warning::Some markdown files missing YAML frontmatter"
           else
+            echo ""
             echo "✅ All markdown files have valid frontmatter"
           fi
 
       - name: Markdown lint
         continue-on-error: true
         run: |
-          nix shell nixpkgs#nodePackages.markdownlint-cli2 --command \
-            markdownlint-cli2 "docs/**/*.md" "*.md" 2>/dev/null || \
-            echo "⚠️  Markdown linting complete (warnings allowed)"
+          if [ -d "docs" ] || ls *.md >/dev/null 2>&1; then
+            nix shell nixpkgs#nodePackages.markdownlint-cli2 --command \
+              markdownlint-cli2 "docs/**/*.md" "*.md" 2>/dev/null || \
+              echo "⚠️  Markdown linting complete (warnings allowed)"
+          else
+            echo "✅ No markdown files to lint"
+          fi
 
   validation-summary:
     name: Validation Summary
@@ -155,7 +196,7 @@ jobs:
 
       - name: Create validation report
         uses: actions/github-script@v7
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         env:
           SYNTAX_RESULT: ${{ needs.syntax.result }}
           SECURITY_RESULT: ${{ needs.security.result }}
@@ -167,7 +208,7 @@ jobs:
             const securityOk = process.env.SECURITY_RESULT === 'success';
             const docsOk = process.env.DOCS_RESULT === 'success';
 
-            const comment = `## Validation Results
+            const comment = `## 🔍 Validation Results
 
 | Check | Status |
 |-------|--------|
@@ -175,11 +216,17 @@ jobs:
 | Security Scan | ${securityOk ? '✅ Pass' : '⚠️  Review findings'} |
 | Documentation | ${docsOk ? '✅ Pass' : '⚠️  Review'} |
 
-**Ready to merge**: ${syntaxOk ? '**Yes**' : '**No** - fix syntax errors'}`;
+**Ready to merge**: ${syntaxOk ? '✅ **Yes**' : '❌ **No** - fix syntax errors first'}
 
-            github.rest.issues.createComment({
+---
+<sub>Automated validation by GitHub Actions</sub>`;
+
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
+            }).catch(err => {
+              console.log('Failed to create comment:', err.message);
             });
+

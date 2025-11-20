@@ -1,8 +1,8 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# and in the NixOS manual (accessible by running 'nixos-help').
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, username, ... }:
 
 {
   imports =
@@ -36,7 +36,7 @@
   nix = {
     settings.auto-optimise-store = true;
     settings.experimental-features = [ "nix-command"  "flakes" ];
-    settings.trusted-users = [ "root" "guyfawkes" ];  # Enable cachix for user
+    settings.trusted-users = [ "root" username ];  # Enable cachix for user
     settings.cores = 4;  # Use half CPU cores for builds (8-core system)
     settings.max-jobs = 2;  # Limit parallel builds to reduce memory pressure
     settings.download-buffer-size = 268435456;  # 256MB download buffer (default is 64MB)
@@ -107,9 +107,9 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with 'passwd'.
-  users.users.guyfawkes = {
+  users.users.${username} = {
     isNormalUser = true;
-    description = "Guy Fawkes";
+    description = "Primary User";
     extraGroups = [ "networkmanager" "wheel" "docker" "input" ];  # Added 'input' for whisper-overlay
     packages = with pkgs; [
     #  thunderbird
@@ -149,12 +149,23 @@
   programs.fish.enable = true;
   users.defaultUserShell = pkgs.fish;
 
-  # Enable Permitted Insecure Packages to solve a dipendency needed to install Obsidian
-  # and temporarily allow libsoup-2 for Google Drive support
+  # Enable Permitted Insecure Packages
+  # SECURITY NOTE: These packages have known vulnerabilities. Review quarterly.
   nixpkgs.config.permittedInsecurePackages = [
-                "electron-24.8.6"
-                "libsoup-2.74.3"
-              ];
+    # Obsidian dependency - Electron 24.8.6 has known CVEs
+    # JUSTIFICATION: No alternative markdown knowledge base with comparable features
+    # MITIGATION: Obsidian runs in user space, no network services exposed
+    # TODO: Monitor https://github.com/obsidianmd/obsidian-releases for Electron 28+ support
+    # REVIEW DATE: 2025-11-20 | NEXT REVIEW: 2026-02-20 (90 days)
+    "electron-24.8.6"
+
+    # GNOME Google Drive support - libsoup-2 is EOL (end-of-life)
+    # JUSTIFICATION: Required for gvfs Google Drive integration until libsoup-3 migration complete
+    # MITIGATION: Only used for authenticated Google Drive API calls (OAuth2)
+    # TODO: Test removing when NixOS 25.05 released (GNOME 47+ has libsoup-3)
+    # REVIEW DATE: 2025-11-20 | NEXT REVIEW: 2026-02-20 (90 days)
+    "libsoup-2.74.3"
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

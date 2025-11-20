@@ -23,7 +23,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Gitleaks scan
         id: gitleaks
@@ -54,7 +54,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Trivy filesystem scan
         id: trivy-fs
@@ -99,7 +99,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Check nix package licenses
         continue-on-error: true
@@ -123,7 +123,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v25
         with:
-          nix-path: nixpkgs=channel:nixos-unstable
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Generate software bill of materials
         continue-on-error: true

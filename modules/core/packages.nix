@@ -36,12 +36,15 @@
     (pkgs.writeShellScriptBin "specify" ''
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from git+https://github.com/github/spec-kit.git specify "$@"
     '')
+    # USER-SPECIFIC: Local development tools (adapt paths for your system)
     # BP-Kit - Business Plan to Constitution (pitch deck → executable MVP specs)
+    # NOTE: Change /home/guyfawkes/ to your home directory or remove if not using
     (pkgs.writeShellScriptBin "bpkit" ''
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/bpkit bpkit "$@"
     '')
     # BrownKit - AI-driven workflow for transitioning brownfield codebases to Speckit-ready state
+    # NOTE: Change /home/guyfawkes/ to your home directory or remove if not using
     (pkgs.writeShellScriptBin "brownfield" ''
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uv run --directory /home/guyfawkes/brownkit brownfield "$@"

@@ -1,12 +1,65 @@
-# Pre-commit configuration
-# Minimal config to satisfy framework - actual validation done by custom hooks
+# Pre-commit hooks for NixOS configuration quality
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
 repos:
+  # Standard hooks for file cleanup
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-yaml
+        name: Check YAML syntax
+        files: \.(yaml|yml)$
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: mixed-line-ending
+        name: Check line endings
+
+  # Nix-specific formatting
+  - repo: https://github.com/nix-community/nixpkgs-fmt
+    rev: v1.3.0
+    hooks:
+      - id: nixpkgs-fmt
+        name: Format Nix files
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        name: Lint Markdown files
+        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041']
+
+  # Local custom hooks
   - repo: local
     hooks:
-      - id: markdown-validation
-        name: Markdown Policy Validation
-        entry: .git/hooks/pre-commit
+      # Check for required YAML frontmatter in documentation
+      - id: check-markdown-frontmatter
+        name: Check Markdown frontmatter
+        entry: python3 scripts/check-frontmatter.py
         language: system
-        pass_filenames: false
-        always_run: false
-        stages: [pre-commit]
+        files: ^docs/.*\.md$
+        pass_filenames: true
+
+      # Warn about temporal markers in documentation
+      - id: check-temporal-markers
+        name: Warn about temporal markers
+        entry: bash -c 'grep -nE "(Week [0-9]+|Phase [0-9]+|NEW 2025|ENHANCED|UPDATED)" "$@" || true'
+        language: system
+        files: ^docs/.*\.md$
+        pass_filenames: true
+
+      # Check for hardcoded usernames (except in comments marked USER-SPECIFIC)
+      - id: check-hardcoded-usernames
+        name: Check for hardcoded usernames
+        entry: bash -c 'if grep -nE "guyfawkes" "$@" | grep -v "USER-SPECIFIC" | grep -v "username = "; then echo "Found hardcoded username!"; exit 1; fi'
+        language: system
+        files: \.(nix|sh|fish)$
+        pass_filenames: true
