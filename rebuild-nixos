@@ -171,6 +171,7 @@ LOCAL_INPUTS=(
     "whisper-dictation"
     "claude-automation"
     "claude-code-nix"  # Also locally maintained by you
+    "antigravity-nix"
 )
 
 if [ "$VERBOSE" = true ]; then
