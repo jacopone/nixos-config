@@ -252,13 +252,15 @@
     # Advanced API development
     hurl               # HTTP testing with file-based test definitions
 
-    # Note: Code quality tools moved to project-level (devenv/package.json)
-    # gitleaks, pre-commit, typos are better managed per-project for:
-    # - Custom configurations (.gitleaksignore, .pre-commit-config.yaml)
+    # Note: Some code quality tools are better managed per-project (devenv/package.json)
+    # gitleaks, typos are better managed per-project for:
+    # - Custom configurations (.gitleaksignore)
     # - Project-specific rules and dictionaries
     # - Team collaboration and reproducibility
+    # However, pre-commit is useful system-wide for NixOS configs
 
     # Code Quality & Analysis Tools (Enterprise-grade)
+    pre-commit         # Git hook framework (needed for .pre-commit-config.yaml)
     python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
     python312Packages.radon # Python code metrics and complexity analysis
     # jscpd - JavaScript/TypeScript clone detection (always latest)
@@ -289,7 +291,8 @@
     choose             # Human-friendly cut/awk alternative
     shellcheck         # Shell script linter
     shfmt              # Shell formatter
-    
+    nixpkgs-fmt        # Nix code formatter (for pre-commit hooks)
+
     # useseless tools
     cmatrix             # A terminal-based "Matrix" screen saver
 

@@ -22,20 +22,9 @@ repos:
       - id: mixed-line-ending
         name: Check line endings
 
-  # Nix-specific formatting
-  - repo: https://github.com/nix-community/nixpkgs-fmt
-    rev: v1.3.0
-    hooks:
-      - id: nixpkgs-fmt
-        name: Format Nix files
-
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.39.0
-    hooks:
-      - id: markdownlint
-        name: Lint Markdown files
-        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041']
+  # NixOS-specific: Use system-installed tools instead of downloading
+  # These are already available via your NixOS packages
+  # Note: markdownlint removed (not in system packages, can be added if needed)
 
   # Local custom hooks
   - repo: local
@@ -62,4 +51,13 @@ repos:
         entry: bash -c 'if grep -nE "guyfawkes" "$@" | grep -v "USER-SPECIFIC" | grep -v "username = "; then echo "Found hardcoded username!"; exit 1; fi'
         language: system
         files: \.(nix|sh|fish)$
+        pass_filenames: true
+
+      # Format Nix files using system nixpkgs-fmt (installed via NixOS)
+      # This replaces the remote nixpkgs-fmt hook that doesn't work on NixOS
+      - id: nixpkgs-fmt
+        name: Format Nix files
+        entry: nixpkgs-fmt
+        language: system
+        files: \.nix$
         pass_filenames: true
