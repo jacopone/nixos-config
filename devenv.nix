@@ -18,7 +18,7 @@
     # Nix development
     nixpkgs-fmt
     nil
-    nix  # Required for git-hooks installation (provides nix-store command)
+    nix # Required for git-hooks installation (provides nix-store command)
 
     # CLAUDE.md automation dependencies (keep existing)
     uv

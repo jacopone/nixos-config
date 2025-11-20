@@ -17,7 +17,7 @@
       # === 2025 CURSOR AI OPTIMIZATIONS ===
 
       # YOLO Mode (Advanced AI Capabilities)
-      "cursor.cpp.disabledLanguages" = [];
+      "cursor.cpp.disabledLanguages" = [ ];
       "cursor.chat.enableContextAwareness" = true;
       "cursor.enableAutoSuggestions" = true;
       "cursor.yolo.enabled" = true;

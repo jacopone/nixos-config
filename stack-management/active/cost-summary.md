@@ -22,7 +22,7 @@ lifecycle: persistent
 *(Auto-calculated from subscriptions.md)*
 
 - AI & Development: €XX.XX
-- Security & Privacy: €XX.XX  
+- Security & Privacy: €XX.XX
 - Productivity: €XX.XX
 - Entertainment: €XX.XX
 - Other: €XX.XX
@@ -64,7 +64,7 @@ Month     | Subscriptions | Total   | vs Previous
 
 ### High-Impact Reductions
 - [ ] Service X: €XX/month - Alternative available
-- [ ] Service Y: €XX/month - Underutilized  
+- [ ] Service Y: €XX/month - Underutilized
 - [ ] Service Z: €XX/month - Duplicate functionality
 
 ### Bundle Opportunities
@@ -123,5 +123,5 @@ Month     | Subscriptions | Total   | vs Previous
 
 ### External Factors
 - Company policy changes
-- Tax considerations  
+- Tax considerations
 - Currency fluctuations (if applicable)

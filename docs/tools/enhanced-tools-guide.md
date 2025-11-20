@@ -20,7 +20,7 @@ Your terminal now has **Starship prompt** with Nerd Font symbols:
 
 **Visual git indicators:**
 - `~/nixos-config` - Current directory path (blue)
-- ` main` - Git branch with Nerd Font git icon (purple)  
+- ` main` - Git branch with Nerd Font git icon (purple)
 - `[✱2✚1⇡3]` - Git status: 2 modified, 1 staged, 3 ahead (red)
 - `(+15/-3)` - Git metrics: 15 lines added, 3 deleted (green/red)
 - Updates in real-time as you work with files
@@ -135,7 +135,7 @@ bat --style=plain file.py      # No decorations, just highlighting
 cat README.md                  # Beautiful rendering
 cat *.md                      # Multiple markdown files
 
-# Code files (uses bat automatically)  
+# Code files (uses bat automatically)
 cat *.py                      # Syntax highlighted code
 cat file.py | grep "function" # Search within files
 
@@ -390,7 +390,7 @@ history | peco
 **With Starship prompt, you get instant git feedback:**
 ```bash
 # Your prompt shows everything you need:
-~/myproject 🚀 feature/auth [✚1?2] ❯ 
+~/myproject 🚀 feature/auth [✚1?2] ❯
 
 # No need for these commands anymore:
 # git status    # Info already in prompt
@@ -425,7 +425,7 @@ tree -L 2                   # Limit depth
 **Your shell has enhanced features + visual git:**
 ```bash
 # Smart directory navigation (enhanced cd function)
-cd desktop-assistant/       # Relative paths work reliably  
+cd desktop-assistant/       # Relative paths work reliably
 cd project                  # Smart jumping to frequently used directories
 cd ..                       # Parent directory navigation
 z project                   # Direct zoxide usage for smart jumping
@@ -446,7 +446,7 @@ cd ../other-project/        # ✅ Parent + relative navigation
 cd /absolute/path          # ✅ Absolute paths
 cd ~/Documents             # ✅ Home directory paths
 
-# Smart jumping (uses zoxide):  
+# Smart jumping (uses zoxide):
 cd project                 # 🧠 Finds best match from visited directories
 z frequently-used          # 🧠 Direct zoxide usage
 ```
@@ -494,7 +494,7 @@ vim $(fd -e py | fzf)
 **Good News!** Your Fish shell is configured with **smart command substitutions** that automatically handle this for you:
 
 ### Smart Commands (Context-Aware)
-When **you** type these commands interactively, you get the enhanced versions.  
+When **you** type these commands interactively, you get the enhanced versions.
 When **agents/scripts** use them, they get the original versions automatically.
 
 | You Type | You Get | Agents Get | Auto-Switches |

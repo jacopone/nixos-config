@@ -10,7 +10,7 @@ lifecycle: persistent
 
 *All paid services currently in use - updated monthly*
 
-**Last Updated**: $(date)  
+**Last Updated**: $(date)
 **Total Monthly Cost**: €XX.XX (update with automation script)
 
 ---
@@ -24,7 +24,7 @@ lifecycle: persistent
 - **Auto-Renew**: Yes
 - **Next Review**: 2025-10-15
 
-### Cursor Ultra - €18/month  
+### Cursor Ultra - €18/month
 - **Started**: 2024-01-15
 - **Usage**: Primary AI coding editor
 - **ROI**: High - 40% productivity boost in coding
@@ -36,7 +36,7 @@ lifecycle: persistent
 ## 🔒 Security & Privacy (€XX/month)
 
 ### NordVPN - €11/month
-- **Started**: 2023-06-01  
+- **Started**: 2023-06-01
 - **Usage**: Daily for work, travel protection
 - **ROI**: Medium - security worth it
 - **Auto-Renew**: Yes
@@ -46,7 +46,7 @@ lifecycle: persistent
 - **Started**: 2023-01-01
 - **Usage**: Daily password management, 2FA
 - **ROI**: High - essential security tool
-- **Auto-Renew**: Yes  
+- **Auto-Renew**: Yes
 - **Next Review**: Annual review only
 
 ---
@@ -66,7 +66,7 @@ lifecycle: persistent
 
 ### Cost Trends
 - **Q4 2023**: €XX/month
-- **Q1 2024**: €XX/month  
+- **Q1 2024**: €XX/month
 - **Trend**: ↗️ Growing / ↘️ Decreasing / ➡️ Stable
 
 ### ROI Assessment
@@ -88,13 +88,13 @@ lifecycle: persistent
 3. Budget approval if >€9/month
 4. Documentation in this file required
 
-### Review Schedule  
+### Review Schedule
 - **Monthly**: Cost totals and usage check
-- **Quarterly**: ROI assessment  
+- **Quarterly**: ROI assessment
 - **Annually**: Full audit of all services
 
 ### Deprecation Criteria
 - Unused for 30+ days
-- Better alternative found  
+- Better alternative found
 - ROI below acceptable threshold
 - Budget constraints

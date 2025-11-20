@@ -41,7 +41,7 @@
           { run = "sxiv \"$@\""; desc = "View with sxiv"; orphan = true; }
           { run = "feh \"$@\""; desc = "View with feh"; orphan = true; }
         ];
-        # PDFs - Okular as default  
+        # PDFs - Okular as default
         pdf = [
           { run = "/run/current-system/sw/bin/okular \"$@\""; desc = "View with Okular"; orphan = true; }
         ];
@@ -49,14 +49,14 @@
         office = [
           { run = "/run/current-system/sw/bin/libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
         ];
-        
+
         # CSV files - LibreOffice Calc as primary opener
         csv = [
           { run = "libreoffice --calc \"$@\""; desc = "Open with LibreOffice Calc"; orphan = true; }
           { run = "csvlook \"$@\""; desc = "View with csvlook"; block = true; }
           { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
         ];
-        
+
         # Text/code files - helix first, then other editors
         edit = [
           { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
@@ -81,7 +81,7 @@
           { name = "*.pdf"; use = "pdf"; }
           # CSV files
           { name = "*.csv"; use = "csv"; }
-          # Office documents  
+          # Office documents
           { name = "*.doc"; use = "office"; }
           { name = "*.docx"; use = "office"; }
           { name = "*.xls"; use = "office"; }
@@ -91,7 +91,7 @@
           { name = "*.odt"; use = "office"; }
           { name = "*.ods"; use = "office"; }
           { name = "*.odp"; use = "office"; }
-          
+
           # Text and code files - all open with Helix by default
           { name = "*.txt"; use = "edit"; }
           { name = "*.py"; use = "edit"; }

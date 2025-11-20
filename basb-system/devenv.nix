@@ -5,8 +5,8 @@
   # This keeps devenv minimal and avoids tkinter/pytest-cov build issues
 
   packages = with pkgs; [
-    python3                   # System Python (already has rich from packages.nix)
-    python312Packages.ruff    # Linter
+    python3 # System Python (already has rich from packages.nix)
+    python312Packages.ruff # Linter
   ];
 
   env.PYTHONPATH = "${toString ./.}/src";

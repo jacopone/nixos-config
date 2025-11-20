@@ -888,4 +888,3 @@ With it: AI always knows system state, zero maintenance, maximum productivity.
 - [Core Thesis](CORE_THESIS.md) - Why this works
 - [Architecture](architecture/CLAUDE_ORCHESTRATION.md) - System design
 - [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation) - Source code
-

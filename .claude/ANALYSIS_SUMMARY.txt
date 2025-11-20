@@ -81,16 +81,16 @@ HYPOTHESIS TO VERIFY
 ====================
 1. Are hooks actually deployed and active?
    Test: Run 'ls /tmp' and see if Modern CLI Enforcer suggests 'eza'
-   
+
 2. Is permission auto-learner recording approvals?
    Check: ~/.claude/learning/permission_approvals.jsonl
-   
+
 3. Why is global CLAUDE.md not loading?
    Check: ~/.claude.json configuration for instruction_context_path
-   
+
 4. Are pre-commit hooks enforcing frontmatter?
    Test: Add .md file without frontmatter and try to commit
-   
+
 5. Is MCP playwright server actually working?
    Issue: Shows 0% success rate despite 2324 invocations
 

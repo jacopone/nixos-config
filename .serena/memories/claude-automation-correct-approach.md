@@ -7,7 +7,7 @@ After ultrathinking, the **merge approach is superior to @import** for this use 
 ## Why Merge Is Better
 
 1. **100% Reliability**: Single file guaranteed read at initialization
-2. **No Import Dependency**: No uncertainty about @import edge cases  
+2. **No Import Dependency**: No uncertainty about @import edge cases
 3. **Critical Policies**: User behavioral rules MUST be enforced, can't risk silent import failure
 4. **Clear Architecture**: Source (user-editable) → Generator → Artifact (Claude-readable)
 
@@ -37,17 +37,17 @@ OUTPUT ARTIFACT (Claude-Readable):
 ```python
 def generate(self) -> GenerationResult:
     """Generate system CLAUDE.md with merged user policies."""
-    
+
     # 1. Load user policies (if exists)
     user_policies_file = Path.home() / ".claude" / "CLAUDE-USER-POLICIES.md"
     user_policies_content = ""
     if user_policies_file.exists():
         user_policies_content = user_policies_file.read_text()
-    
+
     # 2. Parse system configuration
     packages = self.parse_packages()
     fish_abbrevs = self.parse_fish_config()
-    
+
     # 3. Build context with user policies
     context = {
         "timestamp": datetime.now(),
@@ -56,10 +56,10 @@ def generate(self) -> GenerationResult:
         "tool_categories": categorize_tools(packages),
         "fish_abbreviations": fish_abbrevs,
     }
-    
+
     # 4. Render merged template
     content = self.render_template("system-claude.j2", context)
-    
+
     # 5. Write to ~/.claude/CLAUDE.md
     return self.write_file(self.output_file, content)
 ```

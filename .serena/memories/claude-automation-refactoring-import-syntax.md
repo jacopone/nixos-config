@@ -51,7 +51,7 @@ This ensures:
 
 This affects:
 - `claude-nixos-automation` repository (needs template update)
-- `scripts/claude_automation/templates/system-claude.j2` 
+- `scripts/claude_automation/templates/system-claude.j2`
 - All generated `~/.claude/CLAUDE.md` files
 
 ## Next Steps

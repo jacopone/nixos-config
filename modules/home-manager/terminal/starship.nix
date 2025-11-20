@@ -58,144 +58,144 @@
         error_symbol = "[❯](bold red)";
         vicmd_symbol = "[❮](bold yellow)";
       };
-      
+
       # Performance optimization
       scan_timeout = 10;
       command_timeout = 500;
-      
+
       # Additional Nerd Font symbols for other modules
       aws = {
         symbol = "  ";
       };
-      
+
       buf = {
         symbol = " ";
       };
-      
+
       bun = {
         symbol = " ";
       };
-      
+
       cmake = {
         symbol = " ";
       };
-      
+
       crystal = {
         symbol = " ";
       };
-      
+
       dart = {
         symbol = " ";
       };
-      
+
       deno = {
         symbol = " ";
       };
-      
+
       elixir = {
         symbol = " ";
       };
-      
+
       elm = {
         symbol = " ";
       };
-      
+
       fennel = {
         symbol = " ";
       };
-      
+
       fossil_branch = {
         symbol = " ";
       };
-      
+
       gcloud = {
         symbol = "  ";
       };
-      
+
       git_commit = {
         tag_symbol = "  ";
       };
-      
+
       guix_shell = {
         symbol = " ";
       };
-      
+
       haxe = {
         symbol = " ";
       };
-      
+
       hg_branch = {
         symbol = " ";
       };
-      
+
       hostname = {
         ssh_symbol = " ";
       };
-      
+
       julia = {
         symbol = " ";
       };
-      
+
       lua = {
         symbol = " ";
       };
-      
+
       memory_usage = {
         symbol = "󰍛 ";
       };
-      
+
       meson = {
         symbol = "󰔷 ";
       };
-      
+
       nim = {
         symbol = "󰆥 ";
       };
-      
+
       nix_shell = {
         symbol = " ";
       };
-      
+
       ocaml = {
         symbol = " ";
       };
-      
+
       package = {
         symbol = "󰏗 ";
       };
-      
+
       perl = {
         symbol = " ";
       };
-      
+
       pijul_channel = {
         symbol = " ";
       };
-      
+
       pixi = {
         symbol = "󰏗 ";
       };
-      
+
       rlang = {
         symbol = "󰟔 ";
       };
-      
+
       ruby = {
         symbol = " ";
       };
-      
+
       scala = {
         symbol = " ";
       };
-      
+
       swift = {
         symbol = " ";
       };
-      
+
       zig = {
         symbol = " ";
       };
-      
+
       gradle = {
         symbol = " ";
       };

@@ -10,7 +10,7 @@
   # Configure atuin for intelligent shell history
   programs.atuin = {
     enable = true;
-    enableFishIntegration = false;  # Disabled to fix bind -k deprecation warning
+    enableFishIntegration = false; # Disabled to fix bind -k deprecation warning
     settings = {
       # AI workflow optimizations
       auto_sync = true;
@@ -22,9 +22,9 @@
       max_preview_height = 4;
       # Better context for AI agents
       history_filter = [
-        "^\\s"        # Skip commands starting with space
-        "^exit$"      # Skip exit commands
-        "^clear$"     # Skip clear commands
+        "^\\s" # Skip commands starting with space
+        "^exit$" # Skip exit commands
+        "^clear$" # Skip clear commands
       ];
     };
   };
@@ -47,7 +47,7 @@
   # Delta (better git diff) configuration
   programs.delta = {
     enable = true;
-    enableGitIntegration = true;  # Explicitly enable git integration
+    enableGitIntegration = true; # Explicitly enable git integration
     options = {
       navigate = true;
       light = false;

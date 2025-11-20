@@ -29,14 +29,14 @@ Your terminal now includes **Starship prompt** with Nerd Font symbols:
 - **Nerd Font symbols** including  for git branches and 󰌾 for read-only directories
 - **Clean, simple design** without heavy powerline segments
 - **Real-time git status** with comprehensive indicators
-- **Directory icons** for Documents 󰈙, Downloads , Music 󰝚, Pictures 
+- **Directory icons** for Documents 󰈙, Downloads , Music 󰝚, Pictures
 - **Performance optimized** for quick response
 
 ## 🧠 How It Works
 
 Your Fish shell now has **context-aware command substitutions** that:
 - ✅ **Give YOU enhanced tools** when typing commands interactively
-- ✅ **Give AGENTS original tools** when they run commands automatically  
+- ✅ **Give AGENTS original tools** when they run commands automatically
 - ✅ **Preserve script compatibility** for all automation
 
 ## 🔍 Context Detection Logic
@@ -75,7 +75,7 @@ Your `cd` command is enhanced with **intelligent path handling**:
 cd ..                    # Parent directory navigation
 cd ../..                 # Multi-level parent navigation
 cd /absolute/path        # Absolute paths
-cd ~/home/path          # Home directory paths  
+cd ~/home/path          # Home directory paths
 cd desktop-assistant/   # Relative paths with slashes
 cd SomeDirectory        # Existing local directories
 
@@ -85,7 +85,7 @@ cd project              # Directory name only → zoxide finds best match
 
 **How it works:**
 1. **Parent directories** (`..`, `../..`) → Always use builtin `cd`
-2. **Absolute paths** (`/path`) → Always use builtin `cd`  
+2. **Absolute paths** (`/path`) → Always use builtin `cd`
 3. **Home paths** (`~/path`) → Always use builtin `cd`
 4. **Relative paths with slashes** (`dir/subdir`) → Use builtin `cd`
 5. **Existing directories** → Use builtin `cd` if directory exists locally
@@ -107,7 +107,7 @@ batl     # → bat --paging=never (no paging)
 batp     # → bat --style=plain (plain style)
 ```
 
-### Directory Navigation  
+### Directory Navigation
 ```bash
 tree     # → eza --tree
 lt       # → eza --tree --level=2 (limit depth)
@@ -218,7 +218,7 @@ When you need original commands (rare cases):
 
 ```bash
 orig_cat file.txt   # Force original cat
-orig_ls             # Force original ls  
+orig_ls             # Force original ls
 orig_grep pattern   # Force original grep
 ```
 
@@ -272,7 +272,7 @@ functions ls         # Shows the smart ls function
 
 Meanwhile:
 1. **Agent types**: `cat important.py`
-2. **Function runs**: Same smart `cat` function executes  
+2. **Function runs**: Same smart `cat` function executes
 3. **Context check**: `_is_automated_context` returns true (non-TTY detected)
 4. **Tool selection**: Uses original `cat`
 5. **Result**: Agent gets plain text as expected
@@ -290,7 +290,7 @@ _is_automated_context; and echo "Automated context" or echo "Interactive context
 **Check if tools are installed:**
 ```bash
 command -q bat; and echo "bat available" or echo "bat missing"
-command -q eza; and echo "eza available" or echo "eza missing"  
+command -q eza; and echo "eza available" or echo "eza missing"
 command -q rg; and echo "ripgrep available" or echo "ripgrep missing"
 ```
 
@@ -345,7 +345,7 @@ Edit `~/.config/fish/config.fish` and comment out the smart function definitions
 
 ```bash
 show_enhanced_tools     # See what's enhanced
-preview file.txt        # Quick file preview  
+preview file.txt        # Quick file preview
 md file.md             # Enhanced markdown viewer
 ff pattern             # Find files
 search pattern         # Search in files

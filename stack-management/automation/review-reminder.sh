@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Stack Management Review Reminder  
+# Stack Management Review Reminder
 # Automated reminders for stack maintenance tasks.
 #
 
@@ -39,7 +39,7 @@ BACKLOG_FILE="$STACK_DIR/discovery/backlog.md"
 if [ -f "$BACKLOG_FILE" ]; then
     BACKLOG_ITEMS=$(grep -c "^#### " "$BACKLOG_FILE" 2>/dev/null || echo "0")
     echo "   • Backlog items: $BACKLOG_ITEMS"
-    
+
     if [ "$BACKLOG_ITEMS" -gt 10 ]; then
         echo -e "   ${YELLOW}⚠️  High backlog count - consider reviewing${NC}"
     elif [ "$BACKLOG_ITEMS" -gt 0 ]; then
@@ -57,7 +57,7 @@ EVAL_FILE="$STACK_DIR/discovery/evaluating.md"
 if [ -f "$EVAL_FILE" ]; then
     EVAL_ITEMS=$(grep -c "^### " "$EVAL_FILE" 2>/dev/null || echo "0")
     echo "   • Services in trial: $EVAL_ITEMS"
-    
+
     # Check for overdue evaluations (basic check for dates)
     if grep -q "Trial:" "$EVAL_FILE"; then
         echo -e "   ${YELLOW}⏰ Check trial end dates manually${NC}"

@@ -87,7 +87,7 @@ Examples from system CLAUDE.md:
 - Line 281: `**ALL markdown files MUST include frontmatter.**` (ALL CAPS)
 - Line 417: `### MANDATORY Tool Substitutions (Use These ALWAYS)` (3x emphasis)
 
-**Anthropic Best Practice**: 
+**Anthropic Best Practice**:
 - Clear but not alarming
 - "Preferred" over "MANDATORY"
 - Context-aware exceptions acknowledged
@@ -141,7 +141,7 @@ Use grep only if rg isn't available.
 
 **Expected**: Hooks should be integrated into Claude Code's execution environment
 
-**Current Reality**: 
+**Current Reality**:
 - Hooks are standalone Python scripts
 - No `.claude.json` configuration integrating hooks
 - No Claude Code task/command definitions
@@ -187,7 +187,7 @@ $ jq '.projects["/home/guyfawkes/nixos-config"].instruction_context_path' ~/.cla
 null
 
 $ jq '.projects["/home/guyfawkes/nixos-config"] | keys' ~/.claude.json
-["allowedTools", "disabledMcpjsonServers", "enabledMcpjsonServers", 
+["allowedTools", "disabledMcpjsonServers", "enabledMcpjsonServers",
  "exampleFiles", "exampleFilesGeneratedAt", ...]
 ```
 
@@ -213,11 +213,11 @@ $ jq '.projects["/home/guyfawkes/nixos-config"] | keys' ~/.claude.json
   .claude/CLAUDE.local.md (auto-generated machine info)
   .claude/mcp-analytics.md (auto-generated)
   .claude/tool-analytics.md (auto-generated)
-  
+
 /home/guyfawkes/nixos-config/
   CLAUDE.md (162 lines, project config) ✅ LOADS
   .claude/CLAUDE.local.md (auto-generated)
-  
+
 /home/guyfawkes/claude-nixos-automation/
   CLAUDE.md (217 lines, automation docs)
   .claude/... (specs, sessions, etc.)
@@ -316,7 +316,7 @@ Claude Tools (0%):
 - NO tools used by Claude in last 30 days
 ```
 
-**Implication**: 
+**Implication**:
 - Claude Code is not being invoked for tool operations
 - Or: When invoked, Claude isn't using any system tools
 - Hook system may not be detecting Claude Code sessions
@@ -410,7 +410,7 @@ Tool inventory: NOT in instructions
 - "X is preferred, Y can be used when Z"
 - "If you need to bypass, document why"
 
-**Why This Matters**: 
+**Why This Matters**:
 - Emphatic enforcement can trigger override behavior
 - Clear reasoning helps Claude make context-aware decisions
 - Exceptions can be acknowledged gracefully
@@ -534,7 +534,7 @@ When working in `/home/guyfawkes/nixos-config/`:
    - Git commit policy
    - NixOS safety guidelines
    - Documentation governance
-   
+
 2. Project configuration (from this repo)
    - CLAUDE.md (this file)
    - .claude/CLAUDE.local.md (auto-generated machine info)

@@ -14,9 +14,9 @@ lifecycle: persistent
 
 # SERVICE_NAME - Deprecation Postmortem
 
-**Service**: [Service Name]  
-**Type**: [Subscription/Package/Tool]  
-**Active Period**: START_DATE to END_DATE (X days/months)  
+**Service**: [Service Name]
+**Type**: [Subscription/Package/Tool]
+**Active Period**: START_DATE to END_DATE (X days/months)
 **Total Cost**: €XXX.XX (if paid service)
 
 ---
@@ -26,7 +26,7 @@ lifecycle: persistent
 ### Primary Reason
 - [ ] Cost too high for value received
 - [ ] Better alternative found
-- [ ] Feature requirements changed  
+- [ ] Feature requirements changed
 - [ ] Service quality declined
 - [ ] Security/privacy concerns
 - [ ] Vendor lock-in issues
@@ -36,9 +36,9 @@ lifecycle: persistent
 
 **Details**: Explain the main driver for deprecation
 
-### Secondary Issues  
+### Secondary Issues
 - Issue 1: Description
-- Issue 2: Description  
+- Issue 2: Description
 - Issue 3: Description
 
 ### Final Straw
@@ -53,7 +53,7 @@ What specific event/realization triggered the final decision?
 - Feature 2: What was good
 - Feature 3: Positive experience
 
-### Lessons Learned  
+### Lessons Learned
 - Learning 1: What this taught you
 - Learning 2: Process improvement
 - Learning 3: Future considerations
@@ -63,13 +63,13 @@ What specific event/realization triggered the final decision?
 ## 💸 Financial Impact
 
 ### Direct Costs
-- **Monthly Cost**: €XX.XX  
+- **Monthly Cost**: €XX.XX
 - **Total Paid**: €XXX.XX
 - **Refund Received**: €XX.XX (if applicable)
 
 ### Opportunity Cost
 - **Time Invested**: X hours setup/learning
-- **Integration Work**: X hours connecting to workflow  
+- **Integration Work**: X hours connecting to workflow
 - **Migration Time**: X hours switching away
 
 ### Savings Impact
@@ -82,7 +82,7 @@ What specific event/realization triggered the final decision?
 ## 🔄 Replacement Strategy
 
 ### Direct Replacement
-- **New Service**: [Name] 
+- **New Service**: [Name]
 - **Cost**: €XX.XX/month (savings: €XX.XX)
 - **Migration Effort**: X hours
 - **Improvement**: How it's better
@@ -94,7 +94,7 @@ What specific event/realization triggered the final decision?
 
 ### No Replacement
 - Why no replacement needed
-- How workflow simplified  
+- How workflow simplified
 - Benefits of removal
 
 ---
@@ -108,7 +108,7 @@ What specific event/realization triggered the final decision?
 
 **Conditions for Reconsideration**:
 1. Condition 1
-2. Condition 2  
+2. Condition 2
 3. Condition 3
 
 ### Similar Services to Avoid
@@ -126,13 +126,13 @@ What specific event/realization triggered the final decision?
 ## 📊 Success Metrics Review
 
 ### Original Goals (Why Adopted)
-- Goal 1: ✅ Achieved / ❌ Not achieved / ⚠️ Partially  
+- Goal 1: ✅ Achieved / ❌ Not achieved / ⚠️ Partially
 - Goal 2: ✅ Achieved / ❌ Not achieved / ⚠️ Partially
 - Goal 3: ✅ Achieved / ❌ Not achieved / ⚠️ Partially
 
 ### ROI Assessment
 - **Expected ROI**: What you hoped to achieve
-- **Actual ROI**: What actually happened  
+- **Actual ROI**: What actually happened
 - **ROI Rating**: 1-10 scale with explanation
 
 ---
@@ -141,14 +141,14 @@ What specific event/realization triggered the final decision?
 
 ### Technical Cleanup Required
 - [ ] Remove from NixOS configuration
-- [ ] Update documentation  
+- [ ] Update documentation
 - [ ] Clean up integration code
 - [ ] Export/backup data
 - [ ] Cancel subscription
 - [ ] Remove authentication tokens
 
 ### Documentation Updates
-- [ ] Update active/subscriptions.md  
+- [ ] Update active/subscriptions.md
 - [ ] Update active/packages.md
 - [ ] Update workflow documentation
 - [ ] Update cost tracking
@@ -164,7 +164,7 @@ What specific event/realization triggered the final decision?
 
 ### Process Improvements
 1. Evaluation process change
-2. Trial period adjustment  
+2. Trial period adjustment
 3. Documentation improvement
 
 ### Strategic Insights
@@ -174,6 +174,6 @@ What specific event/realization triggered the final decision?
 
 ---
 
-**Postmortem Completed**: $(date)  
-**Reviewed By**: [Your name]  
+**Postmortem Completed**: $(date)
+**Reviewed By**: [Your name]
 **Next Review**: [If applicable - some deprecated services worth periodic review]

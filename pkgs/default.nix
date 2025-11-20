@@ -1,3 +1,3 @@
-{pkgs, ...}: {
-  brownkit = pkgs.callPackage ./brownkit.nix {};
+{ pkgs, ... }: {
+  brownkit = pkgs.callPackage ./brownkit.nix { };
 }

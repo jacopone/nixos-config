@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/core/packages.nix
       ../../profiles/desktop
@@ -35,11 +36,11 @@
   # Nix Package Management and Flakes
   nix = {
     settings.auto-optimise-store = true;
-    settings.experimental-features = [ "nix-command"  "flakes" ];
-    settings.trusted-users = [ "root" username ];  # Enable cachix for user
-    settings.cores = 4;  # Use half CPU cores for builds (8-core system)
-    settings.max-jobs = 2;  # Limit parallel builds to reduce memory pressure
-    settings.download-buffer-size = 268435456;  # 256MB download buffer (default is 64MB)
+    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings.trusted-users = [ "root" username ]; # Enable cachix for user
+    settings.cores = 4; # Use half CPU cores for builds (8-core system)
+    settings.max-jobs = 2; # Limit parallel builds to reduce memory pressure
+    settings.download-buffer-size = 268435456; # 256MB download buffer (default is 64MB)
     gc = {
       automatic = true;
       dates = "weekly";
@@ -61,8 +62,8 @@
   # Enable zram swap for better memory compression
   zramSwap = {
     enable = true;
-    algorithm = "zstd";  # Better compression than default
-    memoryPercent = 25;  # Use 25% of RAM for compressed swap
+    algorithm = "zstd"; # Better compression than default
+    memoryPercent = 25; # Use 25% of RAM for compressed swap
   };
 
   # Automatic Updates
@@ -91,7 +92,7 @@
     LC_TIME = "it_IT.UTF-8";
   };
 
-  
+
 
   # Exclude Nixos Documentation
   documentation.nixos.enable = false;
@@ -99,9 +100,9 @@
   # Try to change the default Editor of the whole system
   environment.variables.EDITOR = "hx";
 
-  
 
-  
+
+
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -110,26 +111,26 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Primary User";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" ];  # Added 'input' for whisper-overlay
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" ]; # Added 'input' for whisper-overlay
     packages = with pkgs; [
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
 
-    # Allow unfree packages
+  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  
 
-  
+
+
 
   # Enable Gnome Online Accounts to manage Google Drive
 
   # Hardware Optimizations
-  services.fstrim.enable = true;  # Weekly SSD TRIM for disk health
-  services.fwupd.enable = true;   # Firmware updates for ThinkPad
-  hardware.graphics.enable = true;  # Graphics hardware acceleration
+  services.fstrim.enable = true; # Weekly SSD TRIM for disk health
+  services.fwupd.enable = true; # Firmware updates for ThinkPad
+  hardware.graphics.enable = true; # Graphics hardware acceleration
 
   # NixOS Services (replaces manual package management)
   virtualisation.docker.enable = true;

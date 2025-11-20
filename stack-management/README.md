@@ -17,7 +17,7 @@ A comprehensive system for tracking, evaluating, and optimizing your technology 
 ## 🎯 Overview
 
 This system helps you:
-- **Discover** new tools and services systematically  
+- **Discover** new tools and services systematically
 - **Evaluate** them with structured trials
 - **Track** active subscriptions and costs
 - **Optimize** through informed deprecation decisions
@@ -34,7 +34,7 @@ stack-management/
 │       └── discovery-item.md   # Template for new discoveries
 ├── active/
 │   ├── subscriptions.md        # Paid services with costs & ROI
-│   ├── packages.md             # NixOS packages with rationale  
+│   ├── packages.md             # NixOS packages with rationale
 │   └── cost-summary.md         # Budget tracking & analysis
 ├── deprecated/
 │   ├── YYYY-MM-service.md      # Individual postmortem files
@@ -63,7 +63,7 @@ stack-management/
 - **Source**: Hacker News thread
 - **URL**: https://example.com
 - **Quick Notes**: Claims 30% faster coding with Rust
-- **Priority**: High  
+- **Priority**: High
 - **Why Interesting**: Current copilot struggles with Rust
 - **Initial Cost**: $20/month
 ```
@@ -79,7 +79,7 @@ stack-management/
 
 **Success Framework:**
 - [ ] Solves real problem
-- [ ] Better than current solution  
+- [ ] Better than current solution
 - [ ] Worth the cost
 - [ ] Good integration
 - [ ] Sustainable vendor
@@ -151,7 +151,7 @@ cd ~/nixos-config/stack-management
 
 ### 2. **Populate Current State**
 - Add existing subscriptions to `active/subscriptions.md`
-- Document current packages in `active/packages.md`  
+- Document current packages in `active/packages.md`
 - Set budget limits in `active/cost-summary.md`
 - Run cost calculator to get baseline
 
@@ -175,7 +175,7 @@ cd ~/nixos-config/stack-management
 python3 automation/cost-calculator.py
 ```
 
-### Review Reminder (`automation/review-reminder.sh`) 
+### Review Reminder (`automation/review-reminder.sh`)
 - Checks backlog health
 - Monitors active evaluations
 - Runs cost calculations
@@ -192,12 +192,12 @@ python3 automation/cost-calculator.py
 
 ### Financial Metrics
 - Monthly subscription costs by category
-- Annual spending projections  
+- Annual spending projections
 - Savings from deprecations
 - Budget utilization percentage
 - ROI assessments per service
 
-### Operational Metrics  
+### Operational Metrics
 - Services in discovery backlog
 - Active evaluations and trial status
 - Package count and usage
@@ -214,7 +214,7 @@ python3 automation/cost-calculator.py
 - **Set priorities** - helps focus evaluation efforts
 - **Regular review** - weekly backlog grooming
 
-### Evaluation  
+### Evaluation
 - **Define success criteria** upfront
 - **Set time limits** - avoid endless trials
 - **Document daily** - capture real usage patterns
@@ -227,7 +227,7 @@ python3 automation/cost-calculator.py
 - **Integration checks** - ensure services work together
 
 ### Deprecation
-- **Document thoroughly** - capture lessons learned  
+- **Document thoroughly** - capture lessons learned
 - **Clean up completely** - remove configs and data
 - **Track savings** - quantify optimization impact
 - **Share insights** - help future decisions
@@ -261,7 +261,7 @@ git commit -m "Add service X (stack-management: +$20/month, see active/subscript
 ### Stack Health
 - ✅ All services have documented purpose
 - ✅ Monthly costs within budget
-- ✅ High ROI across all paid services  
+- ✅ High ROI across all paid services
 - ✅ Regular evaluation of new tools
 - ✅ Systematic deprecation of unused services
 
@@ -282,7 +282,7 @@ git commit -m "Add service X (stack-management: +$20/month, see active/subscript
 - ⚠️ Services unused for 30+ days
 - ⚠️ Backlog growing without evaluation
 
-### Process Breakdown  
+### Process Breakdown
 - ⚠️ No reviews completed in 2+ months
 - ⚠️ Cost calculations out of date
 - ⚠️ Services added without documentation

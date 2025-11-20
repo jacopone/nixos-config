@@ -10,7 +10,7 @@ lifecycle: ephemeral
 
 *Track savings achieved through smart deprecation decisions*
 
-**Last Updated**: $(date)  
+**Last Updated**: $(date)
 **Total Savings**: €XXX.XX/month (cumulative)
 
 ---
@@ -19,7 +19,7 @@ lifecycle: ephemeral
 
 ### Monthly Savings Achieved
 - **2024**: €XXX.XX/month saved
-- **2023**: €XXX.XX/month saved  
+- **2023**: €XXX.XX/month saved
 - **Cumulative**: €XXX.XX/month total savings
 
 ### Annual Impact
@@ -36,12 +36,12 @@ lifecycle: ephemeral
 - Service B (deprecated 2024-03): €XX.XX/month
 - **Category Total**: €XXX.XX/month
 
-### Security & Privacy  
+### Security & Privacy
 - Service C (deprecated 2023-12): €XX.XX/month
 - **Category Total**: €XXX.XX/month
 
 ### Productivity
-- Service D (deprecated 2024-02): €XX.XX/month  
+- Service D (deprecated 2024-02): €XX.XX/month
 - Service E (deprecated 2024-04): €XX.XX/month
 - **Category Total**: €XXX.XX/month
 
@@ -57,14 +57,14 @@ lifecycle: ephemeral
 - **Replacement**: What replaced it (if anything)
 - **Quality Impact**: Better/Same/Slightly Worse/Much Worse
 
-#### 2. Service Name - €XX.XX/month saved  
+#### 2. Service Name - €XX.XX/month saved
 - **Deprecated**: DATE
 - **Reason**: Primary reason for removal
 - **Replacement**: What replaced it (if anything)
 - **Quality Impact**: Better/Same/Slightly Worse/Much Worse
 
 #### 3. Service Name - €XX.XX/month saved
-- **Deprecated**: DATE  
+- **Deprecated**: DATE
 - **Reason**: Primary reason for removal
 - **Replacement**: What replaced it (if anything)
 - **Quality Impact**: Better/Same/Slightly Worse/Much Worse
@@ -85,7 +85,7 @@ Quarter   | Services Removed | Savings | Cumulative
 
 ### Success Rate
 - **Successful Deprecations**: XX% (no regrets, clear savings)
-- **Neutral Deprecations**: XX% (savings but some trade-offs)  
+- **Neutral Deprecations**: XX% (savings but some trade-offs)
 - **Failed Deprecations**: XX% (had to re-subscribe or find expensive alternative)
 
 ---
@@ -101,7 +101,7 @@ Quarter   | Services Removed | Savings | Cumulative
 ### Investment Priorities
 1. **Priority 1**: Core productivity improvements
 2. **Priority 2**: AI/development tool upgrades
-3. **Priority 3**: Infrastructure improvements  
+3. **Priority 3**: Infrastructure improvements
 4. **Priority 4**: Experimental/learning tools
 
 ---
@@ -117,7 +117,7 @@ Quarter   | Services Removed | Savings | Cumulative
 ### Close Calls
 - **Service Name**: Almost deprecated, decided to keep
   - **Why Almost Removed**: What made it seem unnecessary
-  - **Why Kept**: What value was discovered  
+  - **Why Kept**: What value was discovered
   - **Lesson**: How evaluation process improved
 
 ---
@@ -126,7 +126,7 @@ Quarter   | Services Removed | Savings | Cumulative
 
 ### Most Effective Strategies
 1. **Strategy 1**: Description and why it works
-2. **Strategy 2**: Description and impact  
+2. **Strategy 2**: Description and impact
 3. **Strategy 3**: Description and results
 
 ### Common Patterns
@@ -145,7 +145,7 @@ Quarter   | Services Removed | Savings | Cumulative
 
 ### Efficiency Gains
 - **Budget Efficiency**: Savings as % of total budget
-- **Service Density**: Value per service (total value / # services)  
+- **Service Density**: Value per service (total value / # services)
 - **Cost per Category**: Average cost in each service category
 
 ### Quality Maintenance
@@ -155,6 +155,6 @@ Quarter   | Services Removed | Savings | Cumulative
 
 ---
 
-**Next Review**: Monthly on first Sunday  
-**Savings Goal**: Target for next quarter  
+**Next Review**: Monthly on first Sunday
+**Savings Goal**: Target for next quarter
 **Focus Area**: Category or type of service to optimize next

@@ -10,7 +10,7 @@ lifecycle: persistent
 
 *Tracking installed packages with rationale and usage*
 
-**Last Updated**: $(date)  
+**Last Updated**: $(date)
 **Total Packages**: Auto-counted by script
 
 ---
@@ -19,11 +19,11 @@ lifecycle: persistent
 
 ### Core Editors
 - **helix** - Primary modal editor, fast Rust-based
-  - Added: 2024-01-01  
+  - Added: 2024-01-01
   - Usage: Daily, 80% of text editing
   - Alternative to: Vim/Neovim
-  
-- **zed-editor** - Secondary AI-enhanced editor  
+
+- **zed-editor** - Secondary AI-enhanced editor
   - Added: 2024-01-15
   - Usage: AI pair programming sessions
   - Alternative to: VSCode for AI features
@@ -33,13 +33,13 @@ lifecycle: persistent
   - Usage: Large codebases, debugging
   - Extension ecosystem needed
 
-### Language Tools  
+### Language Tools
 - **nodejs_20** - Node.js runtime
   - Added: System default
   - Usage: Build tools, npm packages
   - Version: 20.19.4 LTS
-  
-- **python3** - Python runtime  
+
+- **python3** - Python runtime
   - Added: System default
   - Usage: Scripts, AI tools, build systems
   - Critical dependency
@@ -56,22 +56,22 @@ lifecycle: persistent
   - Plugins: rich-preview, file icons
 
 - **eza** - Modern ls replacement
-  - Added: 2024-01-01  
+  - Added: 2024-01-01
   - Usage: Directory listing (aliased to ls)
   - Alternative to: ls, exa
   - Features: Git integration, icons
 
 ### Search & Text Processing
-- **ripgrep** - Super fast grep alternative  
+- **ripgrep** - Super fast grep alternative
   - Added: 2024-01-01
-  - Usage: Code search, file content search  
+  - Usage: Code search, file content search
   - Alternative to: grep, ag
   - Performance: 10x faster than grep
 
 - **fd** - Modern find alternative
   - Added: 2024-01-01
   - Usage: File name search
-  - Alternative to: find  
+  - Alternative to: find
   - Features: Respect .gitignore, parallel
 
 ---
@@ -84,7 +84,7 @@ lifecycle: persistent
   - Usage: Yazi previews, batch processing
   - Critical for: File manager functionality
 
-### Viewers  
+### Viewers
 - **eog** - Eye of GNOME image viewer
   - Added: System default
   - Usage: Primary image viewing
@@ -96,13 +96,13 @@ lifecycle: persistent
 
 ### Usage Categories
 - **Daily Use**: X packages
-- **Weekly Use**: X packages  
+- **Weekly Use**: X packages
 - **Monthly/Rare**: X packages ⚠️ Review candidates
 - **Dependencies**: X packages (required by others)
 
 ### Installation Sources
 - **System packages**: X packages (environment.systemPackages)
-- **Home Manager**: X packages (home.packages)  
+- **Home Manager**: X packages (home.packages)
 - **Dev shells**: X packages (devenv/flake.nix)
 
 ### Size Impact
@@ -122,10 +122,10 @@ lifecycle: persistent
 
 ### Review Process
 - **Monthly**: Check unused packages
-- **Quarterly**: Evaluate alternatives  
+- **Quarterly**: Evaluate alternatives
 - **After major updates**: Verify all packages still needed
 
-### Removal Process  
+### Removal Process
 1. Remove from NixOS configuration
 2. Test rebuild
 3. Document in `deprecated/` if significant

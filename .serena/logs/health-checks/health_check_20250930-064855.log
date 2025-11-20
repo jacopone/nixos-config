@@ -2,7 +2,7 @@ INFO  2025-09-30 06:48:55,478 serena.cli:health_check:557 - Starting health chec
 INFO  2025-09-30 06:48:55,478 serena.cli:health_check:561 - Creating SerenaAgent with disabled dashboard...
 INFO  2025-09-30 06:48:55,500 serena.agent:__init__:204 - Starting Serena server (version=0.1.4-165e77dc-dirty, process id=731138, parent process id=731137)
 INFO  2025-09-30 06:48:55,500 serena.agent:__init__:205 - Configuration file: None
-INFO  2025-09-30 06:48:55,500 serena.agent:__init__:206 - Available projects: 
+INFO  2025-09-30 06:48:55,500 serena.agent:__init__:206 - Available projects:
 INFO  2025-09-30 06:48:55,500 serena.agent:__init__:207 - Loaded tools (36): read_file, create_text_file, list_dir, find_file, replace_regex, delete_lines, replace_lines, insert_at_line, search_for_pattern, restart_language_server, get_symbols_overview, find_symbol, find_referencing_symbols, replace_symbol_body, insert_after_symbol, insert_before_symbol, write_memory, read_memory, list_memories, delete_memory, execute_shell_command, activate_project, remove_project, switch_modes, get_current_config, check_onboarding_performed, onboarding, think_about_collected_information, think_about_task_adherence, think_about_whether_you_are_done, summarize_changes, prepare_for_new_conversation, initial_instructions, jet_brains_find_symbol, jet_brains_find_referencing_symbols, jet_brains_get_symbols_overview
 INFO  2025-09-30 06:48:55,500 serena.config.serena_config:apply:106 - SerenaAgentContext[name='desktop-app'] included 1 tools: switch_modes
 INFO  2025-09-30 06:48:55,504 serena.agent:__init__:221 - Number of exposed tools: 26

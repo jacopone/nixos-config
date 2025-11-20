@@ -66,7 +66,7 @@ input_delay = 3;            # 3ms input delay
 - **Reduced input lag**: Your typing appears instantly even during heavy operations
 - **Better performance**: Less GPU overhead for faster rendering
 
-**Technical explanation:** 
+**Technical explanation:**
 - `sync_to_monitor = false` decouples rendering from monitor refresh rate
 - Lower delays mean faster response times but slightly higher CPU usage
 
@@ -78,7 +78,7 @@ scrollback_pager_history_size = 10;    # Remember 10 pager sessions
 
 **Why this matters for AI development:**
 - **Long conversations**: Keep entire Claude Code sessions in memory
-- **Debugging**: Scroll back through extensive error logs and outputs  
+- **Debugging**: Scroll back through extensive error logs and outputs
 - **Reference**: Quickly find previous AI suggestions or commands
 
 **Memory usage:** ~50MB for full scrollback buffer (negligible on modern systems)
@@ -95,7 +95,7 @@ selection_background = "#45475a"; # Better contrast for selections
 url_color = "#74c7ec";            # Sapphire blue for links
 ```
 
-**Color psychology:** 
+**Color psychology:**
 - **Dark background**: Reduces eye strain during long sessions
 - **High contrast text**: Improves readability
 - **Blue URLs**: Industry standard for clickable links
@@ -188,7 +188,7 @@ inactive_border_color = "#585b70";     # Gray for inactive
 
 ### **Font Size Control**
 - **Ctrl++**: Increase font size
-- **Ctrl+-**: Decrease font size  
+- **Ctrl+-**: Decrease font size
 - **Ctrl+0**: Reset to default size
 
 ## 🖱️ Mouse & Clipboard

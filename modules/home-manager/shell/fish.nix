@@ -69,14 +69,14 @@
                 s/🏗️//g; s/🎯//g; s/🤖//g        # Build/AI emoji
             ' | tr -cd '[:print:]\n\t'           # Keep only printable ASCII + newlines/tabs
         end
-        
+
         # Smart cat function - context-aware file viewing
         function cat --description "Smart cat: glow for markdown, bat for code, cat for automation"
             if _is_automated_context
                 command cat $argv
                 return
             end
-            
+
             # Interactive mode - check file extension
             for file in $argv
                 if test -f "$file"
@@ -93,8 +93,8 @@
                 end
             end
         end
-        
-        # Smart ls function - context-aware directory listing  
+
+        # Smart ls function - context-aware directory listing
         function ls --description "Smart ls: eza with icons for interactive, ls for automation"
             if _is_automated_context
                 command ls $argv
@@ -102,7 +102,7 @@
                 eza --icons --git $argv
             end
         end
-        
+
         function ll --description "Smart ll: enhanced long listing"
             if _is_automated_context
                 command ls -la $argv
@@ -110,15 +110,15 @@
                 eza -la --icons --git --group-directories-first $argv
             end
         end
-        
+
         function la --description "Smart la: show all files"
-            if _is_automated_context  
+            if _is_automated_context
                 command ls -A $argv
             else
                 eza -A --icons --git --group-directories-first $argv
             end
         end
-        
+
         # Smart grep function - simple patterns only
         function grep --description "Smart grep: rg for simple interactive patterns, grep for complex/automation"
             if _is_automated_context
@@ -128,7 +128,7 @@
                 rg $argv
             end
         end
-        
+
         # Smart cd function - zoxide for interactive, cd for automation
         function cd --description "Smart cd: zoxide for interactive directory jumping, cd for automation"
             # Prevent infinite recursion by checking if we're already in a cd call
@@ -136,7 +136,7 @@
                 builtin cd $argv
                 return
             end
-            
+
             if _is_automated_context
                 builtin cd $argv
             else
@@ -169,7 +169,7 @@
                 end
             end
         end
-        
+
         # Smart find function suggestions
         function find --description "Smart find: suggest fd for interactive use"
             if _is_automated_context
@@ -183,16 +183,16 @@
             end
         end
 
-        
+
         # Abbreviations - expand as you type
         abbr -a tree 'eza --tree'
-        abbr -a lt 'eza --tree --level=2'  
+        abbr -a lt 'eza --tree --level=2'
         abbr -a lg 'eza -la --git --group-directories-first'
         abbr -a l1 'eza -1'
         abbr -a findname 'fd'
         abbr -a searchtext 'rg'
         abbr -a rgpy 'rg --type py'
-        abbr -a rgjs 'rg --type js'  
+        abbr -a rgjs 'rg --type js'
         abbr -a rgmd 'rg --type md'
         abbr -a top 'htop'
         abbr -a gdiff 'git diff | bat --language=diff'
@@ -207,7 +207,7 @@
         abbr -a mkd 'mkdir -p'
         abbr -a batl 'bat --paging=never'
         abbr -a batp 'bat --style=plain'
-        
+
         # New tool abbreviations
         abbr -a zz 'zoxide'
         abbr -a sk 'skim'
@@ -266,33 +266,33 @@
                 echo "Usage: preview <file>"
                 return 1
             end
-            
+
             set file $argv[1]
             switch (string lower (path extension "$file"))
                 case .md .markdown
                     glow "$file"
-                case '*'  
+                case '*'
                     bat "$file"
             end
         end
-        
+
         function ff --description "Find files by name (uses fd)"
             fd $argv
         end
-        
-        function search --description "Search text in files (uses rg)"  
+
+        function search --description "Search text in files (uses rg)"
             rg $argv
         end
-        
+
         function md --description "Enhanced markdown viewer with options"
             if test (count $argv) -eq 0
                 echo "Usage: md [-p] [-w WIDTH] [-s STYLE] <file>"
                 return 1
             end
-            
+
             glow $argv
         end
-        
+
         function show_enhanced_tools --description "Show all available enhanced commands"
             echo "🚀 Enhanced CLI Tools Available:"
             echo ""
@@ -327,7 +327,7 @@
             echo "⚡ Core Abbreviations (type + space to expand):"
             echo "  tree      → eza --tree"
             echo "  findname  → fd"
-            echo "  rgpy      → rg --type py"  
+            echo "  rgpy      → rg --type py"
             echo "  top       → htop"
             echo "  mdcat     → glow"
             echo "  json      → jq ."
@@ -352,16 +352,16 @@
             echo ""
             echo "📚 Documentation: bat fish-smart-commands.md"
         end
-        
+
         # Override functions for original commands
         function orig_cat --description "Force original cat"
             command cat $argv
         end
-        
+
         function orig_ls --description "Force original ls"
-            command ls $argv  
+            command ls $argv
         end
-        
+
         function orig_grep --description "Force original grep"
             command grep $argv
         end
@@ -370,7 +370,7 @@
         alias gd='git diff'
         alias gst='git status'
         alias gl='git log --oneline --graph --decorate'
-        
+
         # Development shortcuts
         alias bench='hyperfine'
         alias loc='tokei'
@@ -387,7 +387,7 @@
                 return $code
             end
         end
-        
+
         # New tool aliases
         alias lintpy='ruff check'
         alias formatpy='ruff format'

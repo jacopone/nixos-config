@@ -450,8 +450,8 @@ cd automation
 
 ---
 
-**Last Updated**: 2025-09-18  
-**Compatible With**: Google Chrome, Chromium  
+**Last Updated**: 2025-09-18
+**Compatible With**: Google Chrome, Chromium
 **Dependencies**: NixOS Home-Manager, Python 3, jq
 
 ---

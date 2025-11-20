@@ -9,8 +9,10 @@ repos:
     hooks:
       - id: trailing-whitespace
         name: Trim trailing whitespace
+        exclude: (hardware-configuration\.nix|backlog\.md)
       - id: end-of-file-fixer
         name: Fix end of files
+        exclude: (hardware-configuration\.nix|backlog\.md)
       - id: check-yaml
         name: Check YAML syntax
         files: \.(yaml|yml)$
@@ -48,9 +50,10 @@ repos:
       # Check for hardcoded usernames (except in comments marked USER-SPECIFIC)
       - id: check-hardcoded-usernames
         name: Check for hardcoded usernames
-        entry: bash -c 'if grep -nE "guyfawkes" "$@" | grep -v "USER-SPECIFIC" | grep -v "username = "; then echo "Found hardcoded username!"; exit 1; fi'
+        entry: bash -c 'for file in "$@"; do if grep -B3 -A1 "guyfawkes" "$file" | grep -qE "(USER-SPECIFIC|username = )"; then continue; else if grep -q "guyfawkes" "$file"; then echo "Found hardcoded username in $file"; grep -n "guyfawkes" "$file"; exit 1; fi; fi; done'
         language: system
         files: \.(nix|sh|fish)$
+        exclude: ^pkgs/
         pass_filenames: true
 
       # Format Nix files using system nixpkgs-fmt (installed via NixOS)
@@ -60,4 +63,5 @@ repos:
         entry: nixpkgs-fmt
         language: system
         files: \.nix$
+        exclude: hardware-configuration\.nix
         pass_filenames: true

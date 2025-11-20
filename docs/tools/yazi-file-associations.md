@@ -39,7 +39,7 @@ This document explains how yazi is configured to open different file types with 
 | `*.csv` | LibreOffice Calc | `csvlook`, `hx` |
 | Office docs (`*.doc`, `*.xlsx`, etc.) | `libreoffice` | - |
 
-### 📦 Archives & Documents  
+### 📦 Archives & Documents
 | File Type | Primary Action | Secondary Actions |
 |-----------|----------------|-------------------|
 | `*.zip`, `*.tar.gz`, `*.7z`, etc. | `file-roller` | `7z l` (list) |
@@ -68,13 +68,13 @@ This document explains how yazi is configured to open different file types with 
 → glow -p README.md    # Beautiful rendering in pager mode
 
 # Options available (press 'o'):
-1. View with Glow (pager)     [PRIMARY]  
+1. View with Glow (pager)     [PRIMARY]
 2. View with Glow
 3. Edit with Helix
 4. Edit with Zed
 ```
 
-### Image Files  
+### Image Files
 ```bash
 # When you press Enter on image.jpg:
 → eog image.jpg        # Eye of GNOME image viewer
@@ -84,7 +84,7 @@ This document explains how yazi is configured to open different file types with 
 ```
 
 ### JSON Files
-```bash  
+```bash
 # When you press Enter on data.json:
 → jq . data.json | bat --language=json    # Pretty-printed with syntax highlighting
 
@@ -121,7 +121,7 @@ Edit `modules/home-manager/base.nix` and add to the `open.rules` section:
 
 ### Adding New Openers
 Add to the `opener` section:
-```nix  
+```nix
 your-opener = [
   { run = "your-program \"$@\""; desc = "Description"; }
 ];
@@ -145,7 +145,7 @@ After applying changes with `./rebuild-nixos`, test the associations:
 
 - **Markdown files**: Beautiful rendering instead of raw text editing
 - **Media files**: Proper viewers instead of text editors
-- **JSON files**: Pretty-printed and syntax highlighted  
+- **JSON files**: Pretty-printed and syntax highlighted
 - **Archives**: Easy extraction with graphical interface
 - **Consistent experience**: Right tool for each file type
 - **Multiple options**: Always have alternatives available

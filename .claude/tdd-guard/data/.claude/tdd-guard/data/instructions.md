@@ -26,7 +26,7 @@ The foundation of TDD is the Red-Green-Refactor cycle:
    - Adding more than one new test at once
    - Exception: Initial test file setup or extracting shared test utilities
 
-2. **Over-Implementation**  
+2. **Over-Implementation**
    - Code that exceeds what's needed to pass the current failing test
    - Adding untested features, methods, or error handling
    - Implementing multiple methods when test only requires one
@@ -39,7 +39,7 @@ The foundation of TDD is the Red-Green-Refactor cycle:
 ### Critical Principle: Incremental Development
 Each step in TDD should address ONE specific issue:
 - Test fails "not defined" → Create empty stub/class only
-- Test fails "not a function" → Add method stub only  
+- Test fails "not a function" → Add method stub only
 - Test fails with assertion → Implement minimal logic only
 
 ### General Information

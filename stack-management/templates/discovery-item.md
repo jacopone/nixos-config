@@ -42,7 +42,7 @@ javascript:(function(){
 - **Priority**: [EDIT_PRIORITY]
 - **Why Interesting**: [EDIT_REASON]
 - **Initial Cost**: [EDIT_COST]`;
-  
+
   navigator.clipboard.writeText(template).then(() => {
     alert('Discovery template copied to clipboard!');
   });

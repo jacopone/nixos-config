@@ -66,49 +66,49 @@
   };
 
   outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
-  let
-    system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
 
-    # CONFIGURATION: Change this username to match your system
-    # This is the ONLY place you need to change when adapting this config
-    username = "guyfawkes";
+      # CONFIGURATION: Change this username to match your system
+      # This is the ONLY place you need to change when adapting this config
+      username = "guyfawkes";
 
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-    };
-  in
-  {
-    # Expose packages for `nix build` (none currently)
-    packages.${system} = {};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+    {
+      # Expose packages for `nix build` (none currently)
+      packages.${system} = { };
 
-    # Your NixOS system configuration
-    nixosConfigurations = {
-      # Hostname is set to "nixos"
-      nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs username; }; # Pass inputs and username to your config
-        modules = [
-          # Your main configuration file
-          ./hosts/nixos
+      # Your NixOS system configuration
+      nixosConfigurations = {
+        # Hostname is set to "nixos"
+        nixos = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs username; }; # Pass inputs and username to your config
+          modules = [
+            # Your main configuration file
+            ./hosts/nixos
 
-          # Allow unfree packages
-          {
-            nixpkgs.config.allowUnfree = true;
-          }
+            # Allow unfree packages
+            {
+              nixpkgs.config.allowUnfree = true;
+            }
 
-          # Home Manager module (optional)
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs username; };
-            # The path to your home-manager config (modular organization in modules/home-manager/)
-            home-manager.users.${username} = import ./modules/home-manager;
-          }
-        ];
+            # Home Manager module (optional)
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "backup";
+              home-manager.extraSpecialArgs = { inherit inputs username; };
+              # The path to your home-manager config (modular organization in modules/home-manager/)
+              home-manager.users.${username} = import ./modules/home-manager;
+            }
+          ];
+        };
       };
     };
-  };
 }

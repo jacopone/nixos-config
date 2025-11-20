@@ -208,18 +208,15 @@ jobs:
             const securityOk = process.env.SECURITY_RESULT === 'success';
             const docsOk = process.env.DOCS_RESULT === 'success';
 
-            const comment = `## 🔍 Validation Results
+            const table = [
+              '| Check | Status |',
+              '|-------|--------|',
+              `| Syntax & Lint | ${syntaxOk ? '✅ Pass' : '❌ Fail'} |`,
+              `| Security Scan | ${securityOk ? '✅ Pass' : '⚠️  Review findings'} |`,
+              `| Documentation | ${docsOk ? '✅ Pass' : '⚠️  Review'} |`
+            ].join('\n');
 
-| Check | Status |
-|-------|--------|
-| Syntax & Lint | ${syntaxOk ? '✅ Pass' : '❌ Fail'} |
-| Security Scan | ${securityOk ? '✅ Pass' : '⚠️  Review findings'} |
-| Documentation | ${docsOk ? '✅ Pass' : '⚠️  Review'} |
-
-**Ready to merge**: ${syntaxOk ? '✅ **Yes**' : '❌ **No** - fix syntax errors first'}
-
----
-<sub>Automated validation by GitHub Actions</sub>`;
+            const comment = `## 🔍 Validation Results\n\n${table}\n\n**Ready to merge**: ${syntaxOk ? '✅ **Yes**' : '❌ **No** - fix syntax errors first'}\n\n---\n<sub>Automated validation by GitHub Actions</sub>`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -229,4 +226,3 @@ jobs:
             }).catch(err => {
               console.log('Failed to create comment:', err.message);
             });
-

@@ -41,7 +41,7 @@ lifecycle: ephemeral
 *Items moved from backlog for deeper research*
 
 #### Service Name (Queued: DATE)
-- **Research Status**: 
+- **Research Status**:
   - [ ] Read documentation
   - [ ] Check pricing
   - [ ] Read reviews/comparisons
