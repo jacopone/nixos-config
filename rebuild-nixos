@@ -493,6 +493,20 @@ echo ""
 log_step "Running adaptive learning cycle..."
 AUTOMATION_DIR="$HOME/claude-nixos-automation"
 if [[ -d "$AUTOMATION_DIR" ]]; then
+    # STEP 1: Update permission approval data from recent Claude Code sessions
+    # This extracts tool usage from ~/.claude/projects/*/*.jsonl into the
+    # learning system's permission_approvals.jsonl file.
+    # Without this step, adaptive learning would run on stale data!
+    log_step "  Refreshing permission data from session logs..."
+    if [[ -f "$AUTOMATION_DIR/scripts/parse_session_logs.py" ]]; then
+        if python3 "$AUTOMATION_DIR/scripts/parse_session_logs.py" > /dev/null 2>&1; then
+            log_success "  Permission data refreshed"
+        else
+            log_warning "  Failed to refresh permission data (continuing anyway)"
+        fi
+    fi
+
+    # STEP 2: Run adaptive learning on fresh data
     # Run WITHOUT pipes to preserve stdin/stdout for user interaction
     # No timeout for interactive mode (user needs time to review and respond)
     # Suppress devenv startup noise but preserve Python output for user

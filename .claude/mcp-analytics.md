@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-11-21
-updated: 2025-11-21
+created: 2025-11-25
+updated: 2025-11-25
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-11-21 00:23:06
+**Last Updated**: 2025-11-25 23:27:32
 **Analysis Period**: 30 days
 
 ### Configured Servers (1)
@@ -26,42 +26,59 @@ lifecycle: persistent
 
 ### Usage Analytics
 
-**Total MCP invocations**: 457
-**Total tokens consumed**: 2,944,821
-**Estimated total cost**: $19.8532
+**Total MCP invocations**: 280
+**Total tokens consumed**: 2,119,458
+**Estimated total cost**: $13.2630
 
 #### sequential-thinking.sequentialthinking (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 292
+- Invocations: 111
 - Success rate: 0.0%
 - Last used: 2025-11-06 08:04
 
 **Token Consumption:**
-- Total tokens: 2,016,198 (Input: 16,201, Output: 87,242)
-- Cache tokens: 15,458,137 reads, 1,912,755 writes
-- Avg tokens/invocation: 6905
+- Total tokens: 1,101,689 (Input: 14,749, Output: 30,239)
+- Cache tokens: 5,636,877 reads, 1,056,701 writes
+- Avg tokens/invocation: 9925
 
 **Cost Analysis:**
-- Estimated cost: $13.1675
-- ROI score: 0.14 invocations per 1K tokens
+- Estimated cost: $6.1515
+- ROI score: 0.10 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_navigate (global scope)
 
 **Usage Metrics:**
-- Invocations: 64
+- Invocations: 66
 - Success rate: 0.0%
-- Last used: 2025-11-20 14:32
+- Last used: 2025-11-25 14:31
 
 **Token Consumption:**
-- Total tokens: 590,650 (Input: 642, Output: 12,076)
-- Cache tokens: 2,919,214 reads, 577,932 writes
-- Avg tokens/invocation: 9229
+- Total tokens: 592,575 (Input: 815, Output: 12,386)
+- Cache tokens: 3,065,123 reads, 579,374 writes
+- Avg tokens/invocation: 8978
 
 **Cost Analysis:**
-- Estimated cost: $3.2261
+- Estimated cost: $3.2804
 - ROI score: 0.11 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_take_screenshot (global scope)
+
+**Usage Metrics:**
+- Invocations: 34
+- Success rate: 0.0%
+- Last used: 2025-11-21 00:16
+
+**Token Consumption:**
+- Total tokens: 189,509 (Input: 354, Output: 4,698)
+- Cache tokens: 2,685,024 reads, 184,457 writes
+- Avg tokens/invocation: 5574
+
+**Cost Analysis:**
+- Estimated cost: $1.5688
+- ROI score: 0.18 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_snapshot (global scope)
@@ -79,23 +96,6 @@ lifecycle: persistent
 **Cost Analysis:**
 - Estimated cost: $0.7264
 - ROI score: 0.13 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
-#### playwright.browser_take_screenshot (global scope)
-
-**Usage Metrics:**
-- Invocations: 32
-- Success rate: 0.0%
-- Last used: 2025-11-18 23:02
-
-**Token Consumption:**
-- Total tokens: 102,288 (Input: 327, Output: 4,452)
-- Cache tokens: 2,546,226 reads, 97,509 writes
-- Avg tokens/invocation: 3196
-
-**Cost Analysis:**
-- Estimated cost: $1.1973
-- ROI score: 0.31 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_evaluate (global scope)
@@ -234,43 +234,43 @@ lifecycle: persistent
 
 ### Session Utilization
 
-**Total sessions analyzed**: 299
+**Total sessions analyzed**: 324
 
 This section shows how efficiently each MCP server uses context tokens across sessions. Global servers load in ALL sessions (consuming overhead tokens), even when not used.
 
 #### playwright (global scope)
 
 **Session Metrics:**
-- Utilization rate: 7.7% (23/299 sessions)
+- Utilization rate: 7.7% (25/324 sessions)
 - Efficiency: POOR
-- ⚠️  Loads in ALL sessions (299 sessions)
+- ⚠️  Loads in ALL sessions (324 sessions)
 
 **Overhead Analysis:**
 - Estimated overhead: ~4,000 tokens per session
-- Total wasted overhead: ~1,104,000 tokens (276 unused sessions)
+- Total wasted overhead: ~1,196,000 tokens (299 unused sessions)
 - 🔴 **Action needed**: Consider moving to project-level config to reduce waste
 
 
 ### Recommendations
 
 **HIGH**: playwright
-   - **Issue**: Server 'playwright' loads in all sessions but only used in 7.7% (23/299 sessions)
-   - **Action**: Consider moving 'playwright' to project-level config. Wasted overhead: ~1,104,000 tokens across 276 sessions
-
-**MEDIUM**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' has low ROI: 292 invocations for 2,016,198 tokens (est. $13.1675)
-   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (unknown scope)
+   - **Issue**: Server 'playwright' loads in all sessions but only used in 7.7% (25/324 sessions)
+   - **Action**: Consider moving 'playwright' to project-level config. Wasted overhead: ~1,196,000 tokens across 299 sessions
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 64 invocations for 590,650 tokens (est. $3.2261)
+   - **Issue**: Server 'playwright' has low ROI: 66 invocations for 592,575 tokens (est. $3.2804)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
+
+**MEDIUM**: sequential-thinking
+   - **Issue**: Server 'sequential-thinking' has low ROI: 111 invocations for 1,101,689 tokens (est. $6.1515)
+   - **Action**: Review usage patterns. Consider if 'sequential-thinking' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
    - **Issue**: Server 'playwright' has low ROI: 17 invocations for 126,631 tokens (est. $0.7264)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 32 invocations for 102,288 tokens (est. $1.1973)
+   - **Issue**: Server 'playwright' has low ROI: 34 invocations for 189,509 tokens (est. $1.5688)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
 **MEDIUM**: playwright
@@ -293,21 +293,21 @@ This section shows how efficiently each MCP server uses context tokens across se
    - **Issue**: Server 'playwright' has low ROI: 1 invocations for 3,350 tokens (est. $0.0276)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (global scope)
 
-**LOW**: sequential-thinking
-   - **Issue**: Server 'sequential-thinking' consumed 2,016,198 tokens (est. $13.17)
-   - **Action**: Frequent user: 292 calls, ~6,904 tokens/call (unknown scope)
-
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 590,650 tokens (est. $3.23)
-   - **Action**: Frequent user: 64 calls, ~9,228 tokens/call (global scope)
+   - **Issue**: Server 'playwright' consumed 592,575 tokens (est. $3.28)
+   - **Action**: Frequent user: 66 calls, ~8,978 tokens/call (global scope)
+
+**LOW**: sequential-thinking
+   - **Issue**: Server 'sequential-thinking' consumed 1,101,689 tokens (est. $6.15)
+   - **Action**: Frequent user: 111 calls, ~9,925 tokens/call (unknown scope)
 
 **LOW**: playwright
    - **Issue**: Server 'playwright' consumed 126,631 tokens (est. $0.73)
    - **Action**: Frequent user: 17 calls, ~7,448 tokens/call (global scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 102,288 tokens (est. $1.20)
-   - **Action**: Frequent user: 32 calls, ~3,196 tokens/call (global scope)
+   - **Issue**: Server 'playwright' consumed 189,509 tokens (est. $1.57)
+   - **Action**: Frequent user: 34 calls, ~5,573 tokens/call (global scope)
 
 
 ---
