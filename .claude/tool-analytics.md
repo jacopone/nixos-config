@@ -1,23 +1,23 @@
 ---
 status: active
-created: 2025-11-25
-updated: 2025-11-25
+created: 2025-11-27
+updated: 2025-11-27
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-11-25 23:27:33
+**Last Updated**: 2025-11-27 09:59:37
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 123
+**Total Commands Tracked**: 104
 
 ## Summary
 
 - **Total Tools Installed**: 141
-- **Tools Used**: 17 (12.1%)
-- **Dormant Tools**: 124
-- **Human-Used Tools**: 17
+- **Tools Used**: 15 (10.6%)
+- **Dormant Tools**: 126
+- **Human-Used Tools**: 15
 - **Claude-Used Tools**: 0
 
 ⚠️ **Low adoption rate**: Less than half of installed tools are being used
@@ -25,98 +25,98 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **git**: 41 total
-   - Human: 41 (100%)
+1. **git**: 42 total
+   - Human: 42 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
-   - Last used: 2025-11-23
-2. **devenv**: 31 total
-   - Human: 31 (100%)
+   - Last used: 2025-11-27
+2. **devenv**: 29 total
+   - Human: 29 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-25
-3. **brownfield**: 16 total
-   - Human: 16 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-10-27
-4. **bat**: 11 total
+3. **bat**: 11 total
    - Human: 11 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-18
-5. **glow**: 7 total
-   - Human: 7 (100%)
+4. **glow**: 6 total
+   - Human: 6 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-25
-6. **atuin**: 2 total
+5. **atuin**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-02
-7. **droid**: 2 total
+6. **droid**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-03
-8. **bmad-method**: 2 total
+7. **bmad-method**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-24
-9. **nix**: 2 total
+8. **nix**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-20
-10. **gemini-cli**: 2 total
+9. **gemini-cli**: 2 total
    - Human: 2 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-24
-11. **pytest**: 1 total
-   - Human: 1 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-10-27
-12. **broot**: 1 total
+10. **broot**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-02
-13. **claude-flow**: 1 total
+11. **claude-flow**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-03
-14. **tmux**: 1 total
+12. **tmux**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-11
-15. **bottom**: 1 total
+13. **bottom**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-18
+14. **cursor**: 1 total
+   - Human: 1 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-11-20
+15. **direnv**: 1 total
+   - Human: 1 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-11-20
 
 ### Human-Preferred Tools (Top 15)
-1. **git**: 41 uses
-2. **devenv**: 31 uses
-3. **brownfield**: 16 uses
-4. **bat**: 11 uses
-5. **glow**: 7 uses
-6. **atuin**: 2 uses
-7. **droid**: 2 uses
-8. **bmad-method**: 2 uses
-9. **nix**: 2 uses
-10. **gemini-cli**: 2 uses
-11. **pytest**: 1 uses
-12. **broot**: 1 uses
-13. **claude-flow**: 1 uses
-14. **tmux**: 1 uses
-15. **bottom**: 1 uses
+1. **git**: 42 uses
+2. **devenv**: 29 uses
+3. **bat**: 11 uses
+4. **glow**: 6 uses
+5. **atuin**: 2 uses
+6. **droid**: 2 uses
+7. **bmad-method**: 2 uses
+8. **nix**: 2 uses
+9. **gemini-cli**: 2 uses
+10. **broot**: 1 uses
+11. **claude-flow**: 1 uses
+12. **tmux**: 1 uses
+13. **bottom**: 1 uses
+14. **cursor**: 1 uses
+15. **direnv**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
 
@@ -132,9 +132,8 @@ lifecycle: persistent
 **bpkit** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 42 in packages.nix
 
-**brownfield** - 16 uses- Human: 16 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-27
-   - Adoption score: 16.0 uses/day
+**brownfield** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
+   - Location: line 48 in packages.nix
 
 **claude-flow** - 1 uses- Human: 1 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-03
@@ -216,8 +215,8 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 170 in packages.nix
 
-**glow** - 7 uses- Markdown renderer
-- Human: 7 | Claude: 0 | Scripts: 0
+**glow** - 6 uses- Markdown renderer
+- Human: 6 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-25
    - Adoption score: 0.2 uses/day
 
@@ -478,10 +477,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 238 in packages.nix
 
-**devenv** - 31 uses- Fast, declarative development environments - instant service commands
-- Human: 31 | Claude: 0 | Scripts: 0
+**devenv** - 29 uses- Fast, declarative development environments - instant service commands
+- Human: 29 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-25
-   - Adoption score: 1.1 uses/day
+   - Adoption score: 1.6 uses/day
 
 **direnv** - 1 uses- Automatic per-directory environment activation - enables .envrc
 - Human: 1 | Claude: 0 | Scripts: 0
@@ -508,10 +507,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 160 in packages.nix
 
-**git** - 41 uses- A free and open source distributed version control system
-- Human: 41 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-23
-   - Adoption score: 1.5 uses/day
+**git** - 42 uses- A free and open source distributed version control system
+- Human: 42 | Claude: 0 | Scripts: 0
+   - Last used: 2025-11-27
+   - Adoption score: 1.4 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -633,10 +632,9 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 186 in packages.nix
 
-**pytest** - 1 uses- Testing framework for Python
-- Human: 1 | Claude: 0 | Scripts: 0
-   - Last used: 2025-10-27
-   - Adoption score: 1.0 uses/day
+**pytest** - 🔴 **DORMANT**- Testing framework for Python
+- ⚠️ Never used in last 30 days
+   - Location: line 185 in packages.nix
 
 **rich** - 🔴 **DORMANT**- Rich - Python terminal UI library (for BASB system)
 - ⚠️ Never used in last 30 days
@@ -715,18 +713,16 @@ lifecycle: persistent
 
 ### Human-Only Tools
 
-17 tools used only by humans:
-- **git**: 41 uses
-- **devenv**: 31 uses
-- **brownfield**: 16 uses
+15 tools used only by humans:
+- **git**: 42 uses
+- **devenv**: 29 uses
 - **bat**: 11 uses
-- **glow**: 7 uses
+- **glow**: 6 uses
 - **atuin**: 2 uses
 - **droid**: 2 uses
 - **bmad-method**: 2 uses
 - **nix**: 2 uses
 - **gemini-cli**: 2 uses
-- **pytest**: 1 uses
 - **broot**: 1 uses
 - **claude-flow**: 1 uses
 - **tmux**: 1 uses
@@ -741,7 +737,7 @@ lifecycle: persistent
 
 ## Dormant Tools (Candidates for Removal)
 
-124 tools unused in last 30 days:
+126 tools unused in last 30 days:
 
 **opencode** - AI coding agent built for the terminal   - Category: ai-tools
    - Location: line 9 in packages.nix
@@ -757,6 +753,9 @@ lifecycle: persistent
 
 **bpkit**   - Category: ai-tools
    - Location: line 42 in packages.nix
+
+**brownfield**   - Category: ai-tools
+   - Location: line 48 in packages.nix
 
 **whisper-cpp** - High-performance C++ port of OpenAI Whisper for local STT   - Category: ai-tools
    - Location: line 152 in packages.nix
@@ -948,6 +947,9 @@ lifecycle: persistent
 
 **markitdown** - Microsoft's multi-format to Markdown converter   - Category: other
    - Location: line 184 in packages.nix
+
+**pytest** - Testing framework for Python   - Category: other
+   - Location: line 185 in packages.nix
 
 **pydantic** - Data validation using Python type hints   - Category: other
    - Location: line 186 in packages.nix
@@ -1155,8 +1157,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 57 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, nodejs_20, and 52 more
+**Issue**: 58 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, nodejs_20, and 53 more
 
 ### 🟡 MEDIUM PRIORITY: modern-cli tools
 
@@ -1179,8 +1181,8 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: ai-tools tools
 
 **Type**: Remove Dormant
-**Issue**: 7 ai-tools tools unused in last 90 days
-**Action**: Consider removing: opencode, jules, serena, specify, bpkit, and 2 more
+**Issue**: 8 ai-tools tools unused in last 90 days
+**Action**: Consider removing: opencode, jules, serena, specify, bpkit, and 3 more
 
 ### 💚 LOW PRIORITY: productivity tools
 
@@ -1203,21 +1205,21 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: git
 
 **Type**: Highlight Value
-**Issue**: Highly used: 41 invocations (human: 41, Claude: 0)
+**Issue**: Highly used: 42 invocations (human: 42, Claude: 0)
 **Action**: Keep git - provides excellent value
 
 ### 💚 LOW PRIORITY: devenv
 
 **Type**: Highlight Value
-**Issue**: Highly used: 31 invocations (human: 31, Claude: 0)
+**Issue**: Highly used: 29 invocations (human: 29, Claude: 0)
 **Action**: Keep devenv - provides excellent value
 
 
 ## Usage Trends by Category
 
-- **Other**: 78 invocations
-- **Ai Tools**: 22 invocations
-- **Modern Cli**: 22 invocations
+- **Other**: 76 invocations
+- **Modern Cli**: 21 invocations
+- **Ai Tools**: 6 invocations
 - **System Tools**: 1 invocations
 
 ## Comparison with October 2025 Baseline
@@ -1225,7 +1227,7 @@ lifecycle: persistent
 
 | Tool | Oct 2025 Baseline | Current | Change | Status |
 |------|-------------------|---------|--------|--------|
-| glow | 32 | 7 | -25 | ⚠️ Declining |
+| glow | 32 | 6 | -26 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
 | eza | 19 | 0 | -19 | ⚠️ Declining |
 | bat | 7 | 11 | +4 | ✅ Growing |
@@ -1237,7 +1239,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2025-12-25
+**Scheduled**: 2025-12-27
 
 **Action items for next review**:
 1. Check if dormant tools are still unused

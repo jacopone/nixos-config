@@ -7,9 +7,28 @@ export NIXOS_REBUILD_WRAPPER=1
 
 # Parse command line arguments
 VERBOSE=false
-if [[ "$1" == "--verbose" ]] || [[ "$1" == "-v" ]]; then
-    VERBOSE=true
-fi
+DRY_RUN=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --verbose|-v) VERBOSE=true; shift ;;
+        --dry-run|-n) DRY_RUN=true; shift ;;
+        --help|-h)
+            echo "Usage: rebuild-nixos [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  -v, --verbose    Show detailed output during build"
+            echo "  -n, --dry-run    Show what would happen without making changes"
+            echo "  -h, --help       Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
 
 # Setup logging
 LOG_DIR="$HOME/.claude/.logs"
@@ -54,6 +73,16 @@ add_action() {
 
 add_stat() {
     STATS+=("$1")
+}
+
+# Dry-run helper - shows what would run without executing
+dry_run_skip() {
+    local description="$1"
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${YELLOW}[DRY-RUN]${NC} Would: $description"
+        return 0
+    fi
+    return 1
 }
 
 # Progress indicator with time estimates and status
@@ -145,6 +174,9 @@ show_progress() {
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║            NixOS System Rebuild & Configuration            ║"
+if [ "$DRY_RUN" = true ]; then
+echo "║          [DRY-RUN MODE - No changes will be made]          ║"
+fi
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -153,9 +185,16 @@ if [ "$VERBOSE" = true ]; then
     echo "📁 Logs: $LOG_FILE"
 fi
 
+if [ "$DRY_RUN" = true ]; then
+    echo "🔍 Dry-run mode: showing what would happen without making changes"
+    echo ""
+fi
+
 # Cache sudo credentials early (activation step needs sudo)
-echo "🔐 This rebuild requires sudo privileges for system activation."
-sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
+if [ "$DRY_RUN" = false ]; then
+    echo "🔐 This rebuild requires sudo privileges for system activation."
+    sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
+fi
 
 # === PHASE 1: Update Flake Inputs ===
 # Updates nix flake lock file to get latest package versions
@@ -165,36 +204,40 @@ sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
 
 log_step "Updating flake inputs..."
 
-# Define locally-maintained inputs that need cache bypass
-LOCAL_INPUTS=(
-    "code-cursor-nix"
-    "whisper-dictation"
-    "claude-automation"
-    "claude-code-nix"  # Also locally maintained by you
-    "antigravity-nix"
-)
-
-if [ "$VERBOSE" = true ]; then
-    echo "📦 Updating external inputs (using cache)..."
-    nix flake update nixpkgs home-manager 2>&1 | tee -a "$LOG_FILE"
-
-    echo "🚀 Updating local inputs (bypassing cache with --refresh)..."
-    for input in "${LOCAL_INPUTS[@]}"; do
-        echo "   - Updating $input..."
-        nix flake update "$input" --refresh 2>&1 | tee -a "$LOG_FILE"
-    done
+if dry_run_skip "update flake inputs (nixpkgs, home-manager, local repos)"; then
+    : # skip
 else
-    # Quiet mode: Update external inputs first (cached)
-    nix flake update nixpkgs home-manager &>>"$LOG_FILE"
+    # Define locally-maintained inputs that need cache bypass
+    LOCAL_INPUTS=(
+        "code-cursor-nix"
+        "whisper-dictation"
+        "claude-automation"
+        "claude-code-nix"  # Also locally maintained by you
+        "antigravity-nix"
+    )
 
-    # Update local inputs with --refresh to bypass cache
-    for input in "${LOCAL_INPUTS[@]}"; do
-        nix flake update "$input" --refresh &>>"$LOG_FILE"
-    done
+    if [ "$VERBOSE" = true ]; then
+        echo "📦 Updating external inputs (using cache)..."
+        nix flake update nixpkgs home-manager 2>&1 | tee -a "$LOG_FILE"
+
+        echo "🚀 Updating local inputs (bypassing cache with --refresh)..."
+        for input in "${LOCAL_INPUTS[@]}"; do
+            echo "   - Updating $input..."
+            nix flake update "$input" --refresh 2>&1 | tee -a "$LOG_FILE"
+        done
+    else
+        # Quiet mode: Update external inputs first (cached)
+        nix flake update nixpkgs home-manager &>>"$LOG_FILE"
+
+        # Update local inputs with --refresh to bypass cache
+        for input in "${LOCAL_INPUTS[@]}"; do
+            nix flake update "$input" --refresh &>>"$LOG_FILE"
+        done
+    fi
+
+    log_success "Flake inputs updated (local repos refreshed)"
+    add_action "Updated flake.lock with cache bypass for local repos"
 fi
-
-log_success "Flake inputs updated (local repos refreshed)"
-add_action "Updated flake.lock with cache bypass for local repos"
 
 # === PHASE 2: Test Build ===
 # Builds new configuration WITHOUT activating it (safe to fail)
@@ -235,33 +278,37 @@ log_success "Test build successful"
 # Activate the new configuration
 log_step "Activating new configuration..."
 
-if [ "$VERBOSE" = true ]; then
-    # Verbose mode - show all output
-    if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>&1 | tee -a "$LOG_FILE"; then
-        ACTIVATE_EXIT=0
+if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
+    : # skip
+else
+    if [ "$VERBOSE" = true ]; then
+        # Verbose mode - show all output
+        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>&1 | tee -a "$LOG_FILE"; then
+            ACTIVATE_EXIT=0
+        else
+            ACTIVATE_EXIT=$?
+        fi
     else
+        # Non-verbose mode - show progress indicator
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>>"$LOG_FILE" &
+        ACTIVATE_PID=$!
+        show_progress "activation" $ACTIVATE_PID
+        wait $ACTIVATE_PID
         ACTIVATE_EXIT=$?
     fi
-else
-    # Non-verbose mode - show progress indicator
-    sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>>"$LOG_FILE" &
-    ACTIVATE_PID=$!
-    show_progress "activation" $ACTIVATE_PID
-    wait $ACTIVATE_PID
-    ACTIVATE_EXIT=$?
-fi
 
-# Check activation result
-if [ $ACTIVATE_EXIT -ne 0 ]; then
-    echo ""  # Ensure we're on a new line
-    log_error "Activation failed (exit code: $ACTIVATE_EXIT)"
-    echo "📁 Check logs: $LOG_FILE"
-    exit 1
-fi
+    # Check activation result
+    if [ $ACTIVATE_EXIT -ne 0 ]; then
+        echo ""  # Ensure we're on a new line
+        log_error "Activation failed (exit code: $ACTIVATE_EXIT)"
+        echo "📁 Check logs: $LOG_FILE"
+        exit 1
+    fi
 
-echo ""  # Ensure we're on a new line after progress indicator
-log_success "Configuration activated"
-add_action "Switched to new NixOS configuration"
+    echo ""  # Ensure we're on a new line after progress indicator
+    log_success "Configuration activated"
+    add_action "Switched to new NixOS configuration"
+fi
 
 # === PHASE 4: Update Claude Code Configurations ===
 # Regenerates 5 Claude context files (CLAUDE.md, permissions, MCP, etc.)
@@ -269,12 +316,16 @@ add_action "Switched to new NixOS configuration"
 # Exit on failure: No (continue with warnings - not critical to system)
 # Update Claude Code configurations
 log_step "Updating Claude Code configurations..."
-echo ""
 
-# Use local flake for automation (development mode)
-AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+if dry_run_skip "update Claude Code configurations (CLAUDE.md, permissions, MCP analytics)"; then
+    AUTOMATION_EXIT=1  # Skip the nested phases 5-6
+else
+    echo ""
 
-if [ "$VERBOSE" = true ]; then
+    # Use local flake for automation (development mode)
+    AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+
+    if [ "$VERBOSE" = true ]; then
     # Verbose mode: show all output
     if [ -d "$AUTOMATION_FLAKE" ]; then
         if (cd ~/nixos-config && nix run "$AUTOMATION_FLAKE#update-all" 2>&1 | tee -a "$LOG_FILE"); then
@@ -476,6 +527,7 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 else
     log_warning "Claude automation had issues (check logs)"
 fi
+fi  # End dry-run skip for Phase 4-6
 
 # === PHASE 7: Adaptive Learning Cycle ===
 # Runs 7 parallel ML analyzers to detect optimization opportunities:
@@ -491,81 +543,79 @@ fi
 # === ADAPTIVE LEARNING CYCLE ===
 echo ""
 log_step "Running adaptive learning cycle..."
-AUTOMATION_DIR="$HOME/claude-nixos-automation"
-if [[ -d "$AUTOMATION_DIR" ]]; then
-    # STEP 1: Update permission approval data from recent Claude Code sessions
-    # This extracts tool usage from ~/.claude/projects/*/*.jsonl into the
-    # learning system's permission_approvals.jsonl file.
-    # Without this step, adaptive learning would run on stale data!
-    log_step "  Refreshing permission data from session logs..."
-    if [[ -f "$AUTOMATION_DIR/scripts/parse_session_logs.py" ]]; then
-        if python3 "$AUTOMATION_DIR/scripts/parse_session_logs.py" > /dev/null 2>&1; then
-            log_success "  Permission data refreshed"
-        else
-            log_warning "  Failed to refresh permission data (continuing anyway)"
-        fi
-    fi
 
-    # STEP 2: Run adaptive learning on fresh data
-    # Run WITHOUT pipes to preserve stdin/stdout for user interaction
-    # No timeout for interactive mode (user needs time to review and respond)
-    # Suppress devenv startup noise but preserve Python output for user
-    if (cd "$AUTOMATION_DIR" && devenv shell -- python run-adaptive-learning.py --interactive 2> >(grep -v "Building shell" >&2)); then
-        LEARNING_EXIT=0
-        log_success "Adaptive learning cycle complete"
-        add_action "Adaptive learning: suggestions reviewed interactively"
-    else
-        LEARNING_EXIT=$?
-        if [ $LEARNING_EXIT -eq 130 ]; then
-            log_warning "Adaptive learning interrupted by user (Ctrl+C)"
-        else
-            log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
-        fi
-    fi
+if dry_run_skip "run adaptive learning cycle (interactive ML analysis)"; then
+    : # skip
 else
-    log_warning "Adaptive learning not available (automation directory not found)"
+    AUTOMATION_DIR="$HOME/claude-nixos-automation"
+    if [[ -d "$AUTOMATION_DIR" ]]; then
+        # STEP 1: Update permission approval data from recent Claude Code sessions
+        # This extracts tool usage from ~/.claude/projects/*/*.jsonl into the
+        # learning system's permission_approvals.jsonl file.
+        # Without this step, adaptive learning would run on stale data!
+        log_step "  Refreshing permission data from session logs..."
+        if [[ -f "$AUTOMATION_DIR/scripts/parse_session_logs.py" ]]; then
+            if python3 "$AUTOMATION_DIR/scripts/parse_session_logs.py" > /dev/null 2>&1; then
+                log_success "  Permission data refreshed"
+            else
+                log_warning "  Failed to refresh permission data (continuing anyway)"
+            fi
+        fi
+
+        # STEP 2: Run adaptive learning on fresh data
+        # Run WITHOUT pipes to preserve stdin/stdout for user interaction
+        # No timeout for interactive mode (user needs time to review and respond)
+        # Suppress devenv startup noise but preserve Python output for user
+        if (cd "$AUTOMATION_DIR" && devenv shell -- python run-adaptive-learning.py --interactive 2> >(grep -v "Building shell" >&2)); then
+            LEARNING_EXIT=0
+            log_success "Adaptive learning cycle complete"
+            add_action "Adaptive learning: suggestions reviewed interactively"
+        else
+            LEARNING_EXIT=$?
+            if [ $LEARNING_EXIT -eq 130 ]; then
+                log_warning "Adaptive learning interrupted by user (Ctrl+C)"
+            else
+                log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
+            fi
+        fi
+    else
+        log_warning "Adaptive learning not available (automation directory not found)"
+    fi
 fi
 
 # === PHASE 8: User Acceptance ===
 # User tests the activated configuration
 # Offers rollback if issues found
-# Creates git commit if changes accepted
+# Stages changes for manual commit
 echo ""
-log_step "Configuration activated. Please test the changes now."
-read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
-echo
 
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    log_step "Changes accepted. Staging for commit..."
-    git add .
-
+if [ "$DRY_RUN" = true ]; then
+    log_step "Dry-run complete. Showing what would be staged:"
     git status
-
-    # Ask for a commit message
-    read -p "Enter a commit message for these changes (or leave blank to skip commit): " commit_message
-
-    if [ -n "$commit_message" ]; then
-      log_step "Committing changes..."
-      # Use PRE_COMMIT_ALLOW_NO_CONFIG=1 to bypass pre-commit config warning
-      # Wrap in error handling so script continues even if commit fails
-      if PRE_COMMIT_ALLOW_NO_CONFIG=1 git commit -m "$commit_message" 2>&1; then
-        log_success "Created git commit"
-        add_action "Created git commit"
-      else
-        log_warning "Git commit failed (likely pre-commit hook issue)"
-        log_warning "Changes are staged but not committed"
-        log_warning "You can commit manually later with: git commit -m \"your message\""
-        add_action "Staged changes (commit failed - manual commit needed)"
-      fi
-    else
-      log_warning "No commit message provided. Skipping commit."
-    fi
+    echo ""
+    echo "💡 To apply these changes, run without --dry-run"
 else
-    log_step "Changes rejected. Rolling back to previous configuration..."
-    sudo nixos-rebuild switch --rollback
-    log_success "Rollback complete"
-    exit 0
+    log_step "Configuration activated. Please test the changes now."
+    read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        log_step "Changes accepted. Staging for commit..."
+        git add .
+        git status
+        echo ""
+        echo "💡 To commit these changes, run:"
+        echo "   git commit -m \"your message here\""
+        echo ""
+        echo "💡 To push after committing:"
+        echo "   git push"
+        add_action "Staged changes for manual commit"
+    else
+        log_step "Changes rejected. Rolling back to previous configuration..."
+        sudo nixos-rebuild switch --rollback
+        log_success "Rollback complete"
+        exit 0
+    fi
 fi
 
 # === PHASE 9: Generation Cleanup ===
@@ -574,22 +624,25 @@ fi
 # Runs garbage collection after deletion
 # Exit on failure: No (cleanup is optional)
 # Clean up old generations
-echo ""
-log_step "Listing system generations..."
-sudo nixos-rebuild list-generations
 
-read -p "Enter the generations you want to delete (separated by space): " generations_to_delete
-if [ -n "$generations_to_delete" ]; then
-    log_step "Deleting generations: $generations_to_delete"
-    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
-    log_success "Selected generations deleted"
+if [ "$DRY_RUN" = false ]; then
+    echo ""
+    log_step "Listing system generations..."
+    sudo nixos-rebuild list-generations
 
-    log_step "Running garbage collection..."
-    nix-collect-garbage
-    log_success "Garbage collection complete"
-    add_action "Cleaned up old generations"
-else
-    log_warning "No generations selected for deletion"
+    read -p "Enter the generations you want to delete (separated by space): " generations_to_delete
+    if [ -n "$generations_to_delete" ]; then
+        log_step "Deleting generations: $generations_to_delete"
+        sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
+        log_success "Selected generations deleted"
+
+        log_step "Running garbage collection..."
+        nix-collect-garbage
+        log_success "Garbage collection complete"
+        add_action "Cleaned up old generations"
+    else
+        log_warning "No generations selected for deletion"
+    fi
 fi
 
 # === PHASE 10: Disk Space Analysis ===
@@ -683,11 +736,13 @@ fi
 # Safe to delete (caches regenerate on demand)
 # Exit on failure: No (cleanup is optional)
 # Clean up cache directories
-echo ""
-log_step "Cache cleanup options..."
-echo "Large cache directories detected:"
-TOTAL_CACHE_SIZE=0
-if [ -d ~/.cache/uv ]; then
+
+if [ "$DRY_RUN" = false ]; then
+    echo ""
+    log_step "Cache cleanup options..."
+    echo "Large cache directories detected:"
+    TOTAL_CACHE_SIZE=0
+    if [ -d ~/.cache/uv ]; then
     SIZE=$(du -sb ~/.cache/uv 2>/dev/null | cut -f1 || echo "0")
     SIZE=${SIZE:-0}
     TOTAL_CACHE_SIZE=$((TOTAL_CACHE_SIZE + SIZE))
@@ -745,6 +800,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 else
     log_warning "Cache cleanup skipped"
 fi
+fi  # End dry-run skip for Phase 11
 
 # === PHASE 12: Claude Session Lifecycle Cleanup ===
 # Deletes sessions marked as IMPLEMENTED (insights already extracted)
@@ -752,7 +808,7 @@ fi
 # Only IMPLEMENTED sessions are safe to delete (value captured)
 # Exit on failure: No (cleanup is optional)
 # Clean up Claude session files (Phase 2: Lifecycle-based cleanup)
-if [ -d ~/.claude/projects ]; then
+if [ "$DRY_RUN" = false ] && [ -d ~/.claude/projects ]; then
     echo ""
     log_step "Checking Claude session lifecycle..."
 
@@ -897,7 +953,7 @@ fi
 # Options: delete all, delete >7 days old, or skip
 # Exit on failure: No (cleanup is optional)
 # Clean up old Claude backup files
-if [ -d .backups ]; then
+if [ "$DRY_RUN" = false ] && [ -d .backups ]; then
     backup_count=$(fd -t f 'backup-' .backups 2>/dev/null | wc -l)
     if [ "$backup_count" -gt 0 ]; then
         echo ""
@@ -928,31 +984,14 @@ if [ -d .backups ]; then
     fi
 fi
 
-# === PHASE 14: Git Push ===
-# Pushes committed changes to remote repository
-# Only runs if user accepted changes in Phase 8
-# Exit on failure: No (user can manually push later)
-echo ""
-read -p "Do you want to push the changes? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    log_step "Pushing to remote..."
-    # Wrap git push in error handling to prevent script exit
-    if git push 2>&1; then
-        log_success "Changes pushed to remote"
-        add_action "Pushed to git remote"
-    else
-        log_warning "Git push failed (check your network/authentication)"
-        log_warning "You can push manually later with: git push"
-        add_action "Push failed (manual push needed)"
-    fi
-fi
-
 # Print summary
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
+if [ "$DRY_RUN" = true ]; then
+echo "║                  Dry-Run Summary                           ║"
+else
 echo "║                    Rebuild Summary                         ║"
+fi
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -988,5 +1027,9 @@ if [ "$VERBOSE" = false ]; then
     echo ""
 fi
 
-log_success "NixOS system rebuild and cleanup complete!"
+if [ "$DRY_RUN" = true ]; then
+    log_success "Dry-run complete! No changes were made."
+else
+    log_success "NixOS system rebuild and cleanup complete!"
+fi
 echo ""
