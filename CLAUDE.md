@@ -126,9 +126,30 @@
 
 <!-- USER_MEMORY_END -->
 
+## 📦 System Tool Usage
+
+**Installed**: 143 tools | **Used**: 15 (10%) | **Analysis period**: 30 days
+
+**Top 5 tools**:
+- **devenv**: 29 uses (H:29 C:0)
+- **git**: 15 uses (H:15 C:0)
+- **bat**: 11 uses (H:11 C:0)
+- **bmad-method**: 7 uses (H:7 C:0)
+- **glow**: 4 uses (H:4 C:0)
+
+⚠️ **128 dormant tools** found (unused in last 30 days)
+
+**Human vs Claude**:
+- 15 tools used by humans
+- 0 tools used by Claude
+- ⚠️ Claude using significantly fewer tools than humans
+
+---
+*Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*
+
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-11-30 19:46:07
+**Status**: 1/1 connected | Last checked: 2025-11-30 23:34:06
 
 **playwright** ✓ connected
    - unknown server
@@ -139,24 +160,3 @@
 
 ---
 *MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*
-
-## 📦 System Tool Usage
-
-**Installed**: 142 tools | **Used**: 15 (11%) | **Analysis period**: 30 days
-
-**Top 5 tools**:
-- **devenv**: 29 uses (H:29 C:0)
-- **git**: 16 uses (H:16 C:0)
-- **bat**: 11 uses (H:11 C:0)
-- **bmad-method**: 7 uses (H:7 C:0)
-- **glow**: 4 uses (H:4 C:0)
-
-⚠️ **127 dormant tools** found (unused in last 30 days)
-
-**Human vs Claude**:
-- 15 tools used by humans
-- 0 tools used by Claude
-- ⚠️ Claude using significantly fewer tools than humans
-
----
-*Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*

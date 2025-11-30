@@ -625,8 +625,36 @@ if [ "$DRY_RUN" = false ]; then
         log_success "Selected generations deleted"
 
         log_step "Running garbage collection..."
-        nix-collect-garbage
-        log_success "Garbage collection complete"
+
+        # Run GC in background, capture output for stats (suppress verbose deletion lines)
+        nix-collect-garbage > /tmp/gc-output-$$.tmp 2>&1 &
+        GC_PID=$!
+        show_progress "garbage-collection" $GC_PID
+        wait $GC_PID
+        GC_EXIT=$?
+
+        # Extract stats from GC output (last few lines have the summary)
+        if [ -f /tmp/gc-output-$$.tmp ]; then
+            # Log full output for debugging
+            cat /tmp/gc-output-$$.tmp >> "$LOG_FILE"
+
+            # Parse summary stats (format: "X store paths deleted, Y MiB freed")
+            GC_SUMMARY=$(tail -5 /tmp/gc-output-$$.tmp | grep -E "store paths deleted|MiB freed|GiB freed" | tail -1)
+            HARDLINK_SAVINGS=$(tail -5 /tmp/gc-output-$$.tmp | grep "hard linking saves" | grep -oP '[\d.]+\s*(MiB|GiB)' | tail -1)
+
+            rm -f /tmp/gc-output-$$.tmp
+        fi
+
+        if [ $GC_EXIT -eq 0 ]; then
+            if [ -n "$GC_SUMMARY" ]; then
+                log_success "Garbage collection: $GC_SUMMARY"
+            else
+                log_success "Garbage collection complete"
+            fi
+            [ -n "$HARDLINK_SAVINGS" ] && echo "  ↳ Hard linking saves: $HARDLINK_SAVINGS"
+        else
+            log_warning "Garbage collection finished with issues (check logs)"
+        fi
         add_action "Cleaned up old generations"
     else
         log_warning "No generations selected for deletion"

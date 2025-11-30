@@ -214,6 +214,7 @@
     anki-bin # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
+    onlyoffice-desktopeditors # Office suite with document, spreadsheet, presentation editing - https://www.onlyoffice.com/
     # libreoffice         # A powerful and free office suite - DISABLED: no binary cache (30+ min build)
 
     # fonts
