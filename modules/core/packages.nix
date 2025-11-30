@@ -27,6 +27,10 @@
     (pkgs.writeShellScriptBin "jules" ''
       exec ${pkgs.nodejs_20}/bin/npx @google/jules@latest "$@"
     '')
+    # OpenSpec - Spec-driven development for AI coding assistants (always latest)
+    (pkgs.writeShellScriptBin "openspec" ''
+      exec ${pkgs.nodejs_20}/bin/npx @fission-ai/openspec@latest "$@"
+    '')
 
     # Serena MCP Server - Semantic code analysis toolkit (tracks GitHub main)
     (pkgs.writeShellScriptBin "serena" ''

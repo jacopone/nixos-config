@@ -586,30 +586,18 @@ fi
 # === PHASE 8: User Acceptance ===
 # User tests the activated configuration
 # Offers rollback if issues found
-# Stages changes for manual commit
 echo ""
 
 if [ "$DRY_RUN" = true ]; then
-    log_step "Dry-run complete. Showing what would be staged:"
-    git status
-    echo ""
-    echo "💡 To apply these changes, run without --dry-run"
+    log_step "Dry-run complete. No changes were made."
 else
     log_step "Configuration activated. Please test the changes now."
     read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        log_step "Changes accepted. Staging for commit..."
-        git add .
-        git status
-        echo ""
-        echo "💡 To commit these changes, run:"
-        echo "   git commit -m \"your message here\""
-        echo ""
-        echo "💡 To push after committing:"
-        echo "   git push"
-        add_action "Staged changes for manual commit"
+        log_success "Changes accepted"
+        add_action "Configuration tested and accepted"
     else
         log_step "Changes rejected. Rolling back to previous configuration..."
         sudo nixos-rebuild switch --rollback
