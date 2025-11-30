@@ -499,9 +499,9 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     # Run tool usage analytics (Phase 1)
     log_step "Analyzing system tool usage..."
     if [ -d "$AUTOMATION_FLAKE" ]; then
-        TOOL_CMD="python3 $AUTOMATION_FLAKE/update-tool-usage-analytics.py"
+        TOOL_CMD="python3 -m claude_automation.cli.update_tool_analytics"
     else
-        TOOL_CMD="python3 ~/claude-nixos-automation/update-tool-usage-analytics.py"
+        TOOL_CMD="python3 -m claude_automation.cli.update_tool_analytics"
     fi
 
     if (cd ~/nixos-config && $TOOL_CMD 2>/dev/null); then
@@ -566,7 +566,7 @@ else
         # Run WITHOUT pipes to preserve stdin/stdout for user interaction
         # No timeout for interactive mode (user needs time to review and respond)
         # Suppress devenv startup noise but preserve Python output for user
-        if (cd "$AUTOMATION_DIR" && devenv shell -- python run-adaptive-learning.py --interactive 2> >(grep -v "Building shell" >&2)); then
+        if (cd "$AUTOMATION_DIR" && devenv shell -- python -m claude_automation.cli.run_adaptive_learning --interactive 2> >(grep -v "Building shell" >&2)); then
             LEARNING_EXIT=0
             log_success "Adaptive learning cycle complete"
             add_action "Adaptive learning: suggestions reviewed interactively"
