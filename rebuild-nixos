@@ -686,13 +686,8 @@ echo ""
 log_step "Checking learning data disk health..."
 
 HEALTH_EXIT_CODE=0
-# Run health check directly (avoid nix wrapper issues with new files)
-if [ -f ~/claude-nixos-automation/check-data-health.py ]; then
-    HEALTH_OUTPUT=$(python3 ~/claude-nixos-automation/check-data-health.py 2>&1) || HEALTH_EXIT_CODE=$?
-else
-    HEALTH_OUTPUT="Health check script not found"
-    HEALTH_EXIT_CODE=1
-fi
+# Run health check via nix (the automation package provides this command)
+HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
 
 # Parse health stats from output
 HEALTH_TOTAL_MB=$(echo "$HEALTH_OUTPUT" | grep "Total:" | grep -oP '\d+(?=MB)' | head -1 || echo "?")
