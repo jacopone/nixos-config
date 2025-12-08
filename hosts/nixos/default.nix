@@ -111,7 +111,7 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Primary User";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" ]; # Added 'input' for whisper-overlay
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" "adbusers" ]; # Added 'input' for whisper-overlay, 'adbusers' for Android debugging
     packages = with pkgs; [
       #  thunderbird
     ];
@@ -149,6 +149,9 @@
   # Enable fish shell
   programs.fish.enable = true;
   users.defaultUserShell = pkgs.fish;
+
+  # Enable ADB for Android development
+  programs.adb.enable = true;
 
   # Enable Permitted Insecure Packages
   # SECURITY NOTE: These packages have known vulnerabilities. Review quarterly.
