@@ -149,14 +149,10 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 1/1 connected | Last checked: 2025-12-02 14:42:23
+**Status**: 0/0 connected | Last checked: 2025-12-08 09:42:07
 
-**playwright** ✓ connected
-   - unknown server
-   - Scope: global (~/.claude.json)
+No MCP servers configured.
 
-💡 **Action needed**: 1 high-priority recommendations available
-   Run rebuild to see details, or check `.claude/mcp-analytics.md` for full report
 
 ---
 *MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*

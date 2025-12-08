@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2025-11-30
-updated: 2025-11-30
+updated: 2025-12-08
 type: reference
 lifecycle: persistent
 ---
@@ -18,9 +18,19 @@ lifecycle: persistent
 - **Tools Used**: 15 (10.5%)
 - **Dormant Tools**: 128
 - **Human-Used Tools**: 15
-- **Claude-Used Tools**: 0
+- **Claude-Used Tools**: 0 (tracking enabled 2025-12-08)
 
 ⚠️ **Low adoption rate**: Less than half of installed tools are being used
+
+### Claude Tracking Status
+
+**Enabled**: 2025-12-08 via PostToolUse hook
+- Hook: `claude_automation/hooks/claude_tool_tracker.py`
+- Logs to: `~/.local/share/fish/command-source.jsonl`
+- Source tag: `"src": "claude-code"`
+
+Previous issue: Claude runs Bash commands, not Fish shell, so commands weren't tracked.
+Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL format.
 
 ## Top Tools by Usage
 
