@@ -499,9 +499,9 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     # Run tool usage analytics (Phase 1)
     log_step "Analyzing system tool usage..."
     if [ -d "$AUTOMATION_FLAKE" ]; then
-        TOOL_CMD="python3 -m claude_automation.cli.update_tool_analytics"
+        TOOL_CMD="nix run $AUTOMATION_FLAKE#update-tool-analytics --"
     else
-        TOOL_CMD="python3 -m claude_automation.cli.update_tool_analytics"
+        TOOL_CMD="nix run github:jacopone/claude-nixos-automation#update-tool-analytics --"
     fi
 
     if (cd ~/nixos-config && $TOOL_CMD 2>/dev/null); then
