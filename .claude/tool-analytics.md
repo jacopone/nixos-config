@@ -1,143 +1,139 @@
 ---
 status: active
-created: 2025-11-30
-updated: 2025-12-08
+created: 2025-12-10
+updated: 2025-12-10
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-11-30 21:51:11
+**Last Updated**: 2025-12-10 10:32:50
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 81
+**Total Commands Tracked**: 216
 
 ## Summary
 
 - **Total Tools Installed**: 143
-- **Tools Used**: 15 (10.5%)
-- **Dormant Tools**: 128
-- **Human-Used Tools**: 15
-- **Claude-Used Tools**: 0 (tracking enabled 2025-12-08)
+- **Tools Used**: 18 (12.6%)
+- **Dormant Tools**: 124
+- **Human-Used Tools**: 13
+- **Claude-Used Tools**: 8
 
 ⚠️ **Low adoption rate**: Less than half of installed tools are being used
-
-### Claude Tracking Status
-
-**Enabled**: 2025-12-08 via PostToolUse hook
-- Hook: `claude_automation/hooks/claude_tool_tracker.py`
-- Logs to: `~/.local/share/fish/command-source.jsonl`
-- Source tag: `"src": "claude-code"`
-
-Previous issue: Claude runs Bash commands, not Fish shell, so commands weren't tracked.
-Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL format.
 
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **devenv**: 29 total
-   - Human: 29 (100%)
-   - Claude: 0 (0%)
+1. **devenv**: 101 total
+   - Human: 20 (20%)
+   - Claude: 81 (80%)
    - Scripts: 0
-   - Last used: 2025-11-25
-2. **git**: 15 total
-   - Human: 15 (100%)
-   - Claude: 0 (0%)
+   - Last used: 2025-12-09
+2. **git**: 71 total
+   - Human: 21 (30%)
+   - Claude: 50 (70%)
    - Scripts: 0
-   - Last used: 2025-11-27
-3. **bat**: 11 total
-   - Human: 11 (100%)
+   - Last used: 2025-12-09
+3. **bat**: 10 total
+   - Human: 10 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-18
-4. **bmad-method**: 7 total
-   - Human: 7 (100%)
+4. **bmad-method**: 6 total
+   - Human: 6 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-27
-5. **glow**: 4 total
-   - Human: 4 (100%)
+5. **fd**: 6 total
+   - Human: 0 (0%)
+   - Claude: 6 (100%)
+   - Scripts: 0
+   - Last used: 2025-12-09
+6. **eza**: 5 total
+   - Human: 0 (0%)
+   - Claude: 5 (100%)
+   - Scripts: 0
+   - Last used: 2025-12-09
+7. **glow**: 3 total
+   - Human: 3 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-25
-6. **gemini-cli**: 3 total
+8. **gemini-cli**: 3 total
    - Human: 3 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-28
-7. **atuin**: 2 total
-   - Human: 2 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-11-02
-8. **droid**: 2 total
-   - Human: 2 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-11-03
 9. **nix**: 2 total
-   - Human: 2 (100%)
-   - Claude: 0 (0%)
+   - Human: 1 (50%)
+   - Claude: 1 (50%)
    - Scripts: 0
-   - Last used: 2025-11-20
-10. **broot**: 1 total
-   - Human: 1 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-11-02
-11. **claude-flow**: 1 total
-   - Human: 1 (100%)
-   - Claude: 0 (0%)
-   - Scripts: 0
-   - Last used: 2025-11-03
-12. **tmux**: 1 total
+   - Last used: 2025-12-09
+10. **tmux**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-11
-13. **bottom**: 1 total
+11. **bottom**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-18
-14. **cursor**: 1 total
+12. **cursor**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-20
-15. **direnv**: 1 total
+13. **direnv**: 1 total
    - Human: 1 (100%)
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-20
+14. **yazi**: 1 total
+   - Human: 1 (100%)
+   - Claude: 0 (0%)
+   - Scripts: 0
+   - Last used: 2025-12-06
+15. **nodejs_20**: 1 total
+   - Human: 0 (0%)
+   - Claude: 1 (100%)
+   - Scripts: 0
+   - Last used: 2025-12-09
 
 ### Human-Preferred Tools (Top 15)
-1. **devenv**: 29 uses
-2. **git**: 15 uses
-3. **bat**: 11 uses
-4. **bmad-method**: 7 uses
-5. **glow**: 4 uses
+1. **git**: 21 uses
+2. **devenv**: 20 uses
+3. **bat**: 10 uses
+4. **bmad-method**: 6 uses
+5. **glow**: 3 uses
 6. **gemini-cli**: 3 uses
-7. **atuin**: 2 uses
-8. **droid**: 2 uses
-9. **nix**: 2 uses
-10. **broot**: 1 uses
-11. **claude-flow**: 1 uses
-12. **tmux**: 1 uses
-13. **bottom**: 1 uses
-14. **cursor**: 1 uses
-15. **direnv**: 1 uses
+7. **tmux**: 1 uses
+8. **bottom**: 1 uses
+9. **cursor**: 1 uses
+10. **direnv**: 1 uses
+11. **nix**: 1 uses
+12. **yazi**: 1 uses
+13. **google-chrome**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
+1. **devenv**: 81 uses
+2. **git**: 50 uses
+3. **fd**: 6 uses
+4. **eza**: 5 uses
+5. **nix**: 1 uses
+6. **nodejs_20**: 1 uses
+7. **uv**: 1 uses
+8. **file**: 1 uses
 
 ## Tool Inventory by Category
 
 
 ### Ai Tools (11 tools)
 
-**bmad-method** - 7 uses- Human: 7 | Claude: 0 | Scripts: 0
+**bmad-method** - 6 uses- Human: 6 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-27
-   - Adoption score: 0.3 uses/day
+   - Adoption score: 3.0 uses/day
 
 **bpkit** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 46 in packages.nix
@@ -145,9 +141,8 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 **brownfield** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 52 in packages.nix
 
-**claude-flow** - 1 uses- Human: 1 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-03
-   - Adoption score: 1.0 uses/day
+**claude-flow** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
+   - Location: line 15 in packages.nix
 
 **gemini-cli** - 3 uses- Human: 3 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-28
@@ -176,30 +171,28 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 
 ### Modern Cli (18 tools)
 
-**atuin** - 2 uses- Neural network-powered shell history
-- Human: 2 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-02
-   - Adoption score: 2.0 uses/day
+**atuin** - 🔴 **DORMANT**- Neural network-powered shell history
+- ⚠️ Never used in last 30 days
+   - Location: line 151 in packages.nix
 
-**bat** - 11 uses- Better cat with syntax highlighting
-- Human: 11 | Claude: 0 | Scripts: 0
+**bat** - 10 uses- Better cat with syntax highlighting
+- Human: 10 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-18
-   - Adoption score: 1.4 uses/day
+   - Adoption score: 10.0 uses/day
 
-**bat** - 11 uses- A cat clone with wings
-- Human: 11 | Claude: 0 | Scripts: 0
+**bat** - 10 uses- A cat clone with wings
+- Human: 10 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-18
-   - Adoption score: 1.4 uses/day
+   - Adoption score: 10.0 uses/day
 
 **bottom** - 1 uses- Modern system monitor (btm command)
 - Human: 1 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-18
    - Adoption score: 1.0 uses/day
 
-**broot** - 1 uses- Interactive tree navigation with fuzzy search
-- Human: 1 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-02
-   - Adoption score: 1.0 uses/day
+**broot** - 🔴 **DORMANT**- Interactive tree navigation with fuzzy search
+- ⚠️ Never used in last 30 days
+   - Location: line 152 in packages.nix
 
 **choose** - 🔴 **DORMANT**- Human-friendly cut/awk alternative
 - ⚠️ Never used in last 30 days
@@ -217,18 +210,20 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 230 in packages.nix
 
-**eza** - 🔴 **DORMANT**- A modern replacement for ls
-- ⚠️ Never used in last 30 days
-   - Location: line 169 in packages.nix
+**eza** - 5 uses- A modern replacement for ls
+- Human: 0 | Claude: 5 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 5.0 uses/day
 
-**fd** - 🔴 **DORMANT**- Modern find alternative
-- ⚠️ Never used in last 30 days
-   - Location: line 174 in packages.nix
+**fd** - 6 uses- Modern find alternative
+- Human: 0 | Claude: 6 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 6.0 uses/day
 
-**glow** - 4 uses- Markdown renderer
-- Human: 4 | Claude: 0 | Scripts: 0
+**glow** - 3 uses- Markdown renderer
+- Human: 3 | Claude: 0 | Scripts: 0
    - Last used: 2025-11-25
-   - Adoption score: 0.2 uses/day
+   - Adoption score: 0.4 uses/day
 
 **mcfly** - 🔴 **DORMANT**- Smart command history search with neural networks
 - ⚠️ Never used in last 30 days
@@ -299,9 +294,10 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 324 in packages.nix
 
-**file** - 🔴 **DORMANT**- File type detection (essential for yazi)
-- ⚠️ Never used in last 30 days
-   - Location: line 323 in packages.nix
+**file** - 1 uses- File type detection (essential for yazi)
+- Human: 0 | Claude: 1 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 1.0 uses/day
 
 **file-roller** - 🔴 **DORMANT**- Archive manager for GNOME
 - ⚠️ Never used in last 30 days
@@ -347,9 +343,10 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 319 in packages.nix
 
-**yazi** - 🔴 **DORMANT**- A modern terminal file manager
-- ⚠️ Never used in last 30 days
-   - Location: line 307 in packages.nix
+**yazi** - 1 uses- A modern terminal file manager
+- Human: 1 | Claude: 0 | Scripts: 0
+   - Last used: 2025-12-06
+   - Adoption score: 1.0 uses/day
 
 **yaziPlugins.rich-preview** - 🔴 **DORMANT**- Rich preview for Yazi
 - ⚠️ Never used in last 30 days
@@ -422,9 +419,10 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 215 in packages.nix
 
-**google-chrome** - 🔴 **DORMANT**- Google's web browser
-- ⚠️ Never used in last 30 days
-   - Location: line 212 in packages.nix
+**google-chrome** - 1 uses- Google's web browser
+- Human: 1 | Claude: 0 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 1.0 uses/day
 
 **obsidian** - 🔴 **DORMANT**- A powerful knowledge base that works on top of a local folder of plain text Markdown files
 - ⚠️ Never used in last 30 days
@@ -487,10 +485,10 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 243 in packages.nix
 
-**devenv** - 29 uses- Fast, declarative development environments - instant service commands
-- Human: 29 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-25
-   - Adoption score: 1.6 uses/day
+**devenv** - 101 uses- Fast, declarative development environments - instant service commands
+- Human: 20 | Claude: 81 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 3.5 uses/day
 
 **direnv** - 1 uses- Automatic per-directory environment activation - enables .envrc
 - Human: 1 | Claude: 0 | Scripts: 0
@@ -501,9 +499,8 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 276 in packages.nix
 
-**droid** - 2 uses- Human: 2 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-03
-   - Adoption score: 2.0 uses/day
+**droid** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
+   - Location: line 57 in packages.nix
 
 **entr** - 🔴 **DORMANT**- File watcher for automated rebuilds/tests
 - ⚠️ Never used in last 30 days
@@ -517,10 +514,10 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 164 in packages.nix
 
-**git** - 15 uses- A free and open source distributed version control system
-- Human: 15 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-27
-   - Adoption score: 0.6 uses/day
+**git** - 71 uses- A free and open source distributed version control system
+- Human: 21 | Claude: 50 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 3.5 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -599,20 +596,22 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 195 in packages.nix
 
-**nix** - 2 uses- Human: 2 | Claude: 0 | Scripts: 0
-   - Last used: 2025-11-20
-   - Adoption score: 0.2 uses/day
+**nix** - 2 uses- Human: 1 | Claude: 1 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 0.1 uses/day
 
 **nixpkgs-fmt** - 🔴 **DORMANT**- Nix code formatter (for pre-commit hooks)
 - ⚠️ Never used in last 30 days
    - Location: line 299 in packages.nix
 
-**nodejs_20** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
-   - Location: line 16 in packages.nix
+**nodejs_20** - 1 uses- Human: 0 | Claude: 1 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 1.0 uses/day
 
-**nodejs_20** - 🔴 **DORMANT**- Node.js 20.19.4 with npm - eliminates devenv activation overhead
-- ⚠️ Never used in last 30 days
-   - Location: line 184 in packages.nix
+**nodejs_20** - 1 uses- Node.js 20.19.4 with npm - eliminates devenv activation overhead
+- Human: 0 | Claude: 1 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 1.0 uses/day
 
 **onlyoffice-desktopeditors** - 🔴 **DORMANT**- Office suite with document, spreadsheet, presentation editing
 - ⚠️ Never used in last 30 days
@@ -686,8 +685,9 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 - ⚠️ Never used in last 30 days
    - Location: line 229 in packages.nix
 
-**uv** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
-   - Location: line 41 in packages.nix
+**uv** - 1 uses- Human: 0 | Claude: 1 | Scripts: 0
+   - Last used: 2025-12-09
+   - Adoption score: 1.0 uses/day
 
 **vhs** - 🔴 **DORMANT**- Terminal session recording for AI workflow documentation
 - ⚠️ Never used in last 30 days
@@ -726,38 +726,47 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 
 ### Tools Both Use (Shared)
 
-0 tools used by both human and Claude:
+3 tools used by both human and Claude:
+- **devenv**: H:20 C:81
+- **git**: H:21 C:50
+- **nix**: H:1 C:1
 
 ### Human-Only Tools
 
-15 tools used only by humans:
-- **devenv**: 29 uses
-- **git**: 15 uses
-- **bat**: 11 uses
-- **bmad-method**: 7 uses
-- **glow**: 4 uses
+10 tools used only by humans:
+- **bat**: 10 uses
+- **bmad-method**: 6 uses
+- **glow**: 3 uses
 - **gemini-cli**: 3 uses
-- **atuin**: 2 uses
-- **droid**: 2 uses
-- **nix**: 2 uses
-- **broot**: 1 uses
-- **claude-flow**: 1 uses
 - **tmux**: 1 uses
 - **bottom**: 1 uses
 - **cursor**: 1 uses
 - **direnv**: 1 uses
+- **yazi**: 1 uses
+- **google-chrome**: 1 uses
 
 💡 **Insight**: These tools solve human-specific needs or Claude is not aware of them.
 
 ### Claude-Only Tools
 
+5 tools used only by Claude:
+- **fd**: 6 uses
+- **eza**: 5 uses
+- **nodejs_20**: 1 uses
+- **uv**: 1 uses
+- **file**: 1 uses
+
+💡 **Insight**: AI-optimized tools working well for Claude's workflows.
 
 ## Dormant Tools (Candidates for Removal)
 
-128 tools unused in last 30 days:
+124 tools unused in last 30 days:
 
 **opencode** - AI coding agent built for the terminal   - Category: ai-tools
    - Location: line 9 in packages.nix
+
+**claude-flow**   - Category: ai-tools
+   - Location: line 15 in packages.nix
 
 **jules**   - Category: ai-tools
    - Location: line 27 in packages.nix
@@ -812,9 +821,6 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 **gum** - Interactive prompts and beautiful CLI forms for shell scripts   - Category: file-management
    - Location: line 306 in packages.nix
 
-**yazi** - A modern terminal file manager   - Category: file-management
-   - Location: line 307 in packages.nix
-
 **yaziPlugins.rich-preview** - Rich preview for Yazi   - Category: file-management
    - Location: line 308 in packages.nix
 
@@ -823,9 +829,6 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 
 **ueberzugpp** - Successor to ueberzug for image previews   - Category: file-management
    - Location: line 319 in packages.nix
-
-**file** - File type detection (essential for yazi)   - Category: file-management
-   - Location: line 323 in packages.nix
 
 **ffmpegthumbnailer** - Video thumbnails for yazi   - Category: file-management
    - Location: line 324 in packages.nix
@@ -872,15 +875,14 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 **python312Packages.radon** - Python code metrics and complexity analysis   - Category: fonts
    - Location: line 270 in packages.nix
 
-**eza** - A modern replacement for ls   - Category: modern-cli
-   - Location: line 169 in packages.nix
-- URL: https://eza.rocks/
+**atuin** - Neural network-powered shell history   - Category: modern-cli
+   - Location: line 151 in packages.nix
+
+**broot** - Interactive tree navigation with fuzzy search   - Category: modern-cli
+   - Location: line 152 in packages.nix
 
 **ripgrep** - Super fast grep (rg command)   - Category: modern-cli
    - Location: line 173 in packages.nix
-
-**fd** - Modern find alternative   - Category: modern-cli
-   - Location: line 174 in packages.nix
 
 **dust** - Modern disk usage analyzer (faster than du)   - Category: modern-cli
    - Location: line 230 in packages.nix
@@ -928,17 +930,14 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 **stdenv.hostPlatform.system**   - Category: other
    - Location: line 10 in packages.nix
 
-**nodejs_20**   - Category: other
-   - Location: line 16 in packages.nix
-
 **openspec**   - Category: other
    - Location: line 31 in packages.nix
 
-**uv**   - Category: other
-   - Location: line 41 in packages.nix
-
 **stdenv.cc.cc.lib**   - Category: other
    - Location: line 47 in packages.nix
+
+**droid**   - Category: other
+   - Location: line 57 in packages.nix
 
 **lib.makeBinPath**   - Category: other
    - Location: line 92 in packages.nix
@@ -958,9 +957,6 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 
 **runCommand**   - Category: other
    - Location: line 178 in packages.nix
-
-**nodejs_20** - Node.js 20.19.4 with npm - eliminates devenv activation overhead   - Category: other
-   - Location: line 184 in packages.nix
 
 **rich** - Rich - Python terminal UI library (for BASB system)   - Category: other
    - Location: line 186 in packages.nix
@@ -1102,10 +1098,6 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
    - Location: line 171 in packages.nix
 - URL: https://wiki.gnome.org/Apps/Gedit
 
-**google-chrome** - Google's web browser   - Category: productivity
-   - Location: line 212 in packages.nix
-- URL: https://www.google.com/chrome/
-
 **obsidian** - A powerful knowledge base that works on top of a local folder of plain text Markdown files   - Category: productivity
    - Location: line 213 in packages.nix
 - URL: https://obsidian.md/
@@ -1169,7 +1161,7 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 ### 🔴 HIGH PRIORITY: bat
 
 **Type**: Policy Violation
-**Issue**: Claude not using bat (modern cat), but humans use it 11 times
+**Issue**: Claude not using bat (modern cat), but humans use it 10 times
 **Action**: Update CLAUDE.md policy to enforce bat usage
 
 ### 🔴 HIGH PRIORITY: bottom
@@ -1181,20 +1173,20 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 60 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, nodejs_20, and 55 more
+**Issue**: 58 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, openspec, and 53 more
 
 ### 🟡 MEDIUM PRIORITY: modern-cli tools
 
 **Type**: Remove Dormant
 **Issue**: 12 modern-cli tools unused in last 90 days
-**Action**: Consider removing: eza, ripgrep, fd, dust, procs, and 7 more
+**Action**: Consider removing: atuin, broot, ripgrep, dust, procs, and 7 more
 
 ### 🟡 MEDIUM PRIORITY: file-management tools
 
 **Type**: Remove Dormant
-**Issue**: 17 file-management tools unused in last 90 days
-**Action**: Consider removing: peco, p7zip, fzf, gum, yazi, and 12 more
+**Issue**: 15 file-management tools unused in last 90 days
+**Action**: Consider removing: peco, p7zip, fzf, gum, yaziPlugins.rich-preview, and 10 more
 
 ### 🟡 MEDIUM PRIORITY: system-tools tools
 
@@ -1205,14 +1197,14 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 ### 💚 LOW PRIORITY: ai-tools tools
 
 **Type**: Remove Dormant
-**Issue**: 8 ai-tools tools unused in last 90 days
-**Action**: Consider removing: opencode, jules, serena, specify, bpkit, and 3 more
+**Issue**: 9 ai-tools tools unused in last 90 days
+**Action**: Consider removing: opencode, claude-flow, jules, serena, specify, and 4 more
 
 ### 💚 LOW PRIORITY: productivity tools
 
 **Type**: Remove Dormant
-**Issue**: 6 productivity tools unused in last 90 days
-**Action**: Consider removing: gedit, google-chrome, obsidian, anki-bin, gimp-with-plugins, and 1 more
+**Issue**: 5 productivity tools unused in last 90 days
+**Action**: Consider removing: gedit, obsidian, anki-bin, gimp-with-plugins, vlc
 
 ### 💚 LOW PRIORITY: fonts tools
 
@@ -1229,27 +1221,35 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 ### 💚 LOW PRIORITY: devenv
 
 **Type**: Highlight Value
-**Issue**: Highly used: 29 invocations (human: 29, Claude: 0)
+**Issue**: Highly used: 101 invocations (human: 20, Claude: 81)
 **Action**: Keep devenv - provides excellent value
+
+### 💚 LOW PRIORITY: git
+
+**Type**: Highlight Value
+**Issue**: Highly used: 71 invocations (human: 21, Claude: 50)
+**Action**: Keep git - provides excellent value
 
 
 ## Usage Trends by Category
 
-- **Other**: 49 invocations
-- **Modern Cli**: 19 invocations
-- **Ai Tools**: 12 invocations
+- **Other**: 177 invocations
+- **Modern Cli**: 25 invocations
+- **Ai Tools**: 10 invocations
+- **File Management**: 2 invocations
 - **System Tools**: 1 invocations
+- **Productivity**: 1 invocations
 
 ## Comparison with October 2025 Baseline
 
 
 | Tool | Oct 2025 Baseline | Current | Change | Status |
 |------|-------------------|---------|--------|--------|
-| glow | 32 | 4 | -28 | ⚠️ Declining |
+| glow | 32 | 3 | -29 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
-| eza | 19 | 0 | -19 | ⚠️ Declining |
-| bat | 7 | 11 | +4 | ✅ Growing |
-| fd | 2 | 0 | -2 | ⚠️ Declining |
+| eza | 19 | 5 | -14 | ⚠️ Declining |
+| bat | 7 | 10 | +3 | ✅ Growing |
+| fd | 2 | 6 | +4 | ✅ Growing |
 | rg | 1 | 0 | -1 | ⚠️ Declining |
 | dust | 1 | 0 | -1 | ⚠️ Declining |
 
@@ -1257,7 +1257,7 @@ Solution: PostToolUse hook now logs all Claude Bash commands to the same JSONL f
 
 ## Next Review
 
-**Scheduled**: 2025-12-30
+**Scheduled**: 2026-01-09
 
 **Action items for next review**:
 1. Check if dormant tools are still unused

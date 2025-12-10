@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (122 tools)
+- `modules/core/packages.nix` - System-wide packages (137 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -84,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (122 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (137 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 0M 0A 3U
-- **Last Updated**: 2025-10-21 23:16:20
-- **Fish Abbreviations**: 56
-- **Total System Tools**: 122
+- **Git Status**: 3M 0A 0U
+- **Last Updated**: 2025-12-10 10:32:35
+- **Fish Abbreviations**: 0
+- **Total System Tools**: 137
 
 ---
 *Auto-updated by ./rebuild-nixos script*
@@ -126,33 +126,32 @@
 
 <!-- USER_MEMORY_END -->
 
-## 📦 System Tool Usage
-
-**Installed**: 143 tools | **Used**: 15 (10%) | **Analysis period**: 30 days
-
-**Top 5 tools**:
-- **devenv**: 29 uses (H:29 C:0)
-- **git**: 15 uses (H:15 C:0)
-- **bat**: 11 uses (H:11 C:0)
-- **bmad-method**: 7 uses (H:7 C:0)
-- **glow**: 4 uses (H:4 C:0)
-
-⚠️ **128 dormant tools** found (unused in last 30 days)
-
-**Human vs Claude**:
-- 15 tools used by humans
-- 0 tools used by Claude
-- ⚠️ Claude using significantly fewer tools than humans
-
----
-*Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*
-
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-08 09:42:07
+**Status**: 0/0 connected | Last checked: 2025-12-10 10:32:47
 
 No MCP servers configured.
 
 
 ---
 *MCP server status tracked automatically. Full analytics: `.claude/mcp-analytics.md`*
+
+## 📦 System Tool Usage
+
+**Installed**: 143 tools | **Used**: 18 (13%) | **Analysis period**: 30 days
+
+**Top 5 tools**:
+- **devenv**: 101 uses (H:20 C:81)
+- **git**: 71 uses (H:21 C:50)
+- **bat**: 10 uses (H:10 C:0)
+- **bmad-method**: 6 uses (H:6 C:0)
+- **fd**: 6 uses (H:0 C:6)
+
+⚠️ **124 dormant tools** found (unused in last 30 days)
+
+**Human vs Claude**:
+- 13 tools used by humans
+- 8 tools used by Claude
+
+---
+*Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*
