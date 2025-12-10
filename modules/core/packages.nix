@@ -207,8 +207,10 @@
     gtop # A system monitoring dashboard for your terminal
     usbimager # A minimalist GUI application to write compressed disk images to USB drives
     p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
+    wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
 
     # productivity tools
+    kooha # Elegantly record your screen (Wayland-native, minimal UI) - https://github.com/SeaDve/Kooha
     google-chrome # Google's web browser - https://www.google.com/chrome/
     obsidian # A powerful knowledge base that works on top of a local folder of plain text Markdown files - https://obsidian.md/
     anki-bin # A program which makes remembering things easy - https://apps.ankiweb.net/

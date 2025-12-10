@@ -8,8 +8,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1764974442,
-        "narHash": "sha256-eZIzAfghvBb9wd25TPSXmTe7nnEnoX1wvLA0WRQGtmo=",
+        "lastModified": 1765361896,
+        "narHash": "sha256-qxrThgNnJ3t6CNGngQVPNqz8RsCdWUy4hSonrbQBWHE=",
         "path": "/home/guyfawkes/antigravity-nix",
         "type": "path"
       },
