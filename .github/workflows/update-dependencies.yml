@@ -37,9 +37,8 @@ jobs:
           # Create backup
           cp flake.lock flake.lock.backup
 
-          # Update only GitHub-hosted inputs (skip path inputs that don't exist on CI)
-          # Path inputs (whisper-dictation, antigravity-nix) only exist on local machine
-          nix flake update nixpkgs home-manager claude-code-nix code-cursor-nix claude-automation
+          # Update all flake inputs
+          nix flake update
 
           # Check what changed
           if git diff --quiet flake.lock; then
@@ -58,14 +57,7 @@ jobs:
         if: steps.update.outputs.has_changes == 'true'
         run: |
           echo "Validating updated configuration..."
-          # Note: Full flake check is skipped because path inputs (whisper-dictation,
-          # antigravity-nix) don't exist in CI. We validate flake.lock structure only.
-          if jq -e '.nodes.nixpkgs.locked.rev' flake.lock > /dev/null; then
-            echo "✅ flake.lock is valid and contains updated inputs"
-          else
-            echo "❌ flake.lock validation failed"
-            exit 1
-          fi
+          nix flake check --no-build
 
       - name: Generate changelog entry
         if: steps.update.outputs.has_changes == 'true'

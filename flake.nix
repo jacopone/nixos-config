@@ -42,24 +42,25 @@
     };
 
     # Whisper Dictation - Local speech-to-text (your project)
-    # PATH INPUT: Tracks local development, always uses latest local code
+    # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
+    # For local dev, use: nix flake lock --override-input whisper-dictation path:../whisper-dictation
     whisper-dictation = {
-      url = "path:/home/guyfawkes/whisper-dictation";
+      url = "github:jacopone/whisper-dictation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Claude NixOS Automation - CLAUDE.md management tools
     # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
-    # Current: a58bcc5 (locked via flake.lock)
     claude-automation = {
       url = "github:jacopone/claude-nixos-automation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Google Antigravity - Next-generation agentic IDE
-    # PATH INPUT: Tracks local development, always uses latest local code
+    # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
+    # For local dev, use: nix flake lock --override-input antigravity-nix path:../antigravity-nix
     antigravity-nix = {
-      url = "path:/home/guyfawkes/antigravity-nix";
+      url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

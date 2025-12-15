@@ -8,14 +8,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1765361896,
-        "narHash": "sha256-qxrThgNnJ3t6CNGngQVPNqz8RsCdWUy4hSonrbQBWHE=",
-        "path": "/home/guyfawkes/antigravity-nix",
-        "type": "path"
+        "lastModified": 1765361927,
+        "narHash": "sha256-tLmcNQktKdMpiQDtULTXSO4lcGvFpup6w+z2aRABbXU=",
+        "owner": "jacopone",
+        "repo": "antigravity-nix",
+        "rev": "c2bf2c9bee379c9a50f532567056cf0befcd82c9",
+        "type": "github"
       },
       "original": {
-        "path": "/home/guyfawkes/antigravity-nix",
-        "type": "path"
+        "owner": "jacopone",
+        "repo": "antigravity-nix",
+        "type": "github"
       }
     },
     "claude-automation": {
@@ -46,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765333933,
-        "narHash": "sha256-gdtRkulKnA4qMvqe2jpEyVBVZNTLu+qm9H7Jmcmma6o=",
+        "lastModified": 1765506793,
+        "narHash": "sha256-cfHpTj7s5E9WKSFwsgI4bnjvAQJb2hcL4dQIF9fsuzI=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "273b0044c6f4558ebea9e038eb9c4fe6b35e165a",
+        "rev": "fd14c5c923937946e2c079d786e1072890975f6a",
         "type": "github"
       },
       "original": {
@@ -67,11 +70,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765185134,
-        "narHash": "sha256-XYRYnXrsyUfujHhJ8hFhbR+sWmJhhNr/z702G2+QUv8=",
+        "lastModified": 1765530614,
+        "narHash": "sha256-mUT6rNH1mcH1nTKhhmE3S3Vxi6BBAaJgddlMlT0BWwc=",
         "owner": "jacopone",
         "repo": "code-cursor-nix",
-        "rev": "707ec41c2337f6b21158c56c1967d72ad01895c5",
+        "rev": "872984fcbedbcda81942f268848dcd3ec21f276e",
         "type": "github"
       },
       "original": {
@@ -159,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765337252,
-        "narHash": "sha256-HuWQp8fM25fyWflbuunQkQI62Hg0ecJxWD52FAgmxqY=",
+        "lastModified": 1765480374,
+        "narHash": "sha256-HlbvQAqLx7WqZFFQZ8nu5UUJAVlXiV/kqKbyueA8srw=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "13cc1efd78b943b98c08d74c9060a5b59bf86921",
+        "rev": "39cb677ed9e908e90478aa9fe5f3383dfc1a63f3",
         "type": "github"
       },
       "original": {
@@ -267,14 +270,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1761134965,
-        "narHash": "sha256-FSqNKV2CBkMxQaqO4Gc8UnAw5WGMz1NqB2/9spHvtk4=",
-        "path": "/home/guyfawkes/whisper-dictation",
-        "type": "path"
+        "lastModified": 1759416689,
+        "narHash": "sha256-d9CofyVUtsffmlLlrKJayTQmwY9wb5dVrMaGQoknAaQ=",
+        "owner": "jacopone",
+        "repo": "whisper-dictation",
+        "rev": "0e47dd58f2c4ab017073e812711d225e5cc2eaac",
+        "type": "github"
       },
       "original": {
-        "path": "/home/guyfawkes/whisper-dictation",
-        "type": "path"
+        "owner": "jacopone",
+        "repo": "whisper-dictation",
+        "type": "github"
       }
     }
   },
