@@ -8,7 +8,7 @@ lifecycle: persistent
 
 # NixOS for AI-Assisted Development
 
-> A self-documenting system that keeps Claude Code synchronized with your tools
+> Self-documenting NixOS with intelligent permission learning and usage analytics
 
 [![NixOS](https://img.shields.io/badge/NixOS-25.11-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
 [![Flakes](https://img.shields.io/badge/Nix-Flakes-informational.svg?style=flat-square&logo=nixos)](https://nixos.wiki/wiki/Flakes)
@@ -59,11 +59,27 @@ cd ~/nixos-config
 
 | Feature | Description |
 |---------|-------------|
-| **Closed-Loop Automation** | System changes automatically update AI knowledge. Your NixOS config is the source of truth. |
-| **145 Curated Tools** | Modern CLI stack: `fd`, `eza`, `bat`, `rg`, `dust`, `procs`, and 139 more. |
-| **Zero Configuration Drift** | AI always sees current system state. Install a tool, rebuild, AI knows instantly. |
-| **Adaptive Learning** | Detects usage patterns, auto-approves frequent permissions, optimizes MCP servers. |
-| **Performance Optimized** | Parallel analyzers, 2.5s faster rebuilds, battle-tested over 6 months. |
+| **Intelligent Permission Learning** | Analyzes 469+ sessions, auto-approves frequent commands, reduces friction |
+| **Tool Usage Analytics** | Tracks which tools are used by humans vs AI, identifies dormant packages |
+| **MCP Server Optimization** | Monitors server utilization, suggests project-level vs system-level placement |
+| **Zero-Drift Documentation** | System state always matches AI knowledge, updated on every rebuild |
+| **Adaptive Suggestions** | Recommends permission patterns, tool additions, configuration improvements |
+
+## How It Works
+
+The intelligence comes from [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation):
+
+```
+./rebuild-nixos
+    │
+    ├─→ Parses Nix config → extracts 145 tools with descriptions
+    ├─→ Analyzes Claude Code usage → learns permission patterns
+    ├─→ Tracks tool usage → human vs AI over 30 days
+    ├─→ Generates suggestions → permission auto-approvals, dormant cleanup
+    └─→ Updates CLAUDE.md → full system context for AI
+```
+
+**Result**: Claude Code that learns your workflow and gets smarter with every session.
 
 ## What's Included
 
@@ -143,10 +159,10 @@ yazi                         # Terminal file manager
 
 ## Ecosystem
 
-| Repository | Purpose |
-|------------|---------|
-| **[nixos-config](https://github.com/jacopone/nixos-config)** | This repo - main system config |
-| **[claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation)** | Auto-generate CLAUDE.md from configs |
+| Repository | What It Does |
+|------------|--------------|
+| **[nixos-config](https://github.com/jacopone/nixos-config)** | System configuration + rebuild orchestration |
+| **[claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation)** | **The brain**: Permission learning, usage analytics, intelligent suggestions, CLAUDE.md generation |
 
 ## Repository Structure
 

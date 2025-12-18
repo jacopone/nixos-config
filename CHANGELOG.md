@@ -27,6 +27,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - README refactored from 445 → 189 lines for better scanability
 - Repository description updated for SEO
 - VHS demo script updated with real command examples
+- README now emphasizes intelligent automation over tool count
+- Key Features table highlights permission learning, analytics, suggestions
+- Added "How It Works" section explaining claude-nixos-automation integration
+- Ecosystem table expanded with better descriptions of each repo's role
 
 ### Documentation
 - Improved repository structure for GitHub discoverability
