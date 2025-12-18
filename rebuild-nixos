@@ -529,7 +529,96 @@ else
 fi
 fi  # End dry-run skip for Phase 4-6
 
-# === PHASE 7: Adaptive Learning Cycle ===
+# === PHASE 7: Changelog Draft Generation ===
+# Generates draft changelog entries from commits since last update
+# Exit on failure: No (non-critical, system already activated)
+# User interaction: Yes (review and approve draft)
+echo ""
+log_step "Checking for changelog updates..."
+
+if dry_run_skip "generate changelog draft from recent commits"; then
+    : # skip
+else
+    # Get last changelog date from CHANGELOG.md
+    LAST_CHANGELOG_DATE=$(grep -oP '^\#\# \[\d{4}-\d{2}-\d{2}\]' CHANGELOG.md 2>/dev/null | head -1 | grep -oP '\d{4}-\d{2}-\d{2}' || echo "")
+
+    if [ -n "$LAST_CHANGELOG_DATE" ]; then
+        # Count commits since last update
+        NEW_COMMITS=$(git log --since="$LAST_CHANGELOG_DATE" --oneline 2>/dev/null | wc -l)
+
+        if [ "$NEW_COMMITS" -gt 0 ]; then
+            echo "  Found $NEW_COMMITS commits since $LAST_CHANGELOG_DATE"
+            read -p "  Generate changelog draft? [y/N] " -n 1 -r CHANGELOG_REPLY
+            echo
+
+            if [[ $CHANGELOG_REPLY =~ ^[Yy]$ ]]; then
+                # Run changelog generator script
+                if [ -x "./scripts/generate-changelog-draft.sh" ]; then
+                    if ./scripts/generate-changelog-draft.sh > /tmp/changelog-draft-$$.md 2>/dev/null; then
+                        echo ""
+                        echo -e "${BLUE}════════════════════ Changelog Draft ════════════════════${NC}"
+                        bat --style=plain --paging=never /tmp/changelog-draft-$$.md 2>/dev/null || cat /tmp/changelog-draft-$$.md
+                        echo -e "${BLUE}══════════════════════════════════════════════════════════${NC}"
+                        echo ""
+                        echo "Options:"
+                        echo "  1) Append to CHANGELOG.md [Unreleased]"
+                        echo "  2) Edit first in \$EDITOR, then append"
+                        echo "  3) Skip (keep draft at /tmp/changelog-draft-$$.md)"
+                        read -p "Choose option (1-3): " -n 1 -r CHANGELOG_ACTION
+                        echo
+
+                        case $CHANGELOG_ACTION in
+                            1)
+                                # Insert draft after [Unreleased] line (before ### Planned)
+                                # Using awk to insert content at the right place
+                                awk -v draft="$(cat /tmp/changelog-draft-$$.md)" '
+                                    /^### Planned/ && !inserted {
+                                        print draft
+                                        print ""
+                                        inserted=1
+                                    }
+                                    {print}
+                                ' CHANGELOG.md > /tmp/changelog-updated-$$.md && mv /tmp/changelog-updated-$$.md CHANGELOG.md
+                                log_success "Added draft to CHANGELOG.md [Unreleased]"
+                                add_action "Generated changelog draft ($NEW_COMMITS commits)"
+                                rm -f /tmp/changelog-draft-$$.md
+                                ;;
+                            2)
+                                ${EDITOR:-nano} /tmp/changelog-draft-$$.md
+                                awk -v draft="$(cat /tmp/changelog-draft-$$.md)" '
+                                    /^### Planned/ && !inserted {
+                                        print draft
+                                        print ""
+                                        inserted=1
+                                    }
+                                    {print}
+                                ' CHANGELOG.md > /tmp/changelog-updated-$$.md && mv /tmp/changelog-updated-$$.md CHANGELOG.md
+                                log_success "Added edited draft to CHANGELOG.md"
+                                add_action "Generated and edited changelog ($NEW_COMMITS commits)"
+                                rm -f /tmp/changelog-draft-$$.md
+                                ;;
+                            *)
+                                log_warning "Changelog update skipped (draft saved at /tmp/changelog-draft-$$.md)"
+                                ;;
+                        esac
+                    else
+                        log_warning "Changelog generator script failed"
+                    fi
+                else
+                    log_warning "Changelog generator script not found at ./scripts/generate-changelog-draft.sh"
+                fi
+            else
+                log_warning "Changelog update skipped ($NEW_COMMITS pending commits)"
+            fi
+        else
+            log_success "Changelog up to date (no commits since $LAST_CHANGELOG_DATE)"
+        fi
+    else
+        log_warning "Could not parse last changelog date from CHANGELOG.md"
+    fi
+fi
+
+# === PHASE 8: Adaptive Learning Cycle ===
 # Runs 7 parallel ML analyzers to detect optimization opportunities:
 # - Permission patterns (auto-approve repeated commands)
 # - MCP server utilization (move to project-level if low usage)
