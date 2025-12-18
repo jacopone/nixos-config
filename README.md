@@ -98,7 +98,7 @@ The intelligence comes from [claude-nixos-automation](https://github.com/jacopon
 
 - **Claude Code** - Anthropic's CLI with auto-sync
 - **Cursor** - AI editor with quality gates
-- **Aider** - AI pair programming
+- **Gemini CLI / Jules** - Google's AI coding assistants
 - **Serena MCP** - Semantic code analysis
 
 ### Development Environment
@@ -125,7 +125,7 @@ The intelligence comes from [claude-nixos-automation](https://github.com/jacopon
 
 **Quality**: `shellcheck`, `shfmt`, `ruff`, `semgrep`, `tokei`, `lizard`
 
-**AI Tools**: `claude-code`, `cursor`, `aider`, `gemini-cli`, `serena`, `mcp-nixos`
+**AI Tools**: `claude-code`, `cursor`, `gemini-cli`, `jules`, `droid`, `opencode`, `serena`, `mcp-nixos`
 
 See [`modules/core/packages.nix`](modules/core/packages.nix) for the complete list.
 

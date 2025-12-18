@@ -160,7 +160,7 @@ def parse_packages(self, path: str) -> List[PackageInfo]:
 ```python
 def generate(self) -> str:
     """
-    1. Parse packages.nix → get 122 tools
+    1. Parse packages.nix → get 145 tools
     2. Parse base.nix → get 58 Fish abbreviations
     3. Render Jinja2 template with data
     4. Write to ~/.claude/CLAUDE.md
@@ -191,7 +191,7 @@ def generate(self) -> str:
 - cat → bat (ALWAYS use bat for file viewing, except when piping)
 - grep → rg (ALWAYS use ripgrep for text search)
 
-## Available Command Line Tools (122)
+## Available Command Line Tools (145)
 
 ### AI Tools
 - aider - AI Development Enhancement Tools
@@ -218,7 +218,7 @@ def generate(self) -> str:
 ```
 
 **Purpose:** Claude reads this on session start and knows:
-- What tools are available (122 tools)
+- What tools are available (145 tools)
 - How to use them (descriptions + commands)
 - What substitutions to use (modern > legacy)
 - What abbreviations exist (Fish shell)
@@ -242,7 +242,7 @@ def generate(self) -> str:
 
 ## Project Structure
 - flake.nix - Main configuration entry point
-- modules/core/packages.nix - System-wide packages (122 tools)
+- modules/core/packages.nix - System-wide packages (145 tools)
 - modules/home-manager/base.nix - User configurations
 
 ## System Status
@@ -373,7 +373,7 @@ claude
 4. Hope you don't forget
 5. Hope you spell it correctly
 6. Hope you update when tool is removed
-7. Repeat for 122 tools 😩
+7. Repeat for 145 tools 😩
 
 **Problems:**
 - ❌ Manual updates (tedious, error-prone)
@@ -621,7 +621,7 @@ def generate_claude_md(self, packages: List[Package]) -> str:
 ```markdown
 # System-Level CLAUDE.md
 
-## Available Command Line Tools (122)
+## Available Command Line Tools (145)
 
 ### AI Tools
 - `aider` - AI Development Enhancement Tools
@@ -718,7 +718,7 @@ def validate_claude_md(content: str) -> ValidationResult:
 |--------|--------|-----------|-------------|
 | **Time to document new tool** | 5-10 min | 0 seconds | ∞ |
 | **Documentation accuracy** | ~70% | 100% | +43% |
-| **Tools documented** | ~40 | 122 | +205% |
+| **Tools documented** | ~40 | 145 | +263% |
 | **Sync errors per month** | 10-15 | 0 | -100% |
 | **Maintenance time per month** | 2-3 hours | 0 seconds | ∞ |
 
@@ -885,6 +885,5 @@ With it: AI always knows system state, zero maintenance, maximum productivity.
 ---
 
 **Learn more:**
-- [Core Thesis](CORE_THESIS.md) - Why this works
 - [Architecture](architecture/CLAUDE_ORCHESTRATION.md) - System design
 - [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation) - Source code

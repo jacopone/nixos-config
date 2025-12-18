@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2025-10-08
+updated: 2025-12-18
 type: reference
 lifecycle: persistent
 ---
@@ -20,6 +20,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `LICENSE` file (MIT) - previously only mentioned in README
 - `INSTALL.md` - comprehensive installation guide extracted from README
 - `CONTRIBUTING.md` - fork-friendly contribution guidelines
+- `SECURITY.md` - security policy (standard for open source projects)
+- `docs/README.md` - documentation navigation index
 - GitHub repository topics (16 tags for discoverability)
 - Demo GIF (`docs/assets/rebuild-demo.gif`) showing closed-loop workflow
 
@@ -31,11 +33,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Key Features table highlights permission learning, analytics, suggestions
 - Added "How It Works" section explaining claude-nixos-automation integration
 - Ecosystem table expanded with better descriptions of each repo's role
+- AI Tools list updated (removed aider, added jules/droid/opencode)
+- Tool count standardized to 145 across all documentation
 
 ### Documentation
 - Improved repository structure for GitHub discoverability
 - Added ecosystem table linking related repositories
 - Consolidated features into scannable tables
+- Moved `THE_CLOSED_LOOP.md` to `docs/architecture/`
+- Moved CI/CD docs to proper folders (`docs/guides/`, `docs/integrations/`)
+- Archived 71-day-old HN planning docs to `docs/archive/2025-10-planning/`
+- Archived draft automation docs (MCP, N8N, Google Drive)
+- Fixed broken link to non-existent `CORE_THESIS.md`
 
 ### Planned
 - User policies merge refactoring for claude-automation
