@@ -1,71 +1,63 @@
-# VHS script to demonstrate rebuild-nixos updating Claude Code configurations
+# VHS script demonstrating the closed-loop: rebuild → auto-update → AI knows
 # Run with: vhs docs/assets/rebuild-demo.tape
 
-# Output configuration
 Output docs/assets/rebuild-demo.gif
-Set FontSize 14
-Set Width 1200
-Set Height 600
+Set FontSize 16
+Set Width 1000
+Set Height 500
 Set Theme "Catppuccin Mocha"
-Set TypingSpeed 50ms
-Set PlaybackSpeed 0.5
+Set TypingSpeed 40ms
+Set PlaybackSpeed 1.0
 
-# Show the nixos-config directory
-Type "cd ~/nixos-config"
+# Title frame
+Type "# NixOS Self-Documenting AI Integration"
 Enter
-Sleep 500ms
-
-# Clear screen for clean demo
-Type "clear"
-Enter
-Sleep 500ms
-
-# Show the rebuild command with explanation
-Type "# Every rebuild updates Claude's knowledge automatically"
 Sleep 1s
-Enter
-Type "./rebuild-nixos"
-Sleep 2s
-Enter
-
-# Wait for the update to happen (simulate)
-Sleep 3s
-Type "# Simulating rebuild process..."
-Enter
-Sleep 2s
-
-# Show the key part where Claude configs get updated
-Type "echo '--> Updating Claude Code configurations...'"
-Enter
-Sleep 500ms
-Type "echo '    ✅ Claude Code configurations updated'"
-Enter
-Type "echo '       - User policies: ~/.claude/CLAUDE-USER-POLICIES.md (preserved)'"
-Enter
-Type "echo '       - System CLAUDE.md: ~/.claude/CLAUDE.md (updated)'"
-Enter
-Type "echo '       - Project CLAUDE.md: ./CLAUDE.md (updated)'"
-Enter
-Sleep 2s
-
-# Show that CLAUDE.md was updated
 Type "clear"
 Enter
-Sleep 500ms
-Type "# Check what was updated"
-Sleep 1s
+Sleep 300ms
+
+# Step 1: Show a tool in packages.nix
+Type "# Step 1: Tool declared in packages.nix"
 Enter
-Type "head -20 CLAUDE.md"
+Sleep 500ms
+Type "rg 'ripgrep' modules/core/packages.nix | head -3"
 Enter
 Sleep 2s
 
-# Show the closing loop concept
-Type "clear"
+# Step 2: Run rebuild (abbreviated output)
+Type ""
+Enter
+Type "# Step 2: Rebuild updates AI documentation"
 Enter
 Sleep 500ms
-Type "echo 'System state → rebuild → auto-documentation → AI knowledge'"
-Enter
-Sleep 2s
-Type "echo 'The closed loop keeps Claude Code always in sync'"
+Type "./rebuild-nixos --dry-run 2>&1 | tail -10"
 Enter
 Sleep 3s
+
+# Step 3: Show CLAUDE.md was updated
+Type ""
+Enter
+Type "# Step 3: CLAUDE.md now includes tool info"
+Enter
+Sleep 500ms
+Type "rg 'ripgrep' CLAUDE.md"
+Enter
+Sleep 2s
+
+# Step 4: Show the closed loop concept
+Type ""
+Enter
+Type "# The Closed Loop:"
+Enter
+Sleep 500ms
+Type "echo 'packages.nix → rebuild → CLAUDE.md → AI knows'"
+Enter
+Sleep 3s
+
+# Final message
+Type ""
+Enter
+Type "# Zero manual documentation. Zero drift."
+Enter
+Sleep 2s

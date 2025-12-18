@@ -16,10 +16,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `LICENSE` file (MIT) - previously only mentioned in README
+- `INSTALL.md` - comprehensive installation guide extracted from README
+- `CONTRIBUTING.md` - fork-friendly contribution guidelines
+- GitHub repository topics (16 tags for discoverability)
+- Demo GIF (`docs/assets/rebuild-demo.gif`) showing closed-loop workflow
+
+### Changed
+- README refactored from 445 → 189 lines for better scanability
+- Repository description updated for SEO
+- VHS demo script updated with real command examples
+
+### Documentation
+- Improved repository structure for GitHub discoverability
+- Added ecosystem table linking related repositories
+- Consolidated features into scannable tables
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
-- Improved documentation structure
 
 ---
 
