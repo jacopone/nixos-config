@@ -154,7 +154,7 @@ yazi                         # Terminal file manager
 | Guide | Description |
 |-------|-------------|
 | [INSTALL.md](INSTALL.md) | Full installation and setup |
-| [THE_CLOSED_LOOP.md](docs/THE_CLOSED_LOOP.md) | How auto-documentation works |
+| [THE_CLOSED_LOOP.md](docs/architecture/THE_CLOSED_LOOP.md) | How auto-documentation works |
 | [COMMON_TASKS.md](docs/guides/COMMON_TASKS.md) | Quick reference for daily use |
 | [enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md) | Modern CLI tools deep dive |
 
