@@ -55,9 +55,6 @@
       echo "  ✅ Commitizen (conventional commits)"
       echo "  ✅ Markdownlint (documentation quality)"
       echo "  ✅ Prettier (formatting)"
-      echo ""
-      echo "💡 Templates now available via ai-project-orchestration package"
-      echo "   Run: ai-init-greenfield or ai-init-brownfield"
     '';
 
     # Assess codebase quality
