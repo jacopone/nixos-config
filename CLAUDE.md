@@ -97,7 +97,7 @@
 
 ## System Status
 - **Git Status**: clean
-- **Last Updated**: 2025-12-21 17:34:28
+- **Last Updated**: 2025-12-22 17:00:20
 - **Fish Abbreviations**: 0
 - **Total System Tools**: 139
 
@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-21 17:34:37
+**Status**: 0/0 connected | Last checked: 2025-12-22 17:00:32
 
 No MCP servers configured.
 
@@ -141,11 +141,11 @@ No MCP servers configured.
 **Installed**: 145 tools | **Used**: 27 (19%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 345 uses (H:27 C:318)
-- **devenv**: 231 uses (H:16 C:215)
+- **git**: 495 uses (H:30 C:465)
+- **devenv**: 280 uses (H:17 C:263)
 - **gh**: 159 uses (H:6 C:153)
-- **fd**: 90 uses (H:0 C:90)
-- **eza**: 42 uses (H:0 C:42)
+- **fd**: 95 uses (H:0 C:95)
+- **eza**: 52 uses (H:0 C:52)
 
 ⚠️ **118 dormant tools** found (unused in last 30 days)
 

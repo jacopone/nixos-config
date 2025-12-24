@@ -1,16 +1,16 @@
 ---
 status: active
-created: 2025-12-21
-updated: 2025-12-21
+created: 2025-12-22
+updated: 2025-12-22
 type: reference
 lifecycle: persistent
 ---
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-12-21 17:34:38
+**Last Updated**: 2025-12-22 17:00:32
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 1,025
+**Total Commands Tracked**: 1,251
 
 ## Summary
 
@@ -25,56 +25,56 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **git**: 345 total
-   - Human: 27 (8%)
-   - Claude: 318 (92%)
+1. **git**: 495 total
+   - Human: 30 (6%)
+   - Claude: 465 (94%)
    - Scripts: 0
-   - Last used: 2025-12-21
-2. **devenv**: 231 total
-   - Human: 16 (7%)
-   - Claude: 215 (93%)
+   - Last used: 2025-12-22
+2. **devenv**: 280 total
+   - Human: 17 (6%)
+   - Claude: 263 (94%)
    - Scripts: 0
-   - Last used: 2025-12-21
+   - Last used: 2025-12-22
 3. **gh**: 159 total
    - Human: 6 (4%)
    - Claude: 153 (96%)
    - Scripts: 0
    - Last used: 2025-12-21
-4. **fd**: 90 total
+4. **fd**: 95 total
    - Human: 0 (0%)
-   - Claude: 90 (100%)
+   - Claude: 95 (100%)
    - Scripts: 0
-   - Last used: 2025-12-19
-5. **eza**: 42 total
+   - Last used: 2025-12-22
+5. **eza**: 52 total
    - Human: 0 (0%)
-   - Claude: 42 (100%)
+   - Claude: 52 (100%)
+   - Scripts: 0
+   - Last used: 2025-12-22
+6. **nix**: 30 total
+   - Human: 0 (0%)
+   - Claude: 30 (100%)
    - Scripts: 0
    - Last used: 2025-12-21
-6. **nix**: 29 total
+7. **nodejs_20**: 26 total
    - Human: 0 (0%)
-   - Claude: 29 (100%)
+   - Claude: 26 (100%)
    - Scripts: 0
    - Last used: 2025-12-21
-7. **nodejs_20**: 24 total
-   - Human: 0 (0%)
-   - Claude: 24 (100%)
-   - Scripts: 0
-   - Last used: 2025-12-15
 8. **rg**: 18 total
    - Human: 0 (0%)
    - Claude: 18 (100%)
    - Scripts: 0
    - Last used: 2025-12-18
-9. **cursor**: 15 total
+9. **xh**: 16 total
+   - Human: 0 (0%)
+   - Claude: 16 (100%)
+   - Scripts: 0
+   - Last used: 2025-12-22
+10. **cursor**: 15 total
    - Human: 2 (13%)
    - Claude: 13 (87%)
    - Scripts: 0
    - Last used: 2025-12-12
-10. **xh**: 13 total
-   - Human: 0 (0%)
-   - Claude: 13 (100%)
-   - Scripts: 0
-   - Last used: 2025-12-11
 11. **tokei**: 12 total
    - Human: 0 (0%)
    - Claude: 12 (100%)
@@ -95,15 +95,15 @@ lifecycle: persistent
    - Claude: 0 (0%)
    - Scripts: 0
    - Last used: 2025-11-27
-15. **gemini-cli**: 3 total
-   - Human: 3 (100%)
-   - Claude: 0 (0%)
+15. **file**: 6 total
+   - Human: 0 (0%)
+   - Claude: 6 (100%)
    - Scripts: 0
-   - Last used: 2025-11-28
+   - Last used: 2025-12-21
 
 ### Human-Preferred Tools (Top 15)
-1. **git**: 27 uses
-2. **devenv**: 16 uses
+1. **git**: 30 uses
+2. **devenv**: 17 uses
 3. **glow**: 7 uses
 4. **bmad-method**: 6 uses
 5. **gh**: 6 uses
@@ -113,21 +113,21 @@ lifecycle: persistent
 9. **google-chrome**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
-1. **git**: 318 uses
-2. **devenv**: 215 uses
+1. **git**: 465 uses
+2. **devenv**: 263 uses
 3. **gh**: 153 uses
-4. **fd**: 90 uses
-5. **eza**: 42 uses
-6. **nix**: 29 uses
-7. **nodejs_20**: 24 uses
+4. **fd**: 95 uses
+5. **eza**: 52 uses
+6. **nix**: 30 uses
+7. **nodejs_20**: 26 uses
 8. **rg**: 18 uses
-9. **xh**: 13 uses
+9. **xh**: 16 uses
 10. **cursor**: 13 uses
 11. **tokei**: 12 uses
 12. **python312Packages.lizard**: 11 uses
-13. **file**: 3 uses
-14. **bat**: 3 uses
-15. **uv**: 2 uses
+13. **file**: 6 uses
+14. **jq**: 4 uses
+15. **bat**: 3 uses
 
 ## Tool Inventory by Category
 
@@ -212,15 +212,15 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 232 in packages.nix
 
-**eza** - 42 uses- A modern replacement for ls
-- Human: 0 | Claude: 42 | Scripts: 0
-   - Last used: 2025-12-21
-   - Adoption score: 3.5 uses/day
+**eza** - 52 uses- A modern replacement for ls
+- Human: 0 | Claude: 52 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 4.0 uses/day
 
-**fd** - 90 uses- Modern find alternative
-- Human: 0 | Claude: 90 | Scripts: 0
-   - Last used: 2025-12-19
-   - Adoption score: 9.0 uses/day
+**fd** - 95 uses- Modern find alternative
+- Human: 0 | Claude: 95 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 7.3 uses/day
 
 **glow** - 7 uses- Markdown renderer
 - Human: 7 | Claude: 0 | Scripts: 0
@@ -297,10 +297,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 326 in packages.nix
 
-**file** - 3 uses- File type detection (essential for yazi)
-- Human: 0 | Claude: 3 | Scripts: 0
-   - Last used: 2025-12-18
-   - Adoption score: 0.4 uses/day
+**file** - 6 uses- File type detection (essential for yazi)
+- Human: 0 | Claude: 6 | Scripts: 0
+   - Last used: 2025-12-21
+   - Adoption score: 0.5 uses/day
 
 **file-roller** - 🔴 **DORMANT**- Archive manager for GNOME
 - ⚠️ Never used in last 30 days
@@ -489,10 +489,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 245 in packages.nix
 
-**devenv** - 231 uses- Fast, declarative development environments - instant service commands
-- Human: 16 | Claude: 215 | Scripts: 0
-   - Last used: 2025-12-21
-   - Adoption score: 8.9 uses/day
+**devenv** - 280 uses- Fast, declarative development environments - instant service commands
+- Human: 17 | Claude: 263 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 10.0 uses/day
 
 **direnv** - 🔴 **DORMANT**- Automatic per-directory environment activation - enables .envrc
 - ⚠️ Never used in last 30 days
@@ -518,10 +518,10 @@ lifecycle: persistent
    - Last used: 2025-12-21
    - Adoption score: 14.5 uses/day
 
-**git** - 345 uses- A free and open source distributed version control system
-- Human: 27 | Claude: 318 | Scripts: 0
-   - Last used: 2025-12-21
-   - Adoption score: 12.8 uses/day
+**git** - 495 uses- A free and open source distributed version control system
+- Human: 30 | Claude: 465 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 17.7 uses/day
 
 **gitui** - 🔴 **DORMANT**- Terminal git UI
 - ⚠️ Never used in last 30 days
@@ -559,10 +559,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 292 in packages.nix
 
-**jq** - 1 uses- JSON processor - essential for development
-- Human: 0 | Claude: 1 | Scripts: 0
-   - Last used: 2025-12-21
-   - Adoption score: 1.0 uses/day
+**jq** - 4 uses- JSON processor - essential for development
+- Human: 0 | Claude: 4 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 4.0 uses/day
 
 **jscpd** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 274 in packages.nix
@@ -605,22 +605,22 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 195 in packages.nix
 
-**nix** - 29 uses- Human: 0 | Claude: 29 | Scripts: 0
+**nix** - 30 uses- Human: 0 | Claude: 30 | Scripts: 0
    - Last used: 2025-12-21
-   - Adoption score: 2.4 uses/day
+   - Adoption score: 2.5 uses/day
 
 **nixpkgs-fmt** - 🔴 **DORMANT**- Nix code formatter (for pre-commit hooks)
 - ⚠️ Never used in last 30 days
    - Location: line 301 in packages.nix
 
-**nodejs_20** - 24 uses- Human: 0 | Claude: 24 | Scripts: 0
-   - Last used: 2025-12-15
-   - Adoption score: 4.0 uses/day
+**nodejs_20** - 26 uses- Human: 0 | Claude: 26 | Scripts: 0
+   - Last used: 2025-12-21
+   - Adoption score: 2.2 uses/day
 
-**nodejs_20** - 24 uses- Node.js 20.19.4 with npm - eliminates devenv activation overhead
-- Human: 0 | Claude: 24 | Scripts: 0
-   - Last used: 2025-12-15
-   - Adoption score: 4.0 uses/day
+**nodejs_20** - 26 uses- Node.js 20.19.4 with npm - eliminates devenv activation overhead
+- Human: 0 | Claude: 26 | Scripts: 0
+   - Last used: 2025-12-21
+   - Adoption score: 2.2 uses/day
 
 **onlyoffice-desktopeditors** - 🔴 **DORMANT**- Office suite with document, spreadsheet, presentation editing
 - ⚠️ Never used in last 30 days
@@ -727,10 +727,10 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 210 in packages.nix
 
-**xh** - 13 uses- Fast HTTPie alternative in Rust
-- Human: 0 | Claude: 13 | Scripts: 0
-   - Last used: 2025-12-11
-   - Adoption score: 13.0 uses/day
+**xh** - 16 uses- Fast HTTPie alternative in Rust
+- Human: 0 | Claude: 16 | Scripts: 0
+   - Last used: 2025-12-22
+   - Adoption score: 1.5 uses/day
 
 **yq-go** - 🔴 **DORMANT**- YAML/XML processor (like jq for YAML)
 - ⚠️ Never used in last 30 days
@@ -746,8 +746,8 @@ lifecycle: persistent
 ### Tools Both Use (Shared)
 
 4 tools used by both human and Claude:
-- **git**: H:27 C:318
-- **devenv**: H:16 C:215
+- **git**: H:30 C:465
+- **devenv**: H:17 C:263
 - **gh**: H:6 C:153
 - **cursor**: H:2 C:13
 
@@ -765,15 +765,16 @@ lifecycle: persistent
 ### Claude-Only Tools
 
 18 tools used only by Claude:
-- **fd**: 90 uses
-- **eza**: 42 uses
-- **nix**: 29 uses
-- **nodejs_20**: 24 uses
+- **fd**: 95 uses
+- **eza**: 52 uses
+- **nix**: 30 uses
+- **nodejs_20**: 26 uses
 - **rg**: 18 uses
-- **xh**: 13 uses
+- **xh**: 16 uses
 - **tokei**: 12 uses
 - **python312Packages.lizard**: 11 uses
-- **file**: 3 uses
+- **file**: 6 uses
+- **jq**: 4 uses
 - **bat**: 3 uses
 - **uv**: 2 uses
 - **procs**: 2 uses
@@ -782,7 +783,6 @@ lifecycle: persistent
 - **vhs**: 1 uses
 - **strace**: 1 uses
 - **pkg-config**: 1 uses
-- **jq**: 1 uses
 
 💡 **Insight**: AI-optimized tools working well for Claude's workflows.
 
@@ -1219,13 +1219,13 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: git
 
 **Type**: Highlight Value
-**Issue**: Highly used: 345 invocations (human: 27, Claude: 318)
+**Issue**: Highly used: 495 invocations (human: 30, Claude: 465)
 **Action**: Keep git - provides excellent value
 
 ### 💚 LOW PRIORITY: devenv
 
 **Type**: Highlight Value
-**Issue**: Highly used: 231 invocations (human: 16, Claude: 215)
+**Issue**: Highly used: 280 invocations (human: 17, Claude: 263)
 **Action**: Keep devenv - provides excellent value
 
 ### 💚 LOW PRIORITY: gh
@@ -1237,13 +1237,13 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: fd
 
 **Type**: Highlight Value
-**Issue**: Highly used: 90 invocations (human: 0, Claude: 90)
+**Issue**: Highly used: 95 invocations (human: 0, Claude: 95)
 **Action**: Keep fd - provides excellent value
 
 ### 💚 LOW PRIORITY: eza
 
 **Type**: Highlight Value
-**Issue**: Highly used: 42 invocations (human: 0, Claude: 42)
+**Issue**: Highly used: 52 invocations (human: 0, Claude: 52)
 **Action**: Keep eza - provides excellent value
 
 ### 💚 LOW PRIORITY: multiple
@@ -1255,11 +1255,11 @@ lifecycle: persistent
 
 ## Usage Trends by Category
 
-- **Other**: 820 invocations
-- **Modern Cli**: 162 invocations
+- **Other**: 1,028 invocations
+- **Modern Cli**: 177 invocations
 - **Ai Tools**: 24 invocations
 - **Fonts**: 11 invocations
-- **File Management**: 6 invocations
+- **File Management**: 9 invocations
 - **Productivity**: 1 invocations
 - **System Tools**: 1 invocations
 
@@ -1270,9 +1270,9 @@ lifecycle: persistent
 |------|-------------------|---------|--------|--------|
 | glow | 32 | 7 | -25 | ⚠️ Declining |
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
-| eza | 19 | 42 | +23 | ✅ Growing |
+| eza | 19 | 52 | +33 | ✅ Growing |
 | bat | 7 | 3 | -4 | ⚠️ Declining |
-| fd | 2 | 90 | +88 | ✅ Growing |
+| fd | 2 | 95 | +93 | ✅ Growing |
 | rg | 1 | 18 | +17 | ✅ Growing |
 | dust | 1 | 0 | -1 | ⚠️ Declining |
 
@@ -1280,7 +1280,7 @@ lifecycle: persistent
 
 ## Next Review
 
-**Scheduled**: 2026-01-20
+**Scheduled**: 2026-01-21
 
 **Action items for next review**:
 1. Check if dormant tools are still unused
