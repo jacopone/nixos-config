@@ -18,12 +18,6 @@
 - `nix flake check` - Validate configuration syntax
 - `nix develop` or `devenv shell` - Enter development environment
 
-### AI Orchestration
-- `./ai-orchestration/scripts/master-orchestrator.sh` - Master control system
-- `claude-flow` or `npx claude-flow@alpha` - Enterprise AI coordination
-- `ai filename.py` - Quick AI pair programming session
-- `aicode src/*.py` - Pre-configured Claude Sonnet session
-
 ### Modern CLI Tools (ALWAYS USE THESE)
 - `fd` instead of `find` - Fast file searching
 - `eza` instead of `ls` - Enhanced directory listing
@@ -40,9 +34,8 @@
 - `modules/core/packages.nix` - System-wide packages (139 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
-- `basb-system/` - Building a Second Brain knowledge management
-- `ai-orchestration/` - Multi-agent AI coordination system
-- `stack-management/` - Technology stack lifecycle management
+- `docs/` - Guides and references
+- `scripts/` - Automation scripts
 
 ## Development Conventions
 
@@ -68,9 +61,8 @@
 - Yazi file manager with rich previews
 - Starship prompt with visual git status
 - Auto-updating Claude Code tool intelligence
-- BASB knowledge management system
-- AI orchestration with CCPM integration
 - Chrome declarative extension management
+- Branch-based personal/public separation
 
 ## Do Not Touch
 - `/etc/nixos/` (use this repo instead)
@@ -81,7 +73,7 @@
 - System uses automated Claude Code optimization (updates tool knowledge automatically)
 - Fish shell context-aware commands (different behavior for interactive vs automated)
 - Chrome extensions managed declaratively via NixOS
-- BASB system integrated with Google Workspace + Sunsama + Readwise
+- Use `personal` branch for full config, `master` for public template
 
 ## Architecture Philosophy
 - **System-level tools**: Universal access for AI agents (139 tools in `packages.nix`)
