@@ -638,6 +638,17 @@ if dry_run_skip "run adaptive learning cycle (interactive ML analysis)"; then
 else
     AUTOMATION_DIR="$HOME/claude-nixos-automation"
     if [[ -d "$AUTOMATION_DIR" ]]; then
+        # STEP 0: Ensure Claude Code hooks are deployed to settings.json
+        # This ensures the permission_auto_learner hook runs during Claude sessions
+        log_step "  Ensuring Claude Code hooks are deployed..."
+        if [[ -f "$AUTOMATION_DIR/claude_automation/deployment/hook_deployer.py" ]]; then
+            if python3 "$AUTOMATION_DIR/claude_automation/deployment/hook_deployer.py" --deploy-to-settings 2>/dev/null; then
+                log_success "  Claude Code hooks verified/deployed"
+            else
+                log_warning "  Hook deployment check failed (continuing anyway)"
+            fi
+        fi
+
         # STEP 1: Update permission approval data from recent Claude Code sessions
         # This extracts tool usage from ~/.claude/projects/*/*.jsonl into the
         # learning system's permission_approvals.jsonl file.
