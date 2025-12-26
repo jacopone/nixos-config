@@ -1,14 +1,14 @@
 ---
 status: active
-created: 2025-12-24
-updated: 2025-12-24
+created: 2025-12-26
+updated: 2025-12-26
 type: reference
 lifecycle: persistent
 ---
 
 ## 🔌 MCP Server Status
 
-**Last Updated**: 2025-12-24 15:36:40
+**Last Updated**: 2025-12-26 20:57:45
 **Analysis Period**: 30 days
 
 ### Configured Servers (0)
@@ -22,195 +22,212 @@ No MCP servers configured.
 
 ### Usage Analytics
 
-**Total MCP invocations**: 2394
-**Total tokens consumed**: 15,321,544
-**Estimated total cost**: $129.2941
+**Total MCP invocations**: 2982
+**Total tokens consumed**: 18,217,689
+**Estimated total cost**: $159.4383
 
 #### playwright.browser_navigate (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 513
+- Invocations: 628
 - Success rate: 0.0%
-- Last used: 2025-12-24 14:02
+- Last used: 2025-12-26 19:47
 
 **Token Consumption:**
-- Total tokens: 4,192,840 (Input: 2,862, Output: 63,835)
-- Cache tokens: 47,879,351 reads, 4,126,143 writes
-- Avg tokens/invocation: 8173
+- Total tokens: 5,699,206 (Input: 3,750, Output: 75,688)
+- Cache tokens: 59,091,061 reads, 5,619,768 writes
+- Avg tokens/invocation: 9075
 
 **Cost Analysis:**
-- Estimated cost: $30.8030
-- ROI score: 0.12 invocations per 1K tokens
+- Estimated cost: $39.9480
+- ROI score: 0.11 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_click (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 718
+- Invocations: 888
 - Success rate: 0.0%
-- Last used: 2025-12-24 14:03
+- Last used: 2025-12-26 19:48
 
 **Token Consumption:**
-- Total tokens: 3,829,828 (Input: 4,496, Output: 79,746)
-- Cache tokens: 70,775,285 reads, 3,745,586 writes
-- Avg tokens/invocation: 5334
+- Total tokens: 4,373,294 (Input: 5,861, Output: 100,812)
+- Cache tokens: 88,627,121 reads, 4,266,621 writes
+- Avg tokens/invocation: 4925
 
 **Cost Analysis:**
-- Estimated cost: $36.4882
-- ROI score: 0.19 invocations per 1K tokens
+- Estimated cost: $44.1177
+- ROI score: 0.20 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_take_screenshot (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 209
+- Invocations: 264
 - Success rate: 0.0%
-- Last used: 2025-12-24 14:03
+- Last used: 2025-12-26 19:52
 
 **Token Consumption:**
-- Total tokens: 1,654,315 (Input: 1,291, Output: 26,829)
-- Cache tokens: 20,956,220 reads, 1,626,195 writes
-- Avg tokens/invocation: 7915
+- Total tokens: 1,817,293 (Input: 1,759, Output: 35,442)
+- Cache tokens: 26,958,557 reads, 1,780,092 writes
+- Avg tokens/invocation: 6884
 
 **Cost Analysis:**
-- Estimated cost: $12.7914
-- ROI score: 0.13 invocations per 1K tokens
+- Estimated cost: $15.2998
+- ROI score: 0.15 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_snapshot (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 212
+- Invocations: 265
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:56
+- Last used: 2025-12-26 19:23
 
 **Token Consumption:**
-- Total tokens: 1,308,410 (Input: 1,299, Output: 8,866)
-- Cache tokens: 17,450,384 reads, 1,298,245 writes
-- Avg tokens/invocation: 6172
+- Total tokens: 1,448,395 (Input: 1,720, Output: 11,258)
+- Cache tokens: 22,609,003 reads, 1,435,417 writes
+- Avg tokens/invocation: 5466
 
 **Cost Analysis:**
-- Estimated cost: $10.2404
-- ROI score: 0.16 invocations per 1K tokens
+- Estimated cost: $12.3395
+- ROI score: 0.18 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_evaluate (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 151
+- Invocations: 177
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:23
+- Last used: 2025-12-26 19:52
 
 **Token Consumption:**
-- Total tokens: 1,238,556 (Input: 714, Output: 46,092)
-- Cache tokens: 13,782,713 reads, 1,191,750 writes
-- Avg tokens/invocation: 8202
+- Total tokens: 1,433,275 (Input: 940, Output: 52,824)
+- Cache tokens: 16,636,350 reads, 1,379,511 writes
+- Avg tokens/invocation: 8098
 
 **Cost Analysis:**
-- Estimated cost: $9.2974
+- Estimated cost: $10.9593
 - ROI score: 0.12 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_wait_for (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 136
+- Invocations: 189
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:54
+- Last used: 2025-12-26 19:47
 
 **Token Consumption:**
-- Total tokens: 1,100,214 (Input: 954, Output: 8,131)
-- Cache tokens: 14,114,899 reads, 1,091,129 writes
-- Avg tokens/invocation: 8090
+- Total tokens: 1,219,157 (Input: 1,406, Output: 11,539)
+- Cache tokens: 19,917,808 reads, 1,206,212 writes
+- Avg tokens/invocation: 6451
 
 **Cost Analysis:**
-- Estimated cost: $8.4510
-- ROI score: 0.12 invocations per 1K tokens
+- Estimated cost: $10.6759
+- ROI score: 0.16 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_type (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 120
+- Invocations: 150
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:56
+- Last used: 2025-12-26 18:07
 
 **Token Consumption:**
-- Total tokens: 546,038 (Input: 693, Output: 17,979)
-- Cache tokens: 11,763,056 reads, 527,366 writes
-- Avg tokens/invocation: 4550
+- Total tokens: 661,281 (Input: 931, Output: 23,561)
+- Cache tokens: 14,934,028 reads, 636,789 writes
+- Avg tokens/invocation: 4409
 
 **Cost Analysis:**
-- Estimated cost: $5.7783
-- ROI score: 0.22 invocations per 1K tokens
+- Estimated cost: $7.2244
+- ROI score: 0.23 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_close (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 73
+- Invocations: 86
 - Success rate: 0.0%
-- Last used: 2025-12-24 14:03
+- Last used: 2025-12-26 19:06
 
 **Token Consumption:**
-- Total tokens: 456,641 (Input: 487, Output: 6,781)
-- Cache tokens: 7,862,362 reads, 449,373 writes
-- Avg tokens/invocation: 6255
+- Total tokens: 470,670 (Input: 587, Output: 8,207)
+- Cache tokens: 9,519,474 reads, 461,876 writes
+- Avg tokens/invocation: 5473
 
 **Cost Analysis:**
-- Estimated cost: $4.1470
-- ROI score: 0.16 invocations per 1K tokens
+- Estimated cost: $4.7127
+- ROI score: 0.18 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_run_code (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 44
+- Invocations: 64
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:28
+- Last used: 2025-12-26 19:40
 
 **Token Consumption:**
-- Total tokens: 268,789 (Input: 317, Output: 22,428)
-- Cache tokens: 4,355,807 reads, 246,044 writes
-- Avg tokens/invocation: 6109
+- Total tokens: 305,856 (Input: 490, Output: 28,892)
+- Cache tokens: 6,761,057 reads, 276,474 writes
+- Avg tokens/invocation: 4779
 
 **Cost Analysis:**
-- Estimated cost: $2.5668
-- ROI score: 0.16 invocations per 1K tokens
+- Estimated cost: $3.4999
+- ROI score: 0.21 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_network_requests (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 39
+- Invocations: 50
 - Success rate: 0.0%
-- Last used: 2025-12-24 13:51
+- Last used: 2025-12-26 17:10
 
 **Token Consumption:**
-- Total tokens: 176,649 (Input: 205, Output: 3,387)
-- Cache tokens: 3,494,533 reads, 173,057 writes
-- Avg tokens/invocation: 4529
+- Total tokens: 185,843 (Input: 297, Output: 3,703)
+- Cache tokens: 4,509,144 reads, 181,843 writes
+- Avg tokens/invocation: 3717
 
 **Cost Analysis:**
-- Estimated cost: $1.7487
-- ROI score: 0.22 invocations per 1K tokens
+- Estimated cost: $2.0911
+- ROI score: 0.27 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### plugin_context7_context7.get-library-docs (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 22
+- Invocations: 27
 - Success rate: 0.0%
-- Last used: 2025-12-24 11:12
+- Last used: 2025-12-24 17:32
 
 **Token Consumption:**
-- Total tokens: 133,556 (Input: 129, Output: 1,887)
-- Cache tokens: 1,652,159 reads, 131,540 writes
-- Avg tokens/invocation: 6071
+- Total tokens: 149,436 (Input: 428, Output: 2,275)
+- Cache tokens: 2,057,058 reads, 146,733 writes
+- Avg tokens/invocation: 5535
 
 **Cost Analysis:**
-- Estimated cost: $1.0176
-- ROI score: 0.16 invocations per 1K tokens
+- Estimated cost: $1.2028
+- ROI score: 0.18 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_console_messages (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 57
+- Success rate: 0.0%
+- Last used: 2025-12-26 17:09
+
+**Token Consumption:**
+- Total tokens: 143,986 (Input: 329, Output: 4,952)
+- Cache tokens: 5,630,009 reads, 138,705 writes
+- Avg tokens/invocation: 2526
+
+**Cost Analysis:**
+- Estimated cost: $2.2844
+- ROI score: 0.40 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_install (unknown scope)
@@ -230,55 +247,55 @@ No MCP servers configured.
 - ROI score: 0.24 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### playwright.browser_console_messages (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 39
-- Success rate: 0.0%
-- Last used: 2025-12-24 06:41
-
-**Token Consumption:**
-- Total tokens: 131,688 (Input: 184, Output: 3,660)
-- Cache tokens: 3,730,778 reads, 127,844 writes
-- Avg tokens/invocation: 3377
-
-**Cost Analysis:**
-- Estimated cost: $1.6541
-- ROI score: 0.30 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
-
 #### playwright.browser_press_key (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 31
+- Invocations: 34
 - Success rate: 0.0%
-- Last used: 2025-12-24 10:24
+- Last used: 2025-12-25 23:54
 
 **Token Consumption:**
-- Total tokens: 56,055 (Input: 204, Output: 2,216)
-- Cache tokens: 2,938,837 reads, 53,635 writes
-- Avg tokens/invocation: 1808
+- Total tokens: 60,578 (Input: 229, Output: 2,686)
+- Cache tokens: 3,299,584 reads, 57,663 writes
+- Avg tokens/invocation: 1782
 
 **Cost Analysis:**
-- Estimated cost: $1.1166
-- ROI score: 0.55 invocations per 1K tokens
+- Estimated cost: $1.2471
+- ROI score: 0.56 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### plugin_context7_context7.resolve-library-id (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 10
+- Invocations: 12
 - Success rate: 0.0%
-- Last used: 2025-12-24 10:57
+- Last used: 2025-12-24 17:32
 
 **Token Consumption:**
-- Total tokens: 20,494 (Input: 854, Output: 785)
-- Cache tokens: 684,796 reads, 18,855 writes
-- Avg tokens/invocation: 2049
+- Total tokens: 27,958 (Input: 863, Output: 791)
+- Cache tokens: 816,492 reads, 26,304 writes
+- Avg tokens/invocation: 2330
 
 **Cost Analysis:**
-- Estimated cost: $0.2905
-- ROI score: 0.49 invocations per 1K tokens
+- Estimated cost: $0.3580
+- ROI score: 0.43 invocations per 1K tokens
+- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_tabs (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 15
+- Success rate: 0.0%
+- Last used: 2025-12-26 17:13
+
+**Token Consumption:**
+- Total tokens: 19,998 (Input: 119, Output: 1,201)
+- Cache tokens: 1,437,744 reads, 18,678 writes
+- Avg tokens/invocation: 1333
+
+**Cost Analysis:**
+- Estimated cost: $0.5197
+- ROI score: 0.75 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
 #### playwright.browser_fill_form (unknown scope)
@@ -315,22 +332,6 @@ No MCP servers configured.
 - ROI score: 0.23 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### playwright.browser_tabs (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 12
-- Success rate: 0.0%
-- Last used: 2025-12-23 17:18
-
-**Token Consumption:**
-- Total tokens: 9,765 (Input: 93, Output: 821)
-- Cache tokens: 1,118,568 reads, 8,851 writes
-- Avg tokens/invocation: 814
-
-**Cost Analysis:**
-- Estimated cost: $0.3814
-- ROI score: 1.23 invocations per 1K tokens
-
 #### playwright.browser_navigate_back (unknown scope)
 
 **Usage Metrics:**
@@ -347,6 +348,22 @@ No MCP servers configured.
 - Estimated cost: $0.0962
 - ROI score: 0.22 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
+
+#### playwright.browser_handle_dialog (unknown scope)
+
+**Usage Metrics:**
+- Invocations: 16
+- Success rate: 0.0%
+- Last used: 2025-12-26 18:04
+
+**Token Consumption:**
+- Total tokens: 8,508 (Input: 135, Output: 651)
+- Cache tokens: 1,869,847 reads, 7,722 writes
+- Avg tokens/invocation: 532
+
+**Cost Analysis:**
+- Estimated cost: $0.6001
+- ROI score: 1.88 invocations per 1K tokens
 
 #### network-monitor.start_monitor (unknown scope)
 
@@ -382,22 +399,6 @@ No MCP servers configured.
 - ROI score: 0.32 invocations per 1K tokens
 - ⚠️  **Low efficiency** - Consider reviewing usage patterns
 
-#### playwright.browser_handle_dialog (unknown scope)
-
-**Usage Metrics:**
-- Invocations: 7
-- Success rate: 0.0%
-- Last used: 2025-12-23 17:45
-
-**Token Consumption:**
-- Total tokens: 5,635 (Input: 60, Output: 197)
-- Cache tokens: 762,305 reads, 5,378 writes
-- Avg tokens/invocation: 805
-
-**Cost Analysis:**
-- Estimated cost: $0.2520
-- ROI score: 1.24 invocations per 1K tokens
-
 #### playwright.browser_select_option (unknown scope)
 
 **Usage Metrics:**
@@ -417,19 +418,18 @@ No MCP servers configured.
 #### playwright.browser_file_upload (unknown scope)
 
 **Usage Metrics:**
-- Invocations: 2
+- Invocations: 4
 - Success rate: 0.0%
-- Last used: 2025-12-24 00:46
+- Last used: 2025-12-26 18:06
 
 **Token Consumption:**
-- Total tokens: 3,108 (Input: 16, Output: 235)
-- Cache tokens: 218,519 reads, 2,857 writes
-- Avg tokens/invocation: 1554
+- Total tokens: 3,992 (Input: 30, Output: 424)
+- Cache tokens: 494,167 reads, 3,538 writes
+- Avg tokens/invocation: 998
 
 **Cost Analysis:**
-- Estimated cost: $0.0798
-- ROI score: 0.64 invocations per 1K tokens
-- ⚠️  **Low efficiency** - Consider reviewing usage patterns
+- Estimated cost: $0.1680
+- ROI score: 1.00 invocations per 1K tokens
 
 
 ### Session Utilization
@@ -439,7 +439,7 @@ No session utilization data available. Enable session tracking to see server eff
 ### Recommendations
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 513 invocations for 4,192,840 tokens (est. $30.8030)
+   - **Issue**: Server 'playwright' has low ROI: 628 invocations for 5,699,206 tokens (est. $39.9480)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
@@ -447,43 +447,47 @@ No session utilization data available. Enable session tracking to see server eff
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 212 invocations for 1,308,410 tokens (est. $10.2404)
+   - **Issue**: Server 'playwright' has low ROI: 265 invocations for 1,448,395 tokens (est. $12.3395)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 718 invocations for 3,829,828 tokens (est. $36.4882)
+   - **Issue**: Server 'playwright' has low ROI: 888 invocations for 4,373,294 tokens (est. $44.1177)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 31 invocations for 56,055 tokens (est. $1.1166)
+   - **Issue**: Server 'playwright' has low ROI: 34 invocations for 60,578 tokens (est. $1.2471)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 136 invocations for 1,100,214 tokens (est. $8.4510)
+   - **Issue**: Server 'playwright' has low ROI: 189 invocations for 1,219,157 tokens (est. $10.6759)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 44 invocations for 268,789 tokens (est. $2.5668)
+   - **Issue**: Server 'playwright' has low ROI: 15 invocations for 19,998 tokens (est. $0.5197)
+   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
+
+**MEDIUM**: playwright
+   - **Issue**: Server 'playwright' has low ROI: 64 invocations for 305,856 tokens (est. $3.4999)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: plugin_context7_context7
-   - **Issue**: Server 'plugin_context7_context7' has low ROI: 10 invocations for 20,494 tokens (est. $0.2905)
+   - **Issue**: Server 'plugin_context7_context7' has low ROI: 12 invocations for 27,958 tokens (est. $0.3580)
    - **Action**: Review usage patterns. Consider if 'plugin_context7_context7' is cost-effective (unknown scope)
 
 **MEDIUM**: plugin_context7_context7
-   - **Issue**: Server 'plugin_context7_context7' has low ROI: 22 invocations for 133,556 tokens (est. $1.0176)
+   - **Issue**: Server 'plugin_context7_context7' has low ROI: 27 invocations for 149,436 tokens (est. $1.2028)
    - **Action**: Review usage patterns. Consider if 'plugin_context7_context7' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 151 invocations for 1,238,556 tokens (est. $9.2974)
+   - **Issue**: Server 'playwright' has low ROI: 177 invocations for 1,433,275 tokens (est. $10.9593)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 73 invocations for 456,641 tokens (est. $4.1470)
+   - **Issue**: Server 'playwright' has low ROI: 86 invocations for 470,670 tokens (est. $4.7127)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 120 invocations for 546,038 tokens (est. $5.7783)
+   - **Issue**: Server 'playwright' has low ROI: 150 invocations for 661,281 tokens (est. $7.2244)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: network-monitor
@@ -495,19 +499,15 @@ No session utilization data available. Enable session tracking to see server eff
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 209 invocations for 1,654,315 tokens (est. $12.7914)
+   - **Issue**: Server 'playwright' has low ROI: 264 invocations for 1,817,293 tokens (est. $15.2998)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 2 invocations for 3,108 tokens (est. $0.0798)
+   - **Issue**: Server 'playwright' has low ROI: 57 invocations for 143,986 tokens (est. $2.2844)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 39 invocations for 131,688 tokens (est. $1.6541)
-   - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
-
-**MEDIUM**: playwright
-   - **Issue**: Server 'playwright' has low ROI: 39 invocations for 176,649 tokens (est. $1.7487)
+   - **Issue**: Server 'playwright' has low ROI: 50 invocations for 185,843 tokens (est. $2.0911)
    - **Action**: Review usage patterns. Consider if 'playwright' is cost-effective (unknown scope)
 
 **MEDIUM**: playwright
@@ -527,56 +527,56 @@ No session utilization data available. Enable session tracking to see server eff
    - **Action**: Consider installing '@modelcontextprotocol/server-sequential-thinking' for improved reasoning
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 4,192,840 tokens (est. $30.80)
-   - **Action**: Frequent user: 513 calls, ~8,173 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 5,699,206 tokens (est. $39.95)
+   - **Action**: Frequent user: 628 calls, ~9,075 tokens/call (unknown scope)
 
 **LOW**: playwright
    - **Issue**: Server 'playwright' consumed 133,362 tokens (est. $1.35)
    - **Action**: Frequent user: 32 calls, ~4,167 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 1,308,410 tokens (est. $10.24)
-   - **Action**: Frequent user: 212 calls, ~6,171 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 1,448,395 tokens (est. $12.34)
+   - **Action**: Frequent user: 265 calls, ~5,465 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 3,829,828 tokens (est. $36.49)
-   - **Action**: Frequent user: 718 calls, ~5,334 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 4,373,294 tokens (est. $44.12)
+   - **Action**: Frequent user: 888 calls, ~4,924 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 1,100,214 tokens (est. $8.45)
-   - **Action**: Frequent user: 136 calls, ~8,089 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 1,219,157 tokens (est. $10.68)
+   - **Action**: Frequent user: 189 calls, ~6,450 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 268,789 tokens (est. $2.57)
-   - **Action**: Frequent user: 44 calls, ~6,108 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 305,856 tokens (est. $3.50)
+   - **Action**: Frequent user: 64 calls, ~4,779 tokens/call (unknown scope)
 
 **LOW**: plugin_context7_context7
-   - **Issue**: Server 'plugin_context7_context7' consumed 133,556 tokens (est. $1.02)
-   - **Action**: Frequent user: 22 calls, ~6,070 tokens/call (unknown scope)
+   - **Issue**: Server 'plugin_context7_context7' consumed 149,436 tokens (est. $1.20)
+   - **Action**: Frequent user: 27 calls, ~5,534 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 1,238,556 tokens (est. $9.30)
-   - **Action**: Frequent user: 151 calls, ~8,202 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 1,433,275 tokens (est. $10.96)
+   - **Action**: Frequent user: 177 calls, ~8,097 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 456,641 tokens (est. $4.15)
-   - **Action**: Frequent user: 73 calls, ~6,255 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 470,670 tokens (est. $4.71)
+   - **Action**: Frequent user: 86 calls, ~5,472 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 546,038 tokens (est. $5.78)
-   - **Action**: Frequent user: 120 calls, ~4,550 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 661,281 tokens (est. $7.22)
+   - **Action**: Frequent user: 150 calls, ~4,408 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 1,654,315 tokens (est. $12.79)
-   - **Action**: Frequent user: 209 calls, ~7,915 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 1,817,293 tokens (est. $15.30)
+   - **Action**: Frequent user: 264 calls, ~6,883 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 131,688 tokens (est. $1.65)
-   - **Action**: Frequent user: 39 calls, ~3,376 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 143,986 tokens (est. $2.28)
+   - **Action**: Frequent user: 57 calls, ~2,526 tokens/call (unknown scope)
 
 **LOW**: playwright
-   - **Issue**: Server 'playwright' consumed 176,649 tokens (est. $1.75)
-   - **Action**: Frequent user: 39 calls, ~4,529 tokens/call (unknown scope)
+   - **Issue**: Server 'playwright' consumed 185,843 tokens (est. $2.09)
+   - **Action**: Frequent user: 50 calls, ~3,716 tokens/call (unknown scope)
 
 
 ---

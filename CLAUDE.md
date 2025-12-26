@@ -18,6 +18,12 @@
 - `nix flake check` - Validate configuration syntax
 - `nix develop` or `devenv shell` - Enter development environment
 
+### AI Orchestration
+- `./ai-orchestration/scripts/master-orchestrator.sh` - Master control system
+- `claude-flow` or `npx claude-flow@alpha` - Enterprise AI coordination
+- `ai filename.py` - Quick AI pair programming session
+- `aicode src/*.py` - Pre-configured Claude Sonnet session
+
 ### Modern CLI Tools (ALWAYS USE THESE)
 - `fd` instead of `find` - Fast file searching
 - `eza` instead of `ls` - Enhanced directory listing
@@ -31,11 +37,12 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (139 tools)
+- `modules/core/packages.nix` - System-wide packages (136 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
-- `docs/` - Guides and references
-- `scripts/` - Automation scripts
+- `basb-system/` - Building a Second Brain knowledge management
+- `ai-orchestration/` - Multi-agent AI coordination system
+- `stack-management/` - Technology stack lifecycle management
 
 ## Development Conventions
 
@@ -61,8 +68,9 @@
 - Yazi file manager with rich previews
 - Starship prompt with visual git status
 - Auto-updating Claude Code tool intelligence
+- BASB knowledge management system
+- AI orchestration with CCPM integration
 - Chrome declarative extension management
-- Branch-based personal/public separation
 
 ## Do Not Touch
 - `/etc/nixos/` (use this repo instead)
@@ -73,10 +81,10 @@
 - System uses automated Claude Code optimization (updates tool knowledge automatically)
 - Fish shell context-aware commands (different behavior for interactive vs automated)
 - Chrome extensions managed declaratively via NixOS
-- Use `personal` branch for full config, `master` for public template
+- BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (139 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (136 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -88,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: clean
-- **Last Updated**: 2025-12-24 15:36:18
+- **Git Status**: 4M 0A 0U
+- **Last Updated**: 2025-12-26 20:57:23
 - **Fish Abbreviations**: 0
-- **Total System Tools**: 139
+- **Total System Tools**: 136
 
 ---
 *Auto-updated by ./rebuild-nixos script*
@@ -120,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-24 15:36:40
+**Status**: 0/0 connected | Last checked: 2025-12-26 20:57:45
 
 No MCP servers configured.
 
@@ -130,16 +138,16 @@ No MCP servers configured.
 
 ## 📦 System Tool Usage
 
-**Installed**: 145 tools | **Used**: 31 (21%) | **Analysis period**: 30 days
+**Installed**: 143 tools | **Used**: 31 (22%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 617 uses (H:34 C:583)
-- **devenv**: 346 uses (H:9 C:337)
-- **gh**: 161 uses (H:6 C:155)
-- **fd**: 129 uses (H:0 C:129)
-- **eza**: 74 uses (H:0 C:74)
+- **git**: 798 uses (H:31 C:767)
+- **devenv**: 363 uses (H:7 C:356)
+- **gh**: 192 uses (H:6 C:186)
+- **fd**: 137 uses (H:0 C:137)
+- **eza**: 81 uses (H:0 C:81)
 
-⚠️ **114 dormant tools** found (unused in last 30 days)
+⚠️ **112 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
 - 11 tools used by humans
