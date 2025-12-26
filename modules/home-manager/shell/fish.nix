@@ -478,19 +478,8 @@
     '';
 
     # Fish abbreviations (persistent across sessions)
-    shellAbbrs = {
-      # Readwise BASB Integration
-      rwsetup = "~/nixos-config/basb-system/scripts/readwise-basb setup";
-      rwdaily = "~/nixos-config/basb-system/scripts/readwise-basb daily";
-      rwtag = "~/nixos-config/basb-system/scripts/readwise-basb tag";
-      rwstats = "~/nixos-config/basb-system/scripts/readwise-basb stats";
-      rwtfp = "~/nixos-config/basb-system/scripts/readwise-basb stats --tfp";
-      rwweekly = "~/nixos-config/basb-system/scripts/readwise-basb stats --weekly";
-
-      # Chrome Bookmarks Review
-      rwchrome = "~/nixos-config/basb-system/scripts/readwise-basb chrome";
-      rwcstats = "~/nixos-config/basb-system/scripts/readwise-basb chrome --stats";
-    };
+    # Note: basb-system abbreviations removed (scripts don't exist yet)
+    shellAbbrs = { };
 
     # Fish completions and integrations
     plugins = [

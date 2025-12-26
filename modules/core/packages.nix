@@ -124,15 +124,8 @@
 
       # Main execution
       if ! check_installation; then
-        echo "🔍 Droid is not installed."
-        read -p "Would you like to install it now? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          install_droid
-        else
-          echo "Installation cancelled. Run 'droid' again when you're ready to install."
-          exit 0
-        fi
+        echo "🔍 Droid is not installed. Installing automatically..."
+        install_droid
       fi
 
       # Ensure environment is properly set

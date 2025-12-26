@@ -32,6 +32,44 @@ Is this actually novel, or am I rediscovering known patterns? What could profess
 
 ---
 
+## 🔬 Related Work & Ecosystem (Research: 2025-12-26)
+
+**Others are exploring this space!** Here's what exists and how we differ:
+
+### Active Projects
+
+| Project | What It Does | Our Differentiation |
+|---------|--------------|---------------------|
+| [**mcp-nixos**](https://github.com/utensils/mcp-nixos) | MCP server providing real-time NixOS data to AI (130K+ packages) | They provide data; we provide governance |
+| [**nixai**](https://discourse.nixos.org/t/introducing-nixai-your-ai-powered-nixos-companion/65168) | AI assistant specifically for NixOS (local-first, Ollama) | General assistant; we're system-integrated |
+| [**numtide/llm-agents.nix**](https://github.com/numtide/llm-agents.nix) | Packages 40+ AI agents with daily updates | Package distribution; we're workflow integration |
+| [**Nixified.ai**](https://nixified.ai/) | One-command AI/ML environments | ML workloads; we're dev tooling |
+
+### Key Insight from mcp-nixos (Skywork deep dive)
+
+> "We don't need smarter AI; we need better information flow."
+
+Their solution: Real-time grounding in authoritative sources.
+Our extension: **Policy-driven governance** on top of grounded data.
+
+### What Makes Our Approach Unique
+
+| Feature | Others | Us |
+|---------|--------|-----|
+| Real-time NixOS data | ✅ mcp-nixos | ✅ via packages.nix parsing |
+| **Policy governance** | ❌ | ✅ CLAUDE-USER-POLICIES.md |
+| **Self-documenting** | ❌ | ✅ auto-generated CLAUDE.md |
+| **Hook enforcement** | ❌ | ✅ modern CLI enforcer |
+| **Native CLI preference** | N/A | ✅ gh over MCP wrappers |
+
+### Prepared Response for "Isn't this just mcp-nixos?"
+
+> "mcp-nixos solves the hallucination problem by grounding AI in real-time data. Our setup extends this with policy governance - CLAUDE-USER-POLICIES.md defines *how* Claude should behave, not just *what* it knows. mcp-nixos is a data source; ours is a governance framework."
+
+**Full research compilation:** [AI_NIXOS_ECOSYSTEM_RESEARCH.md](AI_NIXOS_ECOSYSTEM_RESEARCH.md)
+
+---
+
 ## 📖 The 6-Month Journey: Single File → AI-Native Ecosystem
 
 **What started as a basic `configuration.nix` became a complete development ecosystem, built entirely through collaboration with Claude Code, Cursor, and Gemini.**

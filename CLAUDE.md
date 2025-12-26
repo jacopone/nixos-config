@@ -97,7 +97,7 @@
 
 ## System Status
 - **Git Status**: clean
-- **Last Updated**: 2025-12-22 17:00:20
+- **Last Updated**: 2025-12-24 15:36:18
 - **Fish Abbreviations**: 0
 - **Total System Tools**: 139
 
@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-22 17:00:32
+**Status**: 0/0 connected | Last checked: 2025-12-24 15:36:40
 
 No MCP servers configured.
 
@@ -138,20 +138,20 @@ No MCP servers configured.
 
 ## 📦 System Tool Usage
 
-**Installed**: 145 tools | **Used**: 27 (19%) | **Analysis period**: 30 days
+**Installed**: 145 tools | **Used**: 31 (21%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 495 uses (H:30 C:465)
-- **devenv**: 280 uses (H:17 C:263)
-- **gh**: 159 uses (H:6 C:153)
-- **fd**: 95 uses (H:0 C:95)
-- **eza**: 52 uses (H:0 C:52)
+- **git**: 617 uses (H:34 C:583)
+- **devenv**: 346 uses (H:9 C:337)
+- **gh**: 161 uses (H:6 C:155)
+- **fd**: 129 uses (H:0 C:129)
+- **eza**: 74 uses (H:0 C:74)
 
-⚠️ **118 dormant tools** found (unused in last 30 days)
+⚠️ **114 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
-- 9 tools used by humans
-- 22 tools used by Claude
+- 11 tools used by humans
+- 25 tools used by Claude
 
 ---
 *Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*

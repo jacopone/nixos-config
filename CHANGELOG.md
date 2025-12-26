@@ -46,6 +46,85 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Archived draft automation docs (MCP, N8N, Google Drive)
 - Fixed broken link to non-existent `CORE_THESIS.md`
 
+### Added
+- add command tracking system to home-manager
+- integrate automation updates and add transparency to rebuild-nixos
+- re-enable pymupdf4llm and improve automation transparency
+  (Test: `which pymupdf4llm` or `pymupdf4llm --version`)
+- enhance rebuild-nixos with MCP session utilization display
+- show global vs project-level MCP server breakdown in rebuild
+- show project-level MCP server locations in rebuild
+- optimize MCP scope, add AI tools, integrate adaptive learning
+  (Test: `which AI` or `AI --version`)
+- integrate intelligent data lifecycle management into rebuild-nixos
+  (Test: `which integrate` or `integrate --version`)
+- use local flake for all automation commands in rebuild-nixos
+- add opencode AI agent and improve rebuild-nixos error handling
+  (Test: `which opencode` or `opencode --version`)
+- add tool usage analytics and fix rebuild-nixos stat extraction
+- Update cursor-nix with Chrome browser automation support
+- add NordVPN support via wgnord WireGuard client
+  (Test: `which NordVPN` or `NordVPN --version`)
+- add Google Antigravity IDE and enhance document processing
+  (Test: `which Google` or `Google --version`)
+- add Google Antigravity IDE with FHS environment
+- enable ADB for Android development
+  (Test: Connect Android device, run `adb devices`)
+- add wl-clipboard and kooha, simplify fish config
+  (Test: Launch from application menu, verify recording works)
+- add changelog generation workflow to rebuild-nixos
+
+### Changed
+- consolidate Python invocations in session lifecycle (600ms speedup) (performance improvement)
+- modularize home-manager config & security fixes (restructured)
+- add Claude Code configuration analysis and update system state
+- major code quality improvements - portability, security, and organization (restructured)
+- install pre-commit hooks and apply code quality fixes
+- add openspec tool and simplify rebuild script
+- add OnlyOffice and improve rebuild GC output
+
+### Fixed
+- add complete YAML frontmatter to slash command files
+  (Test: Verify the previous issue is resolved)
+- handle grep -c exit code in warning count extraction
+  (Test: Verify the previous issue is resolved)
+- parse MCP stats from .claude/mcp-analytics.md instead of CLAUDE.md
+  (Test: Verify the previous issue is resolved)
+- extract system tools stats from CLAUDE.md instead of automation logs
+  (Test: Verify the previous issue is resolved)
+- handle grep -c exit code in server count extraction
+  (Test: Verify the previous issue is resolved)
+- remove timeout from adaptive learning cycle for interactive mode
+  (Test: Verify the previous issue is resolved)
+- use local flake for check-data-health instead of GitHub
+  (Test: Verify the previous issue is resolved)
+- improve MCP statistics display and lifecycle warning accuracy
+  (Test: Verify the previous issue is resolved)
+- resolve Fish variable expansion in GitHub workflow functions
+  (Test: Verify the previous issue is resolved)
+- add smart flake update logic to prevent stale cache issues
+  (Test: Verify the previous issue is resolved)
+- resolve pre-commit NixOS compatibility issue
+  (Test: Verify the previous issue is resolved)
+- resolve nix flake check failure in GitHub Actions
+  (Test: Verify the previous issue is resolved)
+- replace deprecated pkgs.system with pkgs.stdenv.hostPlatform.system
+  (Test: Verify the previous issue is resolved)
+- resolve antigravity-nix narHash mismatch in rebuild script
+  (Test: Verify the previous issue is resolved)
+- update script paths for claude-nixos-automation refactor
+  (Test: Verify the previous issue is resolved)
+- use nix run for health check in rebuild script
+  (Test: Verify the previous issue is resolved)
+- use nix run for tool analytics invocation
+  (Test: Verify the previous issue is resolved)
+- skip path inputs in update-dependencies workflow
+  (Test: Verify the previous issue is resolved)
+- convert path inputs to GitHub URLs for CI compatibility
+  (Test: Verify the previous issue is resolved)
+- correct broken THE_CLOSED_LOOP.md link in README
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

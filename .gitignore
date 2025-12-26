@@ -51,6 +51,11 @@ docs/automation/claude-backup-legacy.md
 .claude.json
 .mcp.json
 
+# Auto-generated analytics (regenerated on each rebuild)
+.claude/mcp-analytics.md
+.claude/tool-analytics.md
+.claude/settings.local.json
+
 # Data and model files
 data/models/**/*.bin
 data/models/**/*.ggml
