@@ -180,6 +180,38 @@ nixos-config/
 └── CLAUDE.md                      # Auto-generated AI context
 ```
 
+## Branch Strategy
+
+This repo uses a two-branch workflow to separate public template from personal config:
+
+| Branch | Purpose | Use Case |
+|--------|---------|----------|
+| `master` | Public template | Fork this for your own setup |
+| `personal` | Full config with personal files | Maintainer's working branch |
+
+### For Users (Forking)
+
+```bash
+# Fork and clone master - it's a clean template
+git clone https://github.com/YOUR_USERNAME/nixos-config.git
+```
+
+### For Maintainers (Adding Personal Files)
+
+```bash
+# Create your own personal branch
+git checkout -b personal
+
+# Add personal configs (gitignored from master)
+mkdir basb-system/        # Knowledge management
+mkdir stack-management/   # Subscriptions, tools
+
+# Sync when master updates
+./scripts/sync-branches.sh
+```
+
+The included GitHub Action automatically syncs `master` → `personal` on every push.
+
 ## Contributing
 
 This is a personal configuration shared for learning and inspiration.
