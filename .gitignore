@@ -1,6 +1,12 @@
+# Personal files (keep in 'personal' branch only - not in master)
+# These are gitignored to prevent accidental commits to master
+basb-system/
+stack-management/
+PERSONAL_USE_PRIORITIES.md
+.serena/
+
 # BASB (Building a Second Brain) - Keep books/PDFs local only
 *.pdf
-basb-system/*.pdf
 
 # Temporary files
 *.tmp
