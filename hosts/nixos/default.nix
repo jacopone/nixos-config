@@ -173,7 +173,7 @@
       WIFI_PWR_ON_BAT = "on";
     };
   };
-  services.thermald.enable = true; # Intel thermal management
+  # Note: thermald not needed - ThinkPad DYTC handles thermal management via thinkpad_acpi
   services.power-profiles-daemon.enable = false; # Conflicts with TLP
 
   # NixOS Services (replaces manual package management)
