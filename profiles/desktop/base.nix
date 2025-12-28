@@ -25,12 +25,33 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
 
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
+    # WirePlumber bluetooth configuration (fixes GNOME crashes on BT audio connect/disconnect)
+    wireplumber = {
+      enable = true;
+      extraConfig = {
+        "10-bluez" = {
+          "monitor.bluez.properties" = {
+            "bluez5.enable-hw-volume" = true;
+            "bluez5.headset-roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+            "bluez5.default.rate" = 48000;
+            "bluez5.default.channels" = 2;
+          };
+        };
+      };
+    };
+  };
+
+  # Bluetooth support (explicit config for stable audio device handling)
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        FastConnectable = true;
+        Experimental = true; # Battery reporting for BT devices
+      };
+    };
   };
 
   fonts.packages = [
