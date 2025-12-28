@@ -32,9 +32,9 @@
 
   # Intel GPU stability and power management
   boot.kernelParams = [
-    "i915.enable_dc=2" # Enable display power states
+    "i915.enable_dc=1" # Less aggressive display power states (was 2, caused video crashes)
     "i915.fastboot=1" # Faster recovery from GPU issues
-    "i915.enable_fbc=1" # Frame buffer compression (power saving)
+    "i915.enable_psr=0" # Disable Panel Self Refresh (fixes YouTube/video playback crashes)
   ];
   services.udev.extraRules = ''
     KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"
