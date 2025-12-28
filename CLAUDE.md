@@ -96,8 +96,8 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 4M 0A 0U
-- **Last Updated**: 2025-12-26 20:57:23
+- **Git Status**: 8M 0A 0U
+- **Last Updated**: 2025-12-28 09:29:21
 - **Fish Abbreviations**: 0
 - **Total System Tools**: 136
 
@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-26 20:57:45
+**Status**: 0/0 connected | Last checked: 2025-12-28 09:29:34
 
 No MCP servers configured.
 
@@ -138,19 +138,19 @@ No MCP servers configured.
 
 ## 📦 System Tool Usage
 
-**Installed**: 143 tools | **Used**: 31 (22%) | **Analysis period**: 30 days
+**Installed**: 143 tools | **Used**: 30 (21%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 798 uses (H:31 C:767)
-- **devenv**: 363 uses (H:7 C:356)
-- **gh**: 192 uses (H:6 C:186)
-- **fd**: 137 uses (H:0 C:137)
-- **eza**: 81 uses (H:0 C:81)
+- **git**: 891 uses (H:28 C:863)
+- **devenv**: 369 uses (H:7 C:362)
+- **gh**: 200 uses (H:6 C:194)
+- **fd**: 139 uses (H:0 C:139)
+- **eza**: 85 uses (H:0 C:85)
 
-⚠️ **112 dormant tools** found (unused in last 30 days)
+⚠️ **113 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
-- 11 tools used by humans
+- 10 tools used by humans
 - 25 tools used by Claude
 
 ---

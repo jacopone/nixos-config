@@ -1,7 +1,7 @@
 # Auto-Generated Permissions Update
 
-**Generated**: 2025-12-26 21:07:16
-**Rules Added**: 1
+**Generated**: 2025-12-27 09:23:44
+**Rules Added**: 4
 
 ## What Happened
 
@@ -13,11 +13,23 @@ high-confidence permission patterns that will reduce future prompts.
 ### Allow File write/edit operations
 
 **Confidence**: 95.3%
-**Occurrences**: 518
+**Occurrences**: 498
 **Impact**: Low impact: ~5% fewer prompts
 
 **Permissions added**:
 - `file_write_operations`
+
+### Allow File read operations
+
+**Confidence**: 95.2%
+**Occurrences**: 1717
+**Impact**: Low impact: ~18% fewer prompts
+
+**Permissions added**:
+- `Read(/**)`
+- `Write(/**)`
+- `Edit(/**)`
+- `Glob(**)`
 
 ---
 

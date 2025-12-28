@@ -61,6 +61,7 @@ docs/automation/claude-backup-legacy.md
 .claude/mcp-analytics.md
 .claude/tool-analytics.md
 .claude/settings.local.json
+.claude/.changelog-last-processed
 
 # Data and model files
 data/models/**/*.bin

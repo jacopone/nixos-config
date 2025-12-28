@@ -539,15 +539,32 @@ log_step "Checking for changelog updates..."
 if dry_run_skip "generate changelog draft from recent commits"; then
     : # skip
 else
-    # Get last changelog date from CHANGELOG.md
-    LAST_CHANGELOG_DATE=$(grep -oP '^\#\# \[\d{4}-\d{2}-\d{2}\]' CHANGELOG.md 2>/dev/null | head -1 | grep -oP '\d{4}-\d{2}-\d{2}' || echo "")
+    # Track last processed commit to avoid re-proposing same changes
+    CHANGELOG_STATE_FILE=".claude/.changelog-last-processed"
+    LAST_PROCESSED_COMMIT=""
 
-    if [ -n "$LAST_CHANGELOG_DATE" ]; then
-        # Count commits since last update
-        NEW_COMMITS=$(git log --since="$LAST_CHANGELOG_DATE" --oneline 2>/dev/null | wc -l)
+    if [ -f "$CHANGELOG_STATE_FILE" ]; then
+        LAST_PROCESSED_COMMIT=$(cat "$CHANGELOG_STATE_FILE" 2>/dev/null | head -1)
+    fi
 
-        if [ "$NEW_COMMITS" -gt 0 ]; then
-            echo "  Found $NEW_COMMITS commits since $LAST_CHANGELOG_DATE"
+    # Count new commits since last processed (or since last dated release as fallback)
+    if [ -n "$LAST_PROCESSED_COMMIT" ] && git rev-parse --verify "$LAST_PROCESSED_COMMIT" >/dev/null 2>&1; then
+        NEW_COMMITS=$(git rev-list "$LAST_PROCESSED_COMMIT"..HEAD --count 2>/dev/null || echo "0")
+        SINCE_MARKER="commit ${LAST_PROCESSED_COMMIT:0:7}"
+    else
+        # Fallback to dated release if no state file
+        LAST_CHANGELOG_DATE=$(grep -oP '^\#\# \[\d{4}-\d{2}-\d{2}\]' CHANGELOG.md 2>/dev/null | head -1 | grep -oP '\d{4}-\d{2}-\d{2}' || echo "")
+        if [ -n "$LAST_CHANGELOG_DATE" ]; then
+            NEW_COMMITS=$(git log --since="$LAST_CHANGELOG_DATE" --oneline 2>/dev/null | wc -l)
+            SINCE_MARKER="$LAST_CHANGELOG_DATE"
+        else
+            NEW_COMMITS=0
+            SINCE_MARKER="unknown"
+        fi
+    fi
+
+    if [ "$NEW_COMMITS" -gt 0 ]; then
+            echo "  Found $NEW_COMMITS commits since $SINCE_MARKER"
             read -p "  Generate changelog draft? [y/N] " -n 1 -r CHANGELOG_REPLY
             echo
 
@@ -579,6 +596,8 @@ else
                                     }
                                     {print}
                                 ' CHANGELOG.md > /tmp/changelog-updated-$$.md && mv /tmp/changelog-updated-$$.md CHANGELOG.md
+                                # Save current commit as last processed to avoid re-proposing
+                                git rev-parse HEAD > "$CHANGELOG_STATE_FILE"
                                 log_success "Added draft to CHANGELOG.md [Unreleased]"
                                 add_action "Generated changelog draft ($NEW_COMMITS commits)"
                                 rm -f /tmp/changelog-draft-$$.md
@@ -593,6 +612,8 @@ else
                                     }
                                     {print}
                                 ' CHANGELOG.md > /tmp/changelog-updated-$$.md && mv /tmp/changelog-updated-$$.md CHANGELOG.md
+                                # Save current commit as last processed to avoid re-proposing
+                                git rev-parse HEAD > "$CHANGELOG_STATE_FILE"
                                 log_success "Added edited draft to CHANGELOG.md"
                                 add_action "Generated and edited changelog ($NEW_COMMITS commits)"
                                 rm -f /tmp/changelog-draft-$$.md
@@ -611,11 +632,8 @@ else
                 log_warning "Changelog update skipped ($NEW_COMMITS pending commits)"
             fi
         else
-            log_success "Changelog up to date (no commits since $LAST_CHANGELOG_DATE)"
+            log_success "Changelog up to date (no commits since $SINCE_MARKER)"
         fi
-    else
-        log_warning "Could not parse last changelog date from CHANGELOG.md"
-    fi
 fi
 
 # === PHASE 8: Adaptive Learning Cycle ===

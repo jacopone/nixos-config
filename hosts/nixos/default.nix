@@ -27,8 +27,15 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
-  # Enable uinput for ydotool (Wayland input automation)
-  boot.kernelModules = [ "uinput" ];
+  # Enable uinput for ydotool (Wayland input automation) + ThinkPad ACPI
+  boot.kernelModules = [ "uinput" "thinkpad_acpi" ];
+
+  # Intel GPU stability and power management
+  boot.kernelParams = [
+    "i915.enable_dc=2" # Enable display power states
+    "i915.fastboot=1" # Faster recovery from GPU issues
+    "i915.enable_fbc=1" # Frame buffer compression (power saving)
+  ];
   services.udev.extraRules = ''
     KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"
   '';
@@ -57,6 +64,13 @@
     # Better dirty page management for SSD
     "vm.dirty_ratio" = 15;
     "vm.dirty_background_ratio" = 5;
+    # Panic recovery - auto-reboot 10s after kernel panic
+    "kernel.panic" = 10;
+    # Desktop scheduler tuning for interactive feel
+    "kernel.sched_migration_cost_ns" = 5000000;
+    # inotify limits (prevents fd exhaustion in IDEs/browsers)
+    "fs.inotify.max_user_watches" = 524288;
+    "fs.inotify.max_user_instances" = 1024;
   };
 
   # Enable zram swap for better memory compression
@@ -97,8 +111,11 @@
   # Exclude Nixos Documentation
   documentation.nixos.enable = false;
 
-  # Try to change the default Editor of the whole system
-  environment.variables.EDITOR = "hx";
+  # Environment variables
+  environment.variables = {
+    EDITOR = "hx";
+    LIBVA_DRIVER_NAME = "iHD"; # Intel VA-API driver for hardware video decoding
+  };
 
 
 
@@ -130,7 +147,34 @@
   # Hardware Optimizations
   services.fstrim.enable = true; # Weekly SSD TRIM for disk health
   services.fwupd.enable = true; # Firmware updates for ThinkPad
-  hardware.graphics.enable = true; # Graphics hardware acceleration
+
+  # Intel GPU with VA-API hardware video acceleration
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # VA-API for Intel UHD 620 (iHD driver)
+      libva # VA-API core library
+      libva-vdpau-driver # VA-API to VDPAU wrapper
+      libvdpau-va-gl # VDPAU backend for VA-API
+    ];
+  };
+
+  # ThinkPad Power Management
+  services.tlp = {
+    enable = true;
+    settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 0;
+      START_CHARGE_THRESH_BAT0 = 20; # Start charging at 20%
+      STOP_CHARGE_THRESH_BAT0 = 80; # Stop at 80% (extends battery lifespan)
+      WIFI_PWR_ON_AC = "off";
+      WIFI_PWR_ON_BAT = "on";
+    };
+  };
+  services.thermald.enable = true; # Intel thermal management
+  services.power-profiles-daemon.enable = false; # Conflicts with TLP
 
   # NixOS Services (replaces manual package management)
   virtualisation.docker.enable = true;
