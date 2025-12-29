@@ -319,11 +319,13 @@ if [ "$VERBOSE" = true ]; then
     # Verbose mode - show all output
     NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | tee -a "$LOG_FILE" | tail -1)
 elif [ "$USE_NOM" = true ]; then
-    # Use nix-output-monitor for beautiful build tree visualization
-    # Use --out-link instead of --print-out-paths to avoid pipeline complexity
+    # Use nix-output-monitor with explicit JSON mode for clean tree-only output
+    # --log-format internal-json: nix outputs JSON (not raw text)
+    # -v: verbose mode (needed for full JSON output)
+    # nom --json: parses JSON and shows ONLY the dependency tree
     BUILD_LINK="/tmp/nixos-build-$$"
     echo ""
-    NIXPKGS_ALLOW_UNFREE=1 nix build --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom 2>&1 | tee -a "$LOG_FILE"
+    NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json -v --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ $BUILD_EXIT -ne 0 ]; then
@@ -621,15 +623,14 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     # Extract MCP stats (even if command failed, use existing file)
     if [ -f ~/nixos-config/.claude/mcp-analytics.md ]; then
         # Extract stats from mcp-analytics.md (match actual template format)
-        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || echo "?")
-        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || echo "?")
-        TOTAL_SESSIONS=$(grep "^\*\*Total sessions analyzed\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' || echo "?")
+        # Use subshell to handle empty pipeline results properly
+        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+')
+        TOTAL_CONFIGURED=${TOTAL_CONFIGURED:-0}
+        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1)
+        MCP_CONNECTED=${MCP_CONNECTED:-0}
 
-        # Add to statistics if we have valid data
-        if [ "$MCP_CONNECTED" != "?" ] && [ "$TOTAL_CONFIGURED" != "?" ]; then
-            add_stat "MCP: $MCP_CONNECTED/$TOTAL_CONFIGURED connected | $TOTAL_SESSIONS sessions"
-            echo "  ↳ MCP stats from: .claude/mcp-analytics.md"
-        fi
+        # Add to statistics (simplified - no session count since it's not tracked)
+        add_stat "MCP: $MCP_CONNECTED/$TOTAL_CONFIGURED connected"
     fi
 
     # === PHASE 6: Tool Usage Analytics ===

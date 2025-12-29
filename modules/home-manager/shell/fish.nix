@@ -2,6 +2,12 @@
 { config, pkgs, ... }:
 
 {
+  # Zoxide shell integration - creates `z` and `zi` commands
+  programs.zoxide = {
+    enable = true;
+    enableFishIntegration = true;
+  };
+
   programs.fish = {
     enable = true;
 
