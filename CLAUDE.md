@@ -37,7 +37,7 @@
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point
-- `modules/core/packages.nix` - System-wide packages (136 tools)
+- `modules/core/packages.nix` - System-wide packages (126 tools)
 - `modules/home-manager/base.nix` - User configs and Fish shell setup
 - `hosts/nixos/` - Hardware-specific configuration
 - `basb-system/` - Building a Second Brain knowledge management
@@ -84,7 +84,7 @@
 - BASB system integrated with Google Workspace + Sunsama + Readwise
 
 ## Architecture Philosophy
-- **System-level tools**: Universal access for AI agents (136 tools in `packages.nix`)
+- **System-level tools**: Universal access for AI agents (126 tools in `packages.nix`)
 - **Project-level tools**: Context-specific via devenv/package.json
 - **Modular design**: Inspired by ZaneyOS architecture
 - **AI-first optimization**: Tools selected for Claude Code compatibility
@@ -96,10 +96,10 @@
 - Interactive cache cleanup (UV, Chrome, Yarn, Playwright)
 
 ## System Status
-- **Git Status**: 8M 0A 0U
-- **Last Updated**: 2025-12-28 09:29:21
+- **Git Status**: 7M 0A 17U
+- **Last Updated**: 2025-12-29 21:35:52
 - **Fish Abbreviations**: 0
-- **Total System Tools**: 136
+- **Total System Tools**: 126
 
 ---
 *Auto-updated by ./rebuild-nixos script*
@@ -128,7 +128,7 @@
 
 ## 🔌 MCP Servers
 
-**Status**: 0/0 connected | Last checked: 2025-12-28 09:29:34
+**Status**: 0/0 connected | Last checked: 2025-12-29 21:36:08
 
 No MCP servers configured.
 
@@ -138,20 +138,20 @@ No MCP servers configured.
 
 ## 📦 System Tool Usage
 
-**Installed**: 143 tools | **Used**: 30 (21%) | **Analysis period**: 30 days
+**Installed**: 133 tools | **Used**: 34 (26%) | **Analysis period**: 30 days
 
 **Top 5 tools**:
-- **git**: 891 uses (H:28 C:863)
-- **devenv**: 369 uses (H:7 C:362)
-- **gh**: 200 uses (H:6 C:194)
-- **fd**: 139 uses (H:0 C:139)
-- **eza**: 85 uses (H:0 C:85)
+- **git**: 1037 uses (H:28 C:1009)
+- **devenv**: 380 uses (H:7 C:373)
+- **gh**: 207 uses (H:6 C:201)
+- **fd**: 152 uses (H:0 C:152)
+- **rg**: 101 uses (H:0 C:101)
 
-⚠️ **113 dormant tools** found (unused in last 30 days)
+⚠️ **100 dormant tools** found (unused in last 30 days)
 
 **Human vs Claude**:
-- 10 tools used by humans
-- 25 tools used by Claude
+- 11 tools used by humans
+- 29 tools used by Claude
 
 ---
 *Tool analytics auto-generated. Full report: `.claude/tool-analytics.md`*

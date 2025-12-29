@@ -1,7 +1,7 @@
 # Auto-Generated Permissions Update
 
-**Generated**: 2025-12-27 09:23:44
-**Rules Added**: 4
+**Generated**: 2025-12-29 10:04:31
+**Rules Added**: 2
 
 ## What Happened
 
@@ -10,26 +10,24 @@ high-confidence permission patterns that will reduce future prompts.
 
 ## Added Permissions
 
-### Allow File write/edit operations
+### Allow Pytest test execution
 
-**Confidence**: 95.3%
-**Occurrences**: 498
-**Impact**: Low impact: ~5% fewer prompts
-
-**Permissions added**:
-- `file_write_operations`
-
-### Allow File read operations
-
-**Confidence**: 95.2%
-**Occurrences**: 1717
-**Impact**: Low impact: ~18% fewer prompts
+**Confidence**: 65.5%
+**Occurrences**: 2
+**Impact**: Low impact: ~0% fewer prompts
 
 **Permissions added**:
-- `Read(/**)`
-- `Write(/**)`
-- `Edit(/**)`
-- `Glob(**)`
+- `Bash(pytest:*)`
+- `Bash(python -m pytest:*)`
+
+### Allow Ruff linter/formatter
+
+**Confidence**: 65.5%
+**Occurrences**: 2
+**Impact**: Low impact: ~0% fewer prompts
+
+**Permissions added**:
+- `Bash(ruff:*)`
 
 ---
 
