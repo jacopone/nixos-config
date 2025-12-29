@@ -362,17 +362,22 @@ if command -v nvd &>/dev/null; then
     NVD_OUTPUT=$(nvd diff "$CURRENT_SYSTEM" "$NEW_CONFIG_PATH" 2>/dev/null || true)
 
     if [ -n "$NVD_OUTPUT" ]; then
-        # Count changes
-        PKG_ADDED=$(echo "$NVD_OUTPUT" | grep -c "^+" || echo "0")
-        PKG_REMOVED=$(echo "$NVD_OUTPUT" | grep -c "^-" || echo "0")
-        PKG_UPGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↑" || echo "0")
-        PKG_DOWNGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↓" || echo "0")
+        # Count changes (strip any whitespace/newlines from grep output)
+        PKG_ADDED=$(echo "$NVD_OUTPUT" | grep -c "^+" 2>/dev/null || echo "0")
+        PKG_ADDED="${PKG_ADDED//[^0-9]/}"  # Keep only digits
+        PKG_REMOVED=$(echo "$NVD_OUTPUT" | grep -c "^-" 2>/dev/null || echo "0")
+        PKG_REMOVED="${PKG_REMOVED//[^0-9]/}"
+        PKG_UPGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↑" 2>/dev/null || echo "0")
+        PKG_UPGRADED="${PKG_UPGRADED//[^0-9]/}"
+        PKG_DOWNGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↓" 2>/dev/null || echo "0")
+        PKG_DOWNGRADED="${PKG_DOWNGRADED//[^0-9]/}"
 
         echo -e "  ${GREEN}+${NC} Added: $PKG_ADDED  ${RED}-${NC} Removed: $PKG_REMOVED  ${BLUE}↑${NC} Upgraded: $PKG_UPGRADED  ${YELLOW}↓${NC} Downgraded: $PKG_DOWNGRADED"
         echo ""
 
         # Show first 20 changes
         CHANGE_LINES=$(echo "$NVD_OUTPUT" | wc -l)
+        CHANGE_LINES="${CHANGE_LINES//[^0-9]/}"
         if [ "$CHANGE_LINES" -gt 20 ]; then
             echo "$NVD_OUTPUT" | head -20
             echo "  ... and $((CHANGE_LINES - 20)) more changes"
@@ -381,12 +386,12 @@ if command -v nvd &>/dev/null; then
         fi
         echo ""
 
-        # Store for summary
-        PKG_CHANGES="$PKG_ADDED added, $PKG_REMOVED removed, $PKG_UPGRADED upgraded"
+        # Store for summary (single line, no newlines)
+        PKG_CHANGES="${PKG_ADDED} added, ${PKG_REMOVED} removed, ${PKG_UPGRADED} upgraded"
         add_stat "Packages: $PKG_CHANGES"
     else
         echo "  No package changes detected"
-        PKG_CHANGES="No changes"
+        PKG_CHANGES=""
     fi
 fi
 
@@ -1264,17 +1269,14 @@ fi
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
 if [ "$DRY_RUN" = true ]; then
-echo "║                  ✅ Dry-Run Complete                        ║"
+echo "║                   Dry-Run Complete                         ║"
 else
-echo "║                  ✅ Rebuild Complete                        ║"
+echo "║                   Rebuild Complete                         ║"
 fi
 echo "╠════════════════════════════════════════════════════════════╣"
-printf "║  Duration: %-47s ║\n" "$DURATION_STR"
-if [ -n "$PKG_CHANGES" ] && [ "$PKG_CHANGES" != "No changes" ]; then
-printf "║  Packages: %-47s ║\n" "$PKG_CHANGES"
-fi
+printf "║  Duration: %-47s║\n" "$DURATION_STR"
 if [ "$QUICK" = true ]; then
-printf "║  Mode: %-50s ║\n" "Quick (cleanup skipped)"
+printf "║  Mode: %-50s║\n" "Quick (cleanup skipped)"
 fi
 echo "╚════════════════════════════════════════════════════════════╝"
 
