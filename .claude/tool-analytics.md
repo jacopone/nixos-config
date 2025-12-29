@@ -8,15 +8,15 @@ lifecycle: persistent
 
 # System Tool Usage Analytics
 
-**Last Updated**: 2025-12-29 21:36:09
+**Last Updated**: 2025-12-29 22:45:01
 **Analysis Period**: 30 days
-**Total Commands Tracked**: 2,320
+**Total Commands Tracked**: 2,344
 
 ## Summary
 
-- **Total Tools Installed**: 133
-- **Tools Used**: 34 (25.6%)
-- **Dormant Tools**: 100
+- **Total Tools Installed**: 129
+- **Tools Used**: 34 (26.4%)
+- **Dormant Tools**: 96
 - **Human-Used Tools**: 11
 - **Claude-Used Tools**: 29
 
@@ -25,9 +25,9 @@ lifecycle: persistent
 ## Top Tools by Usage
 
 ### Overall (Human + Claude + Scripts)
-1. **git**: 1,037 total
+1. **git**: 1,057 total
    - Human: 28 (3%)
-   - Claude: 1009 (97%)
+   - Claude: 1029 (97%)
    - Scripts: 0
    - Last used: 2025-12-29
 2. **devenv**: 380 total
@@ -40,14 +40,14 @@ lifecycle: persistent
    - Claude: 201 (97%)
    - Scripts: 0
    - Last used: 2025-12-29
-4. **fd**: 152 total
+4. **fd**: 153 total
    - Human: 0 (0%)
-   - Claude: 152 (100%)
+   - Claude: 153 (100%)
    - Scripts: 0
    - Last used: 2025-12-29
-5. **rg**: 101 total
+5. **rg**: 103 total
    - Human: 0 (0%)
-   - Claude: 101 (100%)
+   - Claude: 103 (100%)
    - Scripts: 0
    - Last used: 2025-12-29
 6. **eza**: 95 total
@@ -55,9 +55,9 @@ lifecycle: persistent
    - Claude: 95 (100%)
    - Scripts: 0
    - Last used: 2025-12-29
-7. **xh**: 72 total
+7. **xh**: 73 total
    - Human: 0 (0%)
-   - Claude: 72 (100%)
+   - Claude: 73 (100%)
    - Scripts: 0
    - Last used: 2025-12-29
 8. **nix**: 70 total
@@ -115,13 +115,13 @@ lifecycle: persistent
 11. **feh**: 1 uses
 
 ### Claude-Preferred Tools (Top 15)
-1. **git**: 1009 uses
+1. **git**: 1029 uses
 2. **devenv**: 373 uses
 3. **gh**: 201 uses
-4. **fd**: 152 uses
-5. **rg**: 101 uses
+4. **fd**: 153 uses
+5. **rg**: 103 uses
 6. **eza**: 95 uses
-7. **xh**: 72 uses
+7. **xh**: 73 uses
 8. **nix**: 70 uses
 9. **nodejs_20**: 60 uses
 10. **tokei**: 20 uses
@@ -185,7 +185,7 @@ lifecycle: persistent
 
 **bottom** - 🔴 **DORMANT**- Modern system monitor (btm command)
 - ⚠️ Never used in last 30 days
-   - Location: line 216 in packages.nix
+   - Location: line 213 in packages.nix
 
 **broot** - 🔴 **DORMANT**- Interactive tree navigation with fuzzy search
 - ⚠️ Never used in last 30 days
@@ -193,7 +193,7 @@ lifecycle: persistent
 
 **choose** - 🔴 **DORMANT**- Human-friendly cut/awk alternative
 - ⚠️ Never used in last 30 days
-   - Location: line 269 in packages.nix
+   - Location: line 265 in packages.nix
 
 **dust** - 1 uses- Modern disk usage analyzer (faster than du)
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -205,10 +205,10 @@ lifecycle: persistent
    - Last used: 2025-12-29
    - Adoption score: 4.8 uses/day
 
-**fd** - 152 uses- Modern find alternative
-- Human: 0 | Claude: 152 | Scripts: 0
+**fd** - 153 uses- Modern find alternative
+- Human: 0 | Claude: 153 | Scripts: 0
    - Last used: 2025-12-29
-   - Adoption score: 7.6 uses/day
+   - Adoption score: 7.7 uses/day
 
 **glow** - 10 uses- Markdown renderer
 - Human: 10 | Claude: 0 | Scripts: 0
@@ -222,52 +222,48 @@ lifecycle: persistent
 
 **ripgrep** - 🔴 **DORMANT**- Super fast grep (rg command)
 - ⚠️ Never used in last 30 days
-   - Location: line 152 in packages.nix
+   - Location: line 151 in packages.nix
 
 **starship** - 🔴 **DORMANT**- Cross-shell prompt
 - ⚠️ Never used in last 30 days
-   - Location: line 268 in packages.nix
+   - Location: line 264 in packages.nix
 
 **zoxide** - 🔴 **DORMANT**- Smarter cd command (z replacement)
 - ⚠️ Never used in last 30 days
-   - Location: line 267 in packages.nix
+   - Location: line 263 in packages.nix
 
 
-### Dev Tools (2 tools)
+### Dev Tools (1 tools)
 
 **fish** - 🔴 **DORMANT**- A smart and user-friendly command line shell
 - ⚠️ Never used in last 30 days
    - Location: line 147 in packages.nix
-
-**fishPlugins.z** - 🔴 **DORMANT**- A z-like directory jumping plugin for fish
-- ⚠️ Never used in last 30 days
-   - Location: line 148 in packages.nix
 
 
 ### Database Tools (4 tools)
 
 **mycli** - 🔴 **DORMANT**- MySQL/MariaDB client with smart completion
 - ⚠️ Never used in last 30 days
-   - Location: line 228 in packages.nix
+   - Location: line 225 in packages.nix
 
 **pgcli** - 🔴 **DORMANT**- PostgreSQL client with autocompletion and syntax highlighting
 - ⚠️ Never used in last 30 days
-   - Location: line 227 in packages.nix
+   - Location: line 224 in packages.nix
 
 **sqlite** - 🔴 **DORMANT**- Database for project indexing and analysis
 - ⚠️ Never used in last 30 days
-   - Location: line 206 in packages.nix
+   - Location: line 205 in packages.nix
 
 **usql** - 🔴 **DORMANT**- Universal database CLI for multiple database types
 - ⚠️ Never used in last 30 days
-   - Location: line 229 in packages.nix
+   - Location: line 226 in packages.nix
 
 
 ### File Management (13 tools)
 
 **eog** - 🔴 **DORMANT**- Eye of GNOME - default GNOME image viewer
 - ⚠️ Never used in last 30 days
-   - Location: line 304 in packages.nix
+   - Location: line 300 in packages.nix
 
 **feh** - 1 uses- Lightweight image viewer (yazi secondary opener)
 - Human: 1 | Claude: 0 | Scripts: 0
@@ -276,7 +272,7 @@ lifecycle: persistent
 
 **ffmpegthumbnailer** - 🔴 **DORMANT**- Video thumbnails for yazi
 - ⚠️ Never used in last 30 days
-   - Location: line 299 in packages.nix
+   - Location: line 295 in packages.nix
 
 **file** - 11 uses- File type detection (essential for yazi)
 - Human: 0 | Claude: 11 | Scripts: 0
@@ -285,31 +281,31 @@ lifecycle: persistent
 
 **file-roller** - 🔴 **DORMANT**- Archive manager for GNOME
 - ⚠️ Never used in last 30 days
-   - Location: line 307 in packages.nix
+   - Location: line 303 in packages.nix
 
 **fzf** - 🔴 **DORMANT**- A command-line fuzzy finder
 - ⚠️ Never used in last 30 days
-   - Location: line 280 in packages.nix
+   - Location: line 276 in packages.nix
 
 **gum** - 🔴 **DORMANT**- Interactive prompts and beautiful CLI forms for shell scripts
 - ⚠️ Never used in last 30 days
-   - Location: line 281 in packages.nix
+   - Location: line 277 in packages.nix
 
 **imagemagick** - 🔴 **DORMANT**- Image processing for previews
 - ⚠️ Never used in last 30 days
-   - Location: line 301 in packages.nix
+   - Location: line 297 in packages.nix
 
 **p7zip** - 🔴 **DORMANT**- A file archiver with a high compression ratio
 - ⚠️ Never used in last 30 days
-   - Location: line 186 in packages.nix
+   - Location: line 185 in packages.nix
 
 **rich-cli** - 🔴 **DORMANT**- Rich command-line interface for rich preview
 - ⚠️ Never used in last 30 days
-   - Location: line 284 in packages.nix
+   - Location: line 280 in packages.nix
 
 **ueberzugpp** - 🔴 **DORMANT**- Successor to ueberzug for image previews
 - ⚠️ Never used in last 30 days
-   - Location: line 294 in packages.nix
+   - Location: line 290 in packages.nix
 
 **yazi** - 3 uses- A modern terminal file manager
 - Human: 3 | Claude: 0 | Scripts: 0
@@ -318,14 +314,14 @@ lifecycle: persistent
 
 **yaziPlugins.rich-preview** - 🔴 **DORMANT**- Rich preview for Yazi
 - ⚠️ Never used in last 30 days
-   - Location: line 283 in packages.nix
+   - Location: line 279 in packages.nix
 
 
-### System Tools (10 tools)
+### System Tools (9 tools)
 
 **cmatrix** - 🔴 **DORMANT**- A terminal-based "Matrix" screen saver
 - ⚠️ Never used in last 30 days
-   - Location: line 277 in packages.nix
+   - Location: line 273 in packages.nix
 
 **fastfetch** - 1 uses- A neofetch-like tool for fetching system information and displaying them in a pretty way
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -334,16 +330,12 @@ lifecycle: persistent
 
 **gparted** - 🔴 **DORMANT**- A free partition editor for graphically managing your disk partitions
 - ⚠️ Never used in last 30 days
-   - Location: line 184 in packages.nix
+   - Location: line 183 in packages.nix
 
 **nmap** - 3 uses- Network discovery and security auditing
 - Human: 0 | Claude: 3 | Scripts: 0
    - Last used: 2025-12-24
    - Adoption score: 3.0 uses/day
-
-**parallel** - 🔴 **DORMANT**- GNU parallel for concurrent execution
-- ⚠️ Never used in last 30 days
-   - Location: line 211 in packages.nix
 
 **strace** - 1 uses- System call tracer
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -352,34 +344,34 @@ lifecycle: persistent
 
 **tcpdump** - 🔴 **DORMANT**- Command-line packet analyzer
 - ⚠️ Never used in last 30 days
-   - Location: line 255 in packages.nix
+   - Location: line 252 in packages.nix
 
 **tmux** - 🔴 **DORMANT**- Session persistence and parallel operations
 - ⚠️ Never used in last 30 days
-   - Location: line 210 in packages.nix
+   - Location: line 209 in packages.nix
 
 **usbimager** - 🔴 **DORMANT**- A minimalist GUI application to write compressed disk images to USB drives
 - ⚠️ Never used in last 30 days
-   - Location: line 185 in packages.nix
+   - Location: line 184 in packages.nix
 
 **wireshark** - 🔴 **DORMANT**- Network protocol analyzer
 - ⚠️ Never used in last 30 days
-   - Location: line 254 in packages.nix
+   - Location: line 251 in packages.nix
 
 
 ### Productivity (6 tools)
 
 **anki-bin** - 🔴 **DORMANT**- A program which makes remembering things easy
 - ⚠️ Never used in last 30 days
-   - Location: line 193 in packages.nix
+   - Location: line 192 in packages.nix
 
 **gedit** - 🔴 **DORMANT**- The official text editor of the GNOME desktop environment
 - ⚠️ Never used in last 30 days
-   - Location: line 150 in packages.nix
+   - Location: line 149 in packages.nix
 
 **gimp-with-plugins** - 🔴 **DORMANT**- The GNU Image Manipulation Program, with a set of popular plugins
 - ⚠️ Never used in last 30 days
-   - Location: line 194 in packages.nix
+   - Location: line 193 in packages.nix
 
 **google-chrome** - 2 uses- Google's web browser
 - Human: 1 | Claude: 1 | Scripts: 0
@@ -388,30 +380,30 @@ lifecycle: persistent
 
 **obsidian** - 🔴 **DORMANT**- A powerful knowledge base that works on top of a local folder of plain text Markdown files
 - ⚠️ Never used in last 30 days
-   - Location: line 192 in packages.nix
+   - Location: line 191 in packages.nix
 
 **vlc** - 🔴 **DORMANT**- A free and open source cross-platform multimedia player and framework
 - ⚠️ Never used in last 30 days
-   - Location: line 195 in packages.nix
+   - Location: line 194 in packages.nix
 
 
 ### Fonts (7 tools)
 
 **dejavu_fonts** - 🔴 **DORMANT**- A font family based on the Vera Fonts
 - ⚠️ Never used in last 30 days
-   - Location: line 200 in packages.nix
+   - Location: line 199 in packages.nix
 
 **jetbrains-mono** - 🔴 **DORMANT**- JetBrains Mono - programming font with ligatures and better readability
 - ⚠️ Never used in last 30 days
-   - Location: line 202 in packages.nix
+   - Location: line 201 in packages.nix
 
 **nerd-fonts.jetbrains-mono** - 🔴 **DORMANT**- JetBrains Mono Nerd Font - adds programming icons and symbols
 - ⚠️ Never used in last 30 days
-   - Location: line 203 in packages.nix
+   - Location: line 202 in packages.nix
 
 **pymupdf4llm** - 🔴 **DORMANT**- PyMuPDF for LLM-optimized PDF processing
 - ⚠️ Never used in last 30 days
-   - Location: line 166 in packages.nix
+   - Location: line 165 in packages.nix
 
 **python312Packages.lizard** - 11 uses- Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
 - Human: 0 | Claude: 11 | Scripts: 0
@@ -420,33 +412,29 @@ lifecycle: persistent
 
 **python312Packages.radon** - 🔴 **DORMANT**- Python code metrics and complexity analysis
 - ⚠️ Never used in last 30 days
-   - Location: line 244 in packages.nix
+   - Location: line 241 in packages.nix
 
 **roboto** - 🔴 **DORMANT**- Google's signature font family
 - ⚠️ Never used in last 30 days
-   - Location: line 201 in packages.nix
+   - Location: line 200 in packages.nix
 
 
-### Other (67 tools)
+### Other (65 tools)
 
 **ast-grep** - 🔴 **DORMANT**- Structural search and replace for code
 - ⚠️ Never used in last 30 days
-   - Location: line 217 in packages.nix
+   - Location: line 214 in packages.nix
 
 **cacert** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 80 in packages.nix
 
 **cachix** - 🔴 **DORMANT**- Binary cache for faster Nix builds - system-wide availability
 - ⚠️ Never used in last 30 days
-   - Location: line 180 in packages.nix
-
-**csvkit** - 🔴 **DORMANT**- CSV manipulation tools
-- ⚠️ Never used in last 30 days
-   - Location: line 263 in packages.nix
+   - Location: line 179 in packages.nix
 
 **delta** - 🔴 **DORMANT**- Better git diff viewer
 - ⚠️ Never used in last 30 days
-   - Location: line 220 in packages.nix
+   - Location: line 217 in packages.nix
 
 **devenv** - 380 uses- Fast, declarative development environments - instant service commands
 - Human: 7 | Claude: 373 | Scripts: 0
@@ -460,32 +448,32 @@ lifecycle: persistent
 
 **docker-compose** - 🔴 **DORMANT**- Container orchestration
 - ⚠️ Never used in last 30 days
-   - Location: line 250 in packages.nix
+   - Location: line 247 in packages.nix
 
 **droid** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 44 in packages.nix
 
 **entr** - 🔴 **DORMANT**- File watcher for automated rebuilds/tests
 - ⚠️ Never used in last 30 days
-   - Location: line 213 in packages.nix
+   - Location: line 211 in packages.nix
 
 **gcc** - 🔴 **DORMANT**- GCC compiler for native dependencies
 - ⚠️ Never used in last 30 days
-   - Location: line 172 in packages.nix
+   - Location: line 171 in packages.nix
 
 **gh** - 207 uses- GitHub's official command-line tool
 - Human: 6 | Claude: 201 | Scripts: 0
    - Last used: 2025-12-29
    - Adoption score: 10.9 uses/day
 
-**git** - 1,037 uses- A free and open source distributed version control system
-- Human: 28 | Claude: 1009 | Scripts: 0
+**git** - 1,057 uses- A free and open source distributed version control system
+- Human: 28 | Claude: 1029 | Scripts: 0
    - Last used: 2025-12-29
-   - Adoption score: 39.9 uses/day
+   - Adoption score: 40.7 uses/day
 
 **gnumake** - 🔴 **DORMANT**- GNU Make for build systems
 - ⚠️ Never used in last 30 days
-   - Location: line 173 in packages.nix
+   - Location: line 172 in packages.nix
 
 **google-cloud-sdk** - 🔴 **DORMANT**- Google Cloud SDK for gcloud CLI and cloud operations
 - ⚠️ Never used in last 30 days
@@ -497,15 +485,15 @@ lifecycle: persistent
 
 **hurl** - 🔴 **DORMANT**- HTTP testing with file-based test definitions
 - ⚠️ Never used in last 30 days
-   - Location: line 232 in packages.nix
+   - Location: line 229 in packages.nix
 
 **hyperfine** - 🔴 **DORMANT**- Precise command benchmarking
 - ⚠️ Never used in last 30 days
-   - Location: line 207 in packages.nix
+   - Location: line 206 in packages.nix
 
 **jinja2** - 🔴 **DORMANT**- Jinja2 templating engine (for claude-nixos-automation)
 - ⚠️ Never used in last 30 days
-   - Location: line 170 in packages.nix
+   - Location: line 169 in packages.nix
 
 **jless** - 2 uses- JSON viewer (better than jq for large files)
 - Human: 0 | Claude: 2 | Scripts: 0
@@ -518,23 +506,23 @@ lifecycle: persistent
    - Adoption score: 2.4 uses/day
 
 **jscpd** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
-   - Location: line 246 in packages.nix
+   - Location: line 243 in packages.nix
 
 **just** - 🔴 **DORMANT**- Modern command runner (better than make)
 - ⚠️ Never used in last 30 days
-   - Location: line 215 in packages.nix
+   - Location: line 212 in packages.nix
 
 **k9s** - 🔴 **DORMANT**- Kubernetes cluster management
 - ⚠️ Never used in last 30 days
-   - Location: line 251 in packages.nix
+   - Location: line 248 in packages.nix
 
 **kdePackages.okular** - 🔴 **DORMANT**- Full-featured PDF viewer with annotations
 - ⚠️ Never used in last 30 days
-   - Location: line 306 in packages.nix
+   - Location: line 302 in packages.nix
 
 **kooha** - 🔴 **DORMANT**- Elegantly record your screen (Wayland-native, minimal UI)
 - ⚠️ Never used in last 30 days
-   - Location: line 190 in packages.nix
+   - Location: line 189 in packages.nix
 
 **lazygit** - 1 uses- Simple terminal UI for git
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -545,19 +533,19 @@ lifecycle: persistent
    - Location: line 79 in packages.nix
 
 **marker** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
-   - Location: line 290 in packages.nix
+   - Location: line 286 in packages.nix
 
 **markitdown** - 🔴 **DORMANT**- Microsoft's multi-format to Markdown converter
 - ⚠️ Never used in last 30 days
-   - Location: line 167 in packages.nix
+   - Location: line 166 in packages.nix
 
 **miller** - 🔴 **DORMANT**- CSV/JSON/YAML data processing
 - ⚠️ Never used in last 30 days
-   - Location: line 266 in packages.nix
+   - Location: line 262 in packages.nix
 
 **ninja** - 🔴 **DORMANT**- Build system for faster compilation (required by numpy/aider)
 - ⚠️ Never used in last 30 days
-   - Location: line 174 in packages.nix
+   - Location: line 173 in packages.nix
 
 **nix** - 70 uses- Human: 0 | Claude: 70 | Scripts: 0
    - Last used: 2025-12-29
@@ -565,11 +553,11 @@ lifecycle: persistent
 
 **nix-output-monitor** - 🔴 **DORMANT**- Beautiful build tree visualization (nom command, used by rebuild-nixos)
 - ⚠️ Never used in last 30 days
-   - Location: line 274 in packages.nix
+   - Location: line 270 in packages.nix
 
 **nixpkgs-fmt** - 🔴 **DORMANT**- Nix code formatter (for pre-commit hooks)
 - ⚠️ Never used in last 30 days
-   - Location: line 272 in packages.nix
+   - Location: line 268 in packages.nix
 
 **nodejs_20** - 61 uses- Human: 1 | Claude: 60 | Scripts: 0
    - Last used: 2025-12-28
@@ -582,22 +570,22 @@ lifecycle: persistent
 
 **nvd** - 🔴 **DORMANT**- NixOS package version diff tool (used by rebuild-nixos)
 - ⚠️ Never used in last 30 days
-   - Location: line 273 in packages.nix
+   - Location: line 269 in packages.nix
 
 **onlyoffice-desktopeditors** - 🔴 **DORMANT**- Office suite with document, spreadsheet, presentation editing
 - ⚠️ Never used in last 30 days
-   - Location: line 196 in packages.nix
+   - Location: line 195 in packages.nix
 
 **openresolv** - 🔴 **DORMANT**- DNS management for VPN connections
 - ⚠️ Never used in last 30 days
-   - Location: line 260 in packages.nix
+   - Location: line 257 in packages.nix
 
 **openspec** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 31 in packages.nix
 
 **pandoc** - 🔴 **DORMANT**- Universal document converter (MD to PPTX/PDF/HTML)
 - ⚠️ Never used in last 30 days
-   - Location: line 286 in packages.nix
+   - Location: line 282 in packages.nix
 
 **pkg-config** - 1 uses- Package config tool for native module builds
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -606,11 +594,11 @@ lifecycle: persistent
 
 **podman** - 🔴 **DORMANT**- Docker alternative
 - ⚠️ Never used in last 30 days
-   - Location: line 252 in packages.nix
+   - Location: line 249 in packages.nix
 
 **poppler-utils** - 🔴 **DORMANT**- PDF preview utilities
 - ⚠️ Never used in last 30 days
-   - Location: line 300 in packages.nix
+   - Location: line 296 in packages.nix
 
 **pre-commit** - 1 uses- Git hook framework (needed for .pre-commit-config.yaml)
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -619,15 +607,15 @@ lifecycle: persistent
 
 **pydantic** - 🔴 **DORMANT**- Data validation using Python type hints
 - ⚠️ Never used in last 30 days
-   - Location: line 169 in packages.nix
+   - Location: line 168 in packages.nix
 
 **pytest** - 🔴 **DORMANT**- Testing framework for Python
 - ⚠️ Never used in last 30 days
-   - Location: line 168 in packages.nix
+   - Location: line 167 in packages.nix
 
 **rich** - 🔴 **DORMANT**- Rich - Python terminal UI library (for BASB system)
 - ⚠️ Never used in last 30 days
-   - Location: line 165 in packages.nix
+   - Location: line 164 in packages.nix
 
 **ruff** - 1 uses- Lightning-fast Python linter/formatter
 - Human: 0 | Claude: 1 | Scripts: 0
@@ -635,19 +623,19 @@ lifecycle: persistent
    - Adoption score: 1.0 uses/day
 
 **runCommand** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
-   - Location: line 157 in packages.nix
+   - Location: line 156 in packages.nix
 
 **semgrep** - 🔴 **DORMANT**- Static analysis for pattern matching
 - ⚠️ Never used in last 30 days
-   - Location: line 218 in packages.nix
+   - Location: line 215 in packages.nix
 
 **shellcheck** - 🔴 **DORMANT**- Shell script linter
 - ⚠️ Never used in last 30 days
-   - Location: line 270 in packages.nix
+   - Location: line 266 in packages.nix
 
 **shfmt** - 🔴 **DORMANT**- Shell formatter
 - ⚠️ Never used in last 30 days
-   - Location: line 271 in packages.nix
+   - Location: line 267 in packages.nix
 
 **stdenv.cc.cc.lib** - 🔴 **DORMANT**- ⚠️ Never used in last 30 days
    - Location: line 140 in packages.nix
@@ -673,30 +661,26 @@ lifecycle: persistent
 - ⚠️ Never used in last 30 days
    - Location: line 8 in packages.nix
 
-**watchman** - 🔴 **DORMANT**- Facebook's file watching service
-- ⚠️ Never used in last 30 days
-   - Location: line 214 in packages.nix
-
 **wgnord** - 🔴 **DORMANT**- NordVPN WireGuard (NordLynx) client in POSIX shell
 - ⚠️ Never used in last 30 days
-   - Location: line 258 in packages.nix
+   - Location: line 255 in packages.nix
 
 **wireguard-tools** - 🔴 **DORMANT**- WireGuard utilities for VPN management
 - ⚠️ Never used in last 30 days
-   - Location: line 259 in packages.nix
+   - Location: line 256 in packages.nix
 
 **wl-clipboard** - 🔴 **DORMANT**- Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
 - ⚠️ Never used in last 30 days
-   - Location: line 187 in packages.nix
+   - Location: line 186 in packages.nix
 
-**xh** - 72 uses- Fast HTTPie alternative in Rust
-- Human: 0 | Claude: 72 | Scripts: 0
+**xh** - 73 uses- Fast HTTPie alternative in Rust
+- Human: 0 | Claude: 73 | Scripts: 0
    - Last used: 2025-12-29
    - Adoption score: 3.8 uses/day
 
 **yq-go** - 🔴 **DORMANT**- YAML/XML processor (like jq for YAML)
 - ⚠️ Never used in last 30 days
-   - Location: line 265 in packages.nix
+   - Location: line 261 in packages.nix
 
 **zed-editor** - 🔴 **DORMANT**- A high-performance, multiplayer code editor
 - ⚠️ Never used in last 30 days
@@ -708,7 +692,7 @@ lifecycle: persistent
 ### Tools Both Use (Shared)
 
 6 tools used by both human and Claude:
-- **git**: H:28 C:1009
+- **git**: H:28 C:1029
 - **devenv**: H:7 C:373
 - **gh**: H:6 C:201
 - **nodejs_20**: H:1 C:60
@@ -729,10 +713,10 @@ lifecycle: persistent
 ### Claude-Only Tools
 
 23 tools used only by Claude:
-- **fd**: 152 uses
-- **rg**: 101 uses
+- **fd**: 153 uses
+- **rg**: 103 uses
 - **eza**: 95 uses
-- **xh**: 72 uses
+- **xh**: 73 uses
 - **nix**: 70 uses
 - **tokei**: 20 uses
 - **jq**: 19 uses
@@ -754,7 +738,7 @@ lifecycle: persistent
 
 ## Dormant Tools (Candidates for Removal)
 
-100 tools unused in last 30 days:
+96 tools unused in last 30 days:
 
 **opencode** - AI coding agent built for the terminal   - Category: ai-tools
    - Location: line 9 in packages.nix
@@ -781,72 +765,69 @@ lifecycle: persistent
    - Location: line 139 in packages.nix
 
 **sqlite** - Database for project indexing and analysis   - Category: database-tools
-   - Location: line 206 in packages.nix
+   - Location: line 205 in packages.nix
 
 **pgcli** - PostgreSQL client with autocompletion and syntax highlighting   - Category: database-tools
-   - Location: line 227 in packages.nix
+   - Location: line 224 in packages.nix
 
 **mycli** - MySQL/MariaDB client with smart completion   - Category: database-tools
-   - Location: line 228 in packages.nix
+   - Location: line 225 in packages.nix
 
 **usql** - Universal database CLI for multiple database types   - Category: database-tools
-   - Location: line 229 in packages.nix
+   - Location: line 226 in packages.nix
 
 **fish** - A smart and user-friendly command line shell   - Category: dev-tools
    - Location: line 147 in packages.nix
 - URL: https://fishshell.com/
 
-**fishPlugins.z** - A z-like directory jumping plugin for fish   - Category: dev-tools
-   - Location: line 148 in packages.nix
-
 **p7zip** - A file archiver with a high compression ratio   - Category: file-management
-   - Location: line 186 in packages.nix
+   - Location: line 185 in packages.nix
 - URL: https://www.7-zip.org/
 
 **fzf** - A command-line fuzzy finder   - Category: file-management
-   - Location: line 280 in packages.nix
+   - Location: line 276 in packages.nix
 
 **gum** - Interactive prompts and beautiful CLI forms for shell scripts   - Category: file-management
-   - Location: line 281 in packages.nix
+   - Location: line 277 in packages.nix
 
 **yaziPlugins.rich-preview** - Rich preview for Yazi   - Category: file-management
-   - Location: line 283 in packages.nix
+   - Location: line 279 in packages.nix
 
 **rich-cli** - Rich command-line interface for rich preview   - Category: file-management
-   - Location: line 284 in packages.nix
+   - Location: line 280 in packages.nix
 
 **ueberzugpp** - Successor to ueberzug for image previews   - Category: file-management
-   - Location: line 294 in packages.nix
+   - Location: line 290 in packages.nix
 
 **ffmpegthumbnailer** - Video thumbnails for yazi   - Category: file-management
-   - Location: line 299 in packages.nix
+   - Location: line 295 in packages.nix
 
 **imagemagick** - Image processing for previews   - Category: file-management
-   - Location: line 301 in packages.nix
+   - Location: line 297 in packages.nix
 
 **eog** - Eye of GNOME - default GNOME image viewer   - Category: file-management
-   - Location: line 304 in packages.nix
+   - Location: line 300 in packages.nix
 
 **file-roller** - Archive manager for GNOME   - Category: file-management
-   - Location: line 307 in packages.nix
+   - Location: line 303 in packages.nix
 
 **pymupdf4llm** - PyMuPDF for LLM-optimized PDF processing   - Category: fonts
-   - Location: line 166 in packages.nix
+   - Location: line 165 in packages.nix
 
 **dejavu_fonts** - A font family based on the Vera Fonts   - Category: fonts
-   - Location: line 200 in packages.nix
+   - Location: line 199 in packages.nix
 
 **roboto** - Google's signature font family   - Category: fonts
-   - Location: line 201 in packages.nix
+   - Location: line 200 in packages.nix
 
 **jetbrains-mono** - JetBrains Mono - programming font with ligatures and better readability   - Category: fonts
-   - Location: line 202 in packages.nix
+   - Location: line 201 in packages.nix
 
 **nerd-fonts.jetbrains-mono** - JetBrains Mono Nerd Font - adds programming icons and symbols   - Category: fonts
-   - Location: line 203 in packages.nix
+   - Location: line 202 in packages.nix
 
 **python312Packages.radon** - Python code metrics and complexity analysis   - Category: fonts
-   - Location: line 244 in packages.nix
+   - Location: line 241 in packages.nix
 
 **atuin** - Neural network-powered shell history   - Category: modern-cli
    - Location: line 131 in packages.nix
@@ -855,19 +836,19 @@ lifecycle: persistent
    - Location: line 132 in packages.nix
 
 **ripgrep** - Super fast grep (rg command)   - Category: modern-cli
-   - Location: line 152 in packages.nix
+   - Location: line 151 in packages.nix
 
 **bottom** - Modern system monitor (btm command)   - Category: modern-cli
-   - Location: line 216 in packages.nix
+   - Location: line 213 in packages.nix
 
 **zoxide** - Smarter cd command (z replacement)   - Category: modern-cli
-   - Location: line 267 in packages.nix
+   - Location: line 263 in packages.nix
 
 **starship** - Cross-shell prompt   - Category: modern-cli
-   - Location: line 268 in packages.nix
+   - Location: line 264 in packages.nix
 
 **choose** - Human-friendly cut/awk alternative   - Category: modern-cli
-   - Location: line 269 in packages.nix
+   - Location: line 265 in packages.nix
 
 **wget** - A free software package for retrieving files using HTTP, HTTPS, FTP and FTPS   - Category: network-security
    - Location: line 146 in packages.nix
@@ -907,168 +888,159 @@ lifecycle: persistent
    - Location: line 145 in packages.nix
 
 **runCommand**   - Category: other
-   - Location: line 157 in packages.nix
+   - Location: line 156 in packages.nix
 
 **rich** - Rich - Python terminal UI library (for BASB system)   - Category: other
-   - Location: line 165 in packages.nix
+   - Location: line 164 in packages.nix
 
 **markitdown** - Microsoft's multi-format to Markdown converter   - Category: other
-   - Location: line 167 in packages.nix
+   - Location: line 166 in packages.nix
 
 **pytest** - Testing framework for Python   - Category: other
-   - Location: line 168 in packages.nix
+   - Location: line 167 in packages.nix
 
 **pydantic** - Data validation using Python type hints   - Category: other
-   - Location: line 169 in packages.nix
+   - Location: line 168 in packages.nix
 
 **jinja2** - Jinja2 templating engine (for claude-nixos-automation)   - Category: other
-   - Location: line 170 in packages.nix
+   - Location: line 169 in packages.nix
 
 **gcc** - GCC compiler for native dependencies   - Category: other
-   - Location: line 172 in packages.nix
+   - Location: line 171 in packages.nix
 
 **gnumake** - GNU Make for build systems   - Category: other
-   - Location: line 173 in packages.nix
+   - Location: line 172 in packages.nix
 
 **ninja** - Build system for faster compilation (required by numpy/aider)   - Category: other
-   - Location: line 174 in packages.nix
+   - Location: line 173 in packages.nix
 
 **cachix** - Binary cache for faster Nix builds - system-wide availability   - Category: other
-   - Location: line 180 in packages.nix
+   - Location: line 179 in packages.nix
 
 **wl-clipboard** - Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste   - Category: other
-   - Location: line 187 in packages.nix
+   - Location: line 186 in packages.nix
 
 **kooha** - Elegantly record your screen (Wayland-native, minimal UI)   - Category: other
-   - Location: line 190 in packages.nix
+   - Location: line 189 in packages.nix
 - URL: https://github.com/SeaDve/Kooha
 
 **onlyoffice-desktopeditors** - Office suite with document, spreadsheet, presentation editing   - Category: other
-   - Location: line 196 in packages.nix
+   - Location: line 195 in packages.nix
 - URL: https://www.onlyoffice.com/
 
 **hyperfine** - Precise command benchmarking   - Category: other
-   - Location: line 207 in packages.nix
+   - Location: line 206 in packages.nix
 
 **entr** - File watcher for automated rebuilds/tests   - Category: other
-   - Location: line 213 in packages.nix
-
-**watchman** - Facebook's file watching service   - Category: other
-   - Location: line 214 in packages.nix
+   - Location: line 211 in packages.nix
 
 **just** - Modern command runner (better than make)   - Category: other
-   - Location: line 215 in packages.nix
+   - Location: line 212 in packages.nix
 
 **ast-grep** - Structural search and replace for code   - Category: other
-   - Location: line 217 in packages.nix
+   - Location: line 214 in packages.nix
 
 **semgrep** - Static analysis for pattern matching   - Category: other
-   - Location: line 218 in packages.nix
+   - Location: line 215 in packages.nix
 
 **delta** - Better git diff viewer   - Category: other
-   - Location: line 220 in packages.nix
+   - Location: line 217 in packages.nix
 
 **hurl** - HTTP testing with file-based test definitions   - Category: other
-   - Location: line 232 in packages.nix
+   - Location: line 229 in packages.nix
 
 **jscpd**   - Category: other
-   - Location: line 246 in packages.nix
+   - Location: line 243 in packages.nix
 
 **docker-compose** - Container orchestration   - Category: other
-   - Location: line 250 in packages.nix
+   - Location: line 247 in packages.nix
 
 **k9s** - Kubernetes cluster management   - Category: other
-   - Location: line 251 in packages.nix
+   - Location: line 248 in packages.nix
 
 **podman** - Docker alternative   - Category: other
-   - Location: line 252 in packages.nix
+   - Location: line 249 in packages.nix
 
 **wgnord** - NordVPN WireGuard (NordLynx) client in POSIX shell   - Category: other
-   - Location: line 258 in packages.nix
+   - Location: line 255 in packages.nix
 
 **wireguard-tools** - WireGuard utilities for VPN management   - Category: other
-   - Location: line 259 in packages.nix
+   - Location: line 256 in packages.nix
 
 **openresolv** - DNS management for VPN connections   - Category: other
-   - Location: line 260 in packages.nix
-
-**csvkit** - CSV manipulation tools   - Category: other
-   - Location: line 263 in packages.nix
+   - Location: line 257 in packages.nix
 
 **yq-go** - YAML/XML processor (like jq for YAML)   - Category: other
-   - Location: line 265 in packages.nix
+   - Location: line 261 in packages.nix
 
 **miller** - CSV/JSON/YAML data processing   - Category: other
-   - Location: line 266 in packages.nix
+   - Location: line 262 in packages.nix
 
 **shellcheck** - Shell script linter   - Category: other
-   - Location: line 270 in packages.nix
+   - Location: line 266 in packages.nix
 
 **shfmt** - Shell formatter   - Category: other
-   - Location: line 271 in packages.nix
+   - Location: line 267 in packages.nix
 
 **nixpkgs-fmt** - Nix code formatter (for pre-commit hooks)   - Category: other
-   - Location: line 272 in packages.nix
+   - Location: line 268 in packages.nix
 
 **nvd** - NixOS package version diff tool (used by rebuild-nixos)   - Category: other
-   - Location: line 273 in packages.nix
+   - Location: line 269 in packages.nix
 
 **nix-output-monitor** - Beautiful build tree visualization (nom command, used by rebuild-nixos)   - Category: other
-   - Location: line 274 in packages.nix
+   - Location: line 270 in packages.nix
 
 **pandoc** - Universal document converter (MD to PPTX/PDF/HTML)   - Category: other
-   - Location: line 286 in packages.nix
+   - Location: line 282 in packages.nix
 
 **marker**   - Category: other
-   - Location: line 290 in packages.nix
+   - Location: line 286 in packages.nix
 
 **poppler-utils** - PDF preview utilities   - Category: other
-   - Location: line 300 in packages.nix
+   - Location: line 296 in packages.nix
 
 **kdePackages.okular** - Full-featured PDF viewer with annotations   - Category: other
-   - Location: line 306 in packages.nix
+   - Location: line 302 in packages.nix
 
 **gedit** - The official text editor of the GNOME desktop environment   - Category: productivity
-   - Location: line 150 in packages.nix
+   - Location: line 149 in packages.nix
 - URL: https://wiki.gnome.org/Apps/Gedit
 
 **obsidian** - A powerful knowledge base that works on top of a local folder of plain text Markdown files   - Category: productivity
-   - Location: line 192 in packages.nix
+   - Location: line 191 in packages.nix
 - URL: https://obsidian.md/
 
 **anki-bin** - A program which makes remembering things easy   - Category: productivity
-   - Location: line 193 in packages.nix
+   - Location: line 192 in packages.nix
 - URL: https://apps.ankiweb.net/
 
 **gimp-with-plugins** - The GNU Image Manipulation Program, with a set of popular plugins   - Category: productivity
-   - Location: line 194 in packages.nix
+   - Location: line 193 in packages.nix
 - URL: https://www.gimp.org/
 
 **vlc** - A free and open source cross-platform multimedia player and framework   - Category: productivity
-   - Location: line 195 in packages.nix
+   - Location: line 194 in packages.nix
 - URL: https://videolan.org/vlc/
 
 **gparted** - A free partition editor for graphically managing your disk partitions   - Category: system-tools
-   - Location: line 184 in packages.nix
+   - Location: line 183 in packages.nix
 - URL: https://gparted.org/
 
 **usbimager** - A minimalist GUI application to write compressed disk images to USB drives   - Category: system-tools
-   - Location: line 185 in packages.nix
+   - Location: line 184 in packages.nix
 
 **tmux** - Session persistence and parallel operations   - Category: system-tools
-   - Location: line 210 in packages.nix
-
-**parallel** - GNU parallel for concurrent execution   - Category: system-tools
-   - Location: line 211 in packages.nix
+   - Location: line 209 in packages.nix
 
 **wireshark** - Network protocol analyzer   - Category: system-tools
-   - Location: line 254 in packages.nix
+   - Location: line 251 in packages.nix
 
 **tcpdump** - Command-line packet analyzer   - Category: system-tools
-   - Location: line 255 in packages.nix
+   - Location: line 252 in packages.nix
 
 **cmatrix** - A terminal-based "Matrix" screen saver   - Category: system-tools
-   - Location: line 277 in packages.nix
+   - Location: line 273 in packages.nix
 
 
 ⚠️ **Action recommended**: Consider removing dormant tools to reduce system bloat.
@@ -1083,8 +1055,8 @@ lifecycle: persistent
 ### 🟡 MEDIUM PRIORITY: other tools
 
 **Type**: Remove Dormant
-**Issue**: 50 other tools unused in last 90 days
-**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, openspec, and 45 more
+**Issue**: 48 other tools unused in last 90 days
+**Action**: Consider removing: helix, zed-editor, vscode-fhs, stdenv.hostPlatform.system, openspec, and 43 more
 
 ### 💚 LOW PRIORITY: ai-tools tools
 
@@ -1113,8 +1085,8 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: system-tools tools
 
 **Type**: Remove Dormant
-**Issue**: 7 system-tools tools unused in last 90 days
-**Action**: Consider removing: gparted, usbimager, tmux, parallel, wireshark, and 2 more
+**Issue**: 6 system-tools tools unused in last 90 days
+**Action**: Consider removing: gparted, usbimager, tmux, wireshark, tcpdump, and 1 more
 
 ### 💚 LOW PRIORITY: file-management tools
 
@@ -1131,7 +1103,7 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: git
 
 **Type**: Highlight Value
-**Issue**: Highly used: 1037 invocations (human: 28, Claude: 1009)
+**Issue**: Highly used: 1057 invocations (human: 28, Claude: 1029)
 **Action**: Keep git - provides excellent value
 
 ### 💚 LOW PRIORITY: devenv
@@ -1149,13 +1121,13 @@ lifecycle: persistent
 ### 💚 LOW PRIORITY: fd
 
 **Type**: Highlight Value
-**Issue**: Highly used: 152 invocations (human: 0, Claude: 152)
+**Issue**: Highly used: 153 invocations (human: 0, Claude: 153)
 **Action**: Keep fd - provides excellent value
 
 ### 💚 LOW PRIORITY: rg
 
 **Type**: Highlight Value
-**Issue**: Highly used: 101 invocations (human: 0, Claude: 101)
+**Issue**: Highly used: 103 invocations (human: 0, Claude: 103)
 **Action**: Keep rg - provides excellent value
 
 ### 💚 LOW PRIORITY: multiple
@@ -1167,8 +1139,8 @@ lifecycle: persistent
 
 ## Usage Trends by Category
 
-- **Other**: 1,888 invocations
-- **Modern Cli**: 379 invocations
+- **Other**: 1,909 invocations
+- **Modern Cli**: 382 invocations
 - **Ai Tools**: 19 invocations
 - **File Management**: 16 invocations
 - **Fonts**: 11 invocations
@@ -1184,8 +1156,8 @@ lifecycle: persistent
 | zoxide | 20 | 0 | -20 | ⚠️ Declining |
 | eza | 19 | 95 | +76 | ✅ Growing |
 | bat | 7 | 18 | +11 | ✅ Growing |
-| fd | 2 | 152 | +150 | ✅ Growing |
-| rg | 1 | 101 | +100 | ✅ Growing |
+| fd | 2 | 153 | +151 | ✅ Growing |
+| rg | 1 | 103 | +102 | ✅ Growing |
 | dust | 1 | 1 | 0 | ➡️ Stable |
 
 **Baseline study**: `docs/analysis/tool-adoption-baseline-2025-10.md`
