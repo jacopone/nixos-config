@@ -145,7 +145,6 @@
     google-cloud-sdk # Google Cloud SDK for gcloud CLI and cloud operations
     wget # A free software package for retrieving files using HTTP, HTTPS, FTP and FTPS - https://www.gnu.org/software/wget/
     fish # A smart and user-friendly command line shell - https://fishshell.com/
-    fishPlugins.z # A z-like directory jumping plugin for fish
     eza # A modern replacement for ls - https://eza.rocks/
     gedit # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
     jq # JSON processor - essential for development
@@ -208,10 +207,8 @@
     tokei # Fast code statistics (lines, languages)
     dust # Modern disk usage analyzer (faster than du)
     tmux # Session persistence and parallel operations
-    parallel # GNU parallel for concurrent execution
     procs # Modern process viewer (better than ps)
     entr # File watcher for automated rebuilds/tests
-    watchman # Facebook's file watching service
     just # Modern command runner (better than make)
     bottom # Modern system monitor (btm command)
     ast-grep # Structural search and replace for code
@@ -260,7 +257,6 @@
     openresolv # DNS management for VPN connections
     strace # System call tracer
     (ltrace.overrideAttrs (old: { doCheck = false; })) # Library call tracer (tests disabled - flaky)
-    csvkit # CSV manipulation tools
     jless # JSON viewer (better than jq for large files)
     yq-go # YAML/XML processor (like jq for YAML)
     miller # CSV/JSON/YAML data processing

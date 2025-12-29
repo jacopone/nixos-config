@@ -21,7 +21,8 @@
     baobab # disk usage analyzer
     epiphany # web browser
     simple-scan # document scanner
-    totem # video player
+    totem # video player (legacy)
+    showtime # video player (GTK4, GNOME 49+) - redundant with VLC
     yelp # help viewer
     geary # email client
     seahorse # password manager
