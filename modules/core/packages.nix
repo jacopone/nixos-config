@@ -222,7 +222,6 @@
 
     # Additional AI workflow enhancement tools
     vhs # Terminal session recording for AI workflow documentation
-    mcfly # Smart command history search with neural networks
 
     # Database development tools (AI-friendly CLI clients)
     pgcli # PostgreSQL client with autocompletion and syntax highlighting
@@ -303,8 +302,6 @@
     eog # Eye of GNOME - default GNOME image viewer
     feh # Fast, keyboard-driven image viewer
     sxiv # Simple X Image Viewer with thumbnails
-    sioyek # Modern PDF viewer for technical documents
-    mupdf # Fast PDF renderer and viewer
     kdePackages.okular # Full-featured PDF viewer with annotations
     file-roller # Archive manager for GNOME
   ];
