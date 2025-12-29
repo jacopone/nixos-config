@@ -30,12 +30,10 @@
     wireplumber = {
       enable = true;
       extraConfig = {
-        "10-bluez" = {
-          "monitor.bluez.properties" = {
-            "bluez5.enable-hw-volume" = true;
-            "bluez5.headset-roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
-            "bluez5.default.rate" = 48000;
-            "bluez5.default.channels" = 2;
+        # Disable automatic headset profile switching - this is what triggers gsd-media-keys crash
+        "11-bluetooth-policy" = {
+          "wireplumber.settings" = {
+            "bluetooth.autoswitch-to-headset-profile" = false;
           };
         };
       };
