@@ -320,15 +320,22 @@ if [ "$VERBOSE" = true ]; then
     NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | tee -a "$LOG_FILE" | tail -1)
 elif [ "$USE_NOM" = true ]; then
     # Use nix-output-monitor for beautiful build tree visualization
+    # Use --out-link instead of --print-out-paths to avoid pipeline complexity
+    BUILD_LINK="/tmp/nixos-build-$$"
     echo ""
-    NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json | tee -a "$LOG_FILE" | tail -1)
+    NIXPKGS_ALLOW_UNFREE=1 nix build --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom 2>&1 | tee -a "$LOG_FILE"
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ $BUILD_EXIT -ne 0 ]; then
         log_error "Test build failed (exit code: $BUILD_EXIT)"
         echo "Check logs: $LOG_FILE"
+        rm -f "$BUILD_LINK"
         exit 1
     fi
+
+    # Get path from symlink and clean up
+    NEW_CONFIG_PATH=$(readlink -f "$BUILD_LINK")
+    rm -f "$BUILD_LINK"
 else
     # Fallback: custom progress indicator (when nom not available)
     NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel > /tmp/nixbuild-output-$$.tmp 2>>"$LOG_FILE" &
