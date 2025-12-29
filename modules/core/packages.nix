@@ -147,7 +147,6 @@
     fish # A smart and user-friendly command line shell - https://fishshell.com/
     fishPlugins.z # A z-like directory jumping plugin for fish
     eza # A modern replacement for ls - https://eza.rocks/
-    peco # Simplistic interactive filtering tool
     gedit # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
     jq # JSON processor - essential for development
     ripgrep # Super fast grep (rg command)
@@ -182,9 +181,7 @@
 
     # system tools
     fastfetch # A neofetch-like tool for fetching system information and displaying them in a pretty way
-    pydf # A df-like utility that displays disk usage in a more human-readable format
     gparted # A free partition editor for graphically managing your disk partitions - https://gparted.org/
-    gtop # A system monitoring dashboard for your terminal
     usbimager # A minimalist GUI application to write compressed disk images to USB drives
     p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
     wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
@@ -216,16 +213,12 @@
     entr # File watcher for automated rebuilds/tests
     watchman # Facebook's file watching service
     just # Modern command runner (better than make)
-    dua # Tool to conveniently learn about disk usage of directories
     bottom # Modern system monitor (btm command)
     ast-grep # Structural search and replace for code
     semgrep # Static analysis for pattern matching
-    httpie # Better HTTP client for API testing
     xh # Fast HTTPie alternative in Rust
     delta # Better git diff viewer
-    gitui # Terminal git UI
     lazygit # Simple terminal UI for git
-    duf # Modern df alternative with color
 
     # Additional AI workflow enhancement tools
     vhs # Terminal session recording for AI workflow documentation
@@ -274,7 +267,6 @@
     miller # CSV/JSON/YAML data processing
     zoxide # Smarter cd command (z replacement)
     starship # Cross-shell prompt
-    skim # Fuzzy finder (fzf alternative)
     choose # Human-friendly cut/awk alternative
     shellcheck # Shell script linter
     shfmt # Shell formatter
