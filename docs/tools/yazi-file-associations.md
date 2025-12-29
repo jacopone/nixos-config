@@ -34,7 +34,7 @@ This document explains how yazi is configured to open different file types with 
 ### 🖼️ Media Files
 | File Type | Primary Action | Secondary Actions |
 |-----------|----------------|-------------------|
-| `*.jpg`, `*.png`, `*.gif`, etc. | `eog` (Eye of GNOME) | `sxiv`, `feh` |
+| `*.jpg`, `*.png`, `*.gif`, etc. | `eog` (Eye of GNOME) | `feh` |
 | `*.pdf` | `okular` | - |
 | `*.csv` | LibreOffice Calc | `csvlook`, `hx` |
 | Office docs (`*.doc`, `*.xlsx`, etc.) | `libreoffice` | - |
