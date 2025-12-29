@@ -270,6 +270,8 @@
     shellcheck # Shell script linter
     shfmt # Shell formatter
     nixpkgs-fmt # Nix code formatter (for pre-commit hooks)
+    nvd # NixOS package version diff tool (used by rebuild-nixos)
+    nix-output-monitor # Beautiful build tree visualization (nom command, used by rebuild-nixos)
 
     # useseless tools
     cmatrix # A terminal-based "Matrix" screen saver

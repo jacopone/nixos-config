@@ -8,18 +8,30 @@ export NIXOS_REBUILD_WRAPPER=1
 # Parse command line arguments
 VERBOSE=false
 DRY_RUN=false
+QUICK=false
+YES=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --verbose|-v) VERBOSE=true; shift ;;
         --dry-run|-n) DRY_RUN=true; shift ;;
+        --quick|-q) QUICK=true; shift ;;
+        --yes|-y) YES=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
             echo "Options:"
             echo "  -v, --verbose    Show detailed output during build"
             echo "  -n, --dry-run    Show what would happen without making changes"
+            echo "  -q, --quick      Skip optional cleanup phases (faster rebuild)"
+            echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
             echo "  -h, --help       Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  ./rebuild-nixos              # Full interactive rebuild"
+            echo "  ./rebuild-nixos --quick      # Skip cleanup phases"
+            echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
+            echo "  ./rebuild-nixos -q -y        # Fastest: skip cleanup + auto-accept"
             exit 0
             ;;
         *)
@@ -42,6 +54,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
+BOLD='\033[1m'
 
 # Tracking arrays for summary
 declare -a WARNINGS=()
@@ -73,6 +86,32 @@ add_action() {
 
 add_stat() {
     STATS+=("$1")
+}
+
+# Major step indicator with "Step X/Y" format
+# Usage: step "Step description"
+step() {
+    CURRENT_STEP=$((CURRENT_STEP + 1))
+    local step_name="$1"
+    echo ""
+    echo -e "${BLUE}━━━ Step $CURRENT_STEP/$TOTAL_STEPS: $step_name ━━━${NC}"
+}
+
+# Prompt user with auto-accept support
+# Usage: prompt_user "Question?" "default" → returns 0 (yes) or 1 (no)
+# With --yes flag: auto-accepts (returns 0)
+prompt_user() {
+    local prompt="$1"
+    local default="${2:-n}"  # Default to 'n' if not specified
+
+    if [ "$YES" = true ]; then
+        echo -e "$prompt ${GREEN}[auto-accepted]${NC}"
+        return 0  # Yes
+    fi
+
+    read -p "$prompt " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]]
 }
 
 # Dry-run helper - shows what would run without executing
@@ -170,12 +209,34 @@ show_progress() {
     fi
 }
 
+# Step counter for "Step X/Y" progress indicator
+# Core steps (always run): Update inputs, Build, Diff preview, Activate, Update Claude configs
+# Optional steps (skipped with --quick): Adaptive learning
+if [ "$QUICK" = true ]; then
+    TOTAL_STEPS=5
+else
+    TOTAL_STEPS=6
+fi
+CURRENT_STEP=0
+
+# Track total rebuild duration
+REBUILD_START_TIME=$(date +%s)
+
 # Start rebuild
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║            NixOS System Rebuild & Configuration            ║"
+echo "╠════════════════════════════════════════════════════════════╣"
 if [ "$DRY_RUN" = true ]; then
-echo "║          [DRY-RUN MODE - No changes will be made]          ║"
+echo "║  Mode: Dry-run (no changes will be made)                   ║"
+elif [ "$QUICK" = true ] && [ "$YES" = true ]; then
+echo "║  Mode: Quick + Auto-accept (fastest)                       ║"
+elif [ "$QUICK" = true ]; then
+echo "║  Mode: Quick (skip cleanup phases)                         ║"
+elif [ "$YES" = true ]; then
+echo "║  Mode: Auto-accept (non-interactive)                       ║"
+else
+echo "║  Mode: Full (interactive)                                  ║"
 fi
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
@@ -202,7 +263,7 @@ fi
 # Side effects: Modifies flake.lock, may pull in breaking changes
 # Exit on failure: Yes (can't build without valid inputs)
 
-log_step "Updating flake inputs..."
+step "Updating flake inputs"
 
 if dry_run_skip "update flake inputs (nixpkgs, home-manager, local repos)"; then
     : # skip
@@ -244,13 +305,32 @@ fi
 # This catches build errors before touching running system
 # Exit on failure: Yes (don't activate broken config)
 # Perform a test build
-log_step "Performing test build..."
+step "Building configuration"
+
+# Check if nom (nix-output-monitor) is available for beautiful build visualization
+if command -v nom &>/dev/null; then
+    USE_NOM=true
+else
+    USE_NOM=false
+    [ "$VERBOSE" = false ] && log_warning "nom not found - using basic progress indicator (install nix-output-monitor for better UX)"
+fi
 
 if [ "$VERBOSE" = true ]; then
     # Verbose mode - show all output
     NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | tee -a "$LOG_FILE" | tail -1)
+elif [ "$USE_NOM" = true ]; then
+    # Use nix-output-monitor for beautiful build tree visualization
+    echo ""
+    NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json | tee -a "$LOG_FILE" | tail -1)
+    BUILD_EXIT=${PIPESTATUS[0]}
+
+    if [ $BUILD_EXIT -ne 0 ]; then
+        log_error "Test build failed (exit code: $BUILD_EXIT)"
+        echo "Check logs: $LOG_FILE"
+        exit 1
+    fi
 else
-    # Non-verbose mode - show progress indicator
+    # Fallback: custom progress indicator (when nom not available)
     NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel > /tmp/nixbuild-output-$$.tmp 2>>"$LOG_FILE" &
     BUILD_PID=$!
     show_progress "test-build" $BUILD_PID
@@ -270,13 +350,53 @@ fi
 
 log_success "Test build successful"
 
+# === PHASE 2.5: Package Diff Preview ===
+# Shows what packages will change before activation (using nvd)
+# This helps users understand the impact before committing
+if command -v nvd &>/dev/null; then
+    CURRENT_SYSTEM=$(readlink -f /run/current-system)
+    step "Analyzing package changes"
+    echo ""
+
+    # Run nvd diff and capture output
+    NVD_OUTPUT=$(nvd diff "$CURRENT_SYSTEM" "$NEW_CONFIG_PATH" 2>/dev/null || true)
+
+    if [ -n "$NVD_OUTPUT" ]; then
+        # Count changes
+        PKG_ADDED=$(echo "$NVD_OUTPUT" | grep -c "^+" || echo "0")
+        PKG_REMOVED=$(echo "$NVD_OUTPUT" | grep -c "^-" || echo "0")
+        PKG_UPGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↑" || echo "0")
+        PKG_DOWNGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↓" || echo "0")
+
+        echo -e "  ${GREEN}+${NC} Added: $PKG_ADDED  ${RED}-${NC} Removed: $PKG_REMOVED  ${BLUE}↑${NC} Upgraded: $PKG_UPGRADED  ${YELLOW}↓${NC} Downgraded: $PKG_DOWNGRADED"
+        echo ""
+
+        # Show first 20 changes
+        CHANGE_LINES=$(echo "$NVD_OUTPUT" | wc -l)
+        if [ "$CHANGE_LINES" -gt 20 ]; then
+            echo "$NVD_OUTPUT" | head -20
+            echo "  ... and $((CHANGE_LINES - 20)) more changes"
+        else
+            echo "$NVD_OUTPUT"
+        fi
+        echo ""
+
+        # Store for summary
+        PKG_CHANGES="$PKG_ADDED added, $PKG_REMOVED removed, $PKG_UPGRADED upgraded"
+        add_stat "Packages: $PKG_CHANGES"
+    else
+        echo "  No package changes detected"
+        PKG_CHANGES="No changes"
+    fi
+fi
+
 # === PHASE 3: Activate Configuration ===
 # Switches running system to new configuration (requires sudo)
 # This is the critical step - system state changes here
 # Exit on failure: Yes (activation failed, system unchanged)
 # Rollback available: Use 'sudo nixos-rebuild switch --rollback'
 # Activate the new configuration
-log_step "Activating new configuration..."
+step "Activating configuration"
 
 if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
     : # skip
@@ -288,8 +408,16 @@ else
         else
             ACTIVATE_EXIT=$?
         fi
+    elif [ "$USE_NOM" = true ]; then
+        # Use nix-output-monitor for beautiful activation visualization
+        echo ""
+        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>&1 | nom | tee -a "$LOG_FILE"; then
+            ACTIVATE_EXIT=0
+        else
+            ACTIVATE_EXIT=${PIPESTATUS[0]}
+        fi
     else
-        # Non-verbose mode - show progress indicator
+        # Fallback: custom progress indicator (when nom not available)
         sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>>"$LOG_FILE" &
         ACTIVATE_PID=$!
         show_progress "activation" $ACTIVATE_PID
@@ -315,7 +443,7 @@ fi
 # Uses claude-nixos-automation flake (local if available, GitHub fallback)
 # Exit on failure: No (continue with warnings - not critical to system)
 # Update Claude Code configurations
-log_step "Updating Claude Code configurations..."
+step "Updating Claude configs"
 
 if dry_run_skip "update Claude Code configurations (CLAUDE.md, permissions, MCP analytics)"; then
     AUTOMATION_EXIT=1  # Skip the nested phases 5-6
@@ -533,12 +661,15 @@ fi  # End dry-run skip for Phase 4-6
 # Generates draft changelog entries from commits since last update
 # Exit on failure: No (non-critical, system already activated)
 # User interaction: Yes (review and approve draft)
+# Skip with: --quick flag
 echo ""
-log_step "Checking for changelog updates..."
 
-if dry_run_skip "generate changelog draft from recent commits"; then
+if [ "$QUICK" = true ]; then
+    log_step "Skipping changelog generation (--quick mode)"
+elif dry_run_skip "generate changelog draft from recent commits"; then
     : # skip
 else
+    log_step "Checking for changelog updates..."
     # Track last processed commit to avoid re-proposing same changes
     CHANGELOG_STATE_FILE=".claude/.changelog-last-processed"
     LAST_PROCESSED_COMMIT=""
@@ -565,10 +696,7 @@ else
 
     if [ "$NEW_COMMITS" -gt 0 ]; then
             echo "  Found $NEW_COMMITS commits since $SINCE_MARKER"
-            read -p "  Generate changelog draft? [y/N] " -n 1 -r CHANGELOG_REPLY
-            echo
-
-            if [[ $CHANGELOG_REPLY =~ ^[Yy]$ ]]; then
+            if prompt_user "  Generate changelog draft? [y/N]"; then
                 # Run changelog generator script
                 if [ -x "./scripts/generate-changelog-draft.sh" ]; then
                     if ./scripts/generate-changelog-draft.sh > /tmp/changelog-draft-$$.md 2>/dev/null; then
@@ -647,13 +775,15 @@ fi
 # - Meta-learning (calibrate detection thresholds)
 # Exit on failure: No (learning is optional, system already activated)
 # User interaction: Yes (interactive approval of suggestions)
-# === ADAPTIVE LEARNING CYCLE ===
-echo ""
-log_step "Running adaptive learning cycle..."
+# Skip with: --quick flag
 
-if dry_run_skip "run adaptive learning cycle (interactive ML analysis)"; then
-    : # skip
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode (step not counted)
+elif dry_run_skip "run adaptive learning cycle (interactive ML analysis)"; then
+    step "Adaptive learning"  # Count step even in dry-run
 else
+    step "Adaptive learning"
+    log_step "Running adaptive learning cycle..."
     AUTOMATION_DIR="$HOME/claude-nixos-automation"
     if [[ -d "$AUTOMATION_DIR" ]]; then
         # STEP 0: Ensure Claude Code hooks are deployed to settings.json
@@ -701,7 +831,7 @@ else
     fi
 fi
 
-# === PHASE 8: User Acceptance ===
+# === PHASE 9: User Acceptance ===
 # User tests the activated configuration
 # Offers rollback if issues found
 echo ""
@@ -710,10 +840,7 @@ if [ "$DRY_RUN" = true ]; then
     log_step "Dry-run complete. No changes were made."
 else
     log_step "Configuration activated. Please test the changes now."
-    read -p "Are you satisfied with the changes? (y/n) " -n 1 -r
-    echo
-
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if prompt_user "Are you satisfied with the changes? (y/n)"; then
         log_success "Changes accepted"
         add_action "Configuration tested and accepted"
     else
@@ -724,14 +851,16 @@ else
     fi
 fi
 
-# === PHASE 9: Generation Cleanup ===
+# === PHASE 10: Generation Cleanup ===
 # Deletes old NixOS generations to free disk space
 # User selects which generations to delete
 # Runs garbage collection after deletion
 # Exit on failure: No (cleanup is optional)
-# Clean up old generations
+# Skip with: --quick flag
 
-if [ "$DRY_RUN" = false ]; then
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode
+elif [ "$DRY_RUN" = false ]; then
     echo ""
     log_step "Listing system generations..."
     sudo nixos-rebuild list-generations
@@ -779,7 +908,7 @@ if [ "$DRY_RUN" = false ]; then
     fi
 fi
 
-# === PHASE 10: Disk Space Analysis ===
+# === PHASE 11: Disk Space Analysis ===
 # Scans for problematic disk usage patterns:
 # - Oversized logs (>100MB = investigate)
 # - Large Claude sessions (>5MB = stuck session?)
@@ -787,9 +916,13 @@ fi
 # - Old backups (cleanup candidates)
 # Checks learning data health (GREEN/YELLOW/RED risk levels)
 # Exit on failure: No (analysis only, no changes made)
-# Disk space analysis for problematic areas
-echo ""
-log_step "Analyzing disk space for issues..."
+# Skip with: --quick flag
+
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode
+else
+    echo ""
+    log_step "Analyzing disk space for issues..."
 declare -a DISK_WARNINGS=()
 
 # Check for oversized log files (>100MB = problematic)
@@ -857,16 +990,19 @@ if [ ${#DISK_WARNINGS[@]} -gt 0 ]; then
     [ "$LARGE_CONFIGS" -gt 0 ] && echo "   fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 | rg -v 'IndexedDB|chrome'"
     echo ""
 fi
+fi  # End QUICK mode skip for Phase 11 (Disk Analysis)
 
-# === PHASE 11: Cache Cleanup ===
+# === PHASE 12: Cache Cleanup ===
 # Offers to clean large cache directories:
 # - UV Python cache, Chrome cache, Yarn/npm/pnpm caches
 # User confirms before deletion
 # Safe to delete (caches regenerate on demand)
 # Exit on failure: No (cleanup is optional)
-# Clean up cache directories
+# Skip with: --quick flag
 
-if [ "$DRY_RUN" = false ]; then
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode
+elif [ "$DRY_RUN" = false ]; then
     echo ""
     log_step "Cache cleanup options..."
     echo "Large cache directories detected:"
@@ -913,9 +1049,7 @@ if [ $TOTAL_CACHE_MB -gt 0 ]; then
     echo "  Total: ${TOTAL_CACHE_MB}MB"
 fi
 
-read -p "Clean these cache directories? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+if prompt_user "Clean these cache directories? (y/n)"; then
     log_step "Cleaning cache directories..."
     [ -d ~/.cache/uv ] && rm -rf ~/.cache/uv && echo "  ✓ UV cache"
     [ -d ~/.cache/google-chrome ] && rm -rf ~/.cache/google-chrome && echo "  ✓ Chrome cache"
@@ -931,13 +1065,15 @@ else
 fi
 fi  # End dry-run skip for Phase 11
 
-# === PHASE 12: Claude Session Lifecycle Cleanup ===
+# === PHASE 13: Claude Session Lifecycle Cleanup ===
 # Deletes sessions marked as IMPLEMENTED (insights already extracted)
 # Session lifecycle: RAW → ANALYZED → INSIGHTS_GENERATED → IMPLEMENTED
 # Only IMPLEMENTED sessions are safe to delete (value captured)
 # Exit on failure: No (cleanup is optional)
-# Clean up Claude session files (Phase 2: Lifecycle-based cleanup)
-if [ "$DRY_RUN" = false ] && [ -d ~/.claude/projects ]; then
+# Skip with: --quick flag
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode
+elif [ "$DRY_RUN" = false ] && [ -d ~/.claude/projects ]; then
     echo ""
     log_step "Checking Claude session lifecycle..."
 
@@ -1012,10 +1148,7 @@ PYTHON_EOF
     if [ "$SAFE_COUNT" -gt 0 ]; then
         echo "  💡 ${SAFE_COUNT} sessions marked as IMPLEMENTED can be safely deleted"
         echo "     (Insights have been extracted and applied to system config)"
-        read -p "  Delete ${SAFE_COUNT} IMPLEMENTED sessions? [y/N]: " -n 1 -r
-        echo
-
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if prompt_user "  Delete ${SAFE_COUNT} IMPLEMENTED sessions? [y/N]:"; then
             log_step "Cleaning up IMPLEMENTED sessions..."
 
             # Extract temp file path from lifecycle output
@@ -1077,12 +1210,14 @@ FREED_MB:0"
     fi
 fi
 
-# === PHASE 13: Claude Backup Cleanup ===
+# === PHASE 14: Claude Backup Cleanup ===
 # Cleans .backups/ directory (old Claude Code backup files)
 # Options: delete all, delete >7 days old, or skip
 # Exit on failure: No (cleanup is optional)
-# Clean up old Claude backup files
-if [ "$DRY_RUN" = false ] && [ -d .backups ]; then
+# Skip with: --quick flag
+if [ "$QUICK" = true ]; then
+    : # Skip silently in quick mode
+elif [ "$DRY_RUN" = false ] && [ -d .backups ]; then
     backup_count=$(fd -t f 'backup-' .backups 2>/dev/null | wc -l)
     if [ "$backup_count" -gt 0 ]; then
         echo ""
@@ -1113,52 +1248,63 @@ if [ "$DRY_RUN" = false ] && [ -d .backups ]; then
     fi
 fi
 
+# Calculate total duration
+REBUILD_END_TIME=$(date +%s)
+TOTAL_DURATION=$((REBUILD_END_TIME - REBUILD_START_TIME))
+DURATION_MINS=$((TOTAL_DURATION / 60))
+DURATION_SECS=$((TOTAL_DURATION % 60))
+
+if [ $DURATION_MINS -gt 0 ]; then
+    DURATION_STR="${DURATION_MINS}m ${DURATION_SECS}s"
+else
+    DURATION_STR="${DURATION_SECS}s"
+fi
+
 # Print summary
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
 if [ "$DRY_RUN" = true ]; then
-echo "║                  Dry-Run Summary                           ║"
+echo "║                  ✅ Dry-Run Complete                        ║"
 else
-echo "║                    Rebuild Summary                         ║"
+echo "║                  ✅ Rebuild Complete                        ║"
+fi
+echo "╠════════════════════════════════════════════════════════════╣"
+printf "║  Duration: %-47s ║\n" "$DURATION_STR"
+if [ -n "$PKG_CHANGES" ] && [ "$PKG_CHANGES" != "No changes" ]; then
+printf "║  Packages: %-47s ║\n" "$PKG_CHANGES"
+fi
+if [ "$QUICK" = true ]; then
+printf "║  Mode: %-50s ║\n" "Quick (cleanup skipped)"
 fi
 echo "╚════════════════════════════════════════════════════════════╝"
-echo ""
 
 if [ ${#ACTIONS[@]} -gt 0 ]; then
-    echo "📋 Actions completed:"
+    echo ""
+    echo "📋 Actions:"
     for action in "${ACTIONS[@]}"; do
         echo "   ✓ $action"
     done
-    echo ""
 fi
 
 if [ ${#STATS[@]} -gt 0 ]; then
-    echo "📊 Statistics:"
+    echo ""
+    echo "📊 Stats:"
     for stat in "${STATS[@]}"; do
         echo "   • $stat"
     done
-    echo ""
 fi
 
 if [ ${#WARNINGS[@]} -gt 0 ]; then
-    echo -e "${YELLOW}⚠️  Warnings (review recommended):${NC}"
+    echo ""
+    echo -e "${YELLOW}⚠️  Warnings:${NC}"
     for warning in "${WARNINGS[@]}"; do
         echo "   • $warning"
     done
-    echo ""
 fi
 
 if [ "$VERBOSE" = false ]; then
-    echo "📁 Detailed logs: $LOG_FILE"
-    if [ -f "$LOG_FILE.automation" ]; then
-        echo "   Automation logs: $LOG_FILE.automation"
-    fi
     echo ""
+    echo "📁 Logs: $LOG_FILE"
 fi
 
-if [ "$DRY_RUN" = true ]; then
-    log_success "Dry-run complete! No changes were made."
-else
-    log_success "NixOS system rebuild and cleanup complete!"
-fi
 echo ""
