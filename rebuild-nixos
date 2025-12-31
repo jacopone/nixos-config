@@ -1128,7 +1128,7 @@ if prompt_user "Clean these cache directories? (y/n)"; then
     [ -d ~/.cache/yarn ] && rm -rf ~/.cache/yarn && echo "  ✓ Yarn cache"
     [ -d ~/.cache/ms-playwright ] && rm -rf ~/.cache/ms-playwright && echo "  ✓ Playwright cache"
     [ -d ~/.cache/pnpm ] && rm -rf ~/.cache/pnpm && echo "  ✓ PNPM cache"
-    [ -d ~/.npm ] && npm cache clean --force 2>/dev/null && echo "  ✓ npm cache"
+    [ -d ~/.npm ] && rm -rf ~/.npm && echo "  ✓ npm cache"
     [ -d ~/.cache/chromium ] && rm -rf ~/.cache/chromium && echo "  ✓ Chromium cache"
     log_success "Cache cleanup complete (freed ~${TOTAL_CACHE_MB}MB)"
     add_action "Cleared ${TOTAL_CACHE_MB}MB of cache"
