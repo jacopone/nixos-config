@@ -71,11 +71,15 @@ jobs:
               continue
             fi
 
-            # Check if file contains personal paths
+            # Check if file contains personal paths (but allow workflow files through)
             if git show "origin/personal:$file" 2>/dev/null | grep -q "$PERSONAL_HOME"; then
               if [[ "$file" == *.md ]] || [[ "$file" == *.nix ]]; then
                 SANITIZE_LIST="$SANITIZE_LIST $file"
                 echo "- Sanitize: $file" >> "$GITHUB_STEP_SUMMARY"
+              elif [[ "$file" == .github/workflows/*.yml ]]; then
+                # Workflow files contain PERSONAL_HOME as env var - sync them directly
+                SYNC_LIST="$SYNC_LIST $file"
+                echo "- Sync: $file (workflow)" >> "$GITHUB_STEP_SUMMARY"
               else
                 echo "- Skip: $file (personal paths)" >> "$GITHUB_STEP_SUMMARY"
               fi
