@@ -55,8 +55,14 @@ jobs:
           SANITIZE_LIST=""
           DELETE_LIST=""
 
-          # Get added/modified files (exist on personal)
-          CHANGED=$(git diff --name-only --diff-filter=AM origin/master..origin/personal)
+          # Find merge base for proper comparison of diverged branches
+          MERGE_BASE=$(git merge-base origin/master origin/personal)
+          echo "Merge base: $MERGE_BASE"
+
+          # Get files that differ between personal and master (comparing branch tips)
+          # Use three-dot diff to compare personal against merge-base
+          CHANGED=$(git diff --name-only "$MERGE_BASE" origin/personal)
+          echo "Changed files from merge-base: $CHANGED"
 
           for file in $CHANGED; do
             # Skip personal-only files
@@ -79,8 +85,10 @@ jobs:
             fi
           done
 
-          # Get deleted files (exist on master but not on personal)
-          DELETED=$(git diff --name-only --diff-filter=D origin/master..origin/personal)
+          # Get deleted files (files that exist on master but were removed on personal since merge-base)
+          # Compare what's on master vs what's on personal
+          DELETED=$(git diff --name-only --diff-filter=D "$MERGE_BASE" origin/personal)
+          echo "Deleted files since merge-base: $DELETED"
 
           for file in $DELETED; do
             # Skip personal-only files (don't delete what shouldn't exist on master anyway)
