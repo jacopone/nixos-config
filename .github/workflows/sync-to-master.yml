@@ -107,20 +107,21 @@ jobs:
             if [ -n "$file" ] && [ "$file" != " " ]; then
               git checkout origin/personal -- "$file" 2>/dev/null || continue
 
-              # Sanitize CLAUDE.md USER_MEMORY section
-              if [[ "$file" == *"CLAUDE.md" ]]; then
-                sed -i '/<!-- USER_MEMORY_START -->/,/<!-- USER_MEMORY_END -->/{
-                  /<!-- USER_MEMORY_START -->/b
-                  /<!-- USER_MEMORY_END -->/b
-                  /<!-- Add your content below this line -->/b
-                  d
-                }' "$file" 2>/dev/null || true
-              fi
-
               # Replace personal paths with placeholders
               sed -i "s|${PERSONAL_HOME}|/home/YOUR_USERNAME|g" "$file" 2>/dev/null || true
             fi
           done
+
+          # Always sanitize CLAUDE.md USER_MEMORY section (regardless of sync path)
+          if [ -f "CLAUDE.md" ]; then
+            sed -i '/<!-- USER_MEMORY_START -->/,/<!-- USER_MEMORY_END -->/{
+              /<!-- USER_MEMORY_START -->/b
+              /<!-- USER_MEMORY_END -->/b
+              /<!-- This section preserves/b
+              /<!-- Add your content below/b
+              d
+            }' "CLAUDE.md" 2>/dev/null || true
+          fi
 
       - name: Commit and push
         if: steps.check.outputs.skip != 'true'
