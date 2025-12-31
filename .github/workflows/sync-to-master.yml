@@ -48,14 +48,15 @@ jobs:
         run: |
           echo "## Sync Analysis" >> "$GITHUB_STEP_SUMMARY"
 
-          # Get changed files
-          CHANGED=$(git diff --name-only origin/master..origin/personal)
-
           # Files to always skip (personal-only)
           SKIP_PATTERNS=".claude/CLAUDE.local.md|.claude/settings.local.json|.claude/learning/|secrets/|.env|.local."
 
           SYNC_LIST=""
           SANITIZE_LIST=""
+          DELETE_LIST=""
+
+          # Get added/modified files (exist on personal)
+          CHANGED=$(git diff --name-only --diff-filter=AM origin/master..origin/personal)
 
           for file in $CHANGED; do
             # Skip personal-only files
@@ -78,14 +79,28 @@ jobs:
             fi
           done
 
+          # Get deleted files (exist on master but not on personal)
+          DELETED=$(git diff --name-only --diff-filter=D origin/master..origin/personal)
+
+          for file in $DELETED; do
+            # Skip personal-only files (don't delete what shouldn't exist on master anyway)
+            if echo "$file" | grep -qE "$SKIP_PATTERNS"; then
+              continue
+            fi
+            DELETE_LIST="$DELETE_LIST $file"
+            echo "- Delete: $file" >> "$GITHUB_STEP_SUMMARY"
+          done
+
           echo "sync_files=$SYNC_LIST" >> "$GITHUB_OUTPUT"
           echo "sanitize_files=$SANITIZE_LIST" >> "$GITHUB_OUTPUT"
+          echo "delete_files=$DELETE_LIST" >> "$GITHUB_OUTPUT"
 
       - name: Sync files to master
         if: steps.check.outputs.skip != 'true'
         env:
           SYNC_FILES: ${{ steps.filter.outputs.sync_files }}
           SANITIZE_FILES: ${{ steps.filter.outputs.sanitize_files }}
+          DELETE_FILES: ${{ steps.filter.outputs.delete_files }}
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           # Checkout master
@@ -109,6 +124,13 @@ jobs:
 
               # Replace personal paths with placeholders
               sed -i "s|${PERSONAL_HOME}|/home/YOUR_USERNAME|g" "$file" 2>/dev/null || true
+            fi
+          done
+
+          # Delete files that were removed on personal
+          for file in $DELETE_FILES; do
+            if [ -n "$file" ] && [ "$file" != " " ]; then
+              git rm "$file" 2>/dev/null || true
             fi
           done
 
