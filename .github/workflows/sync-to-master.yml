@@ -1,0 +1,157 @@
+name: Sync Personal to Master (Sanitized)
+
+# Automatically sync personal branch to master, stripping personal information
+# This allows you to work on personal branch while keeping master public-ready
+
+on:
+  push:
+    branches:
+      - personal
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sync-sanitized:
+    runs-on: ubuntu-latest
+    env:
+      # Personal info patterns to sanitize (defined as env vars for safety)
+      PERSONAL_USERNAME: "guyfawkes"
+      PERSONAL_HOME: "/home/guyfawkes"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for new commits
+        id: check
+        run: |
+          COMMIT_COUNT=$(git rev-list --count origin/master..origin/personal)
+          echo "commit_count=$COMMIT_COUNT" >> "$GITHUB_OUTPUT"
+
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "No new commits to sync"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Found $COMMIT_COUNT commits to sync"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Analyze and filter files
+        if: steps.check.outputs.skip != 'true'
+        id: filter
+        run: |
+          echo "## Sync Analysis" >> "$GITHUB_STEP_SUMMARY"
+
+          # Get changed files
+          CHANGED=$(git diff --name-only origin/master..origin/personal)
+
+          # Files to always skip (personal-only)
+          SKIP_PATTERNS=".claude/CLAUDE.local.md|.claude/settings.local.json|.claude/learning/|secrets/|.env|.local."
+
+          SYNC_LIST=""
+          SANITIZE_LIST=""
+
+          for file in $CHANGED; do
+            # Skip personal-only files
+            if echo "$file" | grep -qE "$SKIP_PATTERNS"; then
+              echo "- Skip: $file (personal-only)" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+
+            # Check if file contains personal paths
+            if git show "origin/personal:$file" 2>/dev/null | grep -q "$PERSONAL_HOME"; then
+              if [[ "$file" == *.md ]] || [[ "$file" == *.nix ]]; then
+                SANITIZE_LIST="$SANITIZE_LIST $file"
+                echo "- Sanitize: $file" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "- Skip: $file (personal paths)" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            else
+              SYNC_LIST="$SYNC_LIST $file"
+              echo "- Sync: $file" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+          echo "sync_files=$SYNC_LIST" >> "$GITHUB_OUTPUT"
+          echo "sanitize_files=$SANITIZE_LIST" >> "$GITHUB_OUTPUT"
+
+      - name: Sync files to master
+        if: steps.check.outputs.skip != 'true'
+        env:
+          SYNC_FILES: ${{ steps.filter.outputs.sync_files }}
+          SANITIZE_FILES: ${{ steps.filter.outputs.sanitize_files }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          # Checkout master
+          git checkout master
+          git pull origin master
+
+          # Create working branch
+          git checkout -b "sync-personal-${RUN_NUMBER}"
+
+          # Copy files that don't need sanitization
+          for file in $SYNC_FILES; do
+            if [ -n "$file" ] && [ "$file" != " " ]; then
+              git checkout origin/personal -- "$file" 2>/dev/null || true
+            fi
+          done
+
+          # Copy and sanitize files with personal content
+          for file in $SANITIZE_FILES; do
+            if [ -n "$file" ] && [ "$file" != " " ]; then
+              git checkout origin/personal -- "$file" 2>/dev/null || continue
+
+              # Sanitize CLAUDE.md USER_MEMORY section
+              if [[ "$file" == *"CLAUDE.md" ]]; then
+                sed -i '/<!-- USER_MEMORY_START -->/,/<!-- USER_MEMORY_END -->/{
+                  /<!-- USER_MEMORY_START -->/b
+                  /<!-- USER_MEMORY_END -->/b
+                  /<!-- Add your content below this line -->/b
+                  d
+                }' "$file" 2>/dev/null || true
+              fi
+
+              # Replace personal paths with placeholders
+              sed -i "s|${PERSONAL_HOME}|/home/YOUR_USERNAME|g" "$file" 2>/dev/null || true
+            fi
+          done
+
+      - name: Commit and push
+        if: steps.check.outputs.skip != 'true'
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          # Check for changes
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "No changes after filtering"
+            echo "### Result: No syncable changes" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Get recent commit subjects for reference (safely)
+          RECENT_COMMITS=$(git log origin/master..origin/personal --format="%h %s" | head -5)
+
+          # Build commit message with printf to avoid YAML parsing issues
+          COMMIT_MSG=$(printf "chore: sync from personal branch (sanitized)\n\nRecent commits synced:\n%s\n\nAuto-synced by GitHub Actions (personal info stripped)" "$RECENT_COMMITS")
+          git commit -m "$COMMIT_MSG"
+
+          # Push to master
+          git push origin HEAD:master
+
+          echo "### Success: Synced to master" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Cleanup
+        if: always()
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          git checkout personal 2>/dev/null || true
+          git branch -D "sync-personal-${RUN_NUMBER}" 2>/dev/null || true
