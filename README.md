@@ -1,46 +1,142 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2025-12-18
+updated: 2025-12-31
 type: reference
 lifecycle: persistent
 ---
 
-# NixOS for AI-Assisted Development
+# Intelligent Permission Learning for Claude Code
 
-> Self-documenting NixOS with intelligent permission learning and usage analytics
+> Your NixOS system learns which commands to auto-approve, reducing friction without compromising security
 
 [![NixOS](https://img.shields.io/badge/NixOS-25.11-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
-[![Flakes](https://img.shields.io/badge/Nix-Flakes-informational.svg?style=flat-square&logo=nixos)](https://nixos.wiki/wiki/Flakes)
-[![Home Manager](https://img.shields.io/badge/Home-Manager-orange.svg?style=flat-square)](https://github.com/nix-community/home-manager)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-5A67D8.svg?style=flat-square&logo=anthropic)](https://claude.ai)
 [![License](https://img.shields.io/github/license/jacopone/nixos-config?style=flat-square)](LICENSE)
 
 ## The Problem
 
-"Claude, use `fd` instead of `find`"
-"Claude, I have `bat` installed, stop suggesting `cat`"
-"Claude, my system has `ripgrep`..."
+Every Claude Code session:
 
-**Stop explaining your environment every session.**
+```
+Allow "git status"? [y/n]
+Allow "fd -e py"? [y/n]
+Allow "rg TODO"? [y/n]
+... 47 more prompts ...
+```
 
-## The Solution
+**Your options:**
+1. Click approve 50+ times per session (tedious)
+2. Use `--dangerously-skip-permissions` (security nightmare)
+3. Manually maintain permission configs (never stays current)
 
-This NixOS configuration closes the loop: **System state → Documentation → AI knowledge**
+**This project adds Option 4:** Let your system learn what's safe.
+
+## How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  YOUR WORKFLOW                                                  │
+│                                                                 │
+│  You approve "git status" → System logs it                      │
+│  You approve "fd -e nix" → System logs it                       │
+│  You approve "rg pattern" → System logs it                      │
+│         ...50+ approvals across sessions...                     │
+│                                                                 │
+│  ./rebuild-nixos runs → Adaptive learning triggers              │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Pattern detected: "git *" approved 89 times (98% rate)  │   │
+│  │ Confidence: 0.94                                        │   │
+│  │ → Auto-generate: allow Bash(git:*)                      │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  Next session: "git status" auto-approved. No prompt.           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Result:** Permission prompts decrease over time as the system learns your workflow.
+
+## Key Features
+
+### 1. Adaptive Permission Learning
+
+The system analyzes your approval history and auto-generates permission rules:
+
+- **Pattern detection** from actual behavior (not guesswork)
+- **Confidence scoring** (only high-confidence patterns become rules)
+- **Audit trail** in `.claude/permissions_auto_generated.md`
+- **Interactive review** before applying suggestions
 
 ```bash
 ./rebuild-nixos
-
-# What happens automatically:
-# ✅ System rebuilds with your changes
-# ✅ Parses 145 tools from your Nix config
-# ✅ Generates CLAUDE.md with tool inventory
-# ✅ Updates AI context for all future sessions
+# Step 6/6: Adaptive learning
+# Found 3 permission patterns:
+#   [1] Bash(git:*) - 94% confidence
+#   [2] Bash(fd:*) - 87% confidence
+#   [3] Read(/home/user/projects/**) - 91% confidence
+# Apply these? [y/n/review each]
 ```
 
-**Result**: Claude Code automatically uses `fd`, `bat`, `rg`, and 142 other modern tools correctly—every session.
+### 2. Zero-Drift Documentation
 
-![Demo: Rebuild updates AI knowledge](docs/assets/rebuild-demo.gif)
+System state automatically syncs to Claude's knowledge:
+
+```
+packages.nix changes → ./rebuild-nixos → CLAUDE.md updated
+```
+
+- **No manual docs** to maintain
+- **Every tool** extracted with descriptions
+- **Always current** - impossible to drift
+
+### 3. Ephemeral Testing (NixOS-Specific)
+
+Test anything without polluting your system:
+
+```bash
+# Test with pytest without installing it globally
+nix shell nixpkgs#pytest --command pytest tests/
+
+# Enter a reproducible dev environment
+nix develop
+
+# Exit → system unchanged. No cleanup needed.
+```
+
+**Why this matters:**
+- macOS: `pip install pytest` → permanent system change
+- Ubuntu: `apt install python3-pytest` → permanent system change
+- NixOS: `nix shell` → temporary, atomic, reversible
+
+### 4. Usage Analytics
+
+Data-driven decisions about your tools:
+
+```
+Tool Usage Report (30 days)
+──────────────────────────────────────
+Installed: 131 tools
+Used: 34 (26%)
+Dormant: 97 tools (candidates for removal)
+
+Top tools (Human vs Claude):
+  git     H:28  C:989
+  fd      H:0   C:152
+  rg      H:0   C:100
+```
+
+## Why NixOS?
+
+This system requires NixOS because:
+
+| Capability | NixOS | macOS/Ubuntu |
+|------------|-------|--------------|
+| Atomic rebuilds | Switch or rollback completely | Partial state changes |
+| Reproducible environments | `flake.lock` pins exact versions | "Works on my machine" |
+| Ephemeral shells | `nix shell` - test without installing | Every install is permanent |
+| Declarative config | Single source of truth | Scattered across dotfiles |
+| Pure derivations | Same inputs = same outputs | Build depends on system state |
 
 ## Quick Start
 
@@ -50,103 +146,81 @@ cd ~/nixos-config
 ./rebuild-nixos
 ```
 
-**Requirements**: NixOS with Flakes enabled, 8GB+ RAM
-**Time**: ~20 minutes first build
+**Requirements:** NixOS with Flakes enabled, 8GB+ RAM
+**Time:** ~20 minutes first build
 
 **[Full Installation Guide →](INSTALL.md)**
 
-## Key Features
+## The Ecosystem
 
-| Feature | Description |
-|---------|-------------|
-| **Intelligent Permission Learning** | Analyzes 469+ sessions, auto-approves frequent commands, reduces friction |
-| **Tool Usage Analytics** | Tracks which tools are used by humans vs AI, identifies dormant packages |
-| **MCP Server Optimization** | Monitors server utilization, suggests project-level vs system-level placement |
-| **Zero-Drift Documentation** | System state always matches AI knowledge, updated on every rebuild |
-| **Adaptive Suggestions** | Recommends permission patterns, tool additions, configuration improvements |
+| Repository | Purpose |
+|------------|---------|
+| [nixos-config](https://github.com/jacopone/nixos-config) | System config + `rebuild-nixos` orchestration |
+| [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation) | **The brain:** Permission learning, analytics, CLAUDE.md generation |
 
-## How It Works
+## How It Differs from Alternatives
 
-The intelligence comes from [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation):
-
-```
-./rebuild-nixos
-    │
-    ├─→ Parses Nix config → extracts 145 tools with descriptions
-    ├─→ Analyzes Claude Code usage → learns permission patterns
-    ├─→ Tracks tool usage → human vs AI over 30 days
-    ├─→ Generates suggestions → permission auto-approvals, dormant cleanup
-    └─→ Updates CLAUDE.md → full system context for AI
-```
-
-**Result**: Claude Code that learns your workflow and gets smarter with every session.
+| Feature | This Project | mcp-nixos | nixai | Manual Config |
+|---------|-------------|-----------|-------|---------------|
+| Permission auto-learning | From behavior | - | - | - |
+| Zero-drift docs | Automatic | - | - | Manual |
+| Ephemeral testing | Nix shells | N/A | - | - |
+| Tool analytics | H vs C usage | - | - | - |
+| NixOS package info | Via automation | MCP | Yes | - |
 
 ## What's Included
 
-### Modern CLI Stack (replaces POSIX defaults)
-
-| Old | New | Improvement |
-|-----|-----|-------------|
-| `find` | `fd` | 5x faster, friendlier syntax |
-| `ls` | `eza` | Icons, git status, tree view |
-| `cat` | `bat` | Syntax highlighting, git diffs |
-| `grep` | `rg` | 10x faster, smart defaults |
-| `du` | `dust` | Visual, interactive |
-| `ps` | `procs` | Modern output, filtering |
-
-### AI Development Tools
-
-- **Claude Code** - Anthropic's CLI with auto-sync
-- **Antigravity** - Google's next-gen agentic IDE
-- **Cursor** - AI editor with quality gates
-- **Gemini CLI / Jules / Droid** - AI coding agents
-- **Serena MCP** - Semantic code analysis
-
-### Development Environment
-
-- **DevEnv + Direnv** - Per-project environments
-- **Fish shell** - Smart completions, context detection
-- **Kitty terminal** - GPU-accelerated, optimized
-- **GNOME (Wayland)** - Minimal, stable desktop
-
 <details>
-<summary><strong>Full Tool List (145 tools)</strong></summary>
+<summary><strong>Modern CLI Stack (130+ tools)</strong></summary>
 
-**File Operations**: `fd`, `eza`, `bat`, `rg`, `dust`, `dua`, `broot`, `fzf`, `zoxide`, `yazi`
+**Replacements for POSIX defaults:**
+| Old | New | Why |
+|-----|-----|-----|
+| `find` | `fd` | 5x faster, better syntax |
+| `ls` | `eza` | Icons, git status |
+| `cat` | `bat` | Syntax highlighting |
+| `grep` | `rg` | 10x faster |
+| `du` | `dust` | Visual, interactive |
 
-**Development**: `git`, `gh`, `delta`, `lazygit`, `devenv`, `direnv`, `just`
+**AI Development:**
+- Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
 
-**Editors**: `helix`, `zed-editor`, `vscode-fhs`, `cursor`
-
-**Languages**: `nodejs_20`, `python312`, `gcc`, `gnumake`
-
-**Data**: `jq`, `yq-go`, `csvkit`, `miller`, `jless`, `choose`
-
-**Monitoring**: `procs`, `bottom`, `htop`, `hyperfine`
-
-**Quality**: `shellcheck`, `shfmt`, `ruff`, `semgrep`, `tokei`, `lizard`
-
-**AI Tools**: `claude-code`, `antigravity`, `cursor`, `opencode`, `gemini-cli`, `jules`, `droid`, `serena`, `mcp-nixos`, `openspec`, `whisper-cpp`
+**Development:**
+- DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)
 
 See [`modules/core/packages.nix`](modules/core/packages.nix) for the complete list.
 
 </details>
 
+## Repository Structure
+
+```
+nixos-config/
+├── flake.nix                      # Main entry point
+├── rebuild-nixos                  # 14-phase rebuild with learning
+├── modules/
+│   ├── core/packages.nix          # System tools (130+)
+│   └── home-manager/              # User configurations
+├── CLAUDE.md                      # Auto-generated AI context
+└── .claude/
+    ├── settings.local.json        # Auto-generated permissions
+    └── permissions_auto_generated.md  # Audit trail
+```
+
 ## Essential Commands
 
 ```bash
-# System
-./rebuild-nixos              # Interactive rebuild (recommended)
-nix flake check              # Validate configuration
+# System rebuild with permission learning
+./rebuild-nixos
 
-# Modern tools (automatic substitutions)
-cat file.py                  # → bat (syntax highlighting)
-ls                           # → eza (icons + git status)
-find . -name "*.nix"         # → fd (faster)
+# Quick rebuild (skip cleanup phases)
+./rebuild-nixos --quick
 
-# Development
-devenv shell                 # Enter project environment
-yazi                         # Terminal file manager
+# Validate configuration
+nix flake check
+
+# Ephemeral testing
+nix shell nixpkgs#python312 --command python
 ```
 
 ## Documentation
@@ -156,61 +230,6 @@ yazi                         # Terminal file manager
 | [INSTALL.md](INSTALL.md) | Full installation and setup |
 | [THE_CLOSED_LOOP.md](docs/architecture/THE_CLOSED_LOOP.md) | How auto-documentation works |
 | [COMMON_TASKS.md](docs/guides/COMMON_TASKS.md) | Quick reference for daily use |
-| [enhanced-tools-guide.md](docs/tools/enhanced-tools-guide.md) | Modern CLI tools deep dive |
-
-## Ecosystem
-
-| Repository | What It Does |
-|------------|--------------|
-| **[nixos-config](https://github.com/jacopone/nixos-config)** | System configuration + rebuild orchestration |
-| **[claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation)** | **The brain**: Permission learning, usage analytics, intelligent suggestions, CLAUDE.md generation |
-
-## Repository Structure
-
-```
-nixos-config/
-├── flake.nix                      # Main entry point
-├── rebuild-nixos                  # Interactive rebuild script
-├── hosts/nixos/                   # Host-specific config
-├── modules/
-│   ├── core/packages.nix          # 145 system tools
-│   └── home-manager/base.nix      # User configurations
-├── profiles/desktop/              # GNOME setup
-├── docs/                          # Guides and references
-└── CLAUDE.md                      # Auto-generated AI context
-```
-
-## Branch Strategy
-
-This repo uses a two-branch workflow to separate public template from personal config:
-
-| Branch | Purpose | Use Case |
-|--------|---------|----------|
-| `master` | Public template | Fork this for your own setup |
-| `personal` | Full config with personal files | Maintainer's working branch |
-
-### For Users (Forking)
-
-```bash
-# Fork and clone master - it's a clean template
-git clone https://github.com/YOUR_USERNAME/nixos-config.git
-```
-
-### For Maintainers (Adding Personal Files)
-
-```bash
-# Create your own personal branch
-git checkout -b personal
-
-# Add personal configs (gitignored from master)
-mkdir basb-system/        # Knowledge management
-mkdir stack-management/   # Subscriptions, tools
-
-# Sync when master updates
-./scripts/sync-branches.sh
-```
-
-The included GitHub Action automatically syncs `master` → `personal` on every push.
 
 ## Contributing
 
@@ -219,19 +238,18 @@ This is a personal configuration shared for learning and inspiration.
 - **Fork** and adapt for your setup
 - **Star** if you find it useful
 - **Issues** for bugs or suggestions
-- **Discussions** for questions
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
-[MIT License](LICENSE) - Use freely, modify, distribute, learn from it.
+[MIT License](LICENSE)
 
 ---
 
 <div align="center">
 
-**Built over 6 months of daily use** · *NixOS meets AI-assisted development*
+**Permission learning that gets smarter with every session**
 
 [Quick Start](#quick-start) · [Documentation](#documentation) · [Report Issue](https://github.com/jacopone/nixos-config/issues)
 
