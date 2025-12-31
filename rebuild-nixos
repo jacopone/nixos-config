@@ -10,6 +10,7 @@ VERBOSE=false
 DRY_RUN=false
 QUICK=false
 YES=false
+RECORD=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -17,6 +18,7 @@ while [[ $# -gt 0 ]]; do
         --dry-run|-n) DRY_RUN=true; shift ;;
         --quick|-q) QUICK=true; shift ;;
         --yes|-y) YES=true; shift ;;
+        --record|-r) RECORD=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
@@ -25,6 +27,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -n, --dry-run    Show what would happen without making changes"
             echo "  -q, --quick      Skip optional cleanup phases (faster rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
+            echo "  -r, --record     Record session with vhs for documentation"
             echo "  -h, --help       Show this help message"
             echo ""
             echo "Examples:"
@@ -32,6 +35,7 @@ while [[ $# -gt 0 ]]; do
             echo "  ./rebuild-nixos --quick      # Skip cleanup phases"
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
             echo "  ./rebuild-nixos -q -y        # Fastest: skip cleanup + auto-accept"
+            echo "  ./rebuild-nixos --record     # Record session for AI workflow docs"
             exit 0
             ;;
         *)
@@ -47,6 +51,17 @@ LOG_DIR="$HOME/.claude/.logs"
 mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="$LOG_DIR/rebuild-$TIMESTAMP.log"
+
+# Session recording setup (for AI workflow documentation)
+if [ "$RECORD" = true ]; then
+    SESSION_DIR="$HOME/.claude/sessions"
+    mkdir -p "$SESSION_DIR"
+    SESSION_FILE="$SESSION_DIR/rebuild-$TIMESTAMP.gif"
+    echo "📹 Recording session to: $SESSION_FILE"
+    echo "   (Recording will be saved when rebuild completes)"
+    # Note: vhs recording is handled by wrapping the entire script
+    # For manual recording: vhs record -o "$SESSION_FILE"
+fi
 
 # Colors for output
 BLUE='\033[0;34m'
@@ -321,11 +336,12 @@ if [ "$VERBOSE" = true ]; then
 elif [ "$USE_NOM" = true ]; then
     # Use nix-output-monitor with explicit JSON mode for clean tree-only output
     # --log-format internal-json: nix outputs JSON (not raw text)
-    # -v: verbose mode (needed for full JSON output)
     # nom --json: parses JSON and shows ONLY the dependency tree
+    # NOTE: -v flag removed - it was causing verbose derivation list to be dumped
+    # The internal-json format works without -v and gives nom what it needs
     BUILD_LINK="/tmp/nixos-build-$$"
     echo ""
-    NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json -v --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
+    NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ $BUILD_EXIT -ne 0 ]; then
@@ -371,15 +387,14 @@ if command -v nvd &>/dev/null; then
     NVD_OUTPUT=$(nvd diff "$CURRENT_SYSTEM" "$NEW_CONFIG_PATH" 2>/dev/null || true)
 
     if [ -n "$NVD_OUTPUT" ]; then
-        # Count changes (strip any whitespace/newlines from grep output)
-        PKG_ADDED=$(echo "$NVD_OUTPUT" | grep -c "^+" 2>/dev/null || echo "0")
-        PKG_ADDED="${PKG_ADDED//[^0-9]/}"  # Keep only digits
-        PKG_REMOVED=$(echo "$NVD_OUTPUT" | grep -c "^-" 2>/dev/null || echo "0")
-        PKG_REMOVED="${PKG_REMOVED//[^0-9]/}"
-        PKG_UPGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↑" 2>/dev/null || echo "0")
-        PKG_UPGRADED="${PKG_UPGRADED//[^0-9]/}"
-        PKG_DOWNGRADED=$(echo "$NVD_OUTPUT" | grep -c "^↓" 2>/dev/null || echo "0")
-        PKG_DOWNGRADED="${PKG_DOWNGRADED//[^0-9]/}"
+        # Count changes - nvd uses format: [A+] added, [R-] removed, [U ↑] upgrade, [D ↓] downgrade
+        # Example: "[A+]  #1  linggen   <none>"
+        # NOTE: grep -c outputs "0" AND exits 1 when no matches, so || echo "0" would give "00"
+        # Fix: Use separate assignment to avoid concatenating both outputs
+        PKG_ADDED=$(echo "$NVD_OUTPUT" | grep -c '\[A[+]\]' 2>/dev/null) || PKG_ADDED=0
+        PKG_REMOVED=$(echo "$NVD_OUTPUT" | grep -c '\[R[-]\]' 2>/dev/null) || PKG_REMOVED=0
+        PKG_UPGRADED=$(echo "$NVD_OUTPUT" | grep -c '\[U' 2>/dev/null) || PKG_UPGRADED=0
+        PKG_DOWNGRADED=$(echo "$NVD_OUTPUT" | grep -c '\[D' 2>/dev/null) || PKG_DOWNGRADED=0
 
         echo -e "  ${GREEN}+${NC} Added: $PKG_ADDED  ${RED}-${NC} Removed: $PKG_REMOVED  ${BLUE}↑${NC} Upgraded: $PKG_UPGRADED  ${YELLOW}↓${NC} Downgraded: $PKG_DOWNGRADED"
         echo ""
@@ -500,13 +515,10 @@ else
         fi
     fi
 
-    # Extract stats from generated files (automation logs suppress output)
+    # Note: Tool counts removed - MCP-NixOS provides dynamic package queries
+    # Keeping only file existence check for debugging
     if [ -f "./CLAUDE.md" ]; then
-        TOOLS_COUNT=$(grep "\*\*Total System Tools\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' || echo "?")
-        ABBREV_COUNT=$(grep "\*\*Fish Abbreviations\*\*:" ./CLAUDE.md 2>/dev/null | grep -oP '\d+' || echo "?")
-
-        add_stat "System tools: $TOOLS_COUNT"
-        add_stat "Fish abbreviations: $ABBREV_COUNT"
+        add_stat "Claude configs updated"
     fi
 
     # Check automation log for warnings
@@ -530,7 +542,7 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     echo "📄 Files updated by automation:"
     echo ""
 
-    # Function to show file status
+    # Function to show file status with meaningful diff summary
     show_file_status() {
         local file="$1"
         local description="$2"
@@ -553,6 +565,8 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
             if git ls-files --error-unmatch "$file" &>/dev/null 2>&1; then
                 if git diff --quiet "$file" 2>/dev/null; then
                     change_indicator=" ${GREEN}unchanged${NC}"
+                    echo -e "  $status $description [$size]$change_indicator"
+                    echo "     ↳ $scope"
                 else
                     # Count lines changed
                     local changes=$(git diff --numstat "$file" 2>/dev/null | awk '{print "+"$1" -"$2}')
@@ -561,13 +575,53 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
                     else
                         change_indicator=" ${YELLOW}updated${NC}"
                     fi
+                    echo -e "  $status $description [$size]$change_indicator"
+                    echo "     ↳ $scope"
+
+                    # Show meaningful diff summary (what actually changed)
+                    # Extract key changes: section headers, important lines
+                    local diff_summary=""
+
+                    # Get added section headers (## lines that were added)
+                    local added_sections=$(git diff "$file" 2>/dev/null | grep "^+##" | sed 's/^+/  + /' | head -3)
+                    # Get removed section headers
+                    local removed_sections=$(git diff "$file" 2>/dev/null | grep "^-##" | sed 's/^-/  - /' | head -3)
+                    # Get other significant additions (non-empty, non-header lines)
+                    local added_content=$(git diff "$file" 2>/dev/null | grep "^+[^+]" | grep -v "^+##" | grep -v "^+$" | grep -v "^+---" | sed 's/^+//' | head -2)
+                    # Get significant removals
+                    local removed_content=$(git diff "$file" 2>/dev/null | grep "^-[^-]" | grep -v "^-##" | grep -v "^-$" | grep -v "^----" | sed 's/^-//' | head -2)
+
+                    # Display changes
+                    if [ -n "$added_sections" ]; then
+                        echo -e "     ${GREEN}Added sections:${NC}"
+                        echo "$added_sections" | while read -r line; do
+                            [ -n "$line" ] && echo -e "       ${GREEN}$line${NC}"
+                        done
+                    fi
+                    if [ -n "$removed_sections" ]; then
+                        echo -e "     ${RED}Removed sections:${NC}"
+                        echo "$removed_sections" | while read -r line; do
+                            [ -n "$line" ] && echo -e "       ${RED}$line${NC}"
+                        done
+                    fi
+                    if [ -n "$added_content" ] && [ -z "$added_sections" ]; then
+                        echo -e "     ${GREEN}Key additions:${NC}"
+                        echo "$added_content" | head -2 | while read -r line; do
+                            [ -n "$line" ] && echo -e "       ${GREEN}+ ${line:0:60}${NC}"
+                        done
+                    fi
+                    if [ -n "$removed_content" ] && [ -z "$removed_sections" ]; then
+                        echo -e "     ${RED}Key removals:${NC}"
+                        echo "$removed_content" | head -2 | while read -r line; do
+                            [ -n "$line" ] && echo -e "       ${RED}- ${line:0:60}${NC}"
+                        done
+                    fi
                 fi
             else
                 change_indicator=" ${BLUE}untracked${NC}"
+                echo -e "  $status $description [$size]$change_indicator"
+                echo "     ↳ $scope"
             fi
-
-            echo -e "  $status $description [$size]$change_indicator"
-            echo "     ↳ $scope"
         else
             echo -e "  ${RED}✗ $description (FILE NOT FOUND - automation failed!)${NC}"
             echo "     ↳ $scope"
@@ -576,8 +630,8 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
 
     # System-wide files (global, all projects)
     show_file_status "$HOME/.claude/CLAUDE.md" \
-        "System tools inventory" \
-        "Global: AI-aware tool documentation (116 tools)"
+        "User policies & conventions" \
+        "Global: Tool selection rules, policies (MCP-NixOS for package queries)"
 
     show_file_status "$HOME/.claude/CLAUDE-USER-POLICIES.md" \
         "Your personal policies" \
@@ -646,12 +700,17 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     fi
 
     if (cd ~/nixos-config && $TOOL_CMD 2>/dev/null); then
-        # Show brief tool usage status
-        if [ -f "./CLAUDE.md" ]; then
-            # Extract stats from CLAUDE.md - look for the Tool Usage section
-            TOOL_TOTAL=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Installed" | grep -oP '\*\*Installed\*\*: \K\d+' || echo "?")
-            TOOL_USED=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Used" | grep -oP '\*\*Used\*\*: \K\d+' || echo "?")
-            TOOL_ADOPTION=$(grep -A 3 "^## 📦 System Tool Usage" ./CLAUDE.md | grep "Used" | grep -oP '\(\K\d+' || echo "?")
+        # Show brief tool usage status from tool-analytics.md
+        TOOL_ANALYTICS="./.claude/tool-analytics.md"
+        if [ -f "$TOOL_ANALYTICS" ]; then
+            # Extract stats from tool-analytics.md Summary section
+            # Format: "- **Total Tools Installed**: 129" and "- **Tools Used**: 35 (27.1%)"
+            TOOL_TOTAL=$(grep "Total Tools Installed" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1)
+            TOOL_TOTAL=${TOOL_TOTAL:-"?"}
+            TOOL_USED=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1)
+            TOOL_USED=${TOOL_USED:-"?"}
+            TOOL_ADOPTION=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\((\d+)' | grep -oP '\d+')
+            TOOL_ADOPTION=${TOOL_ADOPTION:-"?"}
 
             # Display with clearer format
             if [ "$TOOL_USED" != "?" ] && [ "$TOOL_TOTAL" != "?" ]; then

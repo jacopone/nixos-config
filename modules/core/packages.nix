@@ -32,6 +32,13 @@
       exec ${pkgs.nodejs_20}/bin/npx @fission-ai/openspec@latest "$@"
     '')
 
+    # NOTE: Linggen (linggen.dev) - macOS only, Linux "coming soon"
+    # Install manually when available: curl -sSL https://linggen.dev/install-cli.sh | bash
+
+    # NOTE: Superset (superset.sh) - Electron desktop app, macOS only
+    # Requires: git clone, bun install, bun run build
+    # Alternative: Use git worktrees manually for parallel Claude Code sessions
+
     # Serena MCP Server - Semantic code analysis toolkit (tracks GitHub main)
     (pkgs.writeShellScriptBin "serena" ''
       exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"

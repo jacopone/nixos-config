@@ -10,6 +10,8 @@
     ./terminal/starship.nix # Starship prompt
     ./file-management/yazi.nix # Yazi file manager
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)
+    # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
+    # Using manual .mcp.json instead (already configured with MCP-NixOS + Playwright)
   ];
 
   # Home Manager state version

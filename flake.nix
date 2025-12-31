@@ -64,6 +64,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
+    # Revisit when mcp-servers package is available in nixpkgs
+    # For now, using manual .mcp.json configuration
+
   };
 
   outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
