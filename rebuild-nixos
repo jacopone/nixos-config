@@ -769,9 +769,9 @@ else
     if [ "$NEW_COMMITS" -gt 0 ]; then
             echo "  Found $NEW_COMMITS commits since $SINCE_MARKER"
             if prompt_user "  Generate changelog draft? [y/N]"; then
-                # Run changelog generator script
+                # Run changelog generator script (pass commit hash for accurate filtering)
                 if [ -x "./scripts/generate-changelog-draft.sh" ]; then
-                    if ./scripts/generate-changelog-draft.sh > /tmp/changelog-draft-$$.md 2>/dev/null; then
+                    if ./scripts/generate-changelog-draft.sh "$LAST_PROCESSED_COMMIT" > /tmp/changelog-draft-$$.md 2>/dev/null; then
                         echo ""
                         echo -e "${BLUE}════════════════════ Changelog Draft ════════════════════${NC}"
                         bat --style=plain --paging=never /tmp/changelog-draft-$$.md 2>/dev/null || cat /tmp/changelog-draft-$$.md

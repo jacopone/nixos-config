@@ -15,7 +15,8 @@
 set -euo pipefail
 
 # Configuration
-CHANGELOG_FILE="${1:-CHANGELOG.md}"
+CHANGELOG_FILE="CHANGELOG.md"
+SINCE_COMMIT="${1:-}"  # Optional: commit hash to start from
 PACKAGES_FILE="modules/core/packages.nix"
 BASE_FILE="modules/home-manager/base.nix"
 
@@ -110,9 +111,23 @@ main() {
         exit 1
     fi
 
-    local last_date
-    last_date=$(find_last_changelog_date)
-    log_info "Finding commits since $last_date"
+    # Determine how to filter commits
+    local git_log_range=""
+    local since_marker=""
+
+    if [ -n "$SINCE_COMMIT" ] && git rev-parse --verify "$SINCE_COMMIT" >/dev/null 2>&1; then
+        # Use commit-based filtering (preferred)
+        git_log_range="${SINCE_COMMIT}..HEAD"
+        since_marker="commit ${SINCE_COMMIT:0:7}"
+        log_info "Finding commits since $since_marker"
+    else
+        # Fallback to date-based filtering
+        local last_date
+        last_date=$(find_last_changelog_date)
+        git_log_range="--since=$last_date"
+        since_marker="$last_date"
+        log_info "Finding commits since $since_marker (date-based fallback)"
+    fi
 
     # Arrays for categorized entries
     declare -a ADDED=()
@@ -175,7 +190,7 @@ main() {
         fi
         # Skip: docs:, ci:, test:, style:, build: (internal)
 
-    done < <(git log --since="$last_date" --format="%H|%s|%ad" --date=short --reverse)
+    done < <(git log $git_log_range --format="%H|%s|%ad" --date=short --reverse)
 
     log_info "Processed $commit_count commits, included $included_count user-facing changes"
 
