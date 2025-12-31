@@ -89,10 +89,15 @@ jobs:
             fi
           done
 
-          # Get deleted files (files that exist on master but were removed on personal since merge-base)
-          # Compare what's on master vs what's on personal
-          DELETED=$(git diff --name-only --diff-filter=D "$MERGE_BASE" origin/personal)
-          echo "Deleted files since merge-base: $DELETED"
+          # Get deleted files - two sources:
+          # 1. Files deleted since merge-base
+          DELETED_SINCE_BASE=$(git diff --name-only --diff-filter=D "$MERGE_BASE" origin/personal)
+          # 2. Files on master but not on personal (handles files created after merge-base)
+          FILES_ONLY_ON_MASTER=$(comm -23 <(git ls-tree -r --name-only origin/master | sort) <(git ls-tree -r --name-only origin/personal | sort))
+
+          # Combine both lists
+          DELETED=$(echo -e "$DELETED_SINCE_BASE\n$FILES_ONLY_ON_MASTER" | sort -u | grep -v '^$')
+          echo "Files to delete: $DELETED"
 
           for file in $DELETED; do
             # Skip personal-only files (don't delete what shouldn't exist on master anyway)
