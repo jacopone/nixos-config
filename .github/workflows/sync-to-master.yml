@@ -48,14 +48,21 @@ jobs:
         run: |
           echo "## Sync Analysis" >> "$GITHUB_STEP_SUMMARY"
 
-          # Get changed files
-          CHANGED=$(git diff --name-only origin/master..origin/personal)
-
           # Files to always skip (personal-only)
           SKIP_PATTERNS=".claude/CLAUDE.local.md|.claude/settings.local.json|.claude/learning/|secrets/|.env|.local."
 
           SYNC_LIST=""
           SANITIZE_LIST=""
+          DELETE_LIST=""
+
+          # Find merge base for proper comparison of diverged branches
+          MERGE_BASE=$(git merge-base origin/master origin/personal)
+          echo "Merge base: $MERGE_BASE"
+
+          # Get files that differ between personal and master (comparing branch tips)
+          # Use three-dot diff to compare personal against merge-base
+          CHANGED=$(git diff --name-only "$MERGE_BASE" origin/personal)
+          echo "Changed files from merge-base: $CHANGED"
 
           for file in $CHANGED; do
             # Skip personal-only files
@@ -64,11 +71,15 @@ jobs:
               continue
             fi
 
-            # Check if file contains personal paths
+            # Check if file contains personal paths (but allow workflow files through)
             if git show "origin/personal:$file" 2>/dev/null | grep -q "$PERSONAL_HOME"; then
               if [[ "$file" == *.md ]] || [[ "$file" == *.nix ]]; then
                 SANITIZE_LIST="$SANITIZE_LIST $file"
                 echo "- Sanitize: $file" >> "$GITHUB_STEP_SUMMARY"
+              elif [[ "$file" == .github/workflows/*.yml ]]; then
+                # Workflow files contain PERSONAL_HOME as env var - sync them directly
+                SYNC_LIST="$SYNC_LIST $file"
+                echo "- Sync: $file (workflow)" >> "$GITHUB_STEP_SUMMARY"
               else
                 echo "- Skip: $file (personal paths)" >> "$GITHUB_STEP_SUMMARY"
               fi
@@ -78,14 +89,30 @@ jobs:
             fi
           done
 
+          # Get deleted files (files that exist on master but were removed on personal since merge-base)
+          # Compare what's on master vs what's on personal
+          DELETED=$(git diff --name-only --diff-filter=D "$MERGE_BASE" origin/personal)
+          echo "Deleted files since merge-base: $DELETED"
+
+          for file in $DELETED; do
+            # Skip personal-only files (don't delete what shouldn't exist on master anyway)
+            if echo "$file" | grep -qE "$SKIP_PATTERNS"; then
+              continue
+            fi
+            DELETE_LIST="$DELETE_LIST $file"
+            echo "- Delete: $file" >> "$GITHUB_STEP_SUMMARY"
+          done
+
           echo "sync_files=$SYNC_LIST" >> "$GITHUB_OUTPUT"
           echo "sanitize_files=$SANITIZE_LIST" >> "$GITHUB_OUTPUT"
+          echo "delete_files=$DELETE_LIST" >> "$GITHUB_OUTPUT"
 
       - name: Sync files to master
         if: steps.check.outputs.skip != 'true'
         env:
           SYNC_FILES: ${{ steps.filter.outputs.sync_files }}
           SANITIZE_FILES: ${{ steps.filter.outputs.sanitize_files }}
+          DELETE_FILES: ${{ steps.filter.outputs.delete_files }}
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           # Checkout master
@@ -109,6 +136,13 @@ jobs:
 
               # Replace personal paths with placeholders
               sed -i "s|${PERSONAL_HOME}|/home/YOUR_USERNAME|g" "$file" 2>/dev/null || true
+            fi
+          done
+
+          # Delete files that were removed on personal
+          for file in $DELETE_FILES; do
+            if [ -n "$file" ] && [ "$file" != " " ]; then
+              git rm "$file" 2>/dev/null || true
             fi
           done
 
