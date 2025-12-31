@@ -57,16 +57,11 @@ docs/automation/claude-backup-legacy.md
 .claude.json
 .mcp.json
 
-# Auto-generated files (regenerated on each rebuild)
+# Auto-generated analytics (regenerated on each rebuild)
 .claude/mcp-analytics.md
 .claude/tool-analytics.md
 .claude/settings.local.json
 .claude/.changelog-last-processed
-CLAUDE.md
-
-# Demo recordings (personal, large binary files)
-docs/assets/*.gif
-docs/assets/*.tape
 
 # Data and model files
 data/models/**/*.bin
@@ -76,7 +71,6 @@ data/models/**/*.ggml
 .devenv/
 .devenv.*/
 .devenv.flake.nix
-devenv.lock
 scripts/.devenv/
 scripts/devenv.lock
 

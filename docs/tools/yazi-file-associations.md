@@ -96,7 +96,7 @@ This document explains how yazi is configured to open different file types with 
 ## 🔧 Configuration Location
 
 The yazi opener configuration is defined in:
-- **File**: `/home/guyfawkes/nixos-config/modules/home-manager/base.nix`
+- **File**: `/home/YOUR_USERNAME/nixos-config/modules/home-manager/base.nix`
 - **Section**: `programs.yazi.settings.opener` and `programs.yazi.settings.open.rules`
 
 ## 📦 Required Packages
