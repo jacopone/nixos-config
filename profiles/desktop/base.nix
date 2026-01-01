@@ -23,7 +23,7 @@
   services.pipewire = {
     enable = true;
     alsa.enable = true;
-    alsa.support32Bit = true;
+    alsa.support32Bit = false; # Disabled - only needed for 32-bit games/Wine (saves ~50 i686-linux builds)
     pulse.enable = true;
 
     # WirePlumber bluetooth configuration (fixes GNOME crashes on BT audio connect/disconnect)

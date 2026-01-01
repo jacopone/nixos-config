@@ -97,9 +97,21 @@
             # Your main configuration file
             ./hosts/nixos
 
-            # Allow unfree packages
+            # Allow unfree packages + overlays for broken packages
             {
               nixpkgs.config.allowUnfree = true;
+              nixpkgs.overlays = [
+                # Fix GCC 15 / test failures in nixos-unstable
+                (final: prev: {
+                  python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+                    # llm: 5 flaky tests fail on nixos-unstable (453/458 pass)
+                    llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+                  });
+                  python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
+                    llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+                  });
+                })
+              ];
             }
 
             # Home Manager module (optional)
