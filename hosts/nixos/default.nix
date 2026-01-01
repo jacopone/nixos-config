@@ -44,6 +44,17 @@
     settings.auto-optimise-store = true;
     settings.experimental-features = [ "nix-command" "flakes" ];
     settings.trusted-users = [ "root" username ]; # Enable cachix for user
+    # Additional binary caches for faster builds
+    settings.substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org" # Community packages (home-manager, etc.)
+      "https://cuda-maintainers.cachix.org" # CUDA/PyTorch packages
+    ];
+    settings.trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+    ];
     settings.cores = 4; # Use half CPU cores for builds (8-core system)
     settings.max-jobs = 2; # Limit parallel builds to reduce memory pressure
     settings.download-buffer-size = 268435456; # 256MB download buffer (default is 64MB)

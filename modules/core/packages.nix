@@ -139,7 +139,8 @@
     broot # Interactive tree navigation with fuzzy search
 
     # Speech-to-Text (Acqua Voice-like dictation system)
-    inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.default # Whisper Dictation - local STT with push-to-talk
+    # DISABLED: GCC 15 incompatibility in ctranslate2 (missing #include <cstdint> in cxxopts)
+    # inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.default # Whisper Dictation - local STT with push-to-talk
     whisper-cpp # High-performance C++ port of OpenAI Whisper for local STT
 
     # MCP NixOS Server - Model Context Protocol for NixOS package/option info (uvx auto-updates)
@@ -170,7 +171,7 @@
     (python3.withPackages (ps: with ps; [
       rich # Rich - Python terminal UI library (for BASB system)
       pymupdf4llm # PyMuPDF for LLM-optimized PDF processing
-      markitdown # Microsoft's multi-format to Markdown converter
+      # markitdown # DISABLED: pulls in ctranslate2 which fails on GCC 15
       pytest # Testing framework for Python
       pydantic # Data validation using Python type hints
       jinja2 # Jinja2 templating engine (for claude-nixos-automation)
