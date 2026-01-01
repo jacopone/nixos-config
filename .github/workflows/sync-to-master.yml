@@ -49,7 +49,9 @@ jobs:
           echo "## Sync Analysis" >> "$GITHUB_STEP_SUMMARY"
 
           # Files to always skip (personal-only)
-          SKIP_PATTERNS=".claude/CLAUDE.local.md|.claude/settings.local.json|.claude/learning/|secrets/|.env|.local."
+          # NOTE: Use \. to match literal dots, not any character
+          # (^|/)\.env matches .env files but not devenv.lock
+          SKIP_PATTERNS=".claude/CLAUDE.local.md|.claude/settings.local.json|.claude/learning/|secrets/|(^|/)\.env|\.local\."
 
           SYNC_LIST=""
           SANITIZE_LIST=""
