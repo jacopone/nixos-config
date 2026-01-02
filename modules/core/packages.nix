@@ -252,6 +252,7 @@
       exec ${pkgs.nodejs_20}/bin/npx jscpd@latest "$@"
     '')
     ruff # Lightning-fast Python linter/formatter
+    uv # Extremely fast Python package manager (provides uvx for MCP servers)
     docker-compose # Container orchestration
     k9s # Kubernetes cluster management
     podman # Docker alternative
