@@ -1087,6 +1087,40 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - use --out-link for nom build visualization
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add context hook, session recording, and optimization notes
+  (Test: `which context` or `context --version`)
+- add personal→master auto-sync with sanitization
+- handle file deletions in sync workflow
+
+### Fixed
+- always sanitize CLAUDE.md USER_MEMORY section
+  (Test: Verify the previous issue is resolved)
+- use commit-based filtering instead of date-based
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- use merge-base for diverged branch comparison
+  (Test: Verify the previous issue is resolved)
+- allow workflow files through personal paths filter
+  (Test: Verify the previous issue is resolved)
+- detect files only on master for deletion
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- actually delete npm cache instead of fake clean
+  (Test: Verify the previous issue is resolved)
+- commit devenv.lock for reproducible environments
+  (Test: Verify the previous issue is resolved)
+- escape dots in skip patterns to not match devenv.lock
+  (Test: Verify the previous issue is resolved)
+- resolve GCC 15 and nixos-unstable build failures
+  (Test: Verify the previous issue is resolved)
+
+### Added
+- add uv package manager for MCP server support
+  (Test: `which uv` or `uv --version`)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
