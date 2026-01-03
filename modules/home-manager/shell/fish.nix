@@ -189,81 +189,8 @@
       end
 
 
-      # Abbreviations - expand as you type
-      abbr -a tree 'eza --tree'
-      abbr -a lt 'eza --tree --level=2'
-      abbr -a lg 'eza -la --git --group-directories-first'
-      abbr -a l1 'eza -1'
-      abbr -a findname 'fd'
-      abbr -a searchtext 'rg'
-      abbr -a rgpy 'rg --type py'
-      abbr -a rgjs 'rg --type js'
-      abbr -a rgmd 'rg --type md'
-      abbr -a top 'htop'
-      abbr -a gdiff 'git diff | bat --language=diff'
-      abbr -a glog 'git log --oneline | head -20'
-      abbr -a json 'jq .'
-      abbr -a jsonc 'jq -C .'
-      abbr -a mdcat 'glow'
-      abbr -a mdp 'glow -p'
-      abbr -a mdw 'glow -w 80'
-      abbr -a pdf2md 'python3 -m pymupdf4llm'
-      abbr -a pdftomarkdown 'python3 -m pymupdf4llm'
-      abbr -a mkd 'mkdir -p'
-      abbr -a batl 'bat --paging=never'
-      abbr -a batp 'bat --style=plain'
-
-      # New tool abbreviations
-      abbr -a zz 'zoxide'
-      abbr -a sk 'skim'
-      abbr -a aitui 'python3 -m ai_orchestrator_tui'
-      abbr -a br 'broot'
-      abbr -a record 'vhs'
-      abbr -a yamlcat 'yq .'
-      abbr -a yamlp 'yq -P .'
-      abbr -a csvcat 'csvlook'
-      abbr -a csvstat 'csvstat'
-      abbr -a mlr 'miller'
-      abbr -a jlcat 'jless'
-      abbr -a choose1 'choose 0'
-      abbr -a choose2 'choose 0 1'
-      abbr -a ruffcheck 'ruff check'
-      abbr -a rufffix 'ruff check --fix'
-      abbr -a ruffformat 'ruff format'
-      abbr -a uvrun 'uv run'
-      abbr -a uvinstall 'uv add'
-
-      # Modern Nix/Flakes commands
-      abbr -a ndev 'nix develop'
-      abbr -a nshell 'nix shell nixpkgs#'
-      abbr -a nsearch 'nix search nixpkgs'
-      abbr -a nrun 'nix run nixpkgs#'
-      abbr -a devshell 'devenv shell'
-
-      # Database development (AI-friendly)
-      abbr -a pgcli 'pgcli'
-      abbr -a mycli 'mycli'
-      abbr -a dbcli 'usql'
-
-      # Note: Code quality tools are project-level
-      # Use: `devenv shell` or project-specific commands
-      # - gitleaks: configured per-project in devenv.nix
-      # - typos: project-specific dictionaries
-      # - pre-commit: .pre-commit-config.yaml per project
-      abbr -a dcp 'docker-compose'
-      abbr -a dcup 'docker-compose up'
-      abbr -a dcdown 'docker-compose down'
-      abbr -a pods 'k9s'
-      abbr -a netscan 'nmap -sn'
-      abbr -a portscan 'nmap -sS'
-      abbr -a trace 'strace -f'
-      abbr -a ltrace 'ltrace -f'
-
-      # GitHub issue tracking workflow abbreviations
-      abbr -a ideas 'review-ideas'
-      abbr -a bugs 'review-bugs'
-
-      # Note: Readwise BASB and Chrome abbreviations moved to shellAbbrs for persistence
+      # Note: Abbreviations are now managed declaratively in shellAbbrs below
+      # This provides better integration with Home Manager and Fish 4.x
 
       # Utility functions
       function preview --description "Enhanced file preview"
@@ -483,9 +410,98 @@
       end
     '';
 
-    # Fish abbreviations (persistent across sessions)
-    # Note: basb-system abbreviations removed (scripts don't exist yet)
-    shellAbbrs = { };
+    # Fish abbreviations (persistent across sessions, managed by Home Manager)
+    shellAbbrs = {
+      # Tree and listing
+      tree = "eza --tree";
+      lt = "eza --tree --level=2";
+      lg = "eza -la --git --group-directories-first";
+      l1 = "eza -1";
+
+      # Search tools
+      findname = "fd";
+      searchtext = "rg";
+      rgpy = "rg --type py";
+      rgjs = "rg --type js";
+      rgmd = "rg --type md";
+
+      # System monitoring
+      top = "htop";
+
+      # Git shortcuts
+      gdiff = "git diff | bat --language=diff";
+      glog = "git log --oneline | head -20";
+
+      # JSON/YAML/CSV processing
+      json = "jq .";
+      jsonc = "jq -C .";
+      yamlcat = "yq .";
+      yamlp = "yq -P .";
+      csvcat = "csvlook";
+      csvstat = "csvstat";
+      mlr = "miller";
+      jlcat = "jless";
+
+      # Markdown
+      mdcat = "glow";
+      mdp = "glow -p";
+      mdw = "glow -w 80";
+
+      # PDF conversion
+      pdf2md = "python3 -m pymupdf4llm";
+      pdftomarkdown = "python3 -m pymupdf4llm";
+
+      # File operations
+      mkd = "mkdir -p";
+      batl = "bat --paging=never";
+      batp = "bat --style=plain";
+
+      # Tool shortcuts
+      zz = "zoxide";
+      sk = "skim";
+      aitui = "python3 -m ai_orchestrator_tui";
+      br = "broot";
+      record = "vhs";
+
+      # Column extraction
+      choose1 = "choose 0";
+      choose2 = "choose 0 1";
+
+      # Python tools
+      ruffcheck = "ruff check";
+      rufffix = "ruff check --fix";
+      ruffformat = "ruff format";
+      uvrun = "uv run";
+      uvinstall = "uv add";
+
+      # Nix/Flakes
+      ndev = "nix develop";
+      nshell = "nix shell nixpkgs#";
+      nsearch = "nix search nixpkgs";
+      nrun = "nix run nixpkgs#";
+      devshell = "devenv shell";
+
+      # Database CLI
+      pgcli = "pgcli";
+      mycli = "mycli";
+      dbcli = "usql";
+
+      # Docker/Kubernetes
+      dcp = "docker-compose";
+      dcup = "docker-compose up";
+      dcdown = "docker-compose down";
+      pods = "k9s";
+
+      # Network/Security
+      netscan = "nmap -sn";
+      portscan = "nmap -sS";
+      trace = "strace -f";
+      ltrace = "ltrace -f";
+
+      # Workflow
+      ideas = "review-ideas";
+      bugs = "review-bugs";
+    };
 
     # Fish completions and integrations
     plugins = [
