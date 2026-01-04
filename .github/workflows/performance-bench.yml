@@ -71,8 +71,13 @@ jobs:
           START=$(date +%s)
           nix build --no-link --print-out-paths \
             --option use-http-compression true \
+            --fallback \
             .#nixosConfigurations.nixos.config.system.build.toplevel \
-            > /tmp/build-path.txt 2>&1
+            > /tmp/build-path.txt 2>&1 || {
+              echo "Build failed. Last 50 lines of output:"
+              tail -50 /tmp/build-path.txt
+              exit 1
+            }
           END=$(date +%s)
 
           BUILD_TIME=$((END - START))
