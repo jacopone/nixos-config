@@ -1,7 +1,7 @@
 # Auto-Generated Permissions Update
 
-**Generated**: 2025-12-29 10:04:31
-**Rules Added**: 2
+**Generated**: 2026-01-02 01:24:30
+**Rules Added**: 3
 
 ## What Happened
 
@@ -10,24 +10,25 @@ high-confidence permission patterns that will reduce future prompts.
 
 ## Added Permissions
 
-### Allow Pytest test execution
+### Allow Nix/NixOS ecosystem tools
 
-**Confidence**: 65.5%
-**Occurrences**: 2
+**Confidence**: 93.1%
+**Occurrences**: 31
 **Impact**: Low impact: ~0% fewer prompts
 
 **Permissions added**:
-- `Bash(pytest:*)`
-- `Bash(python -m pytest:*)`
+- `Bash(nix:*)`
+- `Bash(devenv:*)`
 
-### Allow Ruff linter/formatter
+### Allow Shell built-ins and utilities
 
-**Confidence**: 65.5%
-**Occurrences**: 2
+**Confidence**: 89.8%
+**Occurrences**: 20
 **Impact**: Low impact: ~0% fewer prompts
 
 **Permissions added**:
-- `Bash(ruff:*)`
+- `Bash(echo:*)`
+- `Bash(which:*)`
 
 ---
 

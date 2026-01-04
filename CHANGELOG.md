@@ -1121,6 +1121,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - add uv package manager for MCP server support
   (Test: `which uv` or `uv --version`)
 
+### Fixed
+- add disk cleanup for performance benchmark
+  (Test: Verify the previous issue is resolved)
+- add --fallback and better error reporting for benchmark
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

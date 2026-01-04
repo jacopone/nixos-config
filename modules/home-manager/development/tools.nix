@@ -5,6 +5,16 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+
+    # Add devenv hook for `use devenv` support in .envrc files
+    # This fixes: "use_devenv: command not found" error
+    stdlib = ''
+      # Source devenv's direnv integration
+      # This provides the `use_devenv` function for devenv-based projects
+      if command -v devenv &>/dev/null; then
+        eval "$(devenv direnvrc)"
+      fi
+    '';
   };
 
   # Configure atuin for intelligent shell history
