@@ -1127,6 +1127,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - add --fallback and better error reporting for benchmark
   (Test: Verify the previous issue is resolved)
 
+### Fixed
+- make performance benchmark non-blocking on upstream issues
+  (Test: Verify the previous issue is resolved)
+- add devenv hook for use_devenv support
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
