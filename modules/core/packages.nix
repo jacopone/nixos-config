@@ -191,6 +191,7 @@
     gparted # A free partition editor for graphically managing your disk partitions - https://gparted.org/
     usbimager # A minimalist GUI application to write compressed disk images to USB drives
     p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
+    android-tools # Android SDK platform tools (adb, fastboot) - replaces programs.adb since systemd 258
     wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
 
     # productivity tools

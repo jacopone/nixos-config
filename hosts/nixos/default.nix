@@ -204,9 +204,6 @@
   programs.fish.enable = true;
   users.defaultUserShell = pkgs.fish;
 
-  # Enable ADB for Android development
-  programs.adb.enable = true;
-
   # Enable Permitted Insecure Packages
   # SECURITY NOTE: These packages have known vulnerabilities. Review quarterly.
   nixpkgs.config.permittedInsecurePackages = [
