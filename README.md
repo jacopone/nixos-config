@@ -184,6 +184,7 @@ cd ~/nixos-config
 
 **AI Development:**
 - Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
+- `claude-sandboxed` / `claude-airgapped` - Bubblewrap sandboxing for autonomous tasks
 
 **Development:**
 - DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)
@@ -222,6 +223,30 @@ nix flake check
 # Ephemeral testing
 nix shell nixpkgs#python312 --command python
 ```
+
+## Sandboxed Claude Code
+
+For long-running autonomous tasks, use kernel-level isolation via [bubblewrap](https://github.com/containers/bubblewrap):
+
+| Command | Network | Use Case |
+|---------|---------|----------|
+| `claude` | Full | Normal interactive use |
+| `claude-sandboxed` | API only | Autonomous tasks with `--dangerously-skip-permissions` |
+| `claude-airgapped` | None | Code review, offline analysis |
+
+```bash
+# Run Claude in sandbox for autonomous work
+claude-sandboxed ~/my-project --dangerously-skip-permissions
+
+# Fully airgapped for security-sensitive code review
+claude-airgapped ~/my-project
+```
+
+**Security features:**
+- Process/IPC/UTS namespace isolation (`--unshare-pid`, `--unshare-ipc`, `--unshare-uts`)
+- Filesystem restricted to project directory + `~/.claude` only
+- All Linux capabilities dropped (`--cap-drop ALL`)
+- Spawned processes inherit sandbox (kernel-enforced, not bypassable)
 
 ## Documentation
 

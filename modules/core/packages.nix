@@ -10,6 +10,108 @@
     inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
+
+    # Bubblewrap sandboxing for Claude Code (kernel-level isolation)
+    bubblewrap # Unprivileged sandboxing tool - https://github.com/containers/bubblewrap
+
+    # Claude Code with bubblewrap sandboxing - use for long-running autonomous tasks
+    (pkgs.writeShellScriptBin "claude-sandboxed" ''
+      set -e
+
+      # Resolve project directory (default: current directory)
+      PROJECT_DIR="''${1:-$(pwd)}"
+      if [ -d "$PROJECT_DIR" ]; then
+        PROJECT_DIR=$(${pkgs.coreutils}/bin/realpath "$PROJECT_DIR")
+        shift 2>/dev/null || true
+      else
+        PROJECT_DIR=$(pwd)
+      fi
+
+      echo "🔒 Starting Claude Code in sandboxed mode"
+      echo "   Project: $PROJECT_DIR"
+      echo "   Filesystem: Project + ~/.claude only"
+      echo ""
+
+      exec ${pkgs.bubblewrap}/bin/bwrap \
+        --unshare-pid \
+        --unshare-ipc \
+        --unshare-uts \
+        --hostname "claude-sandbox" \
+        \
+        --ro-bind /nix/store /nix/store \
+        --ro-bind /etc/ssl /etc/ssl \
+        --ro-bind /etc/resolv.conf /etc/resolv.conf \
+        --ro-bind /etc/hosts /etc/hosts \
+        --ro-bind /etc/passwd /etc/passwd \
+        --ro-bind /etc/group /etc/group \
+        --ro-bind /etc/localtime /etc/localtime \
+        --ro-bind /run/current-system /run/current-system \
+        \
+        --bind "$HOME/.claude" "$HOME/.claude" \
+        --bind "$HOME/.config/claude-code" "$HOME/.config/claude-code" \
+        --bind "$PROJECT_DIR" "$PROJECT_DIR" \
+        --bind /tmp /tmp \
+        --tmpfs /run \
+        \
+        --setenv HOME "$HOME" \
+        --setenv USER "$USER" \
+        --setenv TERM "$TERM" \
+        --setenv PATH "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin" \
+        --setenv NIX_SSL_CERT_FILE "/etc/ssl/certs/ca-certificates.crt" \
+        --setenv ANTHROPIC_API_KEY "''${ANTHROPIC_API_KEY:-}" \
+        \
+        --chdir "$PROJECT_DIR" \
+        --die-with-parent \
+        --cap-drop ALL \
+        \
+        ${inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/claude "$@"
+    '')
+
+    # Claude Code fully airgapped - no network at all (for code review/offline analysis)
+    (pkgs.writeShellScriptBin "claude-airgapped" ''
+      set -e
+
+      echo "🔒 AIRGAPPED MODE: No network access"
+      echo "   Use for code review, NOT API calls"
+      echo ""
+
+      PROJECT_DIR="''${1:-$(pwd)}"
+      if [ -d "$PROJECT_DIR" ]; then
+        PROJECT_DIR=$(${pkgs.coreutils}/bin/realpath "$PROJECT_DIR")
+        shift 2>/dev/null || true
+      else
+        PROJECT_DIR=$(pwd)
+      fi
+
+      exec ${pkgs.bubblewrap}/bin/bwrap \
+        --unshare-net \
+        --unshare-pid \
+        --unshare-ipc \
+        --unshare-uts \
+        --hostname "claude-airgapped" \
+        \
+        --ro-bind /nix/store /nix/store \
+        --ro-bind /etc/passwd /etc/passwd \
+        --ro-bind /etc/group /etc/group \
+        --ro-bind /run/current-system /run/current-system \
+        \
+        --bind "$HOME/.claude" "$HOME/.claude" \
+        --bind "$HOME/.config/claude-code" "$HOME/.config/claude-code" \
+        --bind "$PROJECT_DIR" "$PROJECT_DIR" \
+        --tmpfs /tmp \
+        --tmpfs /run \
+        \
+        --setenv HOME "$HOME" \
+        --setenv USER "$USER" \
+        --setenv TERM "$TERM" \
+        --setenv PATH "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin" \
+        \
+        --chdir "$PROJECT_DIR" \
+        --die-with-parent \
+        --cap-drop ALL \
+        \
+        ${inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/claude "$@"
+    '')
     # AI Tools - All use @latest/@alpha for automatic updates (system philosophy: always latest)
     # Claude Flow - AI orchestration platform (alpha channel)
     (pkgs.writeShellScriptBin "claude-flow" ''
