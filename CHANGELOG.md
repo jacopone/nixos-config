@@ -1133,6 +1133,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - add devenv hook for use_devenv support
   (Test: Verify the previous issue is resolved)
 
+### Fixed
+- replace deprecated programs.adb with android-tools package
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
