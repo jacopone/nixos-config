@@ -6,13 +6,14 @@
     enable = true;
     nix-direnv.enable = true;
 
+    # Suppress verbose export list (the +AR +AS +CC... flood)
+    config.global.hide_env_diff = true;
+
     # Add devenv hook for `use devenv` support in .envrc files
-    # This fixes: "use_devenv: command not found" error
     stdlib = ''
-      # Source devenv's direnv integration
-      # This provides the `use_devenv` function for devenv-based projects
+      # Source devenv's direnv integration (suppress jq errors from version parsing)
       if command -v devenv &>/dev/null; then
-        eval "$(devenv direnvrc)"
+        eval "$(devenv direnvrc 2>/dev/null)"
       fi
     '';
   };

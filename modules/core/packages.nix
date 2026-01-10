@@ -4,7 +4,7 @@
   environment.systemPackages = with pkgs; [
     # dev tools
     helix # A post-modern modal text editor - https://helix-editor.com/
-    zed-editor # A high-performance, multiplayer code editor - https://zed.dev/
+    # zed-editor # TEMP: Disabled - requires source compilation, causes system slowdown on rebuild
     vscode-fhs # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
     opencode # AI coding agent built for the terminal
     inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/

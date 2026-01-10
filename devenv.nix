@@ -80,7 +80,5 @@
   enterShell = ''
     # Set up Python environment for CLAUDE.md automation
     export PYTHONPATH="$DEVENV_PROFILE/lib/python3.13/site-packages:$PYTHONPATH"
-
-    hello
   '';
 }
