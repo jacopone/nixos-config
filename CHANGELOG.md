@@ -1137,6 +1137,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - replace deprecated programs.adb with android-tools package
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add bubblewrap sandboxing for Claude Code
+  (Test: `which bubblewrap` or `bubblewrap --version`)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

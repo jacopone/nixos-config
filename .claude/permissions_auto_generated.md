@@ -1,7 +1,7 @@
 # Auto-Generated Permissions Update
 
-**Generated**: 2026-01-02 01:24:30
-**Rules Added**: 3
+**Generated**: 2026-01-10 09:09:17
+**Rules Added**: 5
 
 ## What Happened
 
@@ -10,25 +10,26 @@ high-confidence permission patterns that will reduce future prompts.
 
 ## Added Permissions
 
-### Allow Nix/NixOS ecosystem tools
+### Allow Cloud provider CLIs (GCP, AWS, Azure)
 
-**Confidence**: 93.1%
-**Occurrences**: 31
+**Confidence**: 95.0%
+**Occurrences**: 25
 **Impact**: Low impact: ~0% fewer prompts
 
 **Permissions added**:
-- `Bash(nix:*)`
-- `Bash(devenv:*)`
+- `Bash(gcloud:*)`
+- `Bash(aws:*)`
+- `Bash(az:*)`
 
-### Allow Shell built-ins and utilities
+### Allow Network/HTTP client tools
 
-**Confidence**: 89.8%
-**Occurrences**: 20
+**Confidence**: 83.0%
+**Occurrences**: 10
 **Impact**: Low impact: ~0% fewer prompts
 
 **Permissions added**:
-- `Bash(echo:*)`
-- `Bash(which:*)`
+- `Bash(curl:*)`
+- `Bash(xh:*)`
 
 ---
 
