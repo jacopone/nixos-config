@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2025-12-18
+updated: 2026-01-11
 type: reference
 lifecycle: persistent
 ---
@@ -15,6 +15,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 
 ## [Unreleased]
+
+### Security
+- Complete 8-layer supply chain hardening implementation:
+  - `--audit` flag exports fixed-output derivation (FOD) manifest
+  - `--verify-bootstrap` flag for deep reproducibility verification of critical packages
+  - Quick reproducibility check for xz/gzip/bzip2/coreutils during audit
+  - r13y.com community reproducibility monitoring integration
+  - NPM version pinning for 6 tools (claude-flow, bmad-method, gemini-cli, jules, openspec, jscpd)
+- New file: `modules/core/npm-versions.nix` - central npm version tracking
+- New file: `scripts/update-npm-versions.sh` - version check helper
+- New file: `docs/architecture/SUPPLY_CHAIN_HARDENING.md` - architecture documentation
 
 ### Added
 - `LICENSE` file (MIT) - previously only mentioned in README
@@ -1140,6 +1151,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - add bubblewrap sandboxing for Claude Code
   (Test: `which bubblewrap` or `bubblewrap --version`)
+
+### Fixed
+- reduce verbose shell output
+  (Test: Verify the previous issue is resolved)
 
 ### Planned
 - User policies merge refactoring for claude-automation

@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2025-12-31
+updated: 2026-01-12
 type: reference
 lifecycle: persistent
 ---
@@ -41,40 +41,47 @@ Allow "rg TODO"? [y/n]
 │  You approve "git status" → System logs it                      │
 │  You approve "fd -e nix" → System logs it                       │
 │  You approve "rg pattern" → System logs it                      │
-│         ...50+ approvals across sessions...                     │
+│         ...approvals across sessions and projects...            │
 │                                                                 │
-│  ./rebuild-nixos runs → Adaptive learning triggers              │
+│  ./rebuild-nixos runs → Adaptive learning with TIER ROUTING     │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ Pattern detected: "git *" approved 89 times (98% rate)  │   │
-│  │ Confidence: 0.94                                        │   │
-│  │ → Auto-generate: allow Bash(git:*)                      │   │
+│  │ TIER_1_SAFE detected: "git status", "fd", "rg", "cat"   │   │
+│  │ → Added to ~/.claude/settings.json (GLOBAL)             │   │
+│  │                                                         │   │
+│  │ TIER_2_MODERATE detected: "git push", "npm install"     │   │
+│  │ → Added to .claude/settings.local.json (per-project)    │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
-│  Next session: "git status" auto-approved. No prompt.           │
+│  Next session (ANY project): "fd -e py" → Auto-approved.        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Result:** Permission prompts decrease over time as the system learns your workflow.
+**Result:** Read-only tools are learned once and applied globally. Write operations stay per-project for safety.
 
 ## Key Features
 
-### 1. Adaptive Permission Learning
+### 1. Adaptive Permission Learning with Tier Routing
 
-The system analyzes your approval history and auto-generates permission rules:
+The system analyzes your approval history and routes rules by tier:
+
+| Tier | Destination | Examples |
+|------|-------------|----------|
+| **TIER_1_SAFE** | `~/.claude/settings.json` (global) | git status, fd, rg, cat, pytest |
+| **TIER_2_MODERATE** | `.claude/settings.local.json` | git push, npm, nix build |
+| **TIER_3_RISKY** | `.claude/settings.local.json` | git --force, sudo |
+| **CROSS_FOLDER** | `~/.claude/settings.json` (global) | Tools used in 2+ projects |
 
 - **Pattern detection** from actual behavior (not guesswork)
-- **Confidence scoring** (only high-confidence patterns become rules)
+- **Tier classification** determines global vs per-project routing
+- **Cross-folder promotion** - tools used across projects become global
 - **Audit trail** in `.claude/permissions_auto_generated.md`
-- **Interactive review** before applying suggestions
 
 ```bash
 ./rebuild-nixos
 # Step 6/6: Adaptive learning
-# Found 3 permission patterns:
-#   [1] Bash(git:*) - 94% confidence
-#   [2] Bash(fd:*) - 87% confidence
-#   [3] Read(/home/user/projects/**) - 91% confidence
+# TIER_1_SAFE (→ global): fd, rg, bat, cat, pytest
+# TIER_2_MODERATE (→ per-project): git push, npm install
 # Apply these? [y/n/review each]
 ```
 
@@ -155,14 +162,17 @@ cd ~/nixos-config
 
 | Repository | Purpose |
 |------------|---------|
-| [nixos-config](https://github.com/jacopone/nixos-config) | System config + `rebuild-nixos` orchestration |
-| [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation) | **The brain:** Permission learning, analytics, CLAUDE.md generation |
+| [nixos-config](https://github.com/jacopone/nixos-config) | System config + `rebuild-nixos` orchestration + sandboxing |
+| [claude-nixos-automation](https://github.com/jacopone/claude-nixos-automation) | **The brain:** Tier-based permission routing, global/local learning, analytics |
 
 ## How It Differs from Alternatives
 
 | Feature | This Project | mcp-nixos | nixai | Manual Config |
 |---------|-------------|-----------|-------|---------------|
+| **Tier-based routing** | Global + per-project | - | - | - |
+| **Cross-folder detection** | Auto-promote to global | - | - | - |
 | Permission auto-learning | From behavior | - | - | - |
+| Sandboxing | Anthropic srt (official) | - | - | - |
 | Zero-drift docs | Automatic | - | - | Manual |
 | Ephemeral testing | Nix shells | N/A | - | - |
 | Tool analytics | H vs C usage | - | - | - |
@@ -184,7 +194,7 @@ cd ~/nixos-config
 
 **AI Development:**
 - Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
-- `claude-sandboxed` / `claude-airgapped` - Bubblewrap sandboxing for autonomous tasks
+- Anthropic [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt) for isolated execution
 
 **Development:**
 - DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)
@@ -204,8 +214,12 @@ nixos-config/
 │   └── home-manager/              # User configurations
 ├── CLAUDE.md                      # Auto-generated AI context
 └── .claude/
-    ├── settings.local.json        # Auto-generated permissions
+    ├── settings.local.json        # Per-project permissions (TIER_2/3)
     └── permissions_auto_generated.md  # Audit trail
+
+~/.claude/
+├── settings.json                  # Global permissions (TIER_1_SAFE)
+└── CLAUDE.md                      # System-wide AI context
 ```
 
 ## Essential Commands
@@ -226,27 +240,39 @@ nix shell nixpkgs#python312 --command python
 
 ## Sandboxed Claude Code
 
-For long-running autonomous tasks, use kernel-level isolation via [bubblewrap](https://github.com/containers/bubblewrap):
-
-| Command | Network | Use Case |
-|---------|---------|----------|
-| `claude` | Full | Normal interactive use |
-| `claude-sandboxed` | API only | Autonomous tasks with `--dangerously-skip-permissions` |
-| `claude-airgapped` | None | Code review, offline analysis |
+For autonomous tasks, use Anthropic's official [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt):
 
 ```bash
-# Run Claude in sandbox for autonomous work
-claude-sandboxed ~/my-project --dangerously-skip-permissions
+# Install srt (one-time)
+npm install -g @anthropic-ai/sandbox-runtime
 
-# Fully airgapped for security-sensitive code review
-claude-airgapped ~/my-project
+# Run Claude in sandbox
+srt claude ~/my-project
+
+# With custom settings
+srt --settings ~/.srt-settings.json claude ~/my-project
+```
+
+Configure `~/.srt-settings.json` for domain filtering and filesystem restrictions:
+
+```json
+{
+  "network": {
+    "allowedDomains": ["api.anthropic.com", "github.com", "*.npmjs.org"]
+  },
+  "filesystem": {
+    "allowWrite": [".", "/tmp", "~/.claude"],
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"]
+  }
+}
 ```
 
 **Security features:**
-- Process/IPC/UTS namespace isolation (`--unshare-pid`, `--unshare-ipc`, `--unshare-uts`)
-- Filesystem restricted to project directory + `~/.claude` only
-- All Linux capabilities dropped (`--cap-drop ALL`)
-- Spawned processes inherit sandbox (kernel-enforced, not bypassable)
+- Domain-level network filtering (not just all-or-nothing)
+- Mandatory protection for sensitive files (.ssh, .gitconfig, etc.)
+- Linux: bubblewrap namespace isolation + seccomp BPF
+- macOS: Seatbelt sandbox profiles
+- Spawned processes inherit sandbox (kernel-enforced)
 
 ## Documentation
 

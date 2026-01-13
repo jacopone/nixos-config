@@ -1,5 +1,9 @@
 { pkgs, inputs, ... }:
 
+let
+  # Pinned npm versions for reproducibility
+  npmVersions = import ./npm-versions.nix;
+in
 {
   environment.systemPackages = with pkgs; [
     # dev tools
@@ -11,127 +15,32 @@
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
 
-    # Bubblewrap sandboxing for Claude Code (kernel-level isolation)
-    bubblewrap # Unprivileged sandboxing tool - https://github.com/containers/bubblewrap
-
-    # Claude Code with bubblewrap sandboxing - use for long-running autonomous tasks
-    (pkgs.writeShellScriptBin "claude-sandboxed" ''
-      set -e
-
-      # Resolve project directory (default: current directory)
-      PROJECT_DIR="''${1:-$(pwd)}"
-      if [ -d "$PROJECT_DIR" ]; then
-        PROJECT_DIR=$(${pkgs.coreutils}/bin/realpath "$PROJECT_DIR")
-        shift 2>/dev/null || true
-      else
-        PROJECT_DIR=$(pwd)
-      fi
-
-      echo "🔒 Starting Claude Code in sandboxed mode"
-      echo "   Project: $PROJECT_DIR"
-      echo "   Filesystem: Project + ~/.claude only"
-      echo ""
-
-      exec ${pkgs.bubblewrap}/bin/bwrap \
-        --unshare-pid \
-        --unshare-ipc \
-        --unshare-uts \
-        --hostname "claude-sandbox" \
-        \
-        --ro-bind /nix/store /nix/store \
-        --ro-bind /etc/ssl /etc/ssl \
-        --ro-bind /etc/resolv.conf /etc/resolv.conf \
-        --ro-bind /etc/hosts /etc/hosts \
-        --ro-bind /etc/passwd /etc/passwd \
-        --ro-bind /etc/group /etc/group \
-        --ro-bind /etc/localtime /etc/localtime \
-        --ro-bind /run/current-system /run/current-system \
-        \
-        --bind "$HOME/.claude" "$HOME/.claude" \
-        --bind "$HOME/.config/claude-code" "$HOME/.config/claude-code" \
-        --bind "$PROJECT_DIR" "$PROJECT_DIR" \
-        --bind /tmp /tmp \
-        --tmpfs /run \
-        \
-        --setenv HOME "$HOME" \
-        --setenv USER "$USER" \
-        --setenv TERM "$TERM" \
-        --setenv PATH "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin" \
-        --setenv NIX_SSL_CERT_FILE "/etc/ssl/certs/ca-certificates.crt" \
-        --setenv ANTHROPIC_API_KEY "''${ANTHROPIC_API_KEY:-}" \
-        \
-        --chdir "$PROJECT_DIR" \
-        --die-with-parent \
-        --cap-drop ALL \
-        \
-        ${inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/claude "$@"
-    '')
-
-    # Claude Code fully airgapped - no network at all (for code review/offline analysis)
-    (pkgs.writeShellScriptBin "claude-airgapped" ''
-      set -e
-
-      echo "🔒 AIRGAPPED MODE: No network access"
-      echo "   Use for code review, NOT API calls"
-      echo ""
-
-      PROJECT_DIR="''${1:-$(pwd)}"
-      if [ -d "$PROJECT_DIR" ]; then
-        PROJECT_DIR=$(${pkgs.coreutils}/bin/realpath "$PROJECT_DIR")
-        shift 2>/dev/null || true
-      else
-        PROJECT_DIR=$(pwd)
-      fi
-
-      exec ${pkgs.bubblewrap}/bin/bwrap \
-        --unshare-net \
-        --unshare-pid \
-        --unshare-ipc \
-        --unshare-uts \
-        --hostname "claude-airgapped" \
-        \
-        --ro-bind /nix/store /nix/store \
-        --ro-bind /etc/passwd /etc/passwd \
-        --ro-bind /etc/group /etc/group \
-        --ro-bind /run/current-system /run/current-system \
-        \
-        --bind "$HOME/.claude" "$HOME/.claude" \
-        --bind "$HOME/.config/claude-code" "$HOME/.config/claude-code" \
-        --bind "$PROJECT_DIR" "$PROJECT_DIR" \
-        --tmpfs /tmp \
-        --tmpfs /run \
-        \
-        --setenv HOME "$HOME" \
-        --setenv USER "$USER" \
-        --setenv TERM "$TERM" \
-        --setenv PATH "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin" \
-        \
-        --chdir "$PROJECT_DIR" \
-        --die-with-parent \
-        --cap-drop ALL \
-        \
-        ${inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/claude "$@"
-    '')
-    # AI Tools - All use @latest/@alpha for automatic updates (system philosophy: always latest)
-    # Claude Flow - AI orchestration platform (alpha channel)
+    # Dependencies for Anthropic's sandbox-runtime (srt)
+    # Install srt via: npm install -g @anthropic-ai/sandbox-runtime
+    # Usage: srt claude [args]  OR  srt --settings ~/.srt-settings.json claude [args]
+    # See: https://github.com/anthropic-experimental/sandbox-runtime
+    bubblewrap # Required by srt on Linux - https://github.com/containers/bubblewrap
+    socat # Required by srt for proxy bridging - https://github.com/3ndG4me/soern
+    # AI Tools - Pinned versions for reproducibility (see npm-versions.nix)
+    # Claude Flow - AI orchestration platform
     (pkgs.writeShellScriptBin "claude-flow" ''
-      exec ${pkgs.nodejs_20}/bin/npx claude-flow@alpha "$@"
+      exec ${pkgs.nodejs_20}/bin/npx claude-flow@${npmVersions.claude-flow} "$@"
     '')
     # BMAD-METHOD - Universal AI agent framework for Agentic Agile Driven Development
     (pkgs.writeShellScriptBin "bmad-method" ''
-      exec ${pkgs.nodejs_20}/bin/npx bmad-method@latest "$@"
+      exec ${pkgs.nodejs_20}/bin/npx bmad-method@${npmVersions.bmad-method} "$@"
     '')
-    # Gemini CLI - Always uses latest version via npx (currently v0.9.0+)
+    # Gemini CLI - Google's Gemini CLI
     (pkgs.writeShellScriptBin "gemini-cli" ''
-      exec ${pkgs.nodejs_20}/bin/npx @google/gemini-cli@latest "$@"
+      exec ${pkgs.nodejs_20}/bin/npx @google/gemini-cli@${npmVersions.gemini-cli} "$@"
     '')
-    # Jules - Google's asynchronous coding agent CLI (always latest)
+    # Jules - Google's asynchronous coding agent CLI
     (pkgs.writeShellScriptBin "jules" ''
-      exec ${pkgs.nodejs_20}/bin/npx @google/jules@latest "$@"
+      exec ${pkgs.nodejs_20}/bin/npx @google/jules@${npmVersions.jules} "$@"
     '')
-    # OpenSpec - Spec-driven development for AI coding assistants (always latest)
+    # OpenSpec - Spec-driven development for AI coding assistants
     (pkgs.writeShellScriptBin "openspec" ''
-      exec ${pkgs.nodejs_20}/bin/npx @fission-ai/openspec@latest "$@"
+      exec ${pkgs.nodejs_20}/bin/npx @fission-ai/openspec@${npmVersions.openspec} "$@"
     '')
 
     # NOTE: Linggen (linggen.dev) - macOS only, Linux "coming soon"
@@ -350,9 +259,9 @@
     pre-commit # Git hook framework (needed for .pre-commit-config.yaml)
     python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
     python312Packages.radon # Python code metrics and complexity analysis
-    # jscpd - JavaScript/TypeScript clone detection (always latest)
+    # jscpd - JavaScript/TypeScript clone detection (pinned version)
     (pkgs.writeShellScriptBin "jscpd" ''
-      exec ${pkgs.nodejs_20}/bin/npx jscpd@latest "$@"
+      exec ${pkgs.nodejs_20}/bin/npx jscpd@${npmVersions.jscpd} "$@"
     '')
     ruff # Lightning-fast Python linter/formatter
     uv # Extremely fast Python package manager (provides uvx for MCP servers)
