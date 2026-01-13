@@ -172,7 +172,7 @@ cd ~/nixos-config
 | **Tier-based routing** | Global + per-project | - | - | - |
 | **Cross-folder detection** | Auto-promote to global | - | - | - |
 | Permission auto-learning | From behavior | - | - | - |
-| Bubblewrap sandboxing | `claude-sandboxed` | - | - | - |
+| Sandboxing | Anthropic srt (official) | - | - | - |
 | Zero-drift docs | Automatic | - | - | Manual |
 | Ephemeral testing | Nix shells | N/A | - | - |
 | Tool analytics | H vs C usage | - | - | - |
@@ -194,7 +194,7 @@ cd ~/nixos-config
 
 **AI Development:**
 - Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
-- `claude-sandboxed` / `claude-airgapped` - Bubblewrap sandboxing for autonomous tasks
+- Anthropic [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt) for isolated execution
 
 **Development:**
 - DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)
@@ -240,27 +240,39 @@ nix shell nixpkgs#python312 --command python
 
 ## Sandboxed Claude Code
 
-For long-running autonomous tasks, use kernel-level isolation via [bubblewrap](https://github.com/containers/bubblewrap):
-
-| Command | Network | Use Case |
-|---------|---------|----------|
-| `claude` | Full | Normal interactive use |
-| `claude-sandboxed` | API only | Autonomous tasks with `--dangerously-skip-permissions` |
-| `claude-airgapped` | None | Code review, offline analysis |
+For autonomous tasks, use Anthropic's official [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt):
 
 ```bash
-# Run Claude in sandbox for autonomous work
-claude-sandboxed ~/my-project --dangerously-skip-permissions
+# Install srt (one-time)
+npm install -g @anthropic-ai/sandbox-runtime
 
-# Fully airgapped for security-sensitive code review
-claude-airgapped ~/my-project
+# Run Claude in sandbox
+srt claude ~/my-project
+
+# With custom settings
+srt --settings ~/.srt-settings.json claude ~/my-project
+```
+
+Configure `~/.srt-settings.json` for domain filtering and filesystem restrictions:
+
+```json
+{
+  "network": {
+    "allowedDomains": ["api.anthropic.com", "github.com", "*.npmjs.org"]
+  },
+  "filesystem": {
+    "allowWrite": [".", "/tmp", "~/.claude"],
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"]
+  }
+}
 ```
 
 **Security features:**
-- Process/IPC/UTS namespace isolation (`--unshare-pid`, `--unshare-ipc`, `--unshare-uts`)
-- Filesystem restricted to project directory + `~/.claude` only
-- All Linux capabilities dropped (`--cap-drop ALL`)
-- Spawned processes inherit sandbox (kernel-enforced, not bypassable)
+- Domain-level network filtering (not just all-or-nothing)
+- Mandatory protection for sensitive files (.ssh, .gitconfig, etc.)
+- Linux: bubblewrap namespace isolation + seccomp BPF
+- macOS: Seatbelt sandbox profiles
+- Spawned processes inherit sandbox (kernel-enforced)
 
 ## Documentation
 
