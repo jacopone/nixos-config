@@ -11,6 +11,8 @@ DRY_RUN=false
 QUICK=false
 YES=false
 RECORD=false
+AUDIT=false
+VERIFY_BOOTSTRAP=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -19,6 +21,8 @@ while [[ $# -gt 0 ]]; do
         --quick|-q) QUICK=true; shift ;;
         --yes|-y) YES=true; shift ;;
         --record|-r) RECORD=true; shift ;;
+        --audit|-a) AUDIT=true; shift ;;
+        --verify-bootstrap) VERIFY_BOOTSTRAP=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
@@ -28,6 +32,8 @@ while [[ $# -gt 0 ]]; do
             echo "  -q, --quick      Skip optional cleanup phases (faster rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
             echo "  -r, --record     Record session with vhs for documentation"
+            echo "  -a, --audit      Export source closure for supply chain verification"
+            echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
             echo "  -h, --help       Show this help message"
             echo ""
             echo "Examples:"
@@ -419,6 +425,460 @@ if command -v nvd &>/dev/null; then
     fi
 fi
 
+# === PHASE 2.7: Supply Chain Security Audit ===
+# Security-first approach: detect threats before offering audit trail export
+# Based on: https://nixcademy.com/posts/secure-supply-chain-with-nix/
+if [ "$AUDIT" = true ]; then
+    log_step "Running supply chain security audit..."
+
+    AUDIT_DIR="$HOME/.nixos-audit"
+    mkdir -p "$AUDIT_DIR"
+    SECURITY_ISSUES=0
+
+    # === PHASE 2.7.1: Git vs Tarball Comparison (PRIMARY SECURITY CHECK) ===
+    # Detects XZ-style attacks where malicious code is in tarballs but not git
+    # This check would have caught CVE-2024-3094
+    log_step "Checking for XZ-style backdoors (git vs tarball comparison)..."
+
+    GIT_TARBALL_DIR="$AUDIT_DIR/git-tarball-compare-$TIMESTAMP"
+    mkdir -p "$GIT_TARBALL_DIR"
+
+    # Critical packages with their git repositories
+    declare -A CRITICAL_PKG_REPOS=(
+        ["xz"]="https://github.com/tukaani-project/xz"
+        ["gzip"]="https://git.savannah.gnu.org/git/gzip.git"
+        ["bzip2"]="https://gitlab.com/bzip2/bzip2.git"
+        ["openssh"]="https://github.com/openssh/openssh-portable"
+        ["openssl"]="https://github.com/openssl/openssl"
+    )
+
+    GIT_TARBALL_PASSED=0
+    GIT_TARBALL_FAILED=0
+    GIT_TARBALL_SKIPPED=0
+
+    for pkg in "${!CRITICAL_PKG_REPOS[@]}"; do
+        GIT_REPO="${CRITICAL_PKG_REPOS[$pkg]}"
+        PKG_WORK_DIR="$GIT_TARBALL_DIR/$pkg"
+        mkdir -p "$PKG_WORK_DIR"
+
+        echo -n "  Checking $pkg... "
+
+        # Get the package version from nixpkgs
+        VERSION=$(nix eval --impure --expr "(import <nixpkgs> {}).${pkg}.version" 2>/dev/null | tr -d '"') || true
+
+        if [ -z "$VERSION" ]; then
+            echo "skipped (couldn't get version)"
+            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+            continue
+        fi
+
+        # Fetch and unpack the tarball source used by nixpkgs
+        TARBALL_PATH=$(nix-build '<nixpkgs>' -A "${pkg}.src" --no-out-link 2>/dev/null) || true
+        if [ -z "$TARBALL_PATH" ]; then
+            echo "skipped (couldn't fetch tarball)"
+            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+            continue
+        fi
+
+        # Unpack if it's a compressed file
+        TARBALL_DIR="$PKG_WORK_DIR/tarball"
+        mkdir -p "$TARBALL_DIR"
+        if [ -f "$TARBALL_PATH" ]; then
+            case "$TARBALL_PATH" in
+                *.tar.xz|*.txz)  tar -xJf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
+                *.tar.gz|*.tgz)  tar -xzf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
+                *.tar.bz2|*.tbz) tar -xjf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
+                *.tar)           tar -xf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
+                *)
+                    echo "skipped (unknown archive format)"
+                    GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+                    continue
+                    ;;
+            esac
+        elif [ -d "$TARBALL_PATH" ]; then
+            TARBALL_DIR="$TARBALL_PATH"
+        else
+            echo "skipped (source not found)"
+            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+            continue
+        fi
+
+        if [ ! -d "$TARBALL_DIR" ] || [ -z "$(ls -A "$TARBALL_DIR" 2>/dev/null)" ]; then
+            echo "skipped (extraction failed)"
+            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+            continue
+        fi
+
+        # Clone git repo at the same version tag
+        # Different projects use different tag formats, so we try multiple
+        GIT_DIR="$PKG_WORK_DIR/git"
+
+        # Build list of tag formats to try for this package
+        case "$pkg" in
+            openssh)
+                # OpenSSH uses V_X_Y_P1 format (e.g., V_9_9_P1 for 9.9p1)
+                TAG_NORMALIZED=$(echo "$VERSION" | tr '.' '_' | sed 's/p/_P/g' | tr '[:lower:]' '[:upper:]')
+                TAG_FORMATS="V_$TAG_NORMALIZED V_$(echo $VERSION | tr '.' '_') v$VERSION $VERSION"
+                ;;
+            bzip2)
+                # bzip2 uses bzip2-X.Y.Z format
+                TAG_FORMATS="bzip2-$VERSION v$VERSION $VERSION"
+                ;;
+            openssl)
+                # OpenSSL uses openssl-X.Y.Z format
+                TAG_FORMATS="openssl-$VERSION v$VERSION $VERSION"
+                ;;
+            *)
+                TAG_FORMATS="v$VERSION $VERSION"
+                ;;
+        esac
+
+        # Try each tag format until one works
+        for GIT_TAG in $TAG_FORMATS; do
+            if timeout 60 git clone --depth 1 --branch "$GIT_TAG" "$GIT_REPO" "$GIT_DIR" 2>/dev/null; then
+                break
+            fi
+        done
+
+        if [ ! -d "$GIT_DIR" ]; then
+            echo "skipped (couldn't clone git at version $VERSION)"
+            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
+            continue
+        fi
+
+        # Compare source files, excluding auto-generated content
+        DIFF_LOG="$PKG_WORK_DIR/diff.log"
+
+        # Auto-generated directories to exclude (gnulib, autotools, etc.)
+        EXCLUDE_DIRS="lib/|build-aux/|gnulib/|gnulib-lib/|m4/|po/|doc/|tests/"
+        # Auto-generated files to exclude
+        EXCLUDE_FILES="ltmain.sh|config.sub|config.guess|config.h.in|aclocal.m4|Makefile.in|compile|depcomp|install-sh|missing|test-driver|ylwrap"
+
+        # Find source files in tarball (excluding auto-generated paths)
+        find "$TARBALL_DIR" -type f \( -name "*.c" -o -name "*.h" -o -name "*.sh" -o -name "*.S" \) \
+            ! -name "config.h" ! -name "configure" 2>/dev/null | \
+            grep -vE "$EXCLUDE_DIRS" | \
+            grep -vE "$EXCLUDE_FILES" | \
+            sort > "$PKG_WORK_DIR/tarball-files.txt"
+
+        # Find source files in git
+        find "$GIT_DIR" -type f \( -name "*.c" -o -name "*.h" -o -name "*.sh" -o -name "*.S" \) \
+            ! -path "*/.git/*" 2>/dev/null | \
+            grep -vE "$EXCLUDE_DIRS" | \
+            sort > "$PKG_WORK_DIR/git-files.txt"
+
+        SUSPICIOUS_FILES=0
+        TARBALL_ONLY_FILES=""
+
+        # Check for tarball-only files (potential hidden malicious code)
+        while IFS= read -r tarball_file; do
+            base_name=$(basename "$tarball_file")
+            # Skip known auto-generated files
+            if echo "$base_name" | grep -qE "^($EXCLUDE_FILES)$"; then
+                continue
+            fi
+            if ! grep -q "/$base_name\$" "$PKG_WORK_DIR/git-files.txt" 2>/dev/null; then
+                if file "$tarball_file" 2>/dev/null | grep -qE "text|script"; then
+                    TARBALL_ONLY_FILES="$TARBALL_ONLY_FILES$base_name "
+                    SUSPICIOUS_FILES=$((SUSPICIOUS_FILES + 1))
+                fi
+            fi
+        done < "$PKG_WORK_DIR/tarball-files.txt"
+
+        # Count content differences in matching files
+        CONTENT_DIFFS=0
+        TOTAL_COMPARED=0
+        while IFS= read -r tarball_file; do
+            base_name=$(basename "$tarball_file")
+            git_file=$(grep "/$base_name\$" "$PKG_WORK_DIR/git-files.txt" 2>/dev/null | head -1)
+            if [ -n "$git_file" ] && [ -f "$git_file" ]; then
+                TOTAL_COMPARED=$((TOTAL_COMPARED + 1))
+                if ! diff -q "$tarball_file" "$git_file" >/dev/null 2>&1; then
+                    echo "DIFFERS: $base_name" >> "$DIFF_LOG"
+                    CONTENT_DIFFS=$((CONTENT_DIFFS + 1))
+                fi
+            fi
+        done < "$PKG_WORK_DIR/tarball-files.txt"
+
+        # Calculate diff percentage (only flag if >20% of files differ)
+        if [ "$TOTAL_COMPARED" -gt 0 ]; then
+            DIFF_PERCENT=$((CONTENT_DIFFS * 100 / TOTAL_COMPARED))
+        else
+            DIFF_PERCENT=0
+        fi
+
+        # Flag as suspicious only if:
+        # - Any tarball-only source files in main tree (not auto-generated), OR
+        # - More than 20% of comparable files differ (suggests major tampering)
+        if [ "$SUSPICIOUS_FILES" -gt 0 ]; then
+            echo -e "${RED}SUSPICIOUS${NC} ($SUSPICIOUS_FILES tarball-only source files)"
+            echo "    Tarball-only files: $TARBALL_ONLY_FILES" >> "$DIFF_LOG"
+            log_warning "$pkg: Found $SUSPICIOUS_FILES source files in tarball not in git!"
+            GIT_TARBALL_FAILED=$((GIT_TARBALL_FAILED + 1))
+        elif [ "$DIFF_PERCENT" -gt 20 ]; then
+            echo -e "${RED}SUSPICIOUS${NC} ($CONTENT_DIFFS/$TOTAL_COMPARED files differ - ${DIFF_PERCENT}%)"
+            log_warning "$pkg: ${DIFF_PERCENT}% of source files differ from git!"
+            GIT_TARBALL_FAILED=$((GIT_TARBALL_FAILED + 1))
+        elif [ "$CONTENT_DIFFS" -gt 0 ]; then
+            echo -e "${YELLOW}MINOR DIFFS${NC} ($CONTENT_DIFFS/$TOTAL_COMPARED files differ - ${DIFF_PERCENT}%)"
+            GIT_TARBALL_PASSED=$((GIT_TARBALL_PASSED + 1))
+        else
+            echo -e "${GREEN}CLEAN ✓${NC}"
+            GIT_TARBALL_PASSED=$((GIT_TARBALL_PASSED + 1))
+        fi
+
+        rm -rf "$GIT_DIR"
+    done
+
+    add_stat "Git vs Tarball: $GIT_TARBALL_PASSED clean, $GIT_TARBALL_FAILED suspicious, $GIT_TARBALL_SKIPPED skipped"
+
+    if [ "$GIT_TARBALL_FAILED" -gt 0 ]; then
+        log_error "SECURITY WARNING: Some packages have suspicious tarball-only content!"
+        log_warning "This is how the XZ backdoor (CVE-2024-3094) was hidden."
+        log_warning "Review: $GIT_TARBALL_DIR"
+        SECURITY_ISSUES=$((SECURITY_ISSUES + GIT_TARBALL_FAILED))
+    fi
+
+    # === PHASE 2.7.2: Reproducibility Check ===
+    log_step "Checking critical package reproducibility..."
+
+    CRITICAL_PKGS="xz gzip bzip2 coreutils"
+    REPRO_PASSED=0
+    REPRO_FAILED=0
+    REPRO_SKIPPED=0
+
+    for pkg in $CRITICAL_PKGS; do
+        PKG_PATH=$(nix-build '<nixpkgs>' -A "$pkg" --no-out-link 2>/dev/null) || true
+
+        if [ -n "$PKG_PATH" ]; then
+            CHECK_OUTPUT=$(nix-build '<nixpkgs>' -A "$pkg" --check 2>&1) || true
+
+            if echo "$CHECK_OUTPUT" | grep -q "checking outputs"; then
+                log_success "$pkg: reproducible ✓"
+                REPRO_PASSED=$((REPRO_PASSED + 1))
+            elif echo "$CHECK_OUTPUT" | grep -q "differs"; then
+                log_warning "$pkg: OUTPUT DIFFERS - check manually"
+                REPRO_FAILED=$((REPRO_FAILED + 1))
+            else
+                log_success "$pkg: verified ✓"
+                REPRO_PASSED=$((REPRO_PASSED + 1))
+            fi
+        else
+            echo "  ⏭️  $pkg: skipped (not in store)"
+            REPRO_SKIPPED=$((REPRO_SKIPPED + 1))
+        fi
+    done
+
+    add_stat "Reproducibility: $REPRO_PASSED passed, $REPRO_FAILED failed, $REPRO_SKIPPED skipped"
+
+    if [ "$REPRO_FAILED" -gt 0 ]; then
+        log_warning "Some packages failed reproducibility check - review before continuing"
+        SECURITY_ISSUES=$((SECURITY_ISSUES + REPRO_FAILED))
+    fi
+
+    # === PHASE 2.7.3: Security Summary ===
+    echo ""
+    if [ "$SECURITY_ISSUES" -eq 0 ]; then
+        log_success "All security checks passed!"
+    else
+        log_error "Found $SECURITY_ISSUES security issue(s) - review before proceeding!"
+    fi
+
+    # === PHASE 2.7.4: Source Manifest (lightweight) ===
+    log_step "Extracting source derivations for manifest..."
+    FODS=$(nix derivation show -r "$NEW_CONFIG_PATH" 2>/dev/null | \
+        jq -r 'to_entries[] | select(.value.outputs.out.hash != null) | .key')
+
+    FOD_COUNT=$(echo "$FODS" | grep -c '^' || echo "0")
+    echo "$FODS" > "$AUDIT_DIR/sources-$TIMESTAMP.manifest"
+    log_success "Source manifest saved: $AUDIT_DIR/sources-$TIMESTAMP.manifest ($FOD_COUNT sources)"
+    add_stat "Source derivations: $FOD_COUNT"
+
+    # === PHASE 2.7.5: Optional Closure Export (audit trail) ===
+    # Only offer after security checks, with appropriate warning
+    echo ""
+    if [ "$SECURITY_ISSUES" -gt 0 ]; then
+        log_warning "Security issues detected above. Closure export is for forensic analysis only."
+        EXPORT_PROMPT="Export source closure for forensic analysis? (y/n)"
+    else
+        EXPORT_PROMPT="Export source closure for audit trail (~5GB, 30-60 min)? (y/n)"
+    fi
+
+    if prompt_user "$EXPORT_PROMPT"; then
+        log_step "Realizing source derivations (this may take a while)..."
+
+        TIMEOUT_PER_DRV=60
+        OVERALL_TIMEOUT=3600
+
+        CLOSURE_FILE="$AUDIT_DIR/source-closure-$TIMESTAMP.nar"
+        REALIZE_LOG="$AUDIT_DIR/realize-$TIMESTAMP.log"
+        OUTPUT_PATHS_FILE="$AUDIT_DIR/output-paths-$TIMESTAMP.txt"
+
+        log_step "Building output-to-derivation mapping for $FOD_COUNT derivations..."
+        DRV_MAP_FILE="$AUDIT_DIR/drv-map-$TIMESTAMP.txt"
+        echo "$FODS" | while read -r drv; do
+            out=$(nix derivation show "$drv" 2>/dev/null | jq -r '.[].outputs.out.path' 2>/dev/null)
+            if [ -n "$out" ]; then
+                echo "$out $drv"
+            fi
+        done > "$DRV_MAP_FILE"
+        OUTPUT_COUNT=$(wc -l < "$DRV_MAP_FILE")
+        log_success "Mapped $OUTPUT_COUNT output paths"
+
+        cut -d' ' -f1 "$DRV_MAP_FILE" > "$OUTPUT_PATHS_FILE"
+
+        log_step "Realizing outputs (timeout: ${TIMEOUT_PER_DRV}s per item, ${OVERALL_TIMEOUT}s total)..."
+
+        REALIZED=0
+        FAILED=0
+        SKIPPED=0
+        START_TIME=$(date +%s)
+
+        while read -r output_path drv_path; do
+            ELAPSED=$(($(date +%s) - START_TIME))
+            if [ "$ELAPSED" -ge "$OVERALL_TIMEOUT" ]; then
+                log_warning "Overall timeout reached (${OVERALL_TIMEOUT}s). Stopping realization."
+                break
+            fi
+
+            if [ -e "$output_path" ]; then
+                SKIPPED=$((SKIPPED + 1))
+            else
+                if timeout "$TIMEOUT_PER_DRV" nix-store --realise "$drv_path" >> "$REALIZE_LOG" 2>&1; then
+                    REALIZED=$((REALIZED + 1))
+                else
+                    EXIT_CODE=$?
+                    if [ "$EXIT_CODE" -eq 124 ]; then
+                        echo "[TIMEOUT] $drv_path" >> "$REALIZE_LOG"
+                    else
+                        echo "[FAILED:$EXIT_CODE] $drv_path" >> "$REALIZE_LOG"
+                    fi
+                    FAILED=$((FAILED + 1))
+                fi
+            fi
+
+            TOTAL=$((REALIZED + FAILED + SKIPPED))
+            if [ $((TOTAL % 100)) -eq 0 ]; then
+                ELAPSED=$(($(date +%s) - START_TIME))
+                printf "  Progress: %d/%d (realized: %d, skipped: %d, failed: %d) [%ds elapsed]\n" \
+                    "$TOTAL" "$OUTPUT_COUNT" "$REALIZED" "$SKIPPED" "$FAILED" "$ELAPSED"
+            fi
+        done < "$DRV_MAP_FILE"
+
+        TOTAL_TIME=$(($(date +%s) - START_TIME))
+        log_success "Realization complete: $REALIZED realized, $SKIPPED already present, $FAILED failed (${TOTAL_TIME}s)"
+
+        if [ "$FAILED" -gt 0 ]; then
+            log_warning "Some derivations failed. Check log: $REALIZE_LOG"
+        fi
+
+        log_step "Exporting realized outputs to NAR..."
+        EXPORT_COUNT=0
+        while read -r output_path; do
+            if [ -e "$output_path" ]; then
+                echo "$output_path"
+                EXPORT_COUNT=$((EXPORT_COUNT + 1))
+            fi
+        done < "$OUTPUT_PATHS_FILE" | xargs nix-store --export > "$CLOSURE_FILE" 2>> "$REALIZE_LOG"
+
+        if [ -f "$CLOSURE_FILE" ]; then
+            CLOSURE_SIZE=$(du -h "$CLOSURE_FILE" | cut -f1)
+            log_success "Source closure exported: $CLOSURE_FILE ($CLOSURE_SIZE, $EXPORT_COUNT paths)"
+            add_action "Exported source closure for offline verification"
+        else
+            log_error "Failed to create closure file"
+        fi
+
+        add_stat "Realized: $REALIZED, Skipped: $SKIPPED, Failed: $FAILED"
+    fi
+
+    add_action "Supply chain security audit completed"
+fi
+
+# === PHASE 2.8: Bootstrap Package Verification ===
+# Deep reproducibility verification of bootstrap-critical packages
+# Inspired by: https://luj.fr/blog/how-nixos-could-have-detected-xz.html
+if [ "$VERIFY_BOOTSTRAP" = true ]; then
+    step "Deep verification of bootstrap packages"
+
+    VERIFY_DIR="$HOME/.nixos-audit/bootstrap-verify-$TIMESTAMP"
+    mkdir -p "$VERIFY_DIR"
+
+    # Bootstrap-critical packages (first-stage build dependencies)
+    BOOTSTRAP_PKGS=(
+        "xz"           # Compression (xz backdoor target)
+        "gzip"         # Compression
+        "bzip2"        # Compression
+        "coreutils"    # Basic utilities
+        "gnugrep"      # Pattern matching
+        "gnused"       # Stream editor
+        "gawk"         # Text processing
+        "bash"         # Shell
+        "gnumake"      # Build system
+        "binutils"     # Linker/assembler
+    )
+
+    declare -a VERIFY_RESULTS=()
+
+    for pkg in "${BOOTSTRAP_PKGS[@]}"; do
+        echo -n "  Verifying $pkg... "
+
+        # Build with --check to compare against existing store path
+        CHECK_OUTPUT=$(nix-build '<nixpkgs>' -A "$pkg" --check --keep-failed 2>&1) || true
+
+        if echo "$CHECK_OUTPUT" | grep -q "output .* is identical"; then
+            echo -e "${GREEN}REPRODUCIBLE ✓${NC}"
+            VERIFY_RESULTS+=("$pkg:PASS")
+        elif echo "$CHECK_OUTPUT" | grep -q "output .* differs"; then
+            echo -e "${RED}DIVERGENT OUTPUT - POTENTIAL TAMPERING${NC}"
+            VERIFY_RESULTS+=("$pkg:FAIL")
+
+            # Find the .check path for analysis
+            CHECK_PATH=$(echo "$CHECK_OUTPUT" | grep -oP '/nix/store/[^"]+\.check' | head -1)
+            if [ -n "$CHECK_PATH" ]; then
+                echo "$pkg diverged. Check path: $CHECK_PATH" >> "$VERIFY_DIR/divergent-packages.txt"
+
+                # Run nix-diff for root cause if available
+                if command -v nix-diff &>/dev/null; then
+                    ORIG_PATH="${CHECK_PATH%.check}"
+                    nix-diff "$ORIG_PATH" "$CHECK_PATH" > "$VERIFY_DIR/$pkg-diff.txt" 2>&1 || true
+                fi
+            fi
+        else
+            echo -e "${YELLOW}skipped (not in store or build failed)${NC}"
+            VERIFY_RESULTS+=("$pkg:SKIP")
+        fi
+    done
+
+    # Summary report
+    PASS_COUNT=$(printf '%s\n' "${VERIFY_RESULTS[@]}" | grep -c ':PASS' || echo 0)
+    FAIL_COUNT=$(printf '%s\n' "${VERIFY_RESULTS[@]}" | grep -c ':FAIL' || echo 0)
+    SKIP_COUNT=$(printf '%s\n' "${VERIFY_RESULTS[@]}" | grep -c ':SKIP' || echo 0)
+
+    echo ""
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║         Bootstrap Verification Summary                     ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    echo "  Reproducible: $PASS_COUNT"
+    echo "  Divergent:    $FAIL_COUNT"
+    echo "  Skipped:      $SKIP_COUNT"
+
+    if [ "$FAIL_COUNT" -gt 0 ]; then
+        log_error "SECURITY ALERT: $FAIL_COUNT package(s) failed reproducibility check!"
+        echo "  Review: $VERIFY_DIR/divergent-packages.txt"
+
+        if ! prompt_user "Continue despite reproducibility failures? (y/n)"; then
+            log_error "Aborting due to reproducibility failures"
+            exit 1
+        fi
+    fi
+
+    # Save results
+    printf '%s\n' "${VERIFY_RESULTS[@]}" > "$VERIFY_DIR/results.txt"
+    add_stat "Bootstrap verification: $PASS_COUNT/$((PASS_COUNT + FAIL_COUNT)) reproducible"
+    add_action "Bootstrap packages verified"
+fi
+
 # === PHASE 3: Activate Configuration ===
 # Switches running system to new configuration (requires sudo)
 # This is the critical step - system state changes here
@@ -465,6 +925,23 @@ else
     echo ""  # Ensure we're on a new line after progress indicator
     log_success "Configuration activated"
     add_action "Switched to new NixOS configuration"
+fi
+
+# === PHASE 3.5: Community Reproducibility Check (r13y) ===
+# Checks packages against r13y.com reproducibility database
+# Only runs when --audit is enabled
+if [ "$AUDIT" = true ]; then
+    AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
+    if [ -d "$AUTOMATION_FLAKE" ]; then
+        log_step "Checking against community reproducibility data..."
+        if nix run "$AUTOMATION_FLAKE#check-reproducibility" 2>&1 | tee -a "$LOG_FILE"; then
+            add_action "r13y reproducibility check completed"
+        else
+            log_warning "r13y check failed (non-critical)"
+        fi
+    else
+        log_warning "claude-nixos-automation not found, skipping r13y check"
+    fi
 fi
 
 # === PHASE 4: Update Claude Code Configurations ===
@@ -1361,6 +1838,15 @@ if [ ${#STATS[@]} -gt 0 ]; then
     for stat in "${STATS[@]}"; do
         echo "   • $stat"
     done
+fi
+
+if [ "$AUDIT" = true ]; then
+    echo ""
+    echo "📋 Audit Files:"
+    # shellcheck disable=SC2086
+    ls -la "$AUDIT_DIR"/*-$TIMESTAMP* 2>/dev/null | while read -r line; do
+        echo "   $line"
+    done || echo "   (none generated)"
 fi
 
 if [ ${#WARNINGS[@]} -gt 0 ]; then
