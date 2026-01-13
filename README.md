@@ -243,10 +243,7 @@ nix shell nixpkgs#python312 --command python
 For autonomous tasks, use Anthropic's official [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt):
 
 ```bash
-# Install srt (one-time)
-npm install -g @anthropic-ai/sandbox-runtime
-
-# Run Claude in sandbox
+# Run Claude in sandbox (srt is installed system-wide)
 srt claude ~/my-project
 
 # With custom settings

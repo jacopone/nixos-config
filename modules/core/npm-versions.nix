@@ -8,4 +8,5 @@
   jules = "0.1.42"; # @google/jules async coding agent
   openspec = "0.18.0"; # @fission-ai/openspec spec-driven dev
   jscpd = "4.0.5"; # JavaScript clone detection
+  srt = "0.0.26"; # @anthropic-ai/sandbox-runtime - Claude Code sandboxing
 }

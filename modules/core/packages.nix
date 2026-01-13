@@ -15,12 +15,14 @@ in
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
 
-    # Dependencies for Anthropic's sandbox-runtime (srt)
-    # Install srt via: npm install -g @anthropic-ai/sandbox-runtime
+    # Anthropic's sandbox-runtime (srt) - Claude Code sandboxing
     # Usage: srt claude [args]  OR  srt --settings ~/.srt-settings.json claude [args]
     # See: https://github.com/anthropic-experimental/sandbox-runtime
     bubblewrap # Required by srt on Linux - https://github.com/containers/bubblewrap
-    socat # Required by srt for proxy bridging - https://github.com/3ndG4me/soern
+    socat # Required by srt for proxy bridging
+    (pkgs.writeShellScriptBin "srt" ''
+      exec ${pkgs.nodejs_20}/bin/npx @anthropic-ai/sandbox-runtime@${npmVersions.srt} "$@"
+    '')
     # AI Tools - Pinned versions for reproducibility (see npm-versions.nix)
     # Claude Flow - AI orchestration platform
     (pkgs.writeShellScriptBin "claude-flow" ''
