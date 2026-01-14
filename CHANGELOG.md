@@ -1156,6 +1156,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - reduce verbose shell output
   (Test: Verify the previous issue is resolved)
 
+### Added
+- implement 8-layer supply chain hardening
+- add NixOS wrapper for Anthropic sandbox-runtime
+  (Test: `which NixOS` or `NixOS --version`)
+
+### Changed
+- replace custom bubblewrap with Anthropic srt (restructured)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

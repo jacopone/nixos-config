@@ -81,6 +81,10 @@
     # inotify limits (prevents fd exhaustion in IDEs/browsers)
     "fs.inotify.max_user_watches" = 524288;
     "fs.inotify.max_user_instances" = 1024;
+    # Disable IPv6 - ISP doesn't provide it, causes slow connections
+    # (Chrome tries IPv6 first, times out, then falls back to IPv4)
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
   };
 
   # Enable zram swap for better memory compression

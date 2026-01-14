@@ -21,28 +21,37 @@ in
     bubblewrap # Required by srt on Linux - https://github.com/containers/bubblewrap
     socat # Required by srt for proxy bridging
     (pkgs.writeShellScriptBin "srt" ''
-      exec ${pkgs.nodejs_20}/bin/npx @anthropic-ai/sandbox-runtime@${npmVersions.srt} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes @anthropic-ai/sandbox-runtime@${npmVersions.srt} "$@"
     '')
+    # Claude Autonomous Workflow Trilogy
+    # 1. claude-autonomous - Single task launcher (foundation)
+    # 2. claude-night-batch - Multi-task batch launcher from manifest
+    # 3. claude-morning-review - Review and merge overnight work
+    # See: scripts/claude-*.sh for documentation
+    (pkgs.writeShellScriptBin "claude-autonomous" (builtins.readFile ../../scripts/claude-autonomous.sh))
+    (pkgs.writeShellScriptBin "claude-night-batch" (builtins.readFile ../../scripts/claude-night-batch.sh))
+    (pkgs.writeShellScriptBin "claude-morning-review" (builtins.readFile ../../scripts/claude-morning-review.sh))
+
     # AI Tools - Pinned versions for reproducibility (see npm-versions.nix)
     # Claude Flow - AI orchestration platform
     (pkgs.writeShellScriptBin "claude-flow" ''
-      exec ${pkgs.nodejs_20}/bin/npx claude-flow@${npmVersions.claude-flow} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes claude-flow@${npmVersions.claude-flow} "$@"
     '')
     # BMAD-METHOD - Universal AI agent framework for Agentic Agile Driven Development
     (pkgs.writeShellScriptBin "bmad-method" ''
-      exec ${pkgs.nodejs_20}/bin/npx bmad-method@${npmVersions.bmad-method} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes bmad-method@${npmVersions.bmad-method} "$@"
     '')
     # Gemini CLI - Google's Gemini CLI
     (pkgs.writeShellScriptBin "gemini-cli" ''
-      exec ${pkgs.nodejs_20}/bin/npx @google/gemini-cli@${npmVersions.gemini-cli} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes @google/gemini-cli@${npmVersions.gemini-cli} "$@"
     '')
     # Jules - Google's asynchronous coding agent CLI
     (pkgs.writeShellScriptBin "jules" ''
-      exec ${pkgs.nodejs_20}/bin/npx @google/jules@${npmVersions.jules} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes @google/jules@${npmVersions.jules} "$@"
     '')
     # OpenSpec - Spec-driven development for AI coding assistants
     (pkgs.writeShellScriptBin "openspec" ''
-      exec ${pkgs.nodejs_20}/bin/npx @fission-ai/openspec@${npmVersions.openspec} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes @fission-ai/openspec@${npmVersions.openspec} "$@"
     '')
 
     # NOTE: Linggen (linggen.dev) - macOS only, Linux "coming soon"
@@ -263,7 +272,7 @@ in
     python312Packages.radon # Python code metrics and complexity analysis
     # jscpd - JavaScript/TypeScript clone detection (pinned version)
     (pkgs.writeShellScriptBin "jscpd" ''
-      exec ${pkgs.nodejs_20}/bin/npx jscpd@${npmVersions.jscpd} "$@"
+      exec ${pkgs.nodejs_20}/bin/npx --yes jscpd@${npmVersions.jscpd} "$@"
     '')
     ruff # Lightning-fast Python linter/formatter
     uv # Extremely fast Python package manager (provides uvx for MCP servers)

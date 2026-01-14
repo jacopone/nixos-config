@@ -29,18 +29,24 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  -v, --verbose    Show detailed output during build"
             echo "  -n, --dry-run    Show what would happen without making changes"
-            echo "  -q, --quick      Skip optional cleanup phases (faster rebuild)"
+            echo "  -q, --quick      Skip security checks and cleanup (fastest rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
             echo "  -r, --record     Record session with vhs for documentation"
-            echo "  -a, --audit      Export source closure for supply chain verification"
+            echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
             echo "  -h, --help       Show this help message"
             echo ""
+            echo "Security:"
+            echo "  By default, rebuild-nixos runs supply chain security checks:"
+            echo "    - Git vs tarball comparison (detects XZ-style backdoors)"
+            echo "    - Reproducibility verification of critical packages"
+            echo "  Use --quick to skip these checks, --audit for full forensic export."
+            echo ""
             echo "Examples:"
-            echo "  ./rebuild-nixos              # Full interactive rebuild"
-            echo "  ./rebuild-nixos --quick      # Skip cleanup phases"
+            echo "  ./rebuild-nixos              # Full rebuild with security checks"
+            echo "  ./rebuild-nixos --quick      # Fastest: skip security + cleanup"
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
-            echo "  ./rebuild-nixos -q -y        # Fastest: skip cleanup + auto-accept"
+            echo "  ./rebuild-nixos --audit      # Include forensic audit trail export"
             echo "  ./rebuild-nixos --record     # Record session for AI workflow docs"
             exit 0
             ;;
@@ -425,15 +431,29 @@ if command -v nvd &>/dev/null; then
     fi
 fi
 
-# === PHASE 2.7: Supply Chain Security Audit ===
-# Security-first approach: detect threats before offering audit trail export
+# === PHASE 2.7: Supply Chain Security Checks ===
+# Security-first approach: detect XZ-style backdoors by DEFAULT
 # Based on: https://nixcademy.com/posts/secure-supply-chain-with-nix/
-if [ "$AUDIT" = true ]; then
-    log_step "Running supply chain security audit..."
+#
+# Default mode: Runs security checks (fast, ~3-5 min)
+#   - Git vs Tarball comparison (catches XZ-style attacks)
+#   - Reproducibility verification
+#
+# --audit flag: Adds forensic audit trail (slow, 30-60 min)
+#   - Source manifest export
+#   - Full closure export (~5GB)
+#
+# --quick flag: Skips security checks (fastest rebuild)
+
+if [ "$QUICK" = true ]; then
+    log_step "Skipping supply chain security checks (--quick mode)"
+else
+    log_step "Running supply chain security checks..."
 
     AUDIT_DIR="$HOME/.nixos-audit"
     mkdir -p "$AUDIT_DIR"
     SECURITY_ISSUES=0
+    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
     # === PHASE 2.7.1: Git vs Tarball Comparison (PRIMARY SECURITY CHECK) ===
     # Detects XZ-style attacks where malicious code is in tarballs but not git
@@ -680,9 +700,21 @@ if [ "$AUDIT" = true ]; then
     echo ""
     if [ "$SECURITY_ISSUES" -eq 0 ]; then
         log_success "All security checks passed!"
+        add_action "Supply chain security checks passed"
     else
         log_error "Found $SECURITY_ISSUES security issue(s) - review before proceeding!"
+        add_action "Supply chain security checks: $SECURITY_ISSUES issue(s) found"
     fi
+fi
+# End of default security checks (skipped with --quick)
+
+# === PHASE 2.7.4-2.7.5: Audit Trail Export (--audit flag only) ===
+# These are slow forensic operations, only run when explicitly requested
+if [ "$AUDIT" = true ]; then
+    # Ensure AUDIT_DIR and TIMESTAMP are set if we skipped security checks
+    AUDIT_DIR="${AUDIT_DIR:-$HOME/.nixos-audit}"
+    mkdir -p "$AUDIT_DIR"
+    TIMESTAMP="${TIMESTAMP:-$(date +%Y%m%d-%H%M%S)}"
 
     # === PHASE 2.7.4: Source Manifest (lightweight) ===
     log_step "Extracting source derivations for manifest..."
@@ -792,7 +824,7 @@ if [ "$AUDIT" = true ]; then
         add_stat "Realized: $REALIZED, Skipped: $SKIPPED, Failed: $FAILED"
     fi
 
-    add_action "Supply chain security audit completed"
+    add_action "Audit trail exported (source manifest + closure)"
 fi
 
 # === PHASE 2.8: Bootstrap Package Verification ===
@@ -1402,7 +1434,14 @@ fi
 
 # === PHASE 10: Generation Cleanup ===
 # Deletes old NixOS generations to free disk space
-# User selects which generations to delete
+# Options:
+#   - Enter specific generation numbers to delete
+#   - Enter 'auto' for automatic cleanup (keeps last 5 of each profile type)
+# Auto mode cleans:
+#   - System generations (/nix/var/nix/profiles/system)
+#   - Root channel profiles (accumulate with each nixpkgs update!)
+#   - Default profiles
+#   - User/home-manager profiles
 # Runs garbage collection after deletion
 # Exit on failure: No (cleanup is optional)
 # Skip with: --quick flag
@@ -1414,11 +1453,51 @@ elif [ "$DRY_RUN" = false ]; then
     log_step "Listing system generations..."
     sudo nixos-rebuild list-generations
 
-    read -p "Enter the generations you want to delete (separated by space): " generations_to_delete
+    read -p "Enter the generations you want to delete (separated by space, or 'auto' for automatic cleanup): " generations_to_delete
     if [ -n "$generations_to_delete" ]; then
-        log_step "Deleting generations: $generations_to_delete"
-        sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
-        log_success "Selected generations deleted"
+        if [ "$generations_to_delete" = "auto" ]; then
+            log_step "Running automatic generation cleanup (keeping last 5)..."
+
+            # Clean system generations (keep last 5)
+            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +5 2>/dev/null || true
+
+            # Clean root channel profiles (these accumulate silently!)
+            # Each nixpkgs channel update creates a new generation
+            ROOT_CHANNELS="/nix/var/nix/profiles/per-user/root/channels"
+            if [ -L "$ROOT_CHANNELS" ]; then
+                BEFORE=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l)
+                sudo nix-env -p "$ROOT_CHANNELS" --delete-generations +5 2>/dev/null || true
+                AFTER=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l)
+                CLEANED=$((BEFORE - AFTER))
+                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED root channel generations"
+            fi
+
+            # Clean default profile generations
+            DEFAULT_PROFILE="/nix/var/nix/profiles/default"
+            if [ -L "$DEFAULT_PROFILE" ]; then
+                BEFORE=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l)
+                sudo nix-env -p "$DEFAULT_PROFILE" --delete-generations +5 2>/dev/null || true
+                AFTER=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l)
+                CLEANED=$((BEFORE - AFTER))
+                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED default profile generations"
+            fi
+
+            # Clean user profile generations (home-manager)
+            USER_PROFILE="$HOME/.local/state/nix/profiles/profile"
+            if [ -L "$USER_PROFILE" ]; then
+                BEFORE=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l)
+                nix-env -p "$USER_PROFILE" --delete-generations +5 2>/dev/null || true
+                AFTER=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l)
+                CLEANED=$((BEFORE - AFTER))
+                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED user profile generations"
+            fi
+
+            log_success "Automatic cleanup complete (kept last 5 of each profile)"
+        else
+            log_step "Deleting generations: $generations_to_delete"
+            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
+            log_success "Selected generations deleted"
+        fi
 
         log_step "Running garbage collection..."
 
