@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2026-01-12
+updated: 2026-01-14
 type: reference
 lifecycle: persistent
 ---
@@ -203,15 +203,43 @@ See [`modules/core/packages.nix`](modules/core/packages.nix) for the complete li
 
 </details>
 
+## Multi-Host Architecture
+
+This configuration supports multiple machines from a single repository. Each host shares the same packages, profiles, and home-manager config—only hardware differs.
+
+| Host | Hardware | Build Command |
+|------|----------|---------------|
+| `nixos` | ThinkPad X1 (Intel) | `nixos-rebuild switch --flake .#nixos` |
+| `framework-16` | Framework 16 (AMD + NVIDIA RTX 5070) | `nixos-rebuild switch --flake .#framework-16` |
+
+**Adding a new host:**
+1. Create `hosts/<hostname>/default.nix` importing `../common` + hardware module
+2. Generate `hardware-configuration.nix` on the machine
+3. Add entry to `flake.nix` using the `mkHost` helper
+
+The `nixos-hardware` flake provides vendor-specific optimizations (Framework LED Matrix support, NVIDIA PRIME, AMD power management).
+
 ## Repository Structure
 
 ```
 nixos-config/
-├── flake.nix                      # Main entry point
-├── rebuild-nixos                  # 14-phase rebuild with learning
+├── flake.nix                      # Main entry point + mkHost helper
+├── rebuild-nixos                  # Multi-phase rebuild with learning
+├── hosts/
+│   ├── common/default.nix         # Shared config (locale, users, packages)
+│   ├── nixos/                     # ThinkPad X1 host
+│   │   ├── default.nix
+│   │   └── hardware-configuration.nix
+│   └── framework-16/              # Framework 16 host
+│       ├── default.nix
+│       └── hardware-configuration.nix
 ├── modules/
 │   ├── core/packages.nix          # System tools (130+)
+│   ├── hardware/                  # Hardware-specific modules
+│   │   ├── thinkpad.nix           # Intel GPU, TLP power management
+│   │   └── framework-16.nix       # AMD/NVIDIA hybrid, LED Matrix
 │   └── home-manager/              # User configurations
+├── profiles/desktop/              # Desktop environment (GNOME)
 ├── CLAUDE.md                      # Auto-generated AI context
 └── .claude/
     ├── settings.local.json        # Per-project permissions (TIER_2/3)
@@ -225,18 +253,36 @@ nixos-config/
 ## Essential Commands
 
 ```bash
-# System rebuild with permission learning
+# Full rebuild with security checks and permission learning
 ./rebuild-nixos
 
-# Quick rebuild (skip cleanup phases)
-./rebuild-nixos --quick
+# Quick rebuild (skip security checks - fastest for iterations)
+./rebuild-nixos --quick --yes    # or: ./rebuild-nixos -q -y
 
-# Validate configuration
+# Fresh rebuild (bypass eval-cache when changes seem ignored)
+./rebuild-nixos --fresh          # or: ./rebuild-nixos -f
+
+# Validate configuration syntax
 nix flake check
+
+# Build specific host
+sudo nixos-rebuild switch --flake .#nixos        # ThinkPad
+sudo nixos-rebuild switch --flake .#framework-16 # Framework 16
 
 # Ephemeral testing
 nix shell nixpkgs#python312 --command python
 ```
+
+**rebuild-nixos flags:**
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--quick` | `-q` | Skip security checks and cleanup (fastest) |
+| `--yes` | `-y` | Auto-accept all prompts (non-interactive) |
+| `--fresh` | `-f` | Bypass eval-cache (use when changes seem ignored) |
+| `--verbose` | `-v` | Show detailed build output |
+| `--dry-run` | `-n` | Preview changes without applying |
+| `--audit` | `-a` | Export source closure for forensic audit |
 
 ## Sandboxed Claude Code
 
