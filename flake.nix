@@ -24,6 +24,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # NixOS Hardware - vendor-specific optimizations
+    # Provides modules for Framework, ThinkPad, Dell, and many other vendors
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
     # Claude Code - Better packaged version with Node.js bundled
     # MAINTAINER: @sadjow | AUTO-UPDATE: Via rebuild-nixos --refresh
     # Current: c06fdde (locked via flake.lock)
@@ -70,62 +74,74 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
     let
-      system = "x86_64-linux";
-
       # CONFIGURATION: Change this username to match your system
       # This is the ONLY place you need to change when adapting this config
       username = "guyfawkes";
 
-      pkgs = import nixpkgs {
+      # Helper function to create NixOS configurations
+      # Reduces duplication when adding new hosts
+      mkHost = { hostname, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
         inherit system;
-        config.allowUnfree = true;
+        specialArgs = { inherit inputs username; };
+        modules = [
+          # Host-specific configuration
+          ./hosts/${hostname}
+
+          # Allow unfree packages + overlays for broken packages
+          {
+            nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [
+              # Fix GCC 15 / test failures in nixos-unstable
+              (final: prev: {
+                python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+                  llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+                });
+                python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
+                  llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+                });
+              })
+            ];
+          }
+
+          # Home Manager module
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
+            home-manager.extraSpecialArgs = { inherit inputs username; };
+            home-manager.users.${username} = import ./modules/home-manager;
+          }
+        ] ++ extraModules;
       };
+
     in
     {
       # Expose packages for `nix build` (none currently)
-      packages.${system} = { };
+      packages.x86_64-linux = { };
 
-      # Your NixOS system configuration
+      # NixOS System Configurations
+      # Each host can be built with: nixos-rebuild switch --flake .#<hostname>
       nixosConfigurations = {
-        # Hostname is set to "nixos"
-        nixos = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs username; }; # Pass inputs and username to your config
-          modules = [
-            # Your main configuration file
-            ./hosts/nixos
 
-            # Allow unfree packages + overlays for broken packages
-            {
-              nixpkgs.config.allowUnfree = true;
-              nixpkgs.overlays = [
-                # Fix GCC 15 / test failures in nixos-unstable
-                (final: prev: {
-                  python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-                    # llm: 5 flaky tests fail on nixos-unstable (453/458 pass)
-                    llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-                  });
-                  python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
-                    llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-                  });
-                })
-              ];
-            }
+        # ThinkPad X1 Carbon (existing system)
+        # Build: nixos-rebuild switch --flake .#nixos
+        nixos = mkHost {
+          hostname = "nixos";
+        };
 
-            # Home Manager module (optional)
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "backup";
-              home-manager.extraSpecialArgs = { inherit inputs username; };
-              # The path to your home-manager config (modular organization in modules/home-manager/)
-              home-manager.users.${username} = import ./modules/home-manager;
-            }
+        # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070)
+        # Build: nixos-rebuild switch --flake .#framework-16
+        framework-16 = mkHost {
+          hostname = "framework-16";
+          extraModules = [
+            # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
+            nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
           ];
         };
+
       };
     };
 }
