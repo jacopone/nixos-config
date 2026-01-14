@@ -13,6 +13,7 @@ YES=false
 RECORD=false
 AUDIT=false
 VERIFY_BOOTSTRAP=false
+FRESH=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -23,6 +24,7 @@ while [[ $# -gt 0 ]]; do
         --record|-r) RECORD=true; shift ;;
         --audit|-a) AUDIT=true; shift ;;
         --verify-bootstrap) VERIFY_BOOTSTRAP=true; shift ;;
+        --fresh|-f) FRESH=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
@@ -31,6 +33,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -n, --dry-run    Show what would happen without making changes"
             echo "  -q, --quick      Skip security checks and cleanup (fastest rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
+            echo "  -f, --fresh      Bypass eval-cache (use when changes seem ignored)"
             echo "  -r, --record     Record session with vhs for documentation"
             echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
@@ -46,6 +49,7 @@ while [[ $# -gt 0 ]]; do
             echo "  ./rebuild-nixos              # Full rebuild with security checks"
             echo "  ./rebuild-nixos --quick      # Fastest: skip security + cleanup"
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
+            echo "  ./rebuild-nixos --fresh      # Bypass eval-cache for clean rebuild"
             echo "  ./rebuild-nixos --audit      # Include forensic audit trail export"
             echo "  ./rebuild-nixos --record     # Record session for AI workflow docs"
             exit 0
@@ -916,6 +920,14 @@ fi
 # This is the critical step - system state changes here
 # Exit on failure: Yes (activation failed, system unchanged)
 # Rollback available: Use 'sudo nixos-rebuild switch --rollback'
+
+# Build extra options based on flags
+NIXOS_REBUILD_OPTS=""
+if [ "$FRESH" = true ]; then
+    NIXOS_REBUILD_OPTS="--option eval-cache false"
+    log_step "Fresh mode: bypassing eval-cache"
+fi
+
 # Activate the new configuration
 step "Activating configuration"
 
@@ -924,7 +936,7 @@ if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
 else
     if [ "$VERBOSE" = true ]; then
         # Verbose mode - show all output
-        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>&1 | tee -a "$LOG_FILE"; then
+        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | tee -a "$LOG_FILE"; then
             ACTIVATE_EXIT=0
         else
             ACTIVATE_EXIT=$?
@@ -932,14 +944,14 @@ else
     elif [ "$USE_NOM" = true ]; then
         # Use nix-output-monitor for beautiful activation visualization
         echo ""
-        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>&1 | nom | tee -a "$LOG_FILE"; then
+        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | nom | tee -a "$LOG_FILE"; then
             ACTIVATE_EXIT=0
         else
             ACTIVATE_EXIT=${PIPESTATUS[0]}
         fi
     else
         # Fallback: custom progress indicator (when nom not available)
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure 2>>"$LOG_FILE" &
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>>"$LOG_FILE" &
         ACTIVATE_PID=$!
         show_progress "activation" $ACTIVATE_PID
         wait $ACTIVATE_PID
