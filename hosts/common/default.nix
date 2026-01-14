@@ -42,7 +42,7 @@
     gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than +2";
+      options = "--delete-older-than 30d"; # Keep generations from last 30 days
     };
   };
 
