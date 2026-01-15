@@ -195,6 +195,7 @@ cd ~/nixos-config
 **AI Development:**
 - Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
 - Anthropic [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt) for isolated execution
+- [Handy](https://github.com/cjpais/Handy) - Offline speech-to-text with Whisper/Parakeet models
 
 **Development:**
 - DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)

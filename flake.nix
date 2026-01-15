@@ -102,6 +102,8 @@
                   llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
                 });
               })
+              # Handy - offline speech-to-text with Whisper/Parakeet
+              (import ./overlays/handy.nix)
             ];
           }
 
