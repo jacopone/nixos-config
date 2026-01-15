@@ -1164,6 +1164,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - replace custom bubblewrap with Anthropic srt (restructured)
 
+### Added
+- add claude-autonomous worker and improve rebuild-nixos
+  (Test: `which claude-autonomous` or `claude-autonomous --version`)
+
+### Added
+- add claude-autonomous worker and improve rebuild-nixos
+  (Test: `which claude-autonomous` or `claude-autonomous --version`)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

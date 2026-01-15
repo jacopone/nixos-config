@@ -15,6 +15,12 @@ in
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
 
+    # Speech-to-text
+    handy # Offline speech-to-text with Whisper/Parakeet - https://github.com/cjpais/Handy
+    wtype # Wayland text input (for handy)
+    xdotool # X11 text input (for handy)
+    dotool # Universal text input (for handy)
+
     # Anthropic's sandbox-runtime (srt) - Claude Code sandboxing
     # Usage: srt claude [args]  OR  srt --settings ~/.srt-settings.json claude [args]
     # See: https://github.com/anthropic-experimental/sandbox-runtime
