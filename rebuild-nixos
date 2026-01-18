@@ -1629,9 +1629,10 @@ elif [ "$DRY_RUN" = false ]; then
     log_step "Listing system generations..."
     sudo nixos-rebuild list-generations
 
-    read -p "Enter the generations you want to delete (separated by space, or 'auto' for automatic cleanup): " generations_to_delete
+    read -p "Enter generations to delete (space-separated), 'a' for auto cleanup, or Enter to skip: " generations_to_delete
     if [ -n "$generations_to_delete" ]; then
-        if [ "$generations_to_delete" = "auto" ]; then
+        # Accept 'a' or 'auto' for automatic cleanup
+        if [ "$generations_to_delete" = "auto" ] || [ "$generations_to_delete" = "a" ]; then
             log_step "Running automatic generation cleanup (keeping last 5)..."
 
             # Clean system generations (keep last 5)
