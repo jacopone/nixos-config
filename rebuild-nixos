@@ -1083,18 +1083,16 @@ else
 
     echo ""  # Ensure we're on a new line after progress indicator
 
-    # Verify new generation was created
-    NEW_GEN=$(readlink /nix/var/nix/profiles/system | sed 's/system-\([0-9]*\)-link/\1/')
-    NEW_SYSTEM=$(readlink /nix/var/nix/profiles/system-${NEW_GEN}-link 2>/dev/null || echo "unknown")
+    # Verify activation succeeded - check the current generation
+    NEW_GEN=$(readlink /nix/var/nix/profiles/system | sed 's/system-\([0-9]*\)-link/\1/' || true)
     CURRENT_SYSTEM=$(readlink /run/current-system)
 
-    if [ "$NEW_SYSTEM" != "$CURRENT_SYSTEM" ]; then
-        log_success "Configuration activated (generation $NEW_GEN created)"
-        log_step "New: $(basename "$NEW_SYSTEM")"
-        add_action "Switched to new NixOS configuration (gen $NEW_GEN)"
+    if [ -n "$NEW_GEN" ]; then
+        log_success "Configuration activated (generation $NEW_GEN)"
+        log_step "System: $(basename "$CURRENT_SYSTEM")"
+        add_action "NixOS configuration activated (gen $NEW_GEN)"
     else
-        log_warning "Activation completed but no new generation created!"
-        log_warning "This may indicate the system derivation was unchanged."
+        log_warning "Could not determine current generation"
         log_step "Current: $(basename "$CURRENT_SYSTEM")"
     fi
 fi
@@ -1762,7 +1760,8 @@ if [ "$LARGE_CLAUDE" -gt 0 ]; then
 fi
 
 # Check for oversized config files (>1MB = investigate)
-LARGE_CONFIGS=$(fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 2>/dev/null | grep -v "IndexedDB\|chrome" | wc -l)
+# Note: { grep -v ... || true; } prevents pipefail exit when all lines match exclusion
+LARGE_CONFIGS=$(fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 2>/dev/null | { grep -v "IndexedDB\|chrome" || true; } | wc -l)
 if [ "$LARGE_CONFIGS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_CONFIGS config file(s) >1MB (should be <100KB)")
 fi
@@ -2119,3 +2118,4 @@ if [ "$VERBOSE" = false ]; then
 fi
 
 echo ""
+exit 0
