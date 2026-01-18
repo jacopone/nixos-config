@@ -1639,9 +1639,9 @@ elif [ "$DRY_RUN" = false ]; then
             # Each nixpkgs channel update creates a new generation
             ROOT_CHANNELS="/nix/var/nix/profiles/per-user/root/channels"
             if [ -L "$ROOT_CHANNELS" ]; then
-                BEFORE=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l)
+                BEFORE=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l || echo "0")
                 sudo nix-env -p "$ROOT_CHANNELS" --delete-generations +5 2>/dev/null || true
-                AFTER=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l)
+                AFTER=$(ls -1 "${ROOT_CHANNELS%/*}"/channels-*-link 2>/dev/null | wc -l || echo "0")
                 CLEANED=$((BEFORE - AFTER))
                 [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED root channel generations"
             fi
@@ -1649,9 +1649,9 @@ elif [ "$DRY_RUN" = false ]; then
             # Clean default profile generations
             DEFAULT_PROFILE="/nix/var/nix/profiles/default"
             if [ -L "$DEFAULT_PROFILE" ]; then
-                BEFORE=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l)
+                BEFORE=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l || echo "0")
                 sudo nix-env -p "$DEFAULT_PROFILE" --delete-generations +5 2>/dev/null || true
-                AFTER=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l)
+                AFTER=$(ls -1 "${DEFAULT_PROFILE%/*}"/default-*-link 2>/dev/null | wc -l || echo "0")
                 CLEANED=$((BEFORE - AFTER))
                 [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED default profile generations"
             fi
@@ -1659,9 +1659,9 @@ elif [ "$DRY_RUN" = false ]; then
             # Clean user profile generations (home-manager)
             USER_PROFILE="$HOME/.local/state/nix/profiles/profile"
             if [ -L "$USER_PROFILE" ]; then
-                BEFORE=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l)
+                BEFORE=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l || echo "0")
                 nix-env -p "$USER_PROFILE" --delete-generations +5 2>/dev/null || true
-                AFTER=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l)
+                AFTER=$(ls -1 "${USER_PROFILE%/*}"/profile-*-link 2>/dev/null | wc -l || echo "0")
                 CLEANED=$((BEFORE - AFTER))
                 [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED user profile generations"
             fi
@@ -1930,13 +1930,14 @@ PYTHON_EOF
 )
 
     # Parse lifecycle stats (now with STATS: prefix)
-    TOTAL_SESSIONS=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:TOTAL:" | cut -d: -f3)
-    RAW_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:RAW:" | cut -d: -f3)
-    ANALYZED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:ANALYZED:" | cut -d: -f3)
-    INSIGHTS_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:INSIGHTS_GENERATED:" | cut -d: -f3)
-    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:IMPLEMENTED:" | cut -d: -f3)
-    SAFE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:SAFE_TO_CLEANUP:" | cut -d: -f3)
-    VALUABLE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | grep "^STATS:VALUABLE:" | cut -d: -f3)
+    # Note: grep returns 1 if no match - protect with || true for pipefail
+    TOTAL_SESSIONS=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:TOTAL:" || true; } | cut -d: -f3)
+    RAW_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:RAW:" || true; } | cut -d: -f3)
+    ANALYZED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:ANALYZED:" || true; } | cut -d: -f3)
+    INSIGHTS_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:INSIGHTS_GENERATED:" || true; } | cut -d: -f3)
+    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:IMPLEMENTED:" || true; } | cut -d: -f3)
+    SAFE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:SAFE_TO_CLEANUP:" || true; } | cut -d: -f3)
+    VALUABLE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:VALUABLE:" || true; } | cut -d: -f3)
 
     # Display lifecycle statistics
     echo "  📋 Session Lifecycle:"
@@ -1956,7 +1957,7 @@ PYTHON_EOF
             log_step "Cleaning up IMPLEMENTED sessions..."
 
             # Extract temp file path from lifecycle output
-            TEMP_FILE=$(echo "$LIFECYCLE_OUTPUT" | grep "^CLEANUP:TEMPFILE:" | cut -d: -f3)
+            TEMP_FILE=$(echo "$LIFECYCLE_OUTPUT" | { grep "^CLEANUP:TEMPFILE:" || true; } | cut -d: -f3)
 
             # Delete sessions using bash + jq (saves ~300ms vs Python interpreter startup)
             if [ -f "$TEMP_FILE" ]; then
@@ -2043,14 +2044,14 @@ elif [ "$DRY_RUN" = false ] && [ -d .backups ]; then
 
         if [[ $REPLY == "1" ]]; then
             # Delete all backup files
-            FREED_SPACE=$(fd -t f 'backup-' .backups 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+            FREED_SPACE=$(fd -t f 'backup-' .backups 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}' || echo "0")
             fd -t f 'backup-' .backups 2>/dev/null -X rm
             log_success "Deleted $backup_count backups (freed ~${FREED_SPACE}MB)"
             add_action "Cleaned $backup_count backup files"
         elif [[ $REPLY == "2" ]]; then
             # Delete only old backups
             OLD_COUNT=$( (fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null || true) | wc -l)
-            FREED_SPACE=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
+            FREED_SPACE=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}' || echo "0")
             fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -X rm
             log_success "Deleted $OLD_COUNT old backups (freed ~${FREED_SPACE}MB)"
             add_action "Cleaned $OLD_COUNT old backup files"
