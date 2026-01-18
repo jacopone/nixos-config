@@ -1326,10 +1326,10 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
     # Extract MCP stats (even if command failed, use existing file)
     if [ -f ~/nixos-config/.claude/mcp-analytics.md ]; then
         # Extract stats from mcp-analytics.md (match actual template format)
-        # Use subshell to handle empty pipeline results properly
-        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+')
+        # Note: Use || true to prevent pipefail from exiting on no matches
+        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || true)
         TOTAL_CONFIGURED=${TOTAL_CONFIGURED:-0}
-        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1)
+        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || true)
         MCP_CONNECTED=${MCP_CONNECTED:-0}
 
         # Add to statistics (simplified - no session count since it's not tracked)
@@ -1354,11 +1354,11 @@ if [ $AUTOMATION_EXIT -eq 0 ]; then
         if [ -f "$TOOL_ANALYTICS" ]; then
             # Extract stats from tool-analytics.md Summary section
             # Format: "- **Total Tools Installed**: 129" and "- **Tools Used**: 35 (27.1%)"
-            TOOL_TOTAL=$(grep "Total Tools Installed" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1)
+            TOOL_TOTAL=$(grep "Total Tools Installed" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1 || true)
             TOOL_TOTAL=${TOOL_TOTAL:-"?"}
-            TOOL_USED=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1)
+            TOOL_USED=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1 || true)
             TOOL_USED=${TOOL_USED:-"?"}
-            TOOL_ADOPTION=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\((\d+)' | grep -oP '\d+')
+            TOOL_ADOPTION=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\((\d+)' | grep -oP '\d+' || true)
             TOOL_ADOPTION=${TOOL_ADOPTION:-"?"}
 
             # Display with clearer format
