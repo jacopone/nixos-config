@@ -29,6 +29,8 @@ export NIXOS_REBUILD_WRAPPER=1
 if [ -z "$ANTHROPIC_API_KEY" ] && [ -f ~/.config/environment.d/50-secrets.conf ]; then
     # shellcheck source=/dev/null
     source ~/.config/environment.d/50-secrets.conf
+    # Export so subprocesses (like nix run) can see it
+    export ANTHROPIC_API_KEY
 fi
 
 # Parse command line arguments
