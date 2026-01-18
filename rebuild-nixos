@@ -24,6 +24,13 @@ trap cleanup EXIT INT TERM
 # This allows Claude Code hooks to permit nixos-rebuild calls from within this script
 export NIXOS_REBUILD_WRAPPER=1
 
+# Source user secrets from environment.d if not already in environment
+# This handles the case where the script is run before re-login after adding secrets
+if [ -z "$ANTHROPIC_API_KEY" ] && [ -f ~/.config/environment.d/50-secrets.conf ]; then
+    # shellcheck source=/dev/null
+    source ~/.config/environment.d/50-secrets.conf
+fi
+
 # Parse command line arguments
 VERBOSE=false
 DRY_RUN=false
