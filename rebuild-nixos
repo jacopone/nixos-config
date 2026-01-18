@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 set -e
+set -o pipefail  # Ensure pipeline failures are caught (critical for nixos-rebuild | nom)
+
+# Cleanup handler for interrupts (Ctrl+C) and errors
+TEMP_FILES=()
+cleanup() {
+    local exit_code=$?
+    # Remove any temp files we created
+    for f in "${TEMP_FILES[@]}"; do
+        rm -f "$f" 2>/dev/null
+    done
+    # Remove common temp file patterns
+    rm -f /tmp/nixos-build-$$ /tmp/nixbuild-output-$$.tmp /tmp/changelog-draft-$$.md /tmp/changelog-updated-$$.md /tmp/gc-output-$$.tmp 2>/dev/null
+    if [ $exit_code -ne 0 ] && [ $exit_code -ne 130 ]; then
+        echo ""
+        echo -e "\033[0;31m⚠️  Rebuild interrupted or failed (exit code: $exit_code)\033[0m"
+    fi
+    exit $exit_code
+}
+trap cleanup EXIT INT TERM
 
 # Mark that we're running inside the rebuild-nixos wrapper
 # This allows Claude Code hooks to permit nixos-rebuild calls from within this script
@@ -33,7 +52,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -n, --dry-run    Show what would happen without making changes"
             echo "  -q, --quick      Skip security checks and cleanup (fastest rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
-            echo "  -f, --fresh      Bypass eval-cache (use when changes seem ignored)"
+            echo "  -f, --fresh      Clear and bypass eval-cache (use when changes seem ignored)"
             echo "  -r, --record     Record session with vhs for documentation"
             echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
@@ -253,6 +272,13 @@ CURRENT_STEP=0
 # Track total rebuild duration
 REBUILD_START_TIME=$(date +%s)
 
+# Detect hostname for flake configuration (avoids hardcoding "nixos")
+NIXOS_HOSTNAME=$(hostname)
+if ! nix eval ".#nixosConfigurations.\"$NIXOS_HOSTNAME\"" --apply 'x: true' &>/dev/null; then
+    # Fallback: try to find any available configuration
+    NIXOS_HOSTNAME=$(nix flake show --json 2>/dev/null | jq -r '.nixosConfigurations | keys[0]' 2>/dev/null || echo "nixos")
+fi
+
 # Start rebuild
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
@@ -287,6 +313,96 @@ if [ "$DRY_RUN" = false ]; then
     echo "🔐 This rebuild requires sudo privileges for system activation."
     sudo -v || { log_error "Failed to obtain sudo access"; exit 1; }
 fi
+
+# === PHASE 0: Eval-Cache Management ===
+# Manages Nix eval-cache to prevent stale cache from causing "changes ignored" issues
+# The eval-cache stores evaluated Nix expressions and can become stale over time,
+# causing rebuilds to incorrectly report "no changes" even when flake.nix was modified.
+# This is the root cause of the "phantom generation" problem.
+#
+# IMPORTANT: Also manages ~/.local/share/nix/trusted-settings.json which can contain
+# a "eval-cache": {"true": true} entry that OVERRIDES --option eval-cache false!
+# Exit on failure: No (cache clearing is best-effort)
+
+# Dynamic eval-cache directory detection (handles v5, v6, future versions)
+# Finds the latest versioned eval-cache directory
+EVAL_CACHE_DIR=$(find "$HOME/.cache/nix" -maxdepth 1 -type d -name "eval-cache-v*" 2>/dev/null | sort -V | tail -1)
+if [ -z "$EVAL_CACHE_DIR" ]; then
+    EVAL_CACHE_DIR="$HOME/.cache/nix/eval-cache-v6"  # Fallback to current version
+fi
+TRUSTED_SETTINGS="$HOME/.local/share/nix/trusted-settings.json"
+CACHE_MAX_AGE_DAYS=7
+
+manage_eval_cache() {
+    local cache_cleared=false
+    local reason=""
+
+    # Case 1: --fresh flag - always clear cache
+    if [ "$FRESH" = true ]; then
+        reason="--fresh flag requested"
+        cache_cleared=true
+    # Case 2: Auto-detect stale cache (files older than threshold)
+    elif [ -d "$EVAL_CACHE_DIR" ]; then
+        # Find files older than threshold
+        local stale_files=$(find "$EVAL_CACHE_DIR" -type f -mtime +$CACHE_MAX_AGE_DAYS 2>/dev/null | head -1)
+        if [ -n "$stale_files" ]; then
+            # Get the oldest file's age for reporting
+            local oldest_file=$(find "$EVAL_CACHE_DIR" -type f -printf '%T+ %p\n' 2>/dev/null | sort | head -1 | cut -d' ' -f2)
+            if [ -n "$oldest_file" ]; then
+                local oldest_age=$(stat -c %Y "$oldest_file" 2>/dev/null)
+                local now=$(date +%s)
+                local age_days=$(( (now - oldest_age) / 86400 ))
+                reason="stale cache detected (oldest entry: ${age_days} days old)"
+                cache_cleared=true
+            fi
+        fi
+    fi
+
+    # Clear eval-cache directory (handles all versioned directories when --fresh)
+    if [ "$cache_cleared" = true ]; then
+        # Clear ALL eval-cache versions when --fresh is used
+        for cache_dir in "$HOME"/.cache/nix/eval-cache-v*; do
+            if [ -d "$cache_dir" ]; then
+                local cache_size=$(du -sh "$cache_dir" 2>/dev/null | cut -f1)
+                if [ "$DRY_RUN" = true ]; then
+                    echo -e "${YELLOW}[DRY-RUN]${NC} Would clear $(basename "$cache_dir") (${cache_size}): ${reason}"
+                else
+                    rm -rf "$cache_dir"
+                    log_step "Cleared $(basename "$cache_dir") (${cache_size}): ${reason}"
+                    add_action "Cleared stale eval-cache to ensure fresh evaluation"
+                fi
+            fi
+        done
+    elif [ "$VERBOSE" = true ] && [ -d "$EVAL_CACHE_DIR" ]; then
+        local cache_size=$(du -sh "$EVAL_CACHE_DIR" 2>/dev/null | cut -f1)
+        log_step "Eval-cache (${cache_size}) is fresh (< ${CACHE_MAX_AGE_DAYS} days old)"
+    fi
+
+    # CRITICAL: ALWAYS remove eval-cache from trusted-settings.json if present
+    # This setting can OVERRIDE --option eval-cache false, causing phantom generation issues
+    # Runs on EVERY rebuild, not just --fresh, to prevent the setting from accumulating
+    if [ -f "$TRUSTED_SETTINGS" ]; then
+        if grep -q '"eval-cache"' "$TRUSTED_SETTINGS" 2>/dev/null; then
+            if [ "$DRY_RUN" = true ]; then
+                echo -e "${YELLOW}[DRY-RUN]${NC} Would remove eval-cache from trusted-settings.json"
+            else
+                # Use jq if available, otherwise sed
+                if command -v jq &>/dev/null; then
+                    local tmp=$(mktemp)
+                    jq 'del(."eval-cache")' "$TRUSTED_SETTINGS" > "$tmp" && mv "$tmp" "$TRUSTED_SETTINGS"
+                else
+                    # Fallback: remove eval-cache entry with sed
+                    sed -i 's/,"eval-cache":{[^}]*}//g; s/"eval-cache":{[^}]*},//g' "$TRUSTED_SETTINGS"
+                fi
+                log_step "Removed eval-cache from trusted-settings.json (prevents --fresh override)"
+                add_action "Removed eval-cache trusted setting to prevent cache override"
+            fi
+        fi
+    fi
+}
+
+# Run eval-cache management
+manage_eval_cache
 
 # === PHASE 1: Update Flake Inputs ===
 # Updates nix flake lock file to get latest package versions
@@ -348,7 +464,7 @@ fi
 
 if [ "$VERBOSE" = true ]; then
     # Verbose mode - show all output
-    NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | tee -a "$LOG_FILE" | tail -1)
+    NEW_CONFIG_PATH=$(NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."$NIXOS_HOSTNAME".config.system.build.toplevel 2>&1 | tee -a "$LOG_FILE" | tail -1)
 elif [ "$USE_NOM" = true ]; then
     # Use nix-output-monitor with explicit JSON mode for clean tree-only output
     # --log-format internal-json: nix outputs JSON (not raw text)
@@ -357,7 +473,7 @@ elif [ "$USE_NOM" = true ]; then
     # The internal-json format works without -v and gives nom what it needs
     BUILD_LINK="/tmp/nixos-build-$$"
     echo ""
-    NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json --out-link "$BUILD_LINK" --impure .#nixosConfigurations."nixos".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
+    NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json --out-link "$BUILD_LINK" --impure .#nixosConfigurations."$NIXOS_HOSTNAME".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
     BUILD_EXIT=${PIPESTATUS[0]}
 
     if [ $BUILD_EXIT -ne 0 ]; then
@@ -372,7 +488,7 @@ elif [ "$USE_NOM" = true ]; then
     rm -f "$BUILD_LINK"
 else
     # Fallback: custom progress indicator (when nom not available)
-    NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."nixos".config.system.build.toplevel > /tmp/nixbuild-output-$$.tmp 2>>"$LOG_FILE" &
+    NIXPKGS_ALLOW_UNFREE=1 nix build --no-link --print-out-paths --impure .#nixosConfigurations."$NIXOS_HOSTNAME".config.system.build.toplevel > /tmp/nixbuild-output-$$.tmp 2>>"$LOG_FILE" &
     BUILD_PID=$!
     show_progress "test-build" $BUILD_PID
     wait $BUILD_PID
@@ -743,8 +859,8 @@ if [ "$AUDIT" = true ]; then
     if prompt_user "$EXPORT_PROMPT"; then
         log_step "Realizing source derivations (this may take a while)..."
 
-        TIMEOUT_PER_DRV=60
-        OVERALL_TIMEOUT=3600
+        TIMEOUT_PER_DRV=${AUDIT_TIMEOUT_PER_DRV:-60}
+        OVERALL_TIMEOUT=${AUDIT_OVERALL_TIMEOUT:-14400}
 
         CLOSURE_FILE="$AUDIT_DIR/source-closure-$TIMESTAMP.nar"
         REALIZE_LOG="$AUDIT_DIR/realize-$TIMESTAMP.log"
@@ -925,33 +1041,32 @@ fi
 NIXOS_REBUILD_OPTS=""
 if [ "$FRESH" = true ]; then
     NIXOS_REBUILD_OPTS="--option eval-cache false"
-    log_step "Fresh mode: bypassing eval-cache"
+    log_step "Fresh mode: eval-cache cleared (Phase 0) + bypassing cache writes"
 fi
 
 # Activate the new configuration
 step "Activating configuration"
 
+# Refresh sudo credentials before activation (may have expired during security checks)
+if [ "$DRY_RUN" = false ]; then
+    sudo -v || { log_error "Failed to refresh sudo access"; exit 1; }
+fi
+
 if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
     : # skip
 else
     if [ "$VERBOSE" = true ]; then
-        # Verbose mode - show all output
-        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | tee -a "$LOG_FILE"; then
-            ACTIVATE_EXIT=0
-        else
-            ACTIVATE_EXIT=$?
-        fi
+        # Verbose mode - show all output, capture exit code properly
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure ${NIXOS_REBUILD_OPTS:-} 2>&1 | tee -a "$LOG_FILE"
+        ACTIVATE_EXIT=${PIPESTATUS[0]}
     elif [ "$USE_NOM" = true ]; then
         # Use nix-output-monitor for beautiful activation visualization
         echo ""
-        if sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | nom | tee -a "$LOG_FILE"; then
-            ACTIVATE_EXIT=0
-        else
-            ACTIVATE_EXIT=${PIPESTATUS[0]}
-        fi
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure ${NIXOS_REBUILD_OPTS:-} 2>&1 | nom | tee -a "$LOG_FILE"
+        ACTIVATE_EXIT=${PIPESTATUS[0]}
     else
-        # Fallback: custom progress indicator (when nom not available)
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>>"$LOG_FILE" &
+        # Fallback: custom progress indicator (capture both stdout and stderr)
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure ${NIXOS_REBUILD_OPTS:-} >>"$LOG_FILE" 2>&1 &
         ACTIVATE_PID=$!
         show_progress "activation" $ACTIVATE_PID
         wait $ACTIVATE_PID
@@ -967,8 +1082,21 @@ else
     fi
 
     echo ""  # Ensure we're on a new line after progress indicator
-    log_success "Configuration activated"
-    add_action "Switched to new NixOS configuration"
+
+    # Verify new generation was created
+    NEW_GEN=$(readlink /nix/var/nix/profiles/system | sed 's/system-\([0-9]*\)-link/\1/')
+    NEW_SYSTEM=$(readlink /nix/var/nix/profiles/system-${NEW_GEN}-link 2>/dev/null || echo "unknown")
+    CURRENT_SYSTEM=$(readlink /run/current-system)
+
+    if [ "$NEW_SYSTEM" != "$CURRENT_SYSTEM" ]; then
+        log_success "Configuration activated (generation $NEW_GEN created)"
+        log_step "New: $(basename "$NEW_SYSTEM")"
+        add_action "Switched to new NixOS configuration (gen $NEW_GEN)"
+    else
+        log_warning "Activation completed but no new generation created!"
+        log_warning "This may indicate the system derivation was unchanged."
+        log_step "Current: $(basename "$CURRENT_SYSTEM")"
+    fi
 fi
 
 # === PHASE 3.5: Community Reproducibility Check (r13y) ===
@@ -1366,6 +1494,11 @@ fi
 # - Instruction effectiveness (improve low-compliance policies)
 # - Cross-project transfers (apply patterns from similar projects)
 # - Meta-learning (calibrate detection thresholds)
+# Then runs CLAUDE.md Suggestion Engine to detect:
+# - Repeated instructions ("always do X", "never do Y")
+# - Corrections ("no, use X instead")
+# - Cross-project patterns (→ suggest for global CLAUDE.md)
+# - Project-specific patterns (→ suggest for project CLAUDE.md)
 # Exit on failure: No (learning is optional, system already activated)
 # User interaction: Yes (interactive approval of suggestions)
 # Skip with: --quick flag
@@ -1417,6 +1550,30 @@ else
                 log_warning "Adaptive learning interrupted by user (Ctrl+C)"
             else
                 log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
+            fi
+        fi
+
+        # STEP 3: CLAUDE.md Suggestion Engine (Two-Stage Pipeline)
+        # Stage 1: Regex extracts candidate instruction patterns from session logs
+        # Stage 2: Claude API analyzes candidates, filters noise, formats suggestions
+        # Suggests edits to global CLAUDE-USER-POLICIES.md or project CLAUDE.md
+        #
+        # Requires: ANTHROPIC_API_KEY environment variable
+        # To enable: export ANTHROPIC_API_KEY=sk-ant-... in your shell profile
+        log_step "  Analyzing sessions for CLAUDE.md suggestions..."
+        if [[ -d "$AUTOMATION_DIR" ]]; then
+            # Use nix run to inherit environment (including ANTHROPIC_API_KEY)
+            # --skip-if-no-key ensures graceful skip if key not set
+            if nix run "${AUTOMATION_DIR}#suggest-claude-md" -- --apply --skip-if-no-key 2>/dev/null; then
+                log_success "  CLAUDE.md suggestions reviewed"
+                add_action "CLAUDE.md suggestions: reviewed interactively"
+            else
+                SUGGEST_EXIT=$?
+                if [ $SUGGEST_EXIT -eq 130 ]; then
+                    log_warning "  CLAUDE.md suggestions interrupted by user (Ctrl+C)"
+                elif [ $SUGGEST_EXIT -ne 0 ]; then
+                    log_warning "  CLAUDE.md suggestion engine had issues (continuing anyway)"
+                fi
             fi
         fi
     else
@@ -1847,6 +2004,14 @@ FREED_MB:0"
         echo "     Next: Review insights → Implement changes → Mark sessions as IMPLEMENTED"
     else
         echo -e "${GREEN}  ✅ No Claude sessions found${NC}"
+    fi
+
+    # Cleanup orphaned learner counter files (older than 1 day)
+    # These accumulate when sessions end unexpectedly
+    ORPHAN_COUNT=$(find ~/.claude -maxdepth 1 -name "learner_counter_*" -mtime +1 2>/dev/null | wc -l)
+    if [ "$ORPHAN_COUNT" -gt 0 ]; then
+        find ~/.claude -maxdepth 1 -name "learner_counter_*" -mtime +1 -delete 2>/dev/null
+        log_step "Cleaned $ORPHAN_COUNT orphaned session counter files"
     fi
 fi
 
