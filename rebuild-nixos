@@ -1721,9 +1721,10 @@ else
 declare -a DISK_WARNINGS=()
 
 # Check for oversized log files (>100MB = problematic)
-LARGE_LOGS=$(fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null | wc -l)
+# Note: fd returns 1 when no matches - protect with || true for pipefail
+LARGE_LOGS=$( (fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null || true) | wc -l)
 if [ "$LARGE_LOGS" -gt 0 ]; then
-    LARGEST_LOG=$(fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null | xargs du -h 2>/dev/null | sort -rh | head -1)
+    LARGEST_LOG=$( (fd -t f -s +100M '\.log$' ~ --max-depth 4 2>/dev/null || true) | xargs du -h 2>/dev/null | sort -rh | head -1)
     DISK_WARNINGS+=("$LARGE_LOGS log file(s) >100MB: ${LARGEST_LOG}")
 fi
 
@@ -1754,20 +1755,20 @@ else
 fi
 
 # Still check for very large individual session files (may indicate stuck sessions)
-LARGE_CLAUDE=$(fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null | wc -l)
+LARGE_CLAUDE=$( (fd -t f -s +5M '\.jsonl$' ~/.claude/projects 2>/dev/null || true) | wc -l)
 if [ "$LARGE_CLAUDE" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_CLAUDE Claude session(s) >5MB (may indicate stuck sessions)")
 fi
 
 # Check for oversized config files (>1MB = investigate)
-# Note: { grep -v ... || true; } prevents pipefail exit when all lines match exclusion
-LARGE_CONFIGS=$(fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 2>/dev/null | { grep -v "IndexedDB\|chrome" || true; } | wc -l)
+# Note: fd returns 1 when no matches; grep -v returns 1 when all excluded - protect both
+LARGE_CONFIGS=$( (fd -t f -s +1M '\.json$' ~/.config ~/.claude --max-depth 3 2>/dev/null || true) | { grep -v "IndexedDB\|chrome" || true; } | wc -l)
 if [ "$LARGE_CONFIGS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_CONFIGS config file(s) >1MB (should be <100KB)")
 fi
 
 # Check for old backup files (>1MB)
-LARGE_BACKUPS=$(fd -t f -s +1M -e bak -e backup -e old ~ --max-depth 3 2>/dev/null | wc -l)
+LARGE_BACKUPS=$( (fd -t f -s +1M -e bak -e backup -e old ~ --max-depth 3 2>/dev/null || true) | wc -l)
 if [ "$LARGE_BACKUPS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_BACKUPS backup file(s) >1MB (should archive/delete)")
 fi
@@ -2022,7 +2023,7 @@ fi
 if [ "$QUICK" = true ]; then
     : # Skip silently in quick mode
 elif [ "$DRY_RUN" = false ] && [ -d .backups ]; then
-    backup_count=$(fd -t f 'backup-' .backups 2>/dev/null | wc -l)
+    backup_count=$( (fd -t f 'backup-' .backups 2>/dev/null || true) | wc -l)
     if [ "$backup_count" -gt 0 ]; then
         echo ""
         log_step "Found $backup_count Claude backup files in .backups/"
@@ -2041,7 +2042,7 @@ elif [ "$DRY_RUN" = false ] && [ -d .backups ]; then
             add_action "Cleaned $backup_count backup files"
         elif [[ $REPLY == "2" ]]; then
             # Delete only old backups
-            OLD_COUNT=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null | wc -l)
+            OLD_COUNT=$( (fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null || true) | wc -l)
             FREED_SPACE=$(fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -x du -sb | awk '{sum+=$1} END {print int(sum/1024/1024)}')
             fd -t f 'backup-' .backups --changed-before 7d 2>/dev/null -X rm
             log_success "Deleted $OLD_COUNT old backups (freed ~${FREED_SPACE}MB)"
