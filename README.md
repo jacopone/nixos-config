@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2026-01-14
+updated: 2026-01-18
 type: reference
 lifecycle: persistent
 ---
@@ -226,6 +226,7 @@ The `nixos-hardware` flake provides vendor-specific optimizations (Framework LED
 nixos-config/
 ├── flake.nix                      # Main entry point + mkHost helper
 ├── rebuild-nixos                  # Multi-phase rebuild with learning
+├── .github/workflows/test.yml     # CI: shellcheck + BATS tests
 ├── hosts/
 │   ├── common/default.nix         # Shared config (locale, users, packages)
 │   ├── nixos/                     # ThinkPad X1 host
@@ -240,6 +241,7 @@ nixos-config/
 │   │   ├── thinkpad.nix           # Intel GPU, TLP power management
 │   │   └── framework-16.nix       # AMD/NVIDIA hybrid, LED Matrix
 │   └── home-manager/              # User configurations
+├── tests/bash/                    # BATS unit tests for shell scripts
 ├── profiles/desktop/              # Desktop environment (GNOME)
 ├── CLAUDE.md                      # Auto-generated AI context
 └── .claude/
@@ -285,6 +287,28 @@ nix shell nixpkgs#python312 --command python
 | `--dry-run` | `-n` | Preview changes without applying |
 | `--audit` | `-a` | Export source closure for forensic audit |
 
+## Testing
+
+The repository includes automated testing for shell scripts and CI validation:
+
+```bash
+# Run all tests (shellcheck + BATS)
+test-all
+
+# Shell script linting only
+lint-bash
+
+# BATS unit tests only
+test-bash
+```
+
+**Test coverage:**
+- **Shellcheck** - Static analysis for `rebuild-nixos` and `scripts/*.sh`
+- **BATS** - Unit tests for pipefail protection, input parsing, script structure
+- **CI** - GitHub Actions runs all tests on push/PR to `personal` and `master` branches
+
+Tests are located in `tests/bash/` with helper utilities in `tests/bash/helpers/`.
+
 ## Sandboxed Claude Code
 
 For autonomous tasks, use Anthropic's official [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt):
@@ -325,6 +349,7 @@ Configure `~/.srt-settings.json` for domain filtering and filesystem restriction
 | [INSTALL.md](INSTALL.md) | Full installation and setup |
 | [THE_CLOSED_LOOP.md](docs/architecture/THE_CLOSED_LOOP.md) | How auto-documentation works |
 | [COMMON_TASKS.md](docs/guides/COMMON_TASKS.md) | Quick reference for daily use |
+| [test.yml](.github/workflows/test.yml) | CI workflow for automated testing |
 
 ## Contributing
 
