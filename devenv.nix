@@ -30,6 +30,10 @@
 
     # Playwright MCP for browser automation
     playwright-mcp
+
+    # Testing infrastructure
+    bats # Bash Automated Testing System
+    shellcheck # Static analysis for shell scripts
   ];
 
   # Languages configuration
@@ -74,6 +78,27 @@
     # Quick rebuild wrapper
     rebuild.exec = ''
       ./rebuild-nixos
+    '';
+
+    # Testing commands
+    test-bash.exec = ''
+      echo "🧪 Running BATS tests..."
+      bats tests/bash/
+    '';
+
+    lint-bash.exec = ''
+      echo "🔍 Running shellcheck on scripts..."
+      shellcheck -x rebuild-nixos scripts/*.sh
+    '';
+
+    test-all.exec = ''
+      echo "🧪 Running all tests..."
+      echo ""
+      echo "=== Shellcheck ==="
+      shellcheck -x rebuild-nixos scripts/*.sh || exit 1
+      echo ""
+      echo "=== BATS tests ==="
+      bats tests/bash/
     '';
   };
 

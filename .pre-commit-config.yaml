@@ -31,6 +31,14 @@ repos:
   # Local custom hooks
   - repo: local
     hooks:
+      # Shellcheck for bash scripts (uses system-installed shellcheck)
+      - id: shellcheck
+        name: Shellcheck (bash linting)
+        entry: shellcheck -x
+        language: system
+        files: ^(rebuild-nixos|scripts/.*\.sh)$
+        types: [file]
+
       # Check for required YAML frontmatter in documentation
       - id: check-markdown-frontmatter
         name: Check Markdown frontmatter
