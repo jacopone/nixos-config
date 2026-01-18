@@ -1,0 +1,76 @@
+name: Tests
+
+on:
+  push:
+    branches: [personal, master]
+    paths:
+      - 'rebuild-nixos'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'rebuild-nixos'
+      - 'scripts/**'
+      - 'tests/**'
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck on rebuild-nixos
+        run: shellcheck -x rebuild-nixos
+
+      - name: Run shellcheck on scripts
+        run: |
+          for script in scripts/*.sh; do
+            if [ -f "$script" ]; then
+              echo "Checking $script..."
+              shellcheck -x "$script"
+            fi
+          done
+
+  bats:
+    name: BATS Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install BATS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Install fd (used in tests)
+        run: |
+          sudo apt-get install -y fd-find
+          # Ubuntu uses fdfind, create fd symlink
+          sudo ln -sf /usr/bin/fdfind /usr/bin/fd
+
+      - name: Run BATS tests
+        run: bats tests/bash/
+
+  syntax-check:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check rebuild-nixos syntax
+        run: bash -n rebuild-nixos
+
+      - name: Check scripts syntax
+        run: |
+          for script in scripts/*.sh; do
+            if [ -f "$script" ]; then
+              echo "Syntax check: $script"
+              bash -n "$script"
+            fi
+          done
