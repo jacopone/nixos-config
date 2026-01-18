@@ -1,9 +1,10 @@
 {
   description = "My NixOS Flake Configuration";
 
-  # Enable evaluation caching for 60-80% faster repeated evaluations
+  # Nix configuration for this flake
+  # NOTE: eval-cache is NOT set here - managed by rebuild-nixos --fresh flag
+  # This prevents phantom generations where cached evaluations mask config changes
   nixConfig = {
-    eval-cache = true;
     tarball-ttl = 3600; # Cache flake inputs for 1 hour
   };
 
