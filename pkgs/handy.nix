@@ -11,6 +11,8 @@
 , vulkan-loader
 , wayland
 , xorg
+, gsettings-desktop-schemas
+, gtk3
 }:
 
 let
@@ -40,10 +42,16 @@ appimageTools.wrapType2 {
     cp ${appimageContents}/Handy.png $out/share/icons/hicolor/128x128/apps/handy.png
 
     # Wrap with runtime dependencies
+    # Note: GDK_BACKEND=x11 required - WebKitGTK crashes on GNOME Wayland
+    # WEBKIT_DISABLE_DMABUF_RENDERER=1 prevents GPU buffer sharing crashes
+    # XDG_DATA_DIRS needed for gsettings schemas (WebKitGTK rendering)
     source ${makeWrapper}/nix-support/setup-hook
     wrapProgram $out/bin/handy \
       --prefix PATH : ${lib.makeBinPath [ wtype xdotool dotool ]} \
-      --set WEBKIT_DISABLE_DMABUF_RENDERER 1
+      --prefix XDG_DATA_DIRS : ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name} \
+      --prefix XDG_DATA_DIRS : ${gtk3}/share/gsettings-schemas/${gtk3.name} \
+      --set WEBKIT_DISABLE_DMABUF_RENDERER 1 \
+      --set GDK_BACKEND x11
   '';
 
   extraPkgs = pkgs: with pkgs; [
@@ -68,18 +76,33 @@ appimageTools.wrapType2 {
     xorg.libXi
     xorg.libxcb
 
-    # WebKitGTK dependencies
+    # WebKitGTK and Tauri dependencies (critical for rendering)
+    webkitgtk_4_1
+    libsoup_3
     gtk3
     glib
     gdk-pixbuf
     cairo
     pango
     harfbuzz
+    at-spi2-atk
+    atk
+    dconf
+    gsettings-desktop-schemas
+
+    # GStreamer (for media in WebKit)
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
 
     # Misc
     openssl
     zlib
     stdenv.cc.cc.lib
+    icu
+    libxml2
+    libxslt
+    sqlite
   ];
 
   meta = with lib; {

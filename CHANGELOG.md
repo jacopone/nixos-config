@@ -1172,6 +1172,45 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - add claude-autonomous worker and improve rebuild-nixos
   (Test: `which claude-autonomous` or `claude-autonomous --version`)
 
+### Added
+- add multi-host support for Framework 16 laptop
+- add --fresh flag to bypass eval-cache
+- add Handy speech-to-text package for NixOS
+  (Test: `which Handy` or `Handy --version`)
+
+### Fixed
+- keep 30 days of generations instead of only 2
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- rebuild-nixos reliability and automation updates
+  (Test: Verify the previous issue is resolved)
+- prevent pipefail exit on grep pattern mismatches
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- rebuild-nixos exit code and generation detection
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- protect all fd pipelines against pipefail exit code 1
+  (Test: Verify the previous issue is resolved)
+- source environment.d secrets in rebuild-nixos
+  (Test: Verify the previous issue is resolved)
+- comprehensive pipefail protection audit
+  (Test: Verify the previous issue is resolved)
+
+### Fixed
+- export ANTHROPIC_API_KEY after sourcing from environment.d
+  (Test: Verify the previous issue is resolved)
+
+### Added
+- add testing infrastructure for rebuild-nixos
+
+### Fixed
+- accept 'a' shortcut for automatic generation cleanup
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

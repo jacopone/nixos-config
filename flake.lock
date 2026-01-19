@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1768707389,
-        "narHash": "sha256-FyZD1xe9bDYSFVky4auVK/oq1LLJocSvxuBXjfasovQ=",
+        "lastModified": 1768773528,
+        "narHash": "sha256-xaiq9ataPhW7dDvXcm7Gct7j5WECA1bPd1+yDgKbjl0=",
         "owner": "jacopone",
         "repo": "claude-nixos-automation",
-        "rev": "72eddba4ef29c8b68f5a9bb1b09105461f74bddc",
+        "rev": "a0ed845e4fa1eac8492175f8fe29434c513479ef",
         "type": "github"
       },
       "original": {
@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1768703115,
-        "narHash": "sha256-JAXjGiDWlQJSwniCYlnEwU/2KjI0bJ/lV0gpyD9UjxE=",
+        "lastModified": 1768770171,
+        "narHash": "sha256-JPmLGZgdWa8QcQbbtBqyZhpmxIHZ3lUO48laERjw+4k=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "05fd3bababe5924f9a6128285e7cf6c67d45f3c0",
+        "rev": "521d5ea1a229ba315dd1cceaf869946ddcc83d36",
         "type": "github"
       },
       "original": {
