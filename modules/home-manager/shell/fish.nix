@@ -327,6 +327,13 @@
       alias jsonpp='jq .'
       alias yamlpp='yq -P .'
 
+      # EOD cleanup workflow
+      alias eod-cleanup='~/nixos-config/scripts/eod-cleanup.sh'
+      alias eod-report='~/nixos-config/scripts/eod-cleanup.sh --report'
+      alias review-files='~/nixos-config/scripts/review-files.sh'
+      alias review-ss='~/nixos-config/scripts/review-files.sh screenshots'
+      alias review-dl='~/nixos-config/scripts/review-files.sh downloads'
+
       # Manual atuin integration with fixed bind syntax (replaces enableFishIntegration)
       # Atuin 18.8.0 has a bug using deprecated "bind -k" syntax
       set -gx ATUIN_SESSION (atuin uuid)
@@ -407,6 +414,12 @@
           bind -M insert \cr _atuin_search
           bind -M insert \eOA _atuin_bind_up
           bind -M insert \e\[A _atuin_bind_up
+      end
+
+      # Load API keys from local secrets (not in git)
+      # Used by: CLAUDE.md suggestion engine, other AI tools
+      if test -f ~/.config/secrets/anthropic.fish
+          source ~/.config/secrets/anthropic.fish
       end
     '';
 

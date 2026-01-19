@@ -69,8 +69,10 @@ cleanup_worktrees() {
     echo -e "${BLUE}Cleaning up worktrees...${NC}"
     local repo="${1:-.}"
     git -C "$repo" worktree list | grep "\.worktrees" | while read -r line; do
-        local wt_path=$(echo "$line" | awk '{print $1}')
-        local branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
+        local wt_path
+        wt_path=$(echo "$line" | awk '{print $1}')
+        local branch
+        branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
         echo -n "  Remove $wt_path ($branch)? [y/N] "
         read -r answer
         if [[ "$answer" =~ ^[Yy]$ ]]; then
@@ -209,6 +211,35 @@ Before writing any feature code:
 ### Phase 4: Refactor (if needed)
 1. Clean up code while keeping tests green
 2. No new functionality in this phase
+
+## Judge-Driven Execution (MANDATORY)
+
+You work in **30-minute cycles** with explicit evaluation after each:
+
+### Cycle Structure
+1. **WORK (30 min)**: Focus on completing PROGRESS.md checklist items (if exists) or task deliverables
+2. **VERIFY**: Run tests, check coverage, lint
+3. **JUDGE**: Evaluate continue vs stop based on the matrix below
+
+### At End of Each Cycle
+If PROGRESS.md exists in the worktree, update it with:
+- Check off items completed this cycle
+- Add test results to Cycle History table
+- Update Current Checkpoint section
+
+### Judge Decision Matrix
+| Condition | Action |
+|-----------|--------|
+| Items remain AND tests pass | Mark cycle complete, continue to next |
+| Items remain AND tests fail | Fix tests first, then continue |
+| All items complete AND tests pass | Create COMPLETED.md, stop |
+| Stuck 2+ cycles on same item | Create BLOCKERS.md, stop |
+
+### INVARIANTS.md Compliance
+If INVARIANTS.md exists in the worktree, before EVERY commit verify:
+- [ ] No INVARIANTS.md violations
+- [ ] All tests passing
+- [ ] Coverage not decreased from baseline
 
 ## Verification Requirements (MANDATORY)
 
