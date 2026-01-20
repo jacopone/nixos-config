@@ -15,10 +15,10 @@ in
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
 
     # Speech-to-text
-    handy # Offline speech-to-text with Whisper/Parakeet - https://github.com/cjpais/Handy
-    wtype # Wayland text input (for handy)
-    xdotool # X11 text input (for handy)
-    dotool # Universal text input (for handy)
+    vibetyper # AI voice typing with speech-to-text - https://vibetyper.com
+    wtype # Wayland text input
+    xdotool # X11 text input
+    dotool # Universal text input
 
     # Anthropic's sandbox-runtime (srt) - Claude Code sandboxing
     # Usage: srt claude [args]  OR  srt --settings ~/.srt-settings.json claude [args]
@@ -236,6 +236,7 @@ in
     roboto # Google's signature font family
     jetbrains-mono # JetBrains Mono - programming font with ligatures and better readability
     nerd-fonts.jetbrains-mono # JetBrains Mono Nerd Font - adds programming icons and symbols
+    noto-fonts-color-emoji # Color emoji support for terminals and applications
 
     # Claude Code performance optimization tools
     sqlite # Database for project indexing and analysis
