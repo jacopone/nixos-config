@@ -1,90 +1,288 @@
 ---
 status: active
 created: 2025-12-18
-updated: 2025-12-18
+updated: 2026-01-20
 type: guide
 lifecycle: persistent
 ---
 
 # Installation Guide
 
-Complete guide for installing and configuring this NixOS configuration.
+Complete guide for installing NixOS and configuring this flake-based system.
 
-## Prerequisites
+## Table of Contents
 
-### System Requirements
+- [Fresh Installation (New Machine)](#fresh-installation-new-machine)
+  - [Create Bootable USB](#step-1-create-bootable-usb)
+  - [Boot and Partition](#step-2-boot-and-partition)
+  - [Install Base NixOS](#step-3-install-base-nixos)
+  - [Migrate to This Flake](#step-4-migrate-to-this-flake)
+- [Framework 16 Specific](#framework-16-specific-instructions)
+- [Existing NixOS Migration](#existing-nixos-migration)
+- [Post-Installation](#post-installation)
+- [Troubleshooting](#troubleshooting)
 
-- **Fresh NixOS installation** (minimal or desktop ISO)
-- **Flakes enabled** (see below)
-- **8GB RAM minimum** (16GB recommended for parallel builds)
-- **20GB free disk space** (for Nix store)
-- **Internet connection** for package downloads
+---
 
-### Enable Flakes
+## Fresh Installation (New Machine)
 
-Add this to `/etc/nixos/configuration.nix` before proceeding:
+Use this section when installing NixOS on a new machine from scratch.
+
+### Prerequisites
+
+- NixOS ISO downloaded from [nixos.org/download](https://nixos.org/download/)
+- USB drive (4GB+ recommended)
+- Internet connection (Ethernet or WiFi)
+
+### Step 1: Create Bootable USB
+
+On an existing Linux/NixOS machine:
+
+```bash
+# Find your USB device
+lsblk -d -o NAME,SIZE,MODEL,TRAN | grep usb
+
+# Unmount if mounted (replace sdX with your device)
+sudo umount /dev/sdX1
+
+# Write ISO to USB (replace paths accordingly)
+sudo dd if=~/Downloads/nixos-*.iso of=/dev/sdX bs=4M status=progress conv=fsync
+
+# Ensure all data is written
+sync
+```
+
+**Alternative (simpler):**
+```bash
+sudo cp ~/Downloads/nixos-*.iso /dev/sdX && sync
+```
+
+### Step 2: Boot and Partition
+
+1. **Boot from USB**: Insert USB, restart, enter BIOS (F2/F12/DEL), select USB boot
+2. **Connect to network**:
+   - Ethernet: Automatic
+   - WiFi: `nmcli device wifi connect "SSID" password "password"`
+
+3. **Partition the disk** (for UEFI systems - most modern hardware):
+
+```bash
+# Identify your target disk
+lsblk
+
+# For NVMe drives (common in laptops like Framework)
+DISK=/dev/nvme0n1
+
+# Create GPT partition table
+sudo parted $DISK -- mklabel gpt
+
+# Create root partition (all space except first 512MB)
+sudo parted $DISK -- mkpart root ext4 512MB 100%
+
+# Create EFI boot partition (first 512MB)
+sudo parted $DISK -- mkpart ESP fat32 1MB 512MB
+sudo parted $DISK -- set 2 esp on
+
+# Format partitions
+sudo mkfs.ext4 -L nixos ${DISK}p1
+sudo mkfs.fat -F 32 -n boot ${DISK}p2
+```
+
+**For BTRFS with snapshots** (optional, advanced):
+```bash
+sudo mkfs.btrfs -L nixos ${DISK}p1
+sudo mount ${DISK}p1 /mnt
+sudo btrfs subvolume create /mnt/@
+sudo btrfs subvolume create /mnt/@home
+sudo btrfs subvolume create /mnt/@nix
+sudo umount /mnt
+sudo mount -o subvol=@,compress=zstd ${DISK}p1 /mnt
+sudo mkdir -p /mnt/{home,nix,boot}
+sudo mount -o subvol=@home,compress=zstd ${DISK}p1 /mnt/home
+sudo mount -o subvol=@nix,compress=zstd ${DISK}p1 /mnt/nix
+sudo mount ${DISK}p2 /mnt/boot
+```
+
+**For ext4** (simpler):
+```bash
+# Mount partitions
+sudo mount /dev/disk/by-label/nixos /mnt
+sudo mkdir -p /mnt/boot
+sudo mount /dev/disk/by-label/boot /mnt/boot
+```
+
+### Step 3: Install Base NixOS
+
+```bash
+# Generate initial configuration
+sudo nixos-generate-config --root /mnt
+
+# Edit configuration to enable flakes and networking
+sudo nano /mnt/etc/nixos/configuration.nix
+```
+
+Add these lines to the configuration:
+
+```nix
+# Enable flakes
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+# Enable NetworkManager for WiFi
+networking.networkmanager.enable = true;
+
+# Add a user (replace 'yourusername')
+users.users.yourusername = {
+  isNormalUser = true;
+  extraGroups = [ "wheel" "networkmanager" ];
+  initialPassword = "changeme";  # Change after first login!
+};
+
+# Allow unfree packages (needed for NVIDIA, etc.)
+nixpkgs.config.allowUnfree = true;
+```
+
+```bash
+# Install NixOS
+sudo nixos-install
+
+# Set root password when prompted
+# Reboot
+sudo reboot
+```
+
+### Step 4: Migrate to This Flake
+
+After rebooting into your fresh NixOS:
+
+```bash
+# Login with your user
+# Change your password immediately
+passwd
+
+# Install git (temporarily)
+nix-shell -p git
+
+# Clone this repository
+git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
+cd ~/nixos-config
+
+# Generate hardware configuration for YOUR machine
+# Choose the appropriate host directory:
+#   - hosts/nixos/ for generic machines
+#   - hosts/framework-16/ for Framework Laptop 16
+sudo nixos-generate-config --show-hardware-config > hosts/YOUR-HOST/hardware-configuration.nix
+
+# Customize username in flake.nix (if different from 'guyfawkes')
+# Edit flake.nix and change: username = "guyfawkes"; → username = "yourusername";
+
+# Build and switch to the flake configuration
+sudo nixos-rebuild switch --flake .#YOUR-HOST
+
+# Reboot to apply all changes
+sudo reboot
+```
+
+---
+
+## Framework 16 Specific Instructions
+
+The Framework Laptop 16 (AMD Ryzen AI + NVIDIA RTX) has dedicated support.
+
+### Hardware Configuration
+
+```bash
+# Generate hardware config specifically for Framework 16
+sudo nixos-generate-config --show-hardware-config > hosts/framework-16/hardware-configuration.nix
+```
+
+### NVIDIA PRIME Bus IDs
+
+After installation, find the correct PCI bus IDs:
+
+```bash
+# Find GPU bus IDs
+lspci | grep -E "VGA|3D"
+
+# Example output:
+# 01:00.0 3D controller: NVIDIA Corporation...  → nvidiaBusId
+# c1:00.0 VGA compatible: AMD/ATI...            → amdgpuBusId
+
+# Convert hex to decimal (for c1 → 193)
+echo "ibase=16; C1" | bc
+```
+
+Update `hosts/framework-16/default.nix`:
+
+```nix
+hardware.nvidia.prime = {
+  amdgpuBusId = "PCI:193:0:0";  # Update with your value
+  nvidiaBusId = "PCI:1:0:0";    # Update with your value
+};
+```
+
+### Build for Framework 16
+
+```bash
+sudo nixos-rebuild switch --flake .#framework-16
+```
+
+### Framework-Specific Features
+
+This config includes (via `nixos-hardware`):
+- AMD Ryzen AI 9 HX 370 optimizations
+- NVIDIA RTX 5070 driver support
+- Power management and battery optimization
+- WiFi 7 (AMD RZ717) support
+- Fingerprint reader support
+- Ambient light sensor
+- Framework EC module for battery limits
+
+### Firmware Updates
+
+After installation, update Framework firmware:
+
+```bash
+# Enable fwupd (already in config)
+sudo fwupdmgr refresh
+sudo fwupdmgr get-updates
+sudo fwupdmgr update
+```
+
+**Warning**: Keep a NixOS USB handy - some firmware updates may require recovery boot.
+
+---
+
+## Existing NixOS Migration
+
+If you already have NixOS installed (without flakes):
+
+### Step 1: Enable Flakes
+
+Add to `/etc/nixos/configuration.nix`:
 
 ```nix
 nix.settings.experimental-features = [ "nix-command" "flakes" ];
 ```
 
-Then rebuild: `sudo nixos-rebuild switch`
+Rebuild: `sudo nixos-rebuild switch`
 
-## Installation
-
-### Step 1: Clone the Repository
+### Step 2: Clone and Configure
 
 ```bash
 git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
 cd ~/nixos-config
-```
 
-### Step 2: Generate Hardware Configuration
-
-```bash
+# Generate hardware config
 sudo nixos-generate-config --show-hardware-config > hosts/nixos/hardware-configuration.nix
+
+# Customize username
+sed -i 's/guyfawkes/yourusername/g' flake.nix
+
+# Apply
+sudo nixos-rebuild switch --flake .#nixos
 ```
 
-This captures your specific hardware (CPU, GPU, disks, etc.).
-
-### Step 3: Customize Username
-
-Replace the default username throughout the config:
-
-```bash
-# Replace 'guyfawkes' with your username
-sed -i 's/guyfawkes/yourusername/g' flake.nix hosts/nixos/default.nix
-```
-
-### Step 4: Review Boot Configuration
-
-Check `hosts/nixos/default.nix` for boot loader settings:
-
-```nix
-# For EFI (most modern systems - 2012+)
-boot.loader.systemd-boot.enable = true;
-boot.loader.efi.canTouchEfiVariables = true;
-
-# For BIOS/Legacy (older systems)
-boot.loader.grub.enable = true;
-boot.loader.grub.device = "/dev/sda";  # Your boot disk
-```
-
-### Step 5: Apply Configuration
-
-```bash
-./rebuild-nixos
-```
-
-The interactive script will:
-1. Validate configuration syntax (`nix flake check`)
-2. Test build without activation (catches errors early)
-3. Prompt for confirmation before applying
-4. Update Claude Code configurations automatically
-5. Offer to commit changes to git
-6. Display rollback instructions
-
-**First build time**: ~20-30 minutes depending on internet speed.
+---
 
 ## Post-Installation
 
@@ -103,24 +301,28 @@ rg --version
 cat ~/.claude/CLAUDE.md | head -20
 ```
 
-### Set Up Claude Code (Optional)
-
-If you use Claude Code:
-
-```bash
-# Claude Code will automatically read:
-# - ~/.claude/CLAUDE.md (system-level, auto-generated)
-# - ./CLAUDE.md (project-level, auto-generated)
-```
-
-No manual setup needed - the rebuild script handles everything.
-
 ### Configure Git
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your@email.com"
 ```
+
+### First Rebuild with Script
+
+```bash
+cd ~/nixos-config
+./rebuild-nixos
+```
+
+The interactive script will:
+1. Validate configuration syntax
+2. Test build without activation
+3. Prompt for confirmation
+4. Update Claude Code configurations
+5. Offer to commit changes
+
+---
 
 ## Troubleshooting
 
@@ -134,9 +336,22 @@ nix log /nix/store/xxx-nixos-system-xxx.drv
 sudo nixos-rebuild switch --rollback
 ```
 
-### Memory Issues
+### WiFi Not Working (Live USB)
 
-Large builds may exhaust RAM. Try:
+```bash
+# List networks
+nmcli device wifi list
+
+# Connect
+nmcli device wifi connect "SSID" password "password"
+
+# Or use wpa_supplicant directly
+wpa_passphrase "SSID" "password" | sudo tee /etc/wpa_supplicant.conf
+sudo wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant.conf
+sudo dhclient wlan0
+```
+
+### Memory Issues During Build
 
 ```bash
 # Reduce parallelism
@@ -149,109 +364,51 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 ```
 
-### Missing Hardware Support
-
-If hardware isn't detected:
+### NVIDIA Issues (Framework 16)
 
 ```bash
-# Regenerate hardware config
-sudo nixos-generate-config --show-hardware-config > hosts/nixos/hardware-configuration.nix
+# Check if NVIDIA module loaded
+lsmod | grep nvidia
 
-# For specific hardware (NVIDIA, etc.), check profiles/
-ls profiles/
+# Check PRIME status
+prime-offload status
+
+# Run app on NVIDIA GPU
+prime-run glxinfo | grep "OpenGL renderer"
 ```
 
-### Network Issues During Build
+### Boot Issues After Firmware Update
 
-```bash
-# Use a mirror
-nix-channel --add https://nixos.org/channels/nixos-unstable nixos
-nix-channel --update
+If Framework won't boot after firmware update:
 
-# Or specify substituter
-sudo nixos-rebuild switch --flake . --option substituters "https://cache.nixos.org"
-```
+1. Boot from NixOS USB
+2. Mount your system:
+   ```bash
+   sudo mount /dev/disk/by-label/nixos /mnt
+   sudo mount /dev/disk/by-label/boot /mnt/boot
+   ```
+3. Enter the system:
+   ```bash
+   sudo nixos-enter
+   ```
+4. Reinstall bootloader:
+   ```bash
+   NIXOS_INSTALL_BOOTLOADER=1 /run/current-system/bin/switch-to-configuration boot
+   ```
+5. Reboot
 
 ### EFI vs BIOS Detection
 
 ```bash
-# Check if system uses EFI
 [ -d /sys/firmware/efi ] && echo "EFI" || echo "BIOS"
 ```
 
-## Customization
-
-### Adding System Packages
-
-Edit `modules/core/packages.nix`:
-
-```nix
-environment.systemPackages = with pkgs; [
-  # Add your packages here
-  your-package
-];
-```
-
-### Adding User Packages
-
-Edit `modules/home-manager/base.nix`:
-
-```nix
-home.packages = with pkgs; [
-  # User-specific packages
-  your-user-package
-];
-```
-
-### Per-Project Environments
-
-Use DevEnv for project-specific tools:
-
-```bash
-cd your-project
-devenv init
-# Edit devenv.nix, then:
-devenv shell
-```
-
-## Updating
-
-### Regular Updates
-
-```bash
-cd ~/nixos-config
-./rebuild-nixos
-```
-
-### Update Flake Inputs
-
-```bash
-nix flake update
-./rebuild-nixos
-```
-
-### Update Specific Input
-
-```bash
-nix flake lock --update-input nixpkgs
-./rebuild-nixos
-```
-
-## Uninstallation
-
-This config doesn't modify your base NixOS installation destructively. To revert:
-
-```bash
-# Switch back to default NixOS config
-sudo nixos-rebuild switch -I nixos-config=/etc/nixos
-
-# Or restore from a previous generation
-sudo nixos-rebuild switch --rollback
-```
+---
 
 ## Getting Help
 
 - **Issues**: [GitHub Issues](https://github.com/jacopone/nixos-config/issues)
 - **NixOS Manual**: [nixos.org/manual](https://nixos.org/manual/nixos/stable/)
-- **Nix Pills**: [nixos.org/guides/nix-pills](https://nixos.org/guides/nix-pills/)
+- **NixOS Hardware**: [github.com/NixOS/nixos-hardware](https://github.com/NixOS/nixos-hardware)
+- **Framework Community**: [community.frame.work](https://community.frame.work/)
 - **NixOS Discourse**: [discourse.nixos.org](https://discourse.nixos.org/)
