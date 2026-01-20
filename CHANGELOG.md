@@ -1211,6 +1211,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - accept 'a' shortcut for automatic generation cleanup
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add life-context system, EOD workflows, and handy fixes
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
