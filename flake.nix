@@ -103,8 +103,8 @@
                   llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
                 });
               })
-              # Handy - offline speech-to-text with Whisper/Parakeet
-              (import ./overlays/handy.nix)
+              # VibeTyper - AI voice typing with speech-to-text
+              (import ./overlays/vibetyper.nix)
             ];
           }
 
