@@ -13,6 +13,7 @@ in
     inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
+    pencil-dev # Design on canvas, land in code - IDE-integrated design tool - https://pencil.dev
 
     # Speech-to-text
     vibetyper # AI voice typing with speech-to-text - https://vibetyper.com

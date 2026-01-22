@@ -2,9 +2,6 @@
 , appimageTools
 , fetchurl
 , makeWrapper
-, pulseaudio
-, alsa-lib
-, alsa-plugins
 , libGL
 , vulkan-loader
 , wayland
@@ -14,12 +11,12 @@
 }:
 
 let
-  pname = "vibetyper";
-  version = "1.1.2";
+  pname = "pencil-dev";
+  version = "1.0.0"; # No version in download URL
 
   src = fetchurl {
-    url = "https://cdn.vibetyper.com/releases/linux/VibeTyper.AppImage";
-    sha256 = "07q1rfv34fvyqn4fbmzyvv2hgaqk15kzhmi6zz0q38g91x0dp84c";
+    url = "https://5ykymftd1soethh5.public.blob.vercel-storage.com/Pencil-linux-x86_64.AppImage";
+    sha256 = "0389m0n9c2xcbbijsb7hbr65hjdms5vqj285pygwrqwrya4v0b6z";
   };
 
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
@@ -29,12 +26,12 @@ appimageTools.wrapType2 {
 
   extraInstallCommands = ''
     # Install desktop file
-    install -Dm444 ${appimageContents}/*.desktop $out/share/applications/vibetyper.desktop 2>/dev/null || true
+    install -Dm444 ${appimageContents}/*.desktop $out/share/applications/pencil-dev.desktop 2>/dev/null || true
 
     # Fix desktop file paths if it exists
-    if [ -f $out/share/applications/vibetyper.desktop ]; then
-      substituteInPlace $out/share/applications/vibetyper.desktop \
-        --replace-quiet 'Exec=AppRun' "Exec=$out/bin/vibetyper"
+    if [ -f $out/share/applications/pencil-dev.desktop ]; then
+      substituteInPlace $out/share/applications/pencil-dev.desktop \
+        --replace-quiet 'Exec=AppRun' "Exec=$out/bin/pencil-dev"
     fi
 
     # Install icons (search common locations)
@@ -49,33 +46,18 @@ appimageTools.wrapType2 {
     # Fallback: copy any PNG in root
     if [ -f ${appimageContents}/*.png ]; then
       mkdir -p $out/share/icons/hicolor/128x128/apps
-      cp ${appimageContents}/*.png $out/share/icons/hicolor/128x128/apps/vibetyper.png 2>/dev/null || true
+      cp ${appimageContents}/*.png $out/share/icons/hicolor/128x128/apps/pencil-dev.png 2>/dev/null || true
     fi
 
-    # Wrap with runtime dependencies (conservative Handy-style config)
-    # GDK_BACKEND=x11: WebKitGTK crashes on GNOME Wayland without this
-    # WEBKIT_DISABLE_DMABUF_RENDERER=1: Prevents GPU buffer sharing crashes
-    # VK_ICD_FILENAMES: Use software Vulkan renderer for stability
-    # LD_LIBRARY_PATH: Ensures OpenGL drivers are found
-    # ALSA_PLUGIN_DIR: Fixes "Unknown PCM pulse/jack" audio warnings
+    # Wrap with runtime dependencies
     source ${makeWrapper}/nix-support/setup-hook
-    wrapProgram $out/bin/vibetyper \
+    wrapProgram $out/bin/pencil-dev \
       --prefix XDG_DATA_DIRS : ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name} \
       --prefix XDG_DATA_DIRS : ${gtk3}/share/gsettings-schemas/${gtk3.name} \
-      --set WEBKIT_DISABLE_DMABUF_RENDERER 1 \
-      --set GDK_BACKEND x11 \
-      --set VK_ICD_FILENAMES /run/opengl-driver/share/vulkan/icd.d/lvp_icd.x86_64.json \
-      --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib \
-      --set ALSA_PLUGIN_DIR "${alsa-plugins}/lib/alsa-lib"
+      --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib
   '';
 
   extraPkgs = pkgs: with pkgs; [
-    # Audio (critical for speech-to-text)
-    pulseaudio
-    alsa-lib
-    alsa-plugins
-    pipewire
-
     # Graphics
     libGL
     vulkan-loader
@@ -92,9 +74,7 @@ appimageTools.wrapType2 {
     xorg.libXi
     xorg.libxcb
 
-    # WebKitGTK / Electron dependencies
-    webkitgtk_4_1
-    libsoup_3
+    # Electron dependencies
     gtk3
     glib
     gdk-pixbuf
@@ -105,6 +85,8 @@ appimageTools.wrapType2 {
     atk
     dconf
     gsettings-desktop-schemas
+    nss
+    nspr
 
     # Misc
     openssl
@@ -113,11 +95,11 @@ appimageTools.wrapType2 {
   ];
 
   meta = with lib; {
-    description = "AI-powered voice typing that transforms speech into polished writing";
-    homepage = "https://vibetyper.com";
+    description = "Design on canvas, land in code - IDE-integrated design tool";
+    homepage = "https://pencil.dev";
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
     maintainers = [ ];
-    mainProgram = "vibetyper";
+    mainProgram = "pencil-dev";
   };
 }
