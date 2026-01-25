@@ -16,7 +16,7 @@ let
 
   src = fetchurl {
     url = "https://5ykymftd1soethh5.public.blob.vercel-storage.com/Pencil-linux-x86_64.AppImage";
-    sha256 = "0389m0n9c2xcbbijsb7hbr65hjdms5vqj285pygwrqwrya4v0b6z";
+    sha256 = "sha256-T0JjwUgyCXZmyqGiUDvox4HDJRYrXrqodwyY8YV5JK4=";
   };
 
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
