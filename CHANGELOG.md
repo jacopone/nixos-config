@@ -1214,6 +1214,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - add life-context system, EOD workflows, and handy fixes
 
+### Added
+- replace handy with vibetyper for speech-to-text
+  (Test: `which replace` or `replace --version`)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
