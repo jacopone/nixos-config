@@ -10,6 +10,7 @@
     ./terminal/starship.nix # Starship prompt
     ./file-management/yazi.nix # Yazi file manager
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)
+    ./cloud-storage/rclone.nix # Google Drive mount via rclone
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
     # Using manual .mcp.json instead (already configured with MCP-NixOS + Playwright)
   ];
@@ -39,4 +40,38 @@
 
   # Enable bash for compatibility
   programs.bash.enable = true;
+
+  # Smart Office Open - desktop application for Google Drive files
+  # Opens Google native files (0 byte) in browser, regular files with OnlyOffice
+  xdg.desktopEntries.smart-office-open = {
+    name = "Smart Office Open";
+    comment = "Opens Google Drive files in browser, others with OnlyOffice";
+    exec = "smart-office-open %f";
+    terminal = false;
+    type = "Application";
+    categories = [ "Office" ];
+    mimeType = [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      "application/msword"
+      "application/vnd.ms-excel"
+      "application/vnd.ms-powerpoint"
+      "application/x-zerosize"
+    ];
+  };
+
+  # Set smart-office-open as default handler for office files
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "smart-office-open.desktop";
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "smart-office-open.desktop";
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "smart-office-open.desktop";
+      "application/msword" = "smart-office-open.desktop";
+      "application/vnd.ms-excel" = "smart-office-open.desktop";
+      "application/vnd.ms-powerpoint" = "smart-office-open.desktop";
+      "application/x-zerosize" = "smart-office-open.desktop";
+    };
+  };
 }

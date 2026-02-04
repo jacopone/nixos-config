@@ -59,6 +59,14 @@ in
     (pkgs.writeShellScriptBin "openspec" ''
       exec ${pkgs.nodejs_20}/bin/npx --yes @fission-ai/openspec@${npmVersions.openspec} "$@"
     '')
+    # Agent Browser - Vercel Labs headless browser CLI for AI agents
+    # Uses system Chrome to avoid NixOS binary compatibility issues
+    playwright-driver.browsers # Provides Playwright-managed browsers for NixOS
+    (pkgs.writeShellScriptBin "agent-browser" ''
+      export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+      export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+      exec ${pkgs.nodejs_20}/bin/npx --yes agent-browser@${npmVersions.agent-browser} "$@"
+    '')
 
     # NOTE: Linggen (linggen.dev) - macOS only, Linux "coming soon"
     # Install manually when available: curl -sSL https://linggen.dev/install-cli.sh | bash
@@ -221,6 +229,9 @@ in
     p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
     android-tools # Android SDK platform tools (adb, fastboot) - replaces programs.adb since systemd 258
     wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
+    rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
+    # smart-office-open: Opens office files - Google native (0 byte) in browser, others with OnlyOffice
+    (pkgs.writeShellScriptBin "smart-office-open" (builtins.readFile ../../scripts/smart-office-open.sh))
 
     # productivity tools
     kooha # Elegantly record your screen (Wayland-native, minimal UI) - https://github.com/SeaDve/Kooha

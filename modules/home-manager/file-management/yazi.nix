@@ -44,9 +44,10 @@
         pdf = [
           { run = "/run/current-system/sw/bin/okular \"$@\""; desc = "View with Okular"; orphan = true; }
         ];
-        # Office documents
+        # Office documents - smart-office-open handles Google Drive files automatically
         office = [
-          { run = "/run/current-system/sw/bin/libreoffice \"$@\""; desc = "Open with LibreOffice"; orphan = true; }
+          { run = "smart-office-open \"$@\""; desc = "Smart Open (auto-detects Google files)"; orphan = true; }
+          { run = "onlyoffice-desktopeditors \"$@\""; desc = "Open with OnlyOffice"; orphan = true; }
         ];
 
         # CSV files - LibreOffice Calc as primary opener
