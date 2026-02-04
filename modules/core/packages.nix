@@ -221,6 +221,9 @@ in
     p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
     android-tools # Android SDK platform tools (adb, fastboot) - replaces programs.adb since systemd 258
     wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
+    rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
+    # smart-office-open: Opens office files - Google native (0 byte) in browser, others with OnlyOffice
+    (pkgs.writeShellScriptBin "smart-office-open" (builtins.readFile ../../scripts/smart-office-open.sh))
 
     # productivity tools
     kooha # Elegantly record your screen (Wayland-native, minimal UI) - https://github.com/SeaDve/Kooha
