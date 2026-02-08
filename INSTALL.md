@@ -150,18 +150,75 @@ sudo nixos-install
 sudo reboot
 ```
 
-### Step 4: Migrate to This Flake
+### Step 3.5: Bootstrap Claude Code (Optional but Recommended)
 
-After rebooting into your fresh NixOS:
+Before migrating to the full flake, install a minimal set of tools on the base NixOS.
+This gives you Claude Code for AI-assisted debugging if the flake migration has issues
+(e.g., slow WiFi, download failures, hardware quirks).
 
 ```bash
-# Login with your user
-# Change your password immediately
+# Login with your user and change password
 passwd
 
-# Install git (temporarily)
-nix-shell -p git
+# Edit the base NixOS config to add bootstrap tools
+sudo nano /etc/nixos/configuration.nix
+```
 
+Add these lines to the configuration:
+
+```nix
+# Bootstrap packages (remove after flake migration)
+environment.systemPackages = with pkgs; [
+  git
+  nodejs_22
+  google-chrome
+  nano
+  curl
+  pciutils  # for lspci (needed to find GPU bus IDs)
+];
+
+# Required for Google Chrome
+nixpkgs.config.allowUnfree = true;
+
+# Fix download issues on WiFi (IPv6 half-working causes failures)
+networking.enableIPv6 = false;
+
+# Enable GNOME desktop (so you have a browser + terminal)
+services.xserver.enable = true;
+services.xserver.displayManager.gdm.enable = true;
+services.xserver.desktopManager.gnome.enable = true;
+```
+
+```bash
+# Rebuild base system (this is a small download - no flake, just a few packages)
+sudo nixos-rebuild switch
+
+# Reboot into GNOME desktop
+sudo reboot
+```
+
+After rebooting into the GNOME desktop:
+
+```bash
+# Open a terminal (search "Terminal" in GNOME Activities)
+
+# Login to Google Chrome first - sync your passwords and extensions
+
+# Run Claude Code (npx downloads the latest version and runs it)
+npx @anthropic-ai/claude-code@latest
+
+# Claude Code will open Chrome for authentication on first run
+# Once authenticated, you have AI assistance for the rest of the install
+```
+
+> **Tip**: If WiFi is unstable, use USB phone tethering. Plug your phone in,
+> enable USB tethering, and NetworkManager will pick it up automatically.
+
+### Step 4: Migrate to This Flake
+
+With Claude Code available (or on your own), proceed with the flake migration:
+
+```bash
 # Clone this repository
 git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
 cd ~/nixos-config
@@ -335,6 +392,33 @@ nix log /nix/store/xxx-nixos-system-xxx.drv
 # Rollback to previous working system
 sudo nixos-rebuild switch --rollback
 ```
+
+### Downloads Failing (HTTP 206 / Slow Downloads)
+
+Common during fresh installs on WiFi. Symptoms: floods of `HTTP error 206`,
+`Failed sending data to the peer`, `retrying from offset` messages.
+
+```bash
+# Fix 1: Disable IPv6 (most common cause)
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+# Fix 2: Disable WiFi power saving (replace wlpXXXs0 with your interface from `ip link`)
+nix-shell -p iw --run "sudo iw dev wlpXXXs0 set power_save off"
+
+# Fix 3: Reduce download parallelism
+sudo nixos-rebuild switch --flake .#YOUR-HOST -j 1
+
+# Fix 4: Use USB phone tethering (most reliable)
+# Plug phone via USB, enable USB tethering, NetworkManager auto-detects it
+
+# Fix 5: Change DNS
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+```
+
+> **Warning**: Do NOT use `--fallback` unless you're prepared to wait hours.
+> It compiles packages from source (LLVM alone takes 30-60 min).
 
 ### WiFi Not Working (Live USB)
 
