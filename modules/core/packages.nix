@@ -5,13 +5,13 @@ let
   npmVersions = import ./npm-versions.nix;
 in
 {
+  imports = [ ../common/packages.nix ];
+
   environment.systemPackages = with pkgs; [
-    # dev tools
+    # dev tools (tech-only editors and AI IDEs)
     helix # A post-modern modal text editor - https://helix-editor.com/
     # zed-editor # TEMP: Disabled - requires source compilation, causes system slowdown on rebuild
-    vscode-fhs # Visual Studio Code in an FHS-like environment - https://code.visualstudio.com/
     inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/
-    inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # A code-generation tool using Anthropic's Claude model (better packaged)
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
     pencil-dev # Design on canvas, land in code - IDE-integrated design tool - https://pencil.dev
 
@@ -180,17 +180,6 @@ in
       export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python mcp-nixos "$@"
     '')
-    git # A free and open source distributed version control system - https://git-scm.com/
-    gh # GitHub's official command-line tool - https://cli.github.com/
-    google-cloud-sdk # Google Cloud SDK for gcloud CLI and cloud operations
-    wget # A free software package for retrieving files using HTTP, HTTPS, FTP and FTPS - https://www.gnu.org/software/wget/
-    fish # A smart and user-friendly command line shell - https://fishshell.com/
-    eza # A modern replacement for ls - https://eza.rocks/
-    gedit # The official text editor of the GNOME desktop environment - https://wiki.gnome.org/Apps/Gedit
-    jq # JSON processor - essential for development
-    ripgrep # Super fast grep (rg command)
-    fd # Modern find alternative
-    bat # Better cat with syntax highlighting
 
     # Create fdfind symlink for yazi compatibility
     (pkgs.runCommand "fdfind" { } ''
@@ -198,8 +187,7 @@ in
       ln -s ${pkgs.fd}/bin/fd $out/bin/fdfind
     '')
 
-    # Core development tools (for instant AI agent commands)
-    nodejs_20 # Node.js 20.19.4 with npm - eliminates devenv activation overhead
+    # Python with tech-specific extras (rich, pymupdf4llm beyond business baseline)
     (python3.withPackages (ps: with ps; [
       rich # Rich - Python terminal UI library (for BASB system)
       pymupdf4llm # PyMuPDF for LLM-optimized PDF processing
@@ -208,50 +196,30 @@ in
       pydantic # Data validation using Python type hints
       jinja2 # Jinja2 templating engine (for claude-nixos-automation)
     ])) # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
-    gcc # GCC compiler for native dependencies
-    gnumake # GNU Make for build systems
     ninja # Build system for faster compilation (required by numpy/aider)
-    pkg-config # Package config tool for native module builds
-
-    # Development environment management (completes AI agent optimization)
-    direnv # Automatic per-directory environment activation - enables .envrc
-    devenv # Fast, declarative development environments - instant service commands
-    cachix # Binary cache for faster Nix builds - system-wide availability
+    google-cloud-sdk # Google Cloud SDK for gcloud CLI and cloud operations
 
     # system tools
     fastfetch # A neofetch-like tool for fetching system information and displaying them in a pretty way
     gparted # A free partition editor for graphically managing your disk partitions - https://gparted.org/
     usbimager # A minimalist GUI application to write compressed disk images to USB drives
-    p7zip # A file archiver with a high compression ratio - https://www.7-zip.org/
     android-tools # Android SDK platform tools (adb, fastboot) - replaces programs.adb since systemd 258
-    wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste) - enables screenshot paste
     rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
     # smart-office-open: Opens office files - Google native (0 byte) in browser, others with OnlyOffice
     (pkgs.writeShellScriptBin "smart-office-open" (builtins.readFile ../../scripts/smart-office-open.sh))
 
     # productivity tools
     kooha # Elegantly record your screen (Wayland-native, minimal UI) - https://github.com/SeaDve/Kooha
-    google-chrome # Google's web browser - https://www.google.com/chrome/
     obsidian # A powerful knowledge base that works on top of a local folder of plain text Markdown files - https://obsidian.md/
     anki-bin # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
-    onlyoffice-desktopeditors # Office suite with document, spreadsheet, presentation editing - https://www.onlyoffice.com/
-    # libreoffice         # A powerful and free office suite - DISABLED: no binary cache (30+ min build)
-
-    # fonts
-    dejavu_fonts # A font family based on the Vera Fonts
-    roboto # Google's signature font family
-    jetbrains-mono # JetBrains Mono - programming font with ligatures and better readability
-    nerd-fonts.jetbrains-mono # JetBrains Mono Nerd Font - adds programming icons and symbols
-    noto-fonts-color-emoji # Color emoji support for terminals and applications
 
     # Claude Code performance optimization tools
     sqlite # Database for project indexing and analysis
     hyperfine # Precise command benchmarking
     tokei # Fast code statistics (lines, languages)
     dust # Modern disk usage analyzer (faster than du)
-    tmux # Session persistence and parallel operations
     procs # Modern process viewer (better than ps)
     entr # File watcher for automated rebuilds/tests
     just # Modern command runner (better than make)
@@ -259,7 +227,6 @@ in
     ast-grep # Structural search and replace for code
     semgrep # Static analysis for pattern matching
     xh # Fast HTTPie alternative in Rust
-    delta # Better git diff viewer
     lazygit # Simple terminal UI for git
 
     # Additional AI workflow enhancement tools
@@ -273,16 +240,9 @@ in
     # Advanced API development
     hurl # HTTP testing with file-based test definitions
 
-    # Note: Some code quality tools are better managed per-project (devenv/package.json)
-    # gitleaks, typos are better managed per-project for:
-    # - Custom configurations (.gitleaksignore)
-    # - Project-specific rules and dictionaries
-    # - Team collaboration and reproducibility
-    # However, pre-commit is useful system-wide for NixOS configs
-
-    # Code Quality & Analysis Tools (Enterprise-grade)
+    # Code Quality & Analysis Tools
     pre-commit # Git hook framework (needed for .pre-commit-config.yaml)
-    python312Packages.lizard # Code complexity analysis (CCN < 10) - integrates with Cursor AI quality gates
+    python312Packages.lizard # Code complexity analysis (CCN < 10)
     python312Packages.radon # Python code metrics and complexity analysis
     # jscpd - JavaScript/TypeScript clone detection (pinned version)
     (pkgs.writeShellScriptBin "jscpd" ''
@@ -290,7 +250,6 @@ in
     '')
     ruff # Lightning-fast Python linter/formatter
     uv # Extremely fast Python package manager (provides uvx for MCP servers)
-    docker-compose # Container orchestration
     k9s # Kubernetes cluster management
     podman # Docker alternative
     nmap # Network discovery and security auditing
@@ -306,26 +265,16 @@ in
     jless # JSON viewer (better than jq for large files)
     yq-go # YAML/XML processor (like jq for YAML)
     miller # CSV/JSON/YAML data processing
-    zoxide # Smarter cd command (z replacement)
-    starship # Cross-shell prompt
     choose # Human-friendly cut/awk alternative
-    shellcheck # Shell script linter
-    shfmt # Shell formatter
-    nixpkgs-fmt # Nix code formatter (for pre-commit hooks)
-    nvd # NixOS package version diff tool (used by rebuild-nixos)
-    nix-output-monitor # Beautiful build tree visualization (nom command, used by rebuild-nixos)
 
-    # useseless tools
+    # useless tools
     cmatrix # A terminal-based "Matrix" screen saver
 
     # file searchers and visualizers
-    fzf # A command-line fuzzy finder
     gum # Interactive prompts and beautiful CLI forms for shell scripts
     yazi # A modern terminal file manager
     yaziPlugins.rich-preview # Rich preview for Yazi
     rich-cli # Rich command-line interface for rich preview
-    glow # Markdown renderer
-    pandoc # Universal document converter (MD to PPTX/PDF/HTML)
 
     # PDF to Markdown converters (AI-optimized document processing)
     # Marker - High-accuracy PDF to Markdown with table/formula support (uses uvx for latest)
@@ -334,7 +283,6 @@ in
       exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python marker-pdf "$@"
     '')
     ueberzugpp # Successor to ueberzug for image previews
-    bat # A cat clone with wings
 
     # Essential dependencies for yazi preview functionality
     file # File type detection (essential for yazi)
