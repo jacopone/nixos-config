@@ -244,20 +244,22 @@ This configuration supports multiple machines and role-based profiles from a sin
 
 | Host | Profile | Hardware | Build Command |
 |------|---------|----------|---------------|
-| `nixos` | Tech | ThinkPad X1 (Intel) | `nixos-rebuild switch --flake .#nixos` |
-| `framework-16` | Tech | Framework 16 (AMD + NVIDIA RTX 5070) | `nixos-rebuild switch --flake .#framework-16` |
+| `thinkpad-x1-jacopo` | Tech | ThinkPad X1 Carbon (Intel) | `nixos-rebuild switch --flake .#thinkpad-x1-jacopo` |
+| `framework-16-jacopo` | Tech | Framework 16 (AMD + NVIDIA RTX 5070) | `nixos-rebuild switch --flake .#framework-16-jacopo` |
 | `business-template` | Business | Template (copy for new deployments) | `nixos-rebuild switch --flake .#business-template` |
+
+Hostnames follow the `model-user` convention for company asset identification.
 
 ### Adding a Tech Host
 1. Create `hosts/<hostname>/default.nix` importing `../common` + hardware module
 2. Generate `hardware-configuration.nix` on the machine
-3. Add entry to `flake.nix`: `name = mkTechHost { hostname = "name"; username = "user"; };`
+3. Add entry to `flake.nix`: `model-user = mkTechHost { hostname = "model-user"; username = "user"; };`
 
 ### Deploying a Business Host
 1. Copy the template: `cp -r hosts/business-template hosts/<hostname>`
 2. Generate hardware config on the target machine: `nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix`
 3. Edit `hosts/<hostname>/default.nix` to set hostname
-4. Add to `flake.nix`: `name = mkBusinessHost { hostname = "name"; username = "user"; };`
+4. Add to `flake.nix`: `model-user = mkBusinessHost { hostname = "model-user"; username = "user"; };`
 5. Build: `sudo nixos-rebuild switch --flake .#<hostname>`
 
 The `nixos-hardware` flake provides vendor-specific optimizations (Framework LED Matrix support, NVIDIA PRIME, AMD power management).
@@ -273,8 +275,8 @@ nixos-config/
 │   ├── common/
 │   │   ├── base.nix               # Universal base (bootloader, nix, locale, Docker...)
 │   │   └── default.nix            # Tech profile (extends base + 350+ packages)
-│   ├── nixos/                     # ThinkPad X1 host
-│   ├── framework-16/              # Framework 16 host
+│   ├── thinkpad-x1-jacopo/         # ThinkPad X1 host (Jacopo)
+│   ├── framework-16-jacopo/        # Framework 16 host (Jacopo)
 │   └── business-template/         # Template for new business deployments
 │       ├── default.nix
 │       └── hardware-configuration.nix  # Placeholder (replace per machine)
@@ -316,9 +318,9 @@ nixos-config/
 nix flake check
 
 # Build specific host
-sudo nixos-rebuild switch --flake .#nixos              # ThinkPad (tech)
-sudo nixos-rebuild switch --flake .#framework-16       # Framework 16 (tech)
-sudo nixos-rebuild switch --flake .#business-template  # Business workstation
+sudo nixos-rebuild switch --flake .#thinkpad-x1-jacopo   # ThinkPad (tech)
+sudo nixos-rebuild switch --flake .#framework-16-jacopo  # Framework 16 (tech)
+sudo nixos-rebuild switch --flake .#business-template    # Business workstation
 
 # Ephemeral testing
 nix shell nixpkgs#python312 --command python

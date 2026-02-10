@@ -158,17 +158,17 @@
 
         # ── Tech workstations ──────────────────────────────────────────
 
-        # ThinkPad X1 Carbon (existing system)
-        # Build: nixos-rebuild switch --flake .#nixos
-        nixos = mkTechHost {
-          hostname = "nixos";
+        # ThinkPad X1 Carbon (Intel UHD 620 + 8-core)
+        # Build: nixos-rebuild switch --flake .#thinkpad-x1-jacopo
+        thinkpad-x1-jacopo = mkTechHost {
+          hostname = "thinkpad-x1-jacopo";
           username = "guyfawkes";
         };
 
         # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070)
-        # Build: nixos-rebuild switch --flake .#framework-16
-        framework-16 = mkTechHost {
-          hostname = "framework-16";
+        # Build: nixos-rebuild switch --flake .#framework-16-jacopo
+        framework-16-jacopo = mkTechHost {
+          hostname = "framework-16-jacopo";
           username = "guyfawkes";
           extraModules = [
             # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
