@@ -79,10 +79,6 @@ in
     (pkgs.writeShellScriptBin "serena" ''
       exec ${pkgs.nix}/bin/nix run github:oraios/serena -- "$@"
     '')
-    # Spec-Kit - GitHub's Spec-Driven Development workflow (tracks git main)
-    (pkgs.writeShellScriptBin "specify" ''
-      exec ${pkgs.uv}/bin/uvx --python ${pkgs.python312}/bin/python --from git+https://github.com/github/spec-kit.git specify "$@"
-    '')
     # Droid - Factory.ai's #1 Terminal-Bench AI development agent (always latest)
     (pkgs.writeShellScriptBin "droid" ''
       #!${pkgs.stdenv.shell}
