@@ -42,12 +42,14 @@ PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/../../../" && pwd)"
 }
 
 @test "all fd pipelines are protected with || true" {
-    # Count fd | wc patterns
-    total_fd=$(grep -c 'fd -t f.*| wc' "$PROJECT_ROOT/rebuild-nixos" || echo "0")
-    # Count protected ones
-    protected=$(grep -c '(fd -t f.*|| true.*| wc\|fd.*|| true.*| wc' "$PROJECT_ROOT/rebuild-nixos" || echo "0")
+    # Find fd commands piped to wc that are NOT wrapped in (fd ... || true)
+    # Protected pattern: $(  (fd ... || true)  | wc -l)
+    # Unprotected pattern: $(fd ... | wc -l)  — fd returns exit 1 on no matches
+    #
+    # grep -v returns exit 1 when no lines pass the filter (= all protected),
+    # so we use wc -l with || true to handle that gracefully.
+    unprotected=$(grep -E 'fd -t f' "$PROJECT_ROOT/rebuild-nixos" | grep '| wc' | { grep -v '|| true' || true; } | wc -l)
 
-    # All should be protected (or the pattern slightly different)
-    # This is a heuristic - if we have fd | wc, we should have protection nearby
-    [ "$total_fd" -gt 0 ]
+    # All fd | wc pipelines must have || true protection
+    [ "$unprotected" -eq 0 ]
 }

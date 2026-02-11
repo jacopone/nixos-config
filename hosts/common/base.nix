@@ -106,8 +106,7 @@
 
   # Permitted Insecure Packages (shared across hosts)
   nixpkgs.config.permittedInsecurePackages = [
-    "electron-24.8.6"
-    "libsoup-2.74.3"
+    "libsoup-2.74.3" # Still required as of 2026-02-11
   ];
 
   # State version should be set per-host (based on installation date)

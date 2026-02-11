@@ -19,8 +19,16 @@ DOWNLOADS_DIR="${HOME}/Downloads"
 TRASH_DIR="${HOME}/.local/share/Trash/files"
 
 # Google Drive via GNOME Online Accounts (GVFS)
-GDRIVE_BASE="/run/user/$(id -u)/gvfs/google-drive:host=gmail.com,user=jacopo.anselmi"
-GDRIVE_ARCHIVE="${GDRIVE_BASE}/0ADnfB1aZUjtGUk9PVA/Archive/$(date +%Y/%m)"
+# Auto-detect mounted Google Drive account (avoids hardcoding email)
+GDRIVE_BASE=$(find "/run/user/$(id -u)/gvfs" -maxdepth 1 -name "google-drive:*" -type d 2>/dev/null | head -1)
+GDRIVE_BASE="${GDRIVE_BASE:-}"
+if [ -n "$GDRIVE_BASE" ]; then
+    # Find the first shared/team drive, or fall back to root
+    GDRIVE_ROOT=$(find "$GDRIVE_BASE" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -1)
+    GDRIVE_ARCHIVE="${GDRIVE_ROOT:-$GDRIVE_BASE}/Archive/$(date +%Y/%m)"
+else
+    GDRIVE_ARCHIVE=""
+fi
 
 # Stats
 DELETED=0
@@ -110,7 +118,7 @@ archive_file() {
     local file="$1"
 
     # Check if GDrive is mounted
-    if [[ ! -d "$GDRIVE_BASE" ]]; then
+    if [[ -z "$GDRIVE_BASE" || ! -d "$GDRIVE_BASE" ]]; then
         echo -e "  ${RED}Google Drive not mounted. Using local archive.${NC}"
         mkdir -p "${HOME}/Archive/$(date +%Y/%m)"
         mv "$file" "${HOME}/Archive/$(date +%Y/%m)/" && return 0

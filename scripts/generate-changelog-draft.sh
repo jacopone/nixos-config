@@ -17,8 +17,6 @@ set -euo pipefail
 # Configuration
 CHANGELOG_FILE="CHANGELOG.md"
 SINCE_COMMIT="${1:-}"  # Optional: commit hash to start from
-PACKAGES_FILE="modules/core/packages.nix"
-BASE_FILE="modules/home-manager/base.nix"
 
 # Colors for stderr output (info messages)
 RED='\033[0;31m'
@@ -139,6 +137,7 @@ main() {
     local included_count=0
 
     # Process commits
+    # shellcheck disable=SC2086  # $git_log_range is "--since=DATE" or "HASH..HEAD"
     while IFS='|' read -r hash subject date; do
         ((commit_count++)) || true
 
@@ -196,7 +195,7 @@ main() {
 
     # Generate output
     if [ $included_count -eq 0 ]; then
-        echo "No user-facing changes found since $last_date."
+        echo "No user-facing changes found since $since_marker."
         echo ""
         echo "Skipped commits were internal maintenance (chore, docs, ci, test)."
         exit 0

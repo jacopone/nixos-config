@@ -1218,6 +1218,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - replace handy with vibetyper for speech-to-text
   (Test: `which replace` or `replace --version`)
 
+### Added
+- add Google Drive integration with rclone mount and smart-office-open
+  (Test: `which Google` or `Google --version`)
+- add agent-browser CLI wrapper with Playwright support
+  (Test: `which agent-browser` or `agent-browser --version`)
+- add business profile with symmetric mkTechHost/mkBusinessHost helpers
+  (Test: `which business` or `business --version`)
+
+### Changed
+- remove Spec Kit, relax shellcheck CI, update flake deps
+- rename hosts to model-user convention for fleet management (restructured)
+- extract shared packages into modules/common/packages.nix (restructured)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
