@@ -77,32 +77,29 @@
 
   outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
     let
-      # CONFIGURATION: Change this username to match your system
-      # This is the ONLY place you need to change when adapting this config
-      username = "guyfawkes";
+      # Shared overlay: fix GCC 15 / test failures in nixos-unstable
+      gccFixOverlay = final: prev: {
+        python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+          llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+        });
+        python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
+          llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+        });
+      };
 
-      # Helper function to create NixOS configurations
-      # Reduces duplication when adding new hosts
-      mkHost = { hostname, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
+      # Tech profile helper — full power-user setup (350+ packages, AI orchestration)
+      mkTechHost = { hostname, username, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs username; };
         modules = [
           # Host-specific configuration
           ./hosts/${hostname}
 
-          # Allow unfree packages + overlays for broken packages
+          # Allow unfree packages + overlays
           {
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [
-              # Fix GCC 15 / test failures in nixos-unstable
-              (final: prev: {
-                python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-                  llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-                });
-                python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
-                  llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-                });
-              })
+              gccFixOverlay
               # VibeTyper - AI voice typing with speech-to-text
               (import ./overlays/vibetyper.nix)
               # Pencil - Design on canvas, land in code
@@ -110,7 +107,7 @@
             ];
           }
 
-          # Home Manager module
+          # Home Manager module (tech profile)
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -118,6 +115,34 @@
             home-manager.backupFileExtension = "backup";
             home-manager.extraSpecialArgs = { inherit inputs username; };
             home-manager.users.${username} = import ./modules/home-manager;
+          }
+        ] ++ extraModules;
+      };
+
+      # Business profile helper — curated setup (~40 packages, office + learning to code)
+      mkBusinessHost = { hostname, username, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs username; };
+        modules = [
+          # Host-specific configuration
+          ./hosts/${hostname}
+
+          # Allow unfree packages + GCC fix overlay only (no VibeTyper/Pencil)
+          {
+            nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [
+              gccFixOverlay
+            ];
+          }
+
+          # Home Manager module (business profile)
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
+            home-manager.extraSpecialArgs = { inherit inputs username; };
+            home-manager.users.${username} = import ./modules/business/home-manager;
           }
         ] ++ extraModules;
       };
@@ -131,20 +156,33 @@
       # Each host can be built with: nixos-rebuild switch --flake .#<hostname>
       nixosConfigurations = {
 
-        # ThinkPad X1 Carbon (existing system)
-        # Build: nixos-rebuild switch --flake .#nixos
-        nixos = mkHost {
-          hostname = "nixos";
+        # ── Tech workstations ──────────────────────────────────────────
+
+        # ThinkPad X1 Carbon (Intel UHD 620 + 8-core)
+        # Build: nixos-rebuild switch --flake .#thinkpad-x1-jacopo
+        thinkpad-x1-jacopo = mkTechHost {
+          hostname = "thinkpad-x1-jacopo";
+          username = "guyfawkes";
         };
 
         # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070)
-        # Build: nixos-rebuild switch --flake .#framework-16
-        framework-16 = mkHost {
-          hostname = "framework-16";
+        # Build: nixos-rebuild switch --flake .#framework-16-jacopo
+        framework-16-jacopo = mkTechHost {
+          hostname = "framework-16-jacopo";
+          username = "guyfawkes";
           extraModules = [
             # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
             nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
           ];
+        };
+
+        # ── Business workstations ──────────────────────────────────────
+
+        # Template for new business deployments (copy and customize)
+        # Build: nixos-rebuild switch --flake .#business-template
+        business-template = mkBusinessHost {
+          hostname = "business-template";
+          username = "user";
         };
 
       };

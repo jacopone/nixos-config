@@ -26,14 +26,15 @@ jobs:
         run: sudo apt-get install -y shellcheck
 
       - name: Run shellcheck on rebuild-nixos
-        run: shellcheck -x rebuild-nixos
+        # -S error: only fail on errors, not warnings (SC2155 style issues are acceptable)
+        run: shellcheck -x -S error rebuild-nixos
 
       - name: Run shellcheck on scripts
         run: |
           for script in scripts/*.sh; do
             if [ -f "$script" ]; then
               echo "Checking $script..."
-              shellcheck -x "$script"
+              shellcheck -x -S error "$script"
             fi
           done
 

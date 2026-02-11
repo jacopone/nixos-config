@@ -12,9 +12,7 @@
     ../../modules/hardware/thinkpad.nix
   ];
 
-  # Hostname (keeping "nixos" for backward compatibility with existing system)
-  # You can rename this to "thinkpad-x1" if desired
-  networking.hostName = "nixos";
+  networking.hostName = "thinkpad-x1-jacopo";
 
   # State version - DO NOT CHANGE (set at initial installation)
   system.stateVersion = "24.05";

@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2024-06-01
-updated: 2026-01-18
+updated: 2026-02-10
 type: reference
 lifecycle: persistent
 ---
@@ -181,7 +181,7 @@ cd ~/nixos-config
 ## What's Included
 
 <details>
-<summary><strong>Modern CLI Stack (130+ tools)</strong></summary>
+<summary><strong>Tech Profile — Full Power-User Stack (350+ tools)</strong></summary>
 
 **Replacements for POSIX defaults:**
 | Old | New | Why |
@@ -195,28 +195,72 @@ cd ~/nixos-config
 **AI Development:**
 - Claude Code, Cursor, Antigravity, Gemini CLI, Jules, Droid
 - Anthropic [sandbox-runtime](https://github.com/anthropic-experimental/sandbox-runtime) (srt) for isolated execution
-- [Handy](https://github.com/cjpais/Handy) - Offline speech-to-text with Whisper/Parakeet models
+- VibeTyper, Whisper speech-to-text
 
 **Development:**
-- DevEnv, Direnv, Fish shell, Kitty terminal, GNOME (Wayland)
+- DevEnv, Direnv, Fish shell (60+ abbreviations), Kitty terminal, GNOME (Wayland)
+- Yazi file manager, rclone Google Drive mount, full atuin integration
 
 See [`modules/core/packages.nix`](modules/core/packages.nix) for the complete list.
 
 </details>
 
+<details>
+<summary><strong>Business Profile — Office + Learning to Code (~40 tools)</strong></summary>
+
+**Essentials:** VS Code, Google Chrome, OnlyOffice, Claude Code
+
+**Modern CLI:** eza, fd, bat, ripgrep, fzf, jq, glow, pandoc
+
+**Dev Runtimes:** Node.js 20, Python 3 (pytest, pydantic), GCC, Make
+
+**Infrastructure:** Docker Compose, direnv, devenv, cachix
+
+**Shell:** Fish with context-aware smart commands (same as tech, simplified abbreviations), Kitty, Starship prompt
+
+See [`modules/business/packages.nix`](modules/business/packages.nix) for the complete list.
+
+</details>
+
 ## Multi-Host Architecture
 
-This configuration supports multiple machines from a single repository. Each host shares the same packages, profiles, and home-manager config—only hardware differs.
+This configuration supports multiple machines and role-based profiles from a single repository. A shared base (`hosts/common/base.nix`) provides the universal foundation, while two symmetric helpers build profile-specific hosts:
 
-| Host | Hardware | Build Command |
-|------|----------|---------------|
-| `nixos` | ThinkPad X1 (Intel) | `nixos-rebuild switch --flake .#nixos` |
-| `framework-16` | Framework 16 (AMD + NVIDIA RTX 5070) | `nixos-rebuild switch --flake .#framework-16` |
+```
+                    hosts/common/base.nix
+                    (bootloader, nix, locale, GNOME, Docker...)
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+     mkTechHost(...)           mkBusinessHost(...)
+              │                         │
+   modules/core/packages.nix   modules/business/packages.nix
+   modules/home-manager/       modules/business/home-manager/
+   (350+ packages, full        (~40 packages, simplified
+    power-user setup)           office + learning-to-code)
+```
 
-**Adding a new host:**
+### Current Hosts
+
+| Host | Profile | Hardware | Build Command |
+|------|---------|----------|---------------|
+| `thinkpad-x1-jacopo` | Tech | ThinkPad X1 Carbon (Intel) | `nixos-rebuild switch --flake .#thinkpad-x1-jacopo` |
+| `framework-16-jacopo` | Tech | Framework 16 (AMD + NVIDIA RTX 5070) | `nixos-rebuild switch --flake .#framework-16-jacopo` |
+| `business-template` | Business | Template (copy for new deployments) | `nixos-rebuild switch --flake .#business-template` |
+
+Hostnames follow the `model-user` convention for company asset identification.
+
+### Adding a Tech Host
 1. Create `hosts/<hostname>/default.nix` importing `../common` + hardware module
 2. Generate `hardware-configuration.nix` on the machine
-3. Add entry to `flake.nix` using the `mkHost` helper
+3. Add entry to `flake.nix`: `model-user = mkTechHost { hostname = "model-user"; username = "user"; };`
+
+### Deploying a Business Host
+1. Copy the template: `cp -r hosts/business-template hosts/<hostname>`
+2. Generate hardware config on the target machine: `nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix`
+3. Edit `hosts/<hostname>/default.nix` to set hostname
+4. Add to `flake.nix`: `model-user = mkBusinessHost { hostname = "model-user"; username = "user"; };`
+5. Build: `sudo nixos-rebuild switch --flake .#<hostname>`
 
 The `nixos-hardware` flake provides vendor-specific optimizations (Framework LED Matrix support, NVIDIA PRIME, AMD power management).
 
@@ -224,23 +268,28 @@ The `nixos-hardware` flake provides vendor-specific optimizations (Framework LED
 
 ```
 nixos-config/
-├── flake.nix                      # Main entry point + mkHost helper
+├── flake.nix                      # Entry point + mkTechHost/mkBusinessHost helpers
 ├── rebuild-nixos                  # Multi-phase rebuild with learning
 ├── .github/workflows/test.yml     # CI: shellcheck + BATS tests
 ├── hosts/
-│   ├── common/default.nix         # Shared config (locale, users, packages)
-│   ├── nixos/                     # ThinkPad X1 host
-│   │   ├── default.nix
-│   │   └── hardware-configuration.nix
-│   └── framework-16/              # Framework 16 host
+│   ├── common/
+│   │   ├── base.nix               # Universal base (bootloader, nix, locale, Docker...)
+│   │   └── default.nix            # Tech profile (extends base + 350+ packages)
+│   ├── thinkpad-x1-jacopo/         # ThinkPad X1 host (Jacopo)
+│   ├── framework-16-jacopo/        # Framework 16 host (Jacopo)
+│   └── business-template/         # Template for new business deployments
 │       ├── default.nix
-│       └── hardware-configuration.nix
+│       └── hardware-configuration.nix  # Placeholder (replace per machine)
 ├── modules/
-│   ├── core/packages.nix          # System tools (130+)
+│   ├── core/packages.nix          # Tech system tools (350+)
+│   ├── business/                  # Business profile modules
+│   │   ├── packages.nix           # Curated business tools (~40)
+│   │   ├── chrome-extensions.nix  # Minimal Chrome extensions
+│   │   └── home-manager/          # Business Home Manager config
+│   │       ├── default.nix        # Entry point (reuses kitty, starship, tools)
+│   │       └── fish.nix           # Simplified Fish shell
 │   ├── hardware/                  # Hardware-specific modules
-│   │   ├── thinkpad.nix           # Intel GPU, TLP power management
-│   │   └── framework-16.nix       # AMD/NVIDIA hybrid, LED Matrix
-│   └── home-manager/              # User configurations
+│   └── home-manager/              # Tech Home Manager config (full)
 ├── tests/bash/                    # BATS unit tests for shell scripts
 ├── profiles/desktop/              # Desktop environment (GNOME)
 ├── CLAUDE.md                      # Auto-generated AI context
@@ -269,8 +318,9 @@ nixos-config/
 nix flake check
 
 # Build specific host
-sudo nixos-rebuild switch --flake .#nixos        # ThinkPad
-sudo nixos-rebuild switch --flake .#framework-16 # Framework 16
+sudo nixos-rebuild switch --flake .#thinkpad-x1-jacopo   # ThinkPad (tech)
+sudo nixos-rebuild switch --flake .#framework-16-jacopo  # Framework 16 (tech)
+sudo nixos-rebuild switch --flake .#business-template    # Business workstation
 
 # Ephemeral testing
 nix shell nixpkgs#python312 --command python

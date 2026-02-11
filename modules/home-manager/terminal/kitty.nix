@@ -119,6 +119,9 @@
       initial_window_width = 120; # Wider for side-by-side code
       initial_window_height = 35; # Taller for more content
 
+      # DEFAULT DIRECTORY
+      chdir = "~/nixos-config"; # New windows start here instead of last CWD
+
       # WINDOW DECORATIONS
       window_border_width = "1px"; # Subtle border
       window_margin_width = 0; # No margin for max space

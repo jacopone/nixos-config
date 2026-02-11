@@ -68,11 +68,11 @@ appimageTools.wrapType2 {
     libxkbcommon
 
     # X11 fallback
-    xorg.libX11
-    xorg.libXcursor
-    xorg.libXrandr
-    xorg.libXi
-    xorg.libxcb
+    libx11
+    libxcursor
+    libxrandr
+    libxi
+    libxcb
 
     # Electron dependencies
     gtk3
