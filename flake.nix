@@ -149,8 +149,12 @@
 
     in
     {
-      # Expose packages for `nix build` (none currently)
-      packages.x86_64-linux = { };
+      # Expose packages for `nix build`
+      packages.x86_64-linux = {
+        # Custom installer ISO with RustDesk for remote business setup
+        # Build: nix build .#business-installer-iso
+        business-installer-iso = self.nixosConfigurations.business-installer.config.system.build.isoImage;
+      };
 
       # NixOS System Configurations
       # Each host can be built with: nixos-rebuild switch --flake .#<hostname>
@@ -183,6 +187,23 @@
         business-template = mkBusinessHost {
           hostname = "business-template";
           username = "user";
+        };
+
+        # ── Installer ISO ──────────────────────────────────────────
+        # Custom NixOS GNOME installer with RustDesk for remote setup
+        # Build ISO: nix build .#business-installer-iso
+        # Flow: business user boots USB → Calamares install → opens RustDesk → tech admin takes over
+        business-installer = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+            ({ pkgs, ... }: {
+              environment.systemPackages = with pkgs; [
+                rustdesk-flutter # Remote desktop (TeamViewer-like)
+                git # For cloning flake repo during install
+              ];
+            })
+          ];
         };
 
       };

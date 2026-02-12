@@ -1728,8 +1728,9 @@ elif [ "$DRY_RUN" = false ]; then
         nix-collect-garbage > /tmp/gc-output-$$.tmp 2>&1 &
         GC_PID=$!
         show_progress "garbage-collection" $GC_PID
-        wait $GC_PID
-        GC_EXIT=$?
+        # Capture exit code without triggering set -e (wait propagates the child's exit code)
+        GC_EXIT=0
+        wait $GC_PID || GC_EXIT=$?
 
         # Extract stats from GC output (last few lines have the summary)
         if [ -f /tmp/gc-output-$$.tmp ]; then

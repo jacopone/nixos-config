@@ -1231,6 +1231,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - rename hosts to model-user convention for fleet management (restructured)
 - extract shared packages into modules/common/packages.nix (restructured)
 
+No user-facing changes found since commit d7e14bd.
+
+Skipped commits were internal maintenance (chore, docs, ci, test).
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
