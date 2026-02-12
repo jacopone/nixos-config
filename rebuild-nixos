@@ -259,11 +259,9 @@ show_progress() {
 
 # Step counter for "Step X/Y" progress indicator
 # Dynamically count phases based on flags and available tools
-TOTAL_STEPS=4  # Core: Update inputs, Build, Activate, Update Claude configs
+TOTAL_STEPS=4  # Core: Update inputs, Build, Activate, Claude config check
 # nvd diff preview adds a step (nvd is installed on this system)
 command -v nvd &>/dev/null && TOTAL_STEPS=$((TOTAL_STEPS + 1))
-# Adaptive learning adds a step unless --quick
-[ "$QUICK" != true ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 # Bootstrap verification adds a step with --verify-bootstrap
 [ "$VERIFY_BOOTSTRAP" = true ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 CURRENT_STEP=0
@@ -1137,289 +1135,22 @@ else
     fi
 fi
 
-# === PHASE 3.5: Community Reproducibility Check (r13y) ===
-# Checks packages against r13y.com reproducibility database
-# Only runs when --audit is enabled
-if [ "$AUDIT" = true ]; then
-    AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
-    if [ -d "$AUTOMATION_FLAKE" ]; then
-        log_step "Checking against community reproducibility data..."
-        if nix run "$AUTOMATION_FLAKE#check-reproducibility" 2>&1 | tee -a "$LOG_FILE"; then
-            add_action "r13y reproducibility check completed"
-        else
-            log_warning "r13y check failed (non-critical)"
-        fi
+# === PHASE 4: Claude Config Check ===
+# Claude configs are now hand-maintained (~/.claude/CLAUDE.md, settings.json)
+# No automation needed - just verify files exist
+step "Checking Claude configs"
+
+if dry_run_skip "check Claude Code configurations"; then
+    : # skip
+else
+    if [ -f "$HOME/.claude/CLAUDE.md" ] && [ -f "$HOME/.claude/settings.json" ]; then
+        CLAUDE_MD_SIZE=$(du -h "$HOME/.claude/CLAUDE.md" 2>/dev/null | cut -f1)
+        log_success "Claude configs are hand-maintained (CLAUDE.md: $CLAUDE_MD_SIZE)"
+        add_stat "Claude configs: hand-maintained"
     else
-        log_warning "claude-nixos-automation not found, skipping r13y check"
+        log_warning "Claude config files missing - check ~/.claude/CLAUDE.md and ~/.claude/settings.json"
     fi
 fi
-
-# === PHASE 4: Update Claude Code Configurations ===
-# Regenerates 5 Claude context files (CLAUDE.md, permissions, MCP, etc.)
-# Uses claude-nixos-automation flake (local if available, GitHub fallback)
-# Exit on failure: No (continue with warnings - not critical to system)
-# Update Claude Code configurations
-step "Updating Claude configs"
-
-if dry_run_skip "update Claude Code configurations (CLAUDE.md, permissions, MCP analytics)"; then
-    AUTOMATION_EXIT=1  # Skip the nested phases 5-6
-else
-    echo ""
-
-    # Use local flake for automation (development mode)
-    AUTOMATION_FLAKE="$HOME/claude-nixos-automation"
-
-    if [ "$VERBOSE" = true ]; then
-    # Verbose mode: show all output
-    if [ -d "$AUTOMATION_FLAKE" ]; then
-        if (cd ~/nixos-config && nix run "$AUTOMATION_FLAKE#update-all" 2>&1 | tee -a "$LOG_FILE"); then
-            AUTOMATION_EXIT=0
-        else
-            AUTOMATION_EXIT=$?
-        fi
-    else
-        # Fallback to GitHub
-        if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all 2>&1 | tee -a "$LOG_FILE"); then
-            AUTOMATION_EXIT=0
-        else
-            AUTOMATION_EXIT=$?
-        fi
-    fi
-else
-    # Quiet mode: redirect to log, show only summary
-    if [ -d "$AUTOMATION_FLAKE" ]; then
-        if (cd ~/nixos-config && nix run "$AUTOMATION_FLAKE#update-all" &>"$LOG_FILE.automation"); then
-            AUTOMATION_EXIT=0
-        else
-            AUTOMATION_EXIT=$?
-        fi
-    else
-        # Fallback to GitHub
-        if (cd ~/nixos-config && nix run github:jacopone/claude-nixos-automation#update-all &>"$LOG_FILE.automation"); then
-            AUTOMATION_EXIT=0
-        else
-            AUTOMATION_EXIT=$?
-        fi
-    fi
-
-    # Note: Tool counts removed - MCP-NixOS provides dynamic package queries
-    # Keeping only file existence check for debugging
-    if [ -f "./CLAUDE.md" ]; then
-        add_stat "Claude configs updated"
-    fi
-
-    # Check automation log for warnings
-    if [ -f "$LOG_FILE.automation" ]; then
-        WARNING_COUNT=$(grep -c "WARNING:" "$LOG_FILE.automation" 2>/dev/null || true)
-        WARNING_COUNT=${WARNING_COUNT:-0}
-
-        if [ "$WARNING_COUNT" -gt 0 ]; then
-            log_warning "$WARNING_COUNT warnings during automation (see $LOG_FILE.automation)"
-        fi
-    fi
-fi
-
-if [ $AUTOMATION_EXIT -eq 0 ]; then
-    echo ""
-    log_success "Claude Code configurations updated"
-    add_action "Updated 5 Claude configuration files"
-
-    # Show detailed file update summary
-    echo ""
-    echo "📄 Files updated by automation:"
-    echo ""
-
-    # Function to show file status with meaningful diff summary
-    show_file_status() {
-        local file="$1"
-        local description="$2"
-        local scope="$3"
-
-        if [ -f "$file" ]; then
-            local size
-            size=$(du -h "$file" 2>/dev/null | cut -f1)
-            local size_bytes
-            size_bytes=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "0")
-            local status="✓"
-            local change_indicator=""
-
-            # Sanity check: 0 bytes = broken
-            if [ -z "$size_bytes" ] || [ "$size_bytes" -eq 0 ]; then
-                echo -e "  ${RED}✗ $description (BROKEN - 0 bytes!)${NC}"
-                echo "     ↳ $scope"
-                return
-            fi
-
-            # Check if file is in git and what changed
-            if git ls-files --error-unmatch "$file" &>/dev/null 2>&1; then
-                if git diff --quiet "$file" 2>/dev/null; then
-                    change_indicator=" ${GREEN}unchanged${NC}"
-                    echo -e "  $status $description [$size]$change_indicator"
-                    echo "     ↳ $scope"
-                else
-                    # Count lines changed
-                    local changes
-                    changes=$(git diff --numstat "$file" 2>/dev/null | awk '{print "+"$1" -"$2}')
-                    if [ -n "$changes" ]; then
-                        change_indicator=" ${YELLOW}updated${NC} ($changes lines)"
-                    else
-                        change_indicator=" ${YELLOW}updated${NC}"
-                    fi
-                    echo -e "  $status $description [$size]$change_indicator"
-                    echo "     ↳ $scope"
-
-                    # Show meaningful diff summary (what actually changed)
-                    # Extract key changes: section headers, important lines
-                    # Get added section headers (## lines that were added)
-                    local added_sections
-                    added_sections=$(git diff "$file" 2>/dev/null | grep "^+##" | sed 's/^+/  + /' | head -3)
-                    # Get removed section headers
-                    local removed_sections
-                    removed_sections=$(git diff "$file" 2>/dev/null | grep "^-##" | sed 's/^-/  - /' | head -3)
-                    # Get other significant additions (non-empty, non-header lines)
-                    local added_content
-                    added_content=$(git diff "$file" 2>/dev/null | grep "^+[^+]" | grep -v "^+##" | grep -v "^+$" | grep -v "^+---" | sed 's/^+//' | head -2)
-                    # Get significant removals
-                    local removed_content
-                    removed_content=$(git diff "$file" 2>/dev/null | grep "^-[^-]" | grep -v "^-##" | grep -v "^-$" | grep -v "^----" | sed 's/^-//' | head -2)
-
-                    # Display changes
-                    if [ -n "$added_sections" ]; then
-                        echo -e "     ${GREEN}Added sections:${NC}"
-                        echo "$added_sections" | while read -r line; do
-                            [ -n "$line" ] && echo -e "       ${GREEN}$line${NC}"
-                        done
-                    fi
-                    if [ -n "$removed_sections" ]; then
-                        echo -e "     ${RED}Removed sections:${NC}"
-                        echo "$removed_sections" | while read -r line; do
-                            [ -n "$line" ] && echo -e "       ${RED}$line${NC}"
-                        done
-                    fi
-                    if [ -n "$added_content" ] && [ -z "$added_sections" ]; then
-                        echo -e "     ${GREEN}Key additions:${NC}"
-                        echo "$added_content" | head -2 | while read -r line; do
-                            [ -n "$line" ] && echo -e "       ${GREEN}+ ${line:0:60}${NC}"
-                        done
-                    fi
-                    if [ -n "$removed_content" ] && [ -z "$removed_sections" ]; then
-                        echo -e "     ${RED}Key removals:${NC}"
-                        echo "$removed_content" | head -2 | while read -r line; do
-                            [ -n "$line" ] && echo -e "       ${RED}- ${line:0:60}${NC}"
-                        done
-                    fi
-                fi
-            else
-                change_indicator=" ${BLUE}untracked${NC}"
-                echo -e "  $status $description [$size]$change_indicator"
-                echo "     ↳ $scope"
-            fi
-        else
-            echo -e "  ${RED}✗ $description (FILE NOT FOUND - automation failed!)${NC}"
-            echo "     ↳ $scope"
-        fi
-    }
-
-    # System-wide files (global, all projects)
-    show_file_status "$HOME/.claude/CLAUDE.md" \
-        "User policies & conventions" \
-        "Global: Tool selection rules, policies (MCP-NixOS for package queries)"
-
-    show_file_status "$HOME/.claude/CLAUDE-USER-POLICIES.md" \
-        "Your personal policies" \
-        "Global: Git commit rules, rebuild restrictions, doc standards"
-
-    echo ""
-
-    # Project-specific files (this project only)
-    show_file_status "./CLAUDE.md" \
-        "Project context" \
-        "Local: Tech stack, commands, architecture (trackable in git)"
-
-    show_file_status "./.claude/settings.local.json" \
-        "Security permissions" \
-        "Local: Auto-generated allow/deny rules for this project"
-
-    show_file_status "./.claude/CLAUDE.local.md" \
-        "Machine state" \
-        "Local: Hardware info, services, git branches (gitignored)"
-
-    echo ""
-
-    # === PHASE 5: MCP Usage Analytics ===
-    # Analyzes MCP server utilization across all sessions
-    # Marks sessions as ANALYZED (Phase 2 lifecycle)
-    # Generates .claude/mcp-analytics.md report
-    # Exit on failure: No (non-critical analytics)
-    # Run MCP usage analytics (marks sessions as ANALYZED - Phase 2)
-    log_step "Analyzing MCP servers and marking sessions..."
-    if [ -d "$AUTOMATION_FLAKE" ]; then
-        MCP_CMD="nix run $AUTOMATION_FLAKE#update-mcp-usage-analytics"
-    else
-        MCP_CMD="nix run github:jacopone/claude-nixos-automation#update-mcp-usage-analytics"
-    fi
-
-    if (cd ~/nixos-config && $MCP_CMD 2>/dev/null); then
-        log_success "MCP analysis completed"
-        echo "  ↳ Sessions automatically marked as ANALYZED (Phase 2 lifecycle)"
-    else
-        log_warning "MCP analysis had issues (non-critical)"
-    fi
-
-    # Extract MCP stats (even if command failed, use existing file)
-    if [ -f ~/nixos-config/.claude/mcp-analytics.md ]; then
-        # Extract stats from mcp-analytics.md (match actual template format)
-        # Note: Use || true to prevent pipefail from exiting on no matches
-        TOTAL_CONFIGURED=$(grep "^### Configured Servers" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\(\K\d+' || true)
-        TOTAL_CONFIGURED=${TOTAL_CONFIGURED:-0}
-        MCP_CONNECTED=$(grep "^- ✅ \*\*Connected\*\*:" ~/nixos-config/.claude/mcp-analytics.md 2>/dev/null | grep -oP '\d+' | head -1 || true)
-        MCP_CONNECTED=${MCP_CONNECTED:-0}
-
-        # Add to statistics (simplified - no session count since it's not tracked)
-        add_stat "MCP: $MCP_CONNECTED/$TOTAL_CONFIGURED connected"
-    fi
-
-    # === PHASE 6: Tool Usage Analytics ===
-    # Tracks which system tools are actually used vs merely installed
-    # Enables data-driven decisions on tool adoption
-    # Exit on failure: No (non-critical analytics)
-    # Run tool usage analytics (Phase 1)
-    log_step "Analyzing system tool usage..."
-    if [ -d "$AUTOMATION_FLAKE" ]; then
-        TOOL_CMD="nix run $AUTOMATION_FLAKE#update-tool-analytics --"
-    else
-        TOOL_CMD="nix run github:jacopone/claude-nixos-automation#update-tool-analytics --"
-    fi
-
-    if (cd ~/nixos-config && $TOOL_CMD 2>/dev/null); then
-        # Show brief tool usage status from tool-analytics.md
-        TOOL_ANALYTICS="./.claude/tool-analytics.md"
-        if [ -f "$TOOL_ANALYTICS" ]; then
-            # Extract stats from tool-analytics.md Summary section
-            # Format: "- **Total Tools Installed**: 129" and "- **Tools Used**: 35 (27.1%)"
-            TOOL_TOTAL=$(grep "Total Tools Installed" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1 || true)
-            TOOL_TOTAL=${TOOL_TOTAL:-"?"}
-            TOOL_USED=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\d+' | head -1 || true)
-            TOOL_USED=${TOOL_USED:-"?"}
-            TOOL_ADOPTION=$(grep "Tools Used" "$TOOL_ANALYTICS" | grep -oP '\((\d+)' | grep -oP '\d+' || true)
-            TOOL_ADOPTION=${TOOL_ADOPTION:-"?"}
-
-            # Display with clearer format
-            if [ "$TOOL_USED" != "?" ] && [ "$TOOL_TOTAL" != "?" ]; then
-                log_success "Tool usage: $TOOL_USED/$TOOL_TOTAL tools used (${TOOL_ADOPTION}% adoption)"
-            else
-                log_success "Tool usage analysis completed"
-            fi
-            echo "  ↳ Detailed report: .claude/tool-analytics.md"
-            add_stat "Tools: $TOOL_USED/$TOOL_TOTAL used | ${TOOL_ADOPTION}% adoption"
-        fi
-    else
-        log_warning "Tool usage analysis had issues (non-critical)"
-    fi
-else
-    log_warning "Claude automation had issues (check logs)"
-fi
-fi  # End dry-run skip for Phase 4-6
 
 # === PHASE 7: Changelog Draft Generation ===
 # Generates draft changelog entries from commits since last update
@@ -1528,101 +1259,7 @@ else
         fi
 fi
 
-# === PHASE 8: Adaptive Learning Cycle ===
-# Runs 7 parallel ML analyzers to detect optimization opportunities:
-# - Permission patterns (auto-approve repeated commands)
-# - MCP server utilization (move to project-level if low usage)
-# - Context optimization (remove unused CLAUDE.md sections)
-# - Workflow patterns (bundle repeated command sequences)
-# - Instruction effectiveness (improve low-compliance policies)
-# - Cross-project transfers (apply patterns from similar projects)
-# - Meta-learning (calibrate detection thresholds)
-# Then runs CLAUDE.md Suggestion Engine to detect:
-# - Repeated instructions ("always do X", "never do Y")
-# - Corrections ("no, use X instead")
-# - Cross-project patterns (→ suggest for global CLAUDE.md)
-# - Project-specific patterns (→ suggest for project CLAUDE.md)
-# Exit on failure: No (learning is optional, system already activated)
-# User interaction: Yes (interactive approval of suggestions)
-# Skip with: --quick flag
-
-if [ "$QUICK" = true ]; then
-    : # Skip silently in quick mode (step not counted)
-elif dry_run_skip "run adaptive learning cycle (interactive ML analysis)"; then
-    step "Adaptive learning"  # Count step even in dry-run
-else
-    step "Adaptive learning"
-    log_step "Running adaptive learning cycle..."
-    AUTOMATION_DIR="$HOME/claude-nixos-automation"
-    if [[ -d "$AUTOMATION_DIR" ]]; then
-        # STEP 0: Ensure Claude Code hooks are deployed to settings.json
-        # This ensures the permission_auto_learner hook runs during Claude sessions
-        log_step "  Ensuring Claude Code hooks are deployed..."
-        if [[ -f "$AUTOMATION_DIR/claude_automation/deployment/hook_deployer.py" ]]; then
-            if python3 "$AUTOMATION_DIR/claude_automation/deployment/hook_deployer.py" --deploy-to-settings 2>/dev/null; then
-                log_success "  Claude Code hooks verified/deployed"
-            else
-                log_warning "  Hook deployment check failed (continuing anyway)"
-            fi
-        fi
-
-        # STEP 1: Update permission approval data from recent Claude Code sessions
-        # This extracts tool usage from ~/.claude/projects/*/*.jsonl into the
-        # learning system's permission_approvals.jsonl file.
-        # Without this step, adaptive learning would run on stale data!
-        log_step "  Refreshing permission data from session logs..."
-        if [[ -f "$AUTOMATION_DIR/scripts/parse_session_logs.py" ]]; then
-            if python3 "$AUTOMATION_DIR/scripts/parse_session_logs.py" > /dev/null 2>&1; then
-                log_success "  Permission data refreshed"
-            else
-                log_warning "  Failed to refresh permission data (continuing anyway)"
-            fi
-        fi
-
-        # STEP 2: Run adaptive learning on fresh data
-        # Run WITHOUT pipes to preserve stdin/stdout for user interaction
-        # No timeout for interactive mode (user needs time to review and respond)
-        # Suppress devenv startup noise but preserve Python output for user
-        if (cd "$AUTOMATION_DIR" && devenv shell -- python -m claude_automation.cli.run_adaptive_learning --interactive 2> >(grep -v "Building shell" >&2)); then
-            LEARNING_EXIT=0
-            log_success "Adaptive learning cycle complete"
-            add_action "Adaptive learning: suggestions reviewed interactively"
-        else
-            LEARNING_EXIT=$?
-            if [ $LEARNING_EXIT -eq 130 ]; then
-                log_warning "Adaptive learning interrupted by user (Ctrl+C)"
-            else
-                log_warning "Adaptive learning had issues (exit code: $LEARNING_EXIT)"
-            fi
-        fi
-
-        # STEP 3: CLAUDE.md Suggestion Engine (Two-Stage Pipeline)
-        # Stage 1: Regex extracts candidate instruction patterns from session logs
-        # Stage 2: Claude API analyzes candidates, filters noise, formats suggestions
-        # Suggests edits to global CLAUDE-USER-POLICIES.md or project CLAUDE.md
-        #
-        # Requires: ANTHROPIC_API_KEY environment variable
-        # To enable: export ANTHROPIC_API_KEY=sk-ant-... in your shell profile
-        log_step "  Analyzing sessions for CLAUDE.md suggestions..."
-        if [[ -d "$AUTOMATION_DIR" ]]; then
-            # Use nix run to inherit environment (including ANTHROPIC_API_KEY)
-            # --skip-if-no-key ensures graceful skip if key not set
-            if nix run "${AUTOMATION_DIR}#suggest-claude-md" -- --apply --skip-if-no-key 2>/dev/null; then
-                log_success "  CLAUDE.md suggestions reviewed"
-                add_action "CLAUDE.md suggestions: reviewed interactively"
-            else
-                SUGGEST_EXIT=$?
-                if [ $SUGGEST_EXIT -eq 130 ]; then
-                    log_warning "  CLAUDE.md suggestions interrupted by user (Ctrl+C)"
-                elif [ $SUGGEST_EXIT -ne 0 ]; then
-                    log_warning "  CLAUDE.md suggestion engine had issues (continuing anyway)"
-                fi
-            fi
-        fi
-    else
-        log_warning "Adaptive learning not available (automation directory not found)"
-    fi
-fi
+# Phase 8 (Adaptive Learning) removed — Claude configs are now hand-maintained
 
 # === PHASE 9: User Acceptance ===
 # User tests the activated configuration
@@ -1785,30 +1422,15 @@ if [ "$LARGE_LOGS" -gt 0 ]; then
     DISK_WARNINGS+=("$LARGE_LOGS log file(s) >100MB: ${LARGEST_LOG}")
 fi
 
-# Check learning data disk health (Phase 1.5)
+# Check Claude data disk usage
 echo ""
-log_step "Checking learning data disk health..."
-
-HEALTH_EXIT_CODE=0
-# Run health check via nix (the automation package provides this command)
-HEALTH_OUTPUT=$(nix run github:jacopone/claude-nixos-automation#check-data-health 2>&1) || HEALTH_EXIT_CODE=$?
-
-# Parse health stats from output
-HEALTH_TOTAL_MB=$(echo "$HEALTH_OUTPUT" | grep "Total:" | grep -oP '\d+(?=MB)' | head -1 || echo "?")
-HEALTH_SESSIONS=$(echo "$HEALTH_OUTPUT" | grep "sessions" | grep -oP '\d+(?= sessions)' | head -1 || echo "?")
-HEALTH_PERCENTAGE=$(echo "$HEALTH_OUTPUT" | grep "Usage:" | grep -oP '[\d.]+(?=% of disk)' || echo "?")
-
-echo "  • Total learning data: ${HEALTH_TOTAL_MB}MB"
-echo "  • Claude sessions: ${HEALTH_SESSIONS}"
-echo "  • Disk usage: ${HEALTH_PERCENTAGE}% of total disk"
-
-if [ $HEALTH_EXIT_CODE -eq 2 ]; then
-    echo -e "${RED}  🔴 URGENT: Learning data disk usage critical!${NC}"
-    DISK_WARNINGS+=("Learning data usage critical - run adaptive learning to extract insights, then cleanup")
-elif [ $HEALTH_EXIT_CODE -eq 1 ]; then
-    echo -e "${YELLOW}  🟡 Learning data growing - consider cleanup after insights extracted${NC}"
+log_step "Checking Claude data disk usage..."
+CLAUDE_DIR_SIZE=$(du -sm ~/.claude 2>/dev/null | cut -f1)
+echo "  • ~/.claude total: ${CLAUDE_DIR_SIZE}MB"
+if [ "$CLAUDE_DIR_SIZE" -gt 500 ] 2>/dev/null; then
+    DISK_WARNINGS+=("$HOME/.claude is ${CLAUDE_DIR_SIZE}MB — consider cleaning old sessions")
 else
-    echo -e "${GREEN}  ✅ Learning data disk health is good${NC}"
+    echo -e "${GREEN}  ✅ Claude data size is reasonable${NC}"
 fi
 
 # Still check for very large individual session files (may indicate stuck sessions)
@@ -1919,157 +1541,36 @@ else
 fi
 fi  # End dry-run skip for Phase 11
 
-# === PHASE 13: Claude Session Lifecycle Cleanup ===
-# Deletes sessions marked as IMPLEMENTED (insights already extracted)
-# Session lifecycle: RAW → ANALYZED → INSIGHTS_GENERATED → IMPLEMENTED
-# Only IMPLEMENTED sessions are safe to delete (value captured)
+# === PHASE 13: Claude Temp File Cleanup ===
+# Cleans orphaned temp files from ~/.claude/
 # Exit on failure: No (cleanup is optional)
 # Skip with: --quick flag
 if [ "$QUICK" = true ]; then
     : # Skip silently in quick mode
-elif [ "$DRY_RUN" = false ] && [ -d ~/.claude/projects ]; then
+elif [ "$DRY_RUN" = false ] && [ -d ~/.claude ]; then
     echo ""
-    log_step "Checking Claude session lifecycle..."
+    log_step "Cleaning orphaned Claude temp files..."
 
-    # Consolidated Python script for lifecycle operations (stats + cleanup)
-    # Saves ~300ms by avoiding second Python interpreter startup
-    LIFECYCLE_OUTPUT=$(python3 <<'PYTHON_EOF'
-import sys
-from pathlib import Path
+    ORPHAN_COUNT=0
 
-# Add claude-nixos-automation to path
-sys.path.insert(0, str(Path.home() / "claude-nixos-automation"))
-
-try:
-    from claude_automation.analyzers.session_lifecycle_tracker import SessionLifecycleTracker
-
-    tracker = SessionLifecycleTracker()
-    stats = tracker.get_lifecycle_stats()
-
-    # Print stats in parseable format
-    print(f"STATS:TOTAL:{stats.total_sessions}")
-    print(f"STATS:RAW:{stats.raw_count}")
-    print(f"STATS:ANALYZED:{stats.analyzed_count}")
-    print(f"STATS:INSIGHTS_GENERATED:{stats.insights_generated_count}")
-    print(f"STATS:IMPLEMENTED:{stats.implemented_count}")
-    print(f"STATS:SAFE_TO_CLEANUP:{stats.safe_to_cleanup_count}")
-    print(f"STATS:VALUABLE:{stats.valuable_data_count}")
-
-    # Pre-load safe sessions list and write to temp file for potential cleanup
-    # This avoids a second Python interpreter startup (saves ~300ms)
-    safe_sessions = tracker.get_safe_to_cleanup_sessions()
-    safe_count = len(safe_sessions)
-    print(f"CLEANUP:READY:{safe_count}")
-
-    if safe_count > 0:
-        import tempfile
-        import json
-        temp_file = Path(tempfile.gettempdir()) / "claude_safe_sessions.json"
-        with open(temp_file, 'w') as f:
-            json.dump([str(p) for p in safe_sessions], f)
-        print(f"CLEANUP:TEMPFILE:{temp_file}")
-
-except Exception as e:
-    # Fallback if lifecycle tracking not available
-    print(f"ERROR:{e}")
-    print("STATS:TOTAL:?")
-    print("STATS:SAFE_TO_CLEANUP:0")
-    print("STATS:VALUABLE:?")
-    print("CLEANUP:READY:0")
-PYTHON_EOF
-)
-
-    # Parse lifecycle stats (now with STATS: prefix)
-    # Note: grep returns 1 if no match - protect with || true for pipefail
-    TOTAL_SESSIONS=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:TOTAL:" || true; } | cut -d: -f3)
-    RAW_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:RAW:" || true; } | cut -d: -f3)
-    ANALYZED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:ANALYZED:" || true; } | cut -d: -f3)
-    INSIGHTS_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:INSIGHTS_GENERATED:" || true; } | cut -d: -f3)
-    IMPLEMENTED_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:IMPLEMENTED:" || true; } | cut -d: -f3)
-    SAFE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:SAFE_TO_CLEANUP:" || true; } | cut -d: -f3)
-    VALUABLE_COUNT=$(echo "$LIFECYCLE_OUTPUT" | { grep "^STATS:VALUABLE:" || true; } | cut -d: -f3)
-
-    # Display lifecycle statistics
-    echo "  📋 Session Lifecycle:"
-    echo "     • Total sessions: ${TOTAL_SESSIONS}"
-    echo "     • RAW (not analyzed): ${RAW_COUNT}"
-    echo "     • ANALYZED: ${ANALYZED_COUNT}"
-    echo "     • INSIGHTS_GENERATED: ${INSIGHTS_COUNT}"
-    echo "     • IMPLEMENTED (safe to cleanup): ${IMPLEMENTED_COUNT}"
-    echo "     • Still valuable: ${VALUABLE_COUNT}"
-    echo ""
-
-    # Only offer cleanup if there are IMPLEMENTED sessions
-    if [ "$SAFE_COUNT" -gt 0 ]; then
-        echo "  💡 ${SAFE_COUNT} sessions marked as IMPLEMENTED can be safely deleted"
-        echo "     (Insights have been extracted and applied to system config)"
-        if prompt_user "  Delete ${SAFE_COUNT} IMPLEMENTED sessions? [y/N]:"; then
-            log_step "Cleaning up IMPLEMENTED sessions..."
-
-            # Extract temp file path from lifecycle output
-            TEMP_FILE=$(echo "$LIFECYCLE_OUTPUT" | { grep "^CLEANUP:TEMPFILE:" || true; } | cut -d: -f3)
-
-            # Delete sessions using bash + jq (saves ~300ms vs Python interpreter startup)
-            if [ -f "$TEMP_FILE" ]; then
-                DELETED_COUNT=0
-                FREED_BYTES=0
-
-                # Read session paths from JSON array
-                while IFS= read -r session_path; do
-                    if [ -f "$session_path" ]; then
-                        # Get size before deleting
-                        SIZE=$(stat -c%s "$session_path" 2>/dev/null || stat -f%z "$session_path" 2>/dev/null || echo "0")
-                        SIZE=${SIZE:-0}
-
-                        # Delete session file
-                        if rm -f "$session_path" 2>/dev/null; then
-                            FREED_BYTES=$((FREED_BYTES + SIZE))
-                            DELETED_COUNT=$((DELETED_COUNT + 1))
-
-                            # Delete sidecar metadata file
-                            METADATA_PATH="${session_path}.lifecycle.json"
-                            rm -f "$METADATA_PATH" 2>/dev/null
-                        fi
-                    fi
-                done < <(jq -r '.[]' "$TEMP_FILE")
-
-                # Calculate freed MB
-                FREED_MB=$((FREED_BYTES / 1024 / 1024))
-
-                # Clean up temp file
-                rm -f "$TEMP_FILE"
-
-                # Output in same format for parsing
-                CLEANUP_RESULT="DELETED:${DELETED_COUNT}
-FREED_MB:${FREED_MB}"
-            else
-                # Fallback if temp file not found
-                CLEANUP_RESULT="DELETED:0
-FREED_MB:0"
-            fi
-
-            DELETED=$(echo "$CLEANUP_RESULT" | grep "^DELETED:" | cut -d: -f2)
-            FREED_MB=$(echo "$CLEANUP_RESULT" | grep "^FREED_MB:" | cut -d: -f2)
-
-            log_success "Deleted ${DELETED} IMPLEMENTED sessions (freed ~${FREED_MB}MB)"
-            add_action "Cleaned ${FREED_MB}MB of Claude sessions (lifecycle-based)"
-        else
-            log_warning "Claude session cleanup skipped"
-        fi
-    elif [ "$VALUABLE_COUNT" -gt 0 ]; then
-        echo -e "${YELLOW}  ⚠️  No sessions marked as IMPLEMENTED yet${NC}"
-        echo "     All $ANALYZED_COUNT sessions have been analyzed"
-        echo "     Next: Review insights → Implement changes → Mark sessions as IMPLEMENTED"
-    else
-        echo -e "${GREEN}  ✅ No Claude sessions found${NC}"
+    # Clean orphaned learner counter files (from old hook system)
+    LEARNER_COUNT=$(find ~/.claude -maxdepth 1 -name "learner_counter_*" 2>/dev/null | wc -l)
+    if [ "$LEARNER_COUNT" -gt 0 ]; then
+        find ~/.claude -maxdepth 1 -name "learner_counter_*" -delete 2>/dev/null
+        ORPHAN_COUNT=$((ORPHAN_COUNT + LEARNER_COUNT))
     fi
 
-    # Cleanup orphaned learner counter files (older than 1 day)
-    # These accumulate when sessions end unexpectedly
-    ORPHAN_COUNT=$(find ~/.claude -maxdepth 1 -name "learner_counter_*" -mtime +1 2>/dev/null | wc -l)
+    # Clean orphaned security warnings state files
+    SEC_COUNT=$(find ~/.claude -maxdepth 1 -name "security_warnings_state_*" 2>/dev/null | wc -l)
+    if [ "$SEC_COUNT" -gt 0 ]; then
+        find ~/.claude -maxdepth 1 -name "security_warnings_state_*" -delete 2>/dev/null
+        ORPHAN_COUNT=$((ORPHAN_COUNT + SEC_COUNT))
+    fi
+
     if [ "$ORPHAN_COUNT" -gt 0 ]; then
-        find ~/.claude -maxdepth 1 -name "learner_counter_*" -mtime +1 -delete 2>/dev/null
-        log_step "Cleaned $ORPHAN_COUNT orphaned session counter files"
+        log_success "Cleaned $ORPHAN_COUNT orphaned temp files"
+    else
+        log_success "No orphaned temp files found"
     fi
 fi
 
