@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2025-12-18
-updated: 2026-01-20
+updated: 2026-02-13
 type: guide
 lifecycle: persistent
 ---
@@ -17,6 +17,10 @@ Complete guide for installing NixOS and configuring this flake-based system.
   - [Boot and Partition](#step-2-boot-and-partition)
   - [Install Base NixOS](#step-3-install-base-nixos)
   - [Migrate to This Flake](#step-4-migrate-to-this-flake)
+- [Remote Business Deployment](#remote-business-deployment)
+  - [Build the Installer ISO](#step-1-build-the-installer-iso)
+  - [Prepare the Business Host](#step-2-prepare-the-business-host)
+  - [Remote Install via RustDesk](#step-3-remote-install-via-rustdesk)
 - [Framework 16 Specific](#framework-16-specific-instructions)
 - [Existing NixOS Migration](#existing-nixos-migration)
 - [Post-Installation](#post-installation)
@@ -237,6 +241,142 @@ sudo nixos-rebuild switch --flake .#YOUR-HOST
 
 # Reboot to apply all changes
 sudo reboot
+```
+
+---
+
+## Remote Business Deployment
+
+Deploy NixOS on a remote business user's machine without them touching a terminal.
+Uses a custom live ISO with RustDesk pre-installed for remote access.
+
+### Prerequisites
+
+- This flake repo cloned on the tech admin's machine
+- Business user has a USB drive (4GB+) and internet connection
+- A way to communicate during setup (phone call, video chat)
+
+### Step 1: Build the Installer ISO
+
+On the tech admin's machine:
+
+```bash
+cd ~/nixos-config
+
+# Build the custom ISO (includes GNOME installer + RustDesk)
+nix build .#business-installer-iso
+
+# ISO output location:
+ls -lh result/iso/
+# Example: result/iso/nixos-gnome-26.05.20260208-x86_64-linux.iso
+```
+
+Send the ISO to the business user (cloud storage, WeTransfer, etc.).
+
+**Flashing the USB (business user does this):**
+
+The business user installs [Balena Etcher](https://etcher.balena.io/) (Windows/macOS/Linux), then:
+1. Open Etcher
+2. Click "Flash from file" → select the ISO
+3. Click "Select target" → pick their USB drive
+4. Click "Flash!"
+
+### Step 2: Prepare the Business Host
+
+Before the remote session, create a host config for the business user's machine.
+
+```bash
+cd ~/nixos-config
+
+# Copy the template
+cp -r hosts/business-template hosts/<model-username>
+
+# Add to flake.nix under nixosConfigurations:
+```
+
+```nix
+# Example: Dell Latitude for user mario
+dell-latitude-mario = mkBusinessHost {
+  hostname = "dell-latitude-mario";
+  username = "mario";
+};
+```
+
+```bash
+# Validate syntax
+nix flake check --no-build
+
+# Commit and push so you can clone it during remote install
+git add hosts/<model-username> flake.nix
+git commit -m "feat: add business host <model-username>"
+git push
+```
+
+> **Note**: `hardware-configuration.nix` in the template is a placeholder.
+> It gets replaced with the real one during remote install (Step 3).
+
+### Step 3: Remote Install via RustDesk
+
+Walk the business user through these steps over a phone/video call:
+
+1. **Boot from USB** — plug in USB, restart, enter BIOS (F2/F12/DEL), select USB boot
+2. **Connect to WiFi** — click the WiFi icon in the GNOME top bar
+3. **Run Calamares installer** — click "Install NixOS" on the desktop, follow the wizard:
+   - Language, timezone, keyboard
+   - "Erase disk" for partitioning (simplest option)
+   - Set username and password (must match `username` in flake.nix)
+   - Click Install, wait for completion
+4. **Do NOT reboot** when Calamares says "All done"
+5. **Open RustDesk** — click Activities, type "RustDesk", open it
+6. **Read you the ID and password** displayed in RustDesk
+
+Once connected via RustDesk, the tech admin takes over:
+
+```bash
+# Open a terminal in the live session
+
+# Find and mount the installed system's partitions
+lsblk  # identify the installed root and boot partitions
+
+# For a typical Calamares UEFI install:
+sudo mount /dev/sda2 /mnt        # root (adjust device as needed)
+sudo mount /dev/sda1 /mnt/boot   # EFI boot partition
+
+# Generate hardware config for this specific machine
+sudo nixos-generate-config --root /mnt
+
+# Backup the Calamares-generated config, clone the flake
+sudo mv /mnt/etc/nixos/configuration.nix /mnt/etc/nixos/configuration.nix.calamares
+cd /mnt/etc/nixos
+sudo git clone https://github.com/jacopone/nixos-config.git .
+
+# Copy the real hardware config into the host directory
+sudo cp /mnt/etc/nixos/hardware-configuration.nix hosts/<model-username>/hardware-configuration.nix
+
+# Install using the flake
+sudo nixos-install --root /mnt --flake .#<model-username> --no-root-passwd
+```
+
+Tell the business user to reboot. They boot into the full business profile with
+Chrome, VS Code, OnlyOffice, RustDesk, and all configured tools.
+
+### Post-Deployment
+
+After the first real boot, connect via RustDesk again to:
+
+- Configure WiFi (if not auto-detected)
+- Sign into Google Chrome and other accounts
+- Set up Git credentials for the business user
+- Commit the real `hardware-configuration.nix` back to the repo
+
+```bash
+# On your machine, pull the hardware config
+cd ~/nixos-config
+# Copy hardware-configuration.nix from the business machine
+# Commit it so future rebuilds work
+git add hosts/<model-username>/hardware-configuration.nix
+git commit -m "feat: add hardware config for <model-username>"
+git push
 ```
 
 ---
