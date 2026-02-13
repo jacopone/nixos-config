@@ -58,6 +58,9 @@
     nvd # NixOS version diff (for rebuild-nixos)
     nix-output-monitor # Build visualization (nom)
 
+    # Remote support (TeamViewer-like, connects via ID + password)
+    rustdesk-flutter
+
     # System utilities
     p7zip
     wl-clipboard # Wayland clipboard (wl-copy, wl-paste)

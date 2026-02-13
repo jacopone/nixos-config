@@ -6,9 +6,6 @@
   imports = [ ../common/packages.nix ];
 
   environment.systemPackages = with pkgs; [
-    # Remote support (tech admin connects via ID + password)
-    rustdesk-flutter
-
     # Business-specific CLI
     less
 
