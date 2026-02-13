@@ -189,6 +189,13 @@
           username = "user";
         };
 
+        # HP workstation for Pietro
+        # Build: nixos-rebuild switch --flake .#hp-pietro
+        hp-pietro = mkBusinessHost {
+          hostname = "hp-pietro";
+          username = "pietro";
+        };
+
         # ── Installer ISO ──────────────────────────────────────────
         # Custom NixOS GNOME installer with RustDesk for remote setup
         # Build ISO: nix build .#business-installer-iso

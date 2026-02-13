@@ -20,6 +20,7 @@
     isNormalUser = true;
     description = "Business User";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
+    initialPassword = "changeme"; # Safety net — user should change after first login
   };
 
   nixpkgs.config.allowUnfree = true;
