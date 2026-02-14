@@ -15,7 +15,6 @@ Navigation guide for all documentation in this repository.
 | Need | Go To |
 |------|-------|
 | Daily commands | [Common Tasks](guides/COMMON_TASKS.md) |
-| System architecture | [The Closed Loop](architecture/THE_CLOSED_LOOP.md) |
 | Tool configuration | [Tool Guides](#tool-guides) |
 | CI/CD setup | [CI/CD Quick Start](guides/CICD_QUICK_START.md) |
 
@@ -27,8 +26,7 @@ System design and how things work.
 
 | Document | Description |
 |----------|-------------|
-| [The Closed Loop](architecture/THE_CLOSED_LOOP.md) | How system state auto-syncs to AI knowledge |
-| [Claude Orchestration](architecture/CLAUDE_ORCHESTRATION.md) | Multi-agent AI coordination system |
+| [Supply Chain Hardening](architecture/SUPPLY_CHAIN_HARDENING.md) | Nix supply chain security |
 
 ## Guides
 
@@ -52,22 +50,13 @@ Configuration and optimization for specific tools.
 | [Kitty Terminal](tools/kitty-optimization-guide.md) | Terminal optimization guide |
 | [Yazi File Manager](tools/yazi-file-associations.md) | File associations and keybindings |
 
-## Integrations
-
-External tool integrations.
-
-| Document | Description |
-|----------|-------------|
-| [Cursor AI Quality](integrations/CURSOR_AI_QUALITY_INTEGRATION.md) | AI editor quality gates |
-| [CI/CD Assessment](integrations/CICD_DEVOPS_ASSESSMENT.md) | DevOps maturity assessment |
-
 ## Archive
 
 Historical documentation (kept for reference, may be outdated).
 
 | Document | Description |
 |----------|-------------|
-| [2025-10 Planning](archive/2025-10-planning/) | HN launch planning docs |
+| [2025-10 Planning](archive/planning-2025-10/) | HN launch planning docs |
 | [Documentation Audit](archive/DOCUMENTATION_AUDIT_2025-10-06.md) | October 2025 audit report |
 
 ---
