@@ -10,11 +10,11 @@ lifecycle: persistent
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build NixClaw, a plugin-based AI agent that runs as a NixOS service with Telegram, Terminal, and Web UI channels.
+**Goal:** Build NixClaw, an MCP-native AI agent with voice support that runs as a NixOS service with Telegram (text + voice), Terminal, and Web UI channels.
 
-**Architecture:** Event-driven plugin monolith. Core agent loop receives messages from channels via an event bus, routes them to Claude API with registered tools, executes tool calls, and responds through the originating channel. State persisted in SQLite. Entire system declaratively configured via a NixOS module (`services.nixclaw`).
+**Architecture:** Event-driven plugin monolith with MCP client. Local plugins for NixOS/dev tools, MCP servers for external services (email, calendar, messaging via Rube/sunsama/etc). Voice interaction via Telegram voice messages (STT: Claude multimodal, TTS: ElevenLabs/Piper). State in SQLite. Declaratively configured via NixOS module (`services.nixclaw`).
 
-**Tech Stack:** TypeScript, Node.js, vitest, grammy (Telegram), @anthropic-ai/sdk (Claude), fastify (Web UI), better-sqlite3 (state), tsup (build), Nix flakes + buildNpmPackage.
+**Tech Stack:** TypeScript, Node.js, vitest, grammy (Telegram), @anthropic-ai/sdk (Claude), @modelcontextprotocol/sdk (MCP client), fastify (Web UI), better-sqlite3 (state), tsup (build), Nix flakes + buildNpmPackage.
 
 **Design Doc:** `docs/plans/2026-02-14-nixclaw-design.md` (in nixos-config repo)
 
@@ -516,7 +516,9 @@ describe("loadConfig", () => {
     const cfg: NixClawConfig = {
       ai: { provider: "claude", model: "claude-sonnet-4-5-20250929", apiKeyFile: "/run/secrets/key" },
       channels: { telegram: { enable: false }, webui: { enable: false, port: 3333 } },
+      voice: { stt: { provider: "claude" }, tts: { provider: "none" } },
       tools: { nixos: { enable: false }, dev: { enable: false } },
+      mcp: { servers: {} },
       stateDir: "/var/lib/nixclaw",
     };
     process.env = { ...originalEnv, NIXCLAW_CONFIG: JSON.stringify(cfg) };
@@ -559,9 +561,16 @@ export interface NixClawConfig {
     telegram: { enable: boolean; botTokenFile?: string; allowedUsers?: string[] };
     webui: { enable: boolean; port: number; host?: string };
   };
+  voice: {
+    stt: { provider: "claude" | "whisper" };
+    tts: { provider: "elevenlabs" | "piper" | "none"; elevenlabs?: { apiKeyFile: string; voiceId: string } };
+  };
   tools: {
     nixos: { enable: boolean; flakePath?: string; allowConfigEdits?: boolean };
     dev: { enable: boolean };
+  };
+  mcp: {
+    servers: Record<string, { command: string; args?: string[]; env?: Record<string, string> }>;
   };
   stateDir: string;
 }
@@ -576,9 +585,16 @@ const DEFAULT_CONFIG: NixClawConfig = {
     telegram: { enable: false },
     webui: { enable: false, port: 3333 },
   },
+  voice: {
+    stt: { provider: "claude" },
+    tts: { provider: "none" },
+  },
   tools: {
     nixos: { enable: false },
     dev: { enable: false },
+  },
+  mcp: {
+    servers: {},
   },
   stateDir: join(homedir(), ".local/share/nixclaw"),
 };
@@ -1168,7 +1184,9 @@ describe("Agent", () => {
     config = {
       ai: { provider: "claude", model: "claude-sonnet-4-5-20250929", apiKeyFile: FAKE_KEY_FILE },
       channels: { telegram: { enable: false }, webui: { enable: false, port: 3333 } },
+      voice: { stt: { provider: "claude" }, tts: { provider: "none" } },
       tools: { nixos: { enable: false }, dev: { enable: false } },
+      mcp: { servers: {} },
       stateDir: "/tmp/nixclaw-agent-test-state",
     };
   });
@@ -2145,6 +2163,17 @@ let
         host = cfg.channels.webui.host;
       };
     };
+    voice = {
+      stt = { provider = cfg.voice.stt.provider; };
+      tts = {
+        provider = cfg.voice.tts.provider;
+      } // lib.optionalAttrs (cfg.voice.tts.provider == "elevenlabs") {
+        elevenlabs = {
+          apiKeyFile = cfg.voice.tts.elevenlabs.apiKeyFile;
+          voiceId = cfg.voice.tts.elevenlabs.voiceId;
+        };
+      };
+    };
     tools = {
       nixos = {
         enable = cfg.tools.nixos.enable;
@@ -2154,6 +2183,13 @@ let
       dev = {
         enable = cfg.tools.dev.enable;
       };
+    };
+    mcp = {
+      servers = lib.mapAttrs (name: serverCfg: {
+        command = serverCfg.command;
+        args = serverCfg.args;
+        env = serverCfg.env;
+      }) cfg.mcp.servers;
     };
     stateDir = cfg.stateDir;
   };
@@ -2208,6 +2244,35 @@ in
       };
     };
 
+    voice = {
+      stt = {
+        provider = lib.mkOption {
+          type = lib.types.enum [ "claude" "whisper" ];
+          default = "claude";
+          description = "Speech-to-text provider";
+        };
+      };
+      tts = {
+        provider = lib.mkOption {
+          type = lib.types.enum [ "elevenlabs" "piper" "none" ];
+          default = "none";
+          description = "Text-to-speech provider";
+        };
+        elevenlabs = {
+          apiKeyFile = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            default = null;
+            description = "Path to file containing ElevenLabs API key";
+          };
+          voiceId = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = "ElevenLabs voice ID for TTS output";
+          };
+        };
+      };
+    };
+
     tools = {
       nixos = {
         enable = lib.mkEnableOption "NixOS management tools";
@@ -2224,6 +2289,31 @@ in
       };
       dev = {
         enable = lib.mkEnableOption "Development workflow tools";
+      };
+    };
+
+    mcp = {
+      servers = lib.mkOption {
+        type = lib.types.attrsOf (lib.types.submodule {
+          options = {
+            command = lib.mkOption {
+              type = lib.types.str;
+              description = "Command to run the MCP server";
+            };
+            args = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Arguments for the MCP server command";
+            };
+            env = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              default = { };
+              description = "Environment variables for the MCP server";
+            };
+          };
+        });
+        default = { };
+        description = "MCP servers to connect to at startup";
       };
     };
 
@@ -2279,9 +2369,396 @@ git commit -m "feat: implement full NixOS module with systemd hardening"
 
 ---
 
-## Phase 9: Dev Tools & Scheduler
+## Phase 9: MCP Client
 
-### Task 16: Implement Dev tools plugin
+### Task 16: Implement MCP client for connecting to external MCP servers
+
+**Files:**
+- Create: `src/core/mcp-client.ts`
+- Test: `src/core/mcp-client.test.ts`
+
+The MCP client spawns configured MCP servers as child processes, communicates via stdio (JSON-RPC), discovers their tools at startup, and registers them in the PluginHost so Claude can call them.
+
+**Step 1: Install MCP SDK**
+
+```bash
+npm install @modelcontextprotocol/sdk
+```
+
+**Step 2: Write the failing tests**
+
+```typescript
+// src/core/mcp-client.test.ts
+import { describe, it, expect } from "vitest";
+import { McpClientManager } from "./mcp-client.js";
+
+describe("McpClientManager", () => {
+  it("constructs with empty server config", () => {
+    const mgr = new McpClientManager({});
+    expect(mgr).toBeDefined();
+  });
+
+  it("returns empty tools when no servers configured", async () => {
+    const mgr = new McpClientManager({});
+    const tools = await mgr.getAllTools();
+    expect(tools).toEqual([]);
+  });
+});
+```
+
+**Step 3: Run tests to verify they fail**
+
+```bash
+npx vitest run src/core/mcp-client.test.ts
+# Expected: FAIL
+```
+
+**Step 4: Implement McpClientManager**
+
+```typescript
+// src/core/mcp-client.ts
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import type { Tool } from "./types.js";
+import { z } from "zod";
+
+interface McpServerConfig {
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+}
+
+interface ConnectedServer {
+  name: string;
+  client: Client;
+  transport: StdioClientTransport;
+}
+
+export class McpClientManager {
+  private servers: ConnectedServer[] = [];
+
+  constructor(private serverConfigs: Record<string, McpServerConfig>) {}
+
+  async connectAll(): Promise<void> {
+    for (const [name, config] of Object.entries(this.serverConfigs)) {
+      try {
+        const transport = new StdioClientTransport({
+          command: config.command,
+          args: config.args ?? [],
+          env: { ...process.env, ...config.env },
+        });
+        const client = new Client({ name: `nixclaw-${name}`, version: "0.1.0" });
+        await client.connect(transport);
+        this.servers.push({ name, client, transport });
+        console.log(`[mcp] Connected to ${name}`);
+      } catch (err) {
+        console.error(`[mcp] Failed to connect to ${name}:`, err);
+      }
+    }
+  }
+
+  async getAllTools(): Promise<Tool[]> {
+    const tools: Tool[] = [];
+    for (const server of this.servers) {
+      try {
+        const response = await server.client.listTools();
+        for (const mcpTool of response.tools) {
+          tools.push({
+            name: `${server.name}_${mcpTool.name}`,
+            description: mcpTool.description ?? mcpTool.name,
+            inputSchema: z.any(),
+            run: async (input) => {
+              const result = await server.client.callTool({
+                name: mcpTool.name,
+                arguments: input as Record<string, unknown>,
+              });
+              const textContent = result.content
+                .filter((c): c is { type: "text"; text: string } => c.type === "text")
+                .map((c) => c.text)
+                .join("\n");
+              return textContent || JSON.stringify(result.content);
+            },
+          });
+        }
+      } catch (err) {
+        console.error(`[mcp] Failed to list tools from ${server.name}:`, err);
+      }
+    }
+    return tools;
+  }
+
+  async disconnectAll(): Promise<void> {
+    for (const server of this.servers) {
+      try {
+        await server.client.close();
+      } catch {}
+    }
+    this.servers = [];
+  }
+}
+```
+
+**Step 5: Run tests to verify they pass**
+
+```bash
+npx vitest run src/core/mcp-client.test.ts
+# Expected: 2 passed
+```
+
+**Step 6: Integrate into main entry point and Agent**
+
+In `src/index.ts`, after creating PluginHost:
+
+```typescript
+import { McpClientManager } from "./core/mcp-client.js";
+
+// Connect to MCP servers
+const mcpManager = new McpClientManager(config.mcp?.servers ?? {});
+await mcpManager.connectAll();
+const mcpTools = await mcpManager.getAllTools();
+// Register MCP tools in the plugin host
+for (const tool of mcpTools) {
+  pluginHost.registerExternalTool(tool);
+}
+```
+
+**Step 7: Commit**
+
+```bash
+git add src/core/mcp-client.ts src/core/mcp-client.test.ts src/index.ts
+git commit -m "feat: add MCP client for connecting to external tool servers"
+```
+
+---
+
+## Phase 10: Voice Messages
+
+### Task 17: Implement STT (Speech-to-Text)
+
+**Files:**
+- Create: `src/voice/stt.ts`
+- Test: `src/voice/stt.test.ts`
+
+**Step 1: Write the failing tests**
+
+```typescript
+// src/voice/stt.test.ts
+import { describe, it, expect } from "vitest";
+import { createSTT } from "./stt.js";
+
+describe("STT", () => {
+  it("creates a claude STT provider", () => {
+    const stt = createSTT({ provider: "claude" });
+    expect(stt).toBeDefined();
+    expect(stt.transcribe).toBeInstanceOf(Function);
+  });
+});
+```
+
+**Step 2: Run tests to verify they fail**
+
+```bash
+npx vitest run src/voice/stt.test.ts
+# Expected: FAIL
+```
+
+**Step 3: Implement STT**
+
+```typescript
+// src/voice/stt.ts
+import Anthropic from "@anthropic-ai/sdk";
+
+interface STTConfig {
+  provider: "claude" | "whisper";
+}
+
+export interface STTProvider {
+  transcribe(audioBuffer: Buffer, mimeType: string): Promise<string>;
+}
+
+class ClaudeSTT implements STTProvider {
+  async transcribe(audioBuffer: Buffer, mimeType: string): Promise<string> {
+    // Claude can process audio directly via multimodal input
+    // The audio is sent as a base64 content block in the messages API
+    const client = new Anthropic();
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 1024,
+      messages: [{
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Transcribe this audio message exactly. Return only the transcription, nothing else.",
+          },
+          {
+            type: "document",
+            source: {
+              type: "base64",
+              media_type: mimeType as any,
+              data: audioBuffer.toString("base64"),
+            },
+          },
+        ],
+      }],
+    });
+    const text = response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("");
+    return text;
+  }
+}
+
+export function createSTT(config: STTConfig): STTProvider {
+  switch (config.provider) {
+    case "claude":
+      return new ClaudeSTT();
+    case "whisper":
+      throw new Error("Whisper STT not yet implemented");
+    default:
+      return new ClaudeSTT();
+  }
+}
+```
+
+**Step 4: Run tests, commit**
+
+```bash
+npx vitest run src/voice/stt.test.ts
+git add src/voice/stt.ts src/voice/stt.test.ts
+git commit -m "feat: add STT with Claude multimodal transcription"
+```
+
+---
+
+### Task 18: Implement TTS (Text-to-Speech)
+
+**Files:**
+- Create: `src/voice/tts.ts`
+- Test: `src/voice/tts.test.ts`
+
+**Step 1: Write the failing tests**
+
+```typescript
+// src/voice/tts.test.ts
+import { describe, it, expect } from "vitest";
+import { createTTS } from "./tts.js";
+
+describe("TTS", () => {
+  it("creates an elevenlabs TTS provider", () => {
+    const tts = createTTS({ provider: "elevenlabs", apiKey: "test", voiceId: "test" });
+    expect(tts).toBeDefined();
+    expect(tts.synthesize).toBeInstanceOf(Function);
+  });
+
+  it("creates a none TTS provider that returns null", async () => {
+    const tts = createTTS({ provider: "none" });
+    const result = await tts.synthesize("hello");
+    expect(result).toBeNull();
+  });
+});
+```
+
+**Step 2: Run tests to verify they fail**
+
+```bash
+npx vitest run src/voice/tts.test.ts
+# Expected: FAIL
+```
+
+**Step 3: Implement TTS**
+
+```typescript
+// src/voice/tts.ts
+interface TTSConfig {
+  provider: "elevenlabs" | "piper" | "none";
+  apiKey?: string;
+  voiceId?: string;
+}
+
+export interface TTSProvider {
+  synthesize(text: string): Promise<Buffer | null>;
+}
+
+class ElevenLabsTTS implements TTSProvider {
+  constructor(private apiKey: string, private voiceId: string) {}
+
+  async synthesize(text: string): Promise<Buffer | null> {
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${this.voiceId}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": this.apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_turbo_v2_5",
+        }),
+      },
+    );
+    if (!response.ok) throw new Error(`ElevenLabs API error: ${response.status}`);
+    return Buffer.from(await response.arrayBuffer());
+  }
+}
+
+class NoneTTS implements TTSProvider {
+  async synthesize(): Promise<null> {
+    return null;
+  }
+}
+
+export function createTTS(config: TTSConfig): TTSProvider {
+  switch (config.provider) {
+    case "elevenlabs":
+      return new ElevenLabsTTS(config.apiKey!, config.voiceId!);
+    case "piper":
+      throw new Error("Piper TTS not yet implemented");
+    case "none":
+    default:
+      return new NoneTTS();
+  }
+}
+```
+
+**Step 4: Run tests, commit**
+
+```bash
+npx vitest run src/voice/tts.test.ts
+git add src/voice/tts.ts src/voice/tts.test.ts
+git commit -m "feat: add TTS with ElevenLabs and none providers"
+```
+
+---
+
+### Task 19: Add voice message handling to Telegram channel
+
+**Files:**
+- Modify: `src/channels/telegram/index.ts`
+- Test: `src/channels/telegram/voice.test.ts`
+
+Add a `bot.on("message:voice")` handler that:
+1. Downloads the .ogg voice file from Telegram
+2. Passes it to STT for transcription
+3. Emits the transcribed text as a normal `message:incoming`
+4. When a response comes back, passes it through TTS
+5. Sends the audio back as a Telegram voice message via `ctx.replyWithVoice()`
+
+**Step 1: Write tests for voice handling logic**
+**Step 2: Implement voice handler in TelegramChannel**
+**Step 3: Run tests, commit**
+
+```bash
+git commit -m "feat: add voice message support to Telegram channel"
+```
+
+---
+
+## Phase 11: Dev Tools & Scheduler
+
+### Task 20: Implement Dev tools plugin
 
 **Files:**
 - Create: `src/tools/dev/index.ts`
@@ -2300,7 +2777,7 @@ git commit -m "feat: add dev tools plugin with git and test runner"
 
 ---
 
-### Task 17: Implement Scheduler plugin
+### Task 21: Implement Scheduler plugin
 
 **Files:**
 - Create: `src/tools/scheduler/index.ts`
@@ -2323,9 +2800,9 @@ git commit -m "feat: add scheduler plugin with cron-based task execution"
 
 ---
 
-## Phase 10: Integration & Polish
+## Phase 12: Integration & Polish
 
-### Task 18: Integration test — end-to-end terminal flow
+### Task 22: Integration test — end-to-end terminal flow
 
 **Files:**
 - Create: `src/integration.test.ts`
@@ -2342,7 +2819,7 @@ git commit -m "test: add end-to-end integration test"
 
 ---
 
-### Task 19: Set npmDepsHash and verify Nix build
+### Task 23: Set npmDepsHash and verify Nix build
 
 **Step 1: Generate the hash**
 
@@ -2368,7 +2845,7 @@ git commit -m "chore: set npmDepsHash for reproducible Nix build"
 
 ---
 
-### Task 20: Add NixClaw as flake input to nixos-config
+### Task 24: Add NixClaw as flake input to nixos-config
 
 **Files:**
 - Modify: `~/nixos-config/flake.nix` (add nixclaw input)
@@ -2433,11 +2910,13 @@ The user must run `./rebuild-nixos` to activate the service.
 | 2: Core | 3-6 | EventBus, StateStore, Config, PluginHost |
 | 3: AI | 7-8 | Claude client with tool-use, conversation memory |
 | 4: MVP | 9-11 | Agent core + Terminal channel (first working version) |
-| 5: Telegram | 12 | Mobile interaction via Telegram |
+| 5: Telegram | 12 | Mobile interaction via Telegram (text) |
 | 6: NixOS Tools | 13 | System status, flake check, service monitoring |
 | 7: Web UI | 14 | Dashboard with SSE streaming |
-| 8: NixOS Module | 15 | Declarative `services.nixclaw` configuration |
-| 9: Dev + Scheduler | 16-17 | Git tools, test runner, scheduled tasks |
-| 10: Integration | 18-20 | E2E tests, Nix build, flake integration |
+| 8: NixOS Module | 15 | Declarative `services.nixclaw` with voice + MCP config |
+| 9: MCP Client | 16 | Connect to external MCP servers (Rube, sunsama, etc.) |
+| 10: Voice | 17-19 | STT (Claude multimodal), TTS (ElevenLabs), Telegram voice messages |
+| 11: Dev + Scheduler | 20-21 | Git tools, test runner, scheduled tasks |
+| 12: Integration | 22-24 | E2E tests, Nix build, flake integration |
 
 **MVP checkpoint is after Task 11** — you'll have a working agent in the terminal that can chat with Claude. Everything after that is incremental enhancement.
