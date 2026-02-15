@@ -118,6 +118,22 @@ get_test_summary() {
     echo "unknown"
 }
 
+# Check if worktree has a demo report
+has_demo_report() {
+    local worktree_path="$1"
+    [[ -f "$worktree_path/DEMO.md" ]]
+}
+
+# Count screenshots in demo
+demo_screenshot_count() {
+    local worktree_path="$1"
+    if [[ -d "$worktree_path/.demo" ]]; then
+        find "$worktree_path/.demo" -name "*.png" 2>/dev/null | wc -l
+    else
+        echo "0"
+    fi
+}
+
 show_review() {
     local repo_path="$1"
     local worktree_base="$repo_path/.worktrees"
