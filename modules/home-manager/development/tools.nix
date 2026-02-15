@@ -49,6 +49,11 @@
   # Git configuration
   programs.git = {
     enable = true;
+    userName = "Jacopo Anselmi";
+    userEmail = "jacopo.anselmi@gmail.com";
+    extraConfig = {
+      credential.helper = "!/run/current-system/sw/bin/gh auth git-credential";
+    };
     settings = {
       # Rewrite SSH URLs to HTTPS for GitHub (fixes plugin marketplace cloning)
       url."https://github.com/".insteadOf = "git@github.com:";

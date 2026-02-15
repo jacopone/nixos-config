@@ -13,6 +13,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Networking (host-specific hostname set in host's default.nix)
+  networking.nameservers = [ "8.8.8.8" "8.8.4.4" ];
   networking.networkmanager = {
     enable = true;
     connectionConfig = {
