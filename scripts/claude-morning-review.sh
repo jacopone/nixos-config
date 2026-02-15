@@ -307,6 +307,18 @@ interactive_merge() {
         git -C "$wt" diff --stat "$current_branch...$branch" 2>/dev/null | head -10 | sed 's/^/    /'
         echo ""
 
+        # Show demo report if available
+        if has_demo_report "$wt"; then
+            echo -e "  ${BLUE}Demo Report:${NC}"
+            # Show summary and visual demo sections
+            sed -n '/^## Summary/,/^## [^V]/p' "$wt/DEMO.md" | head -20 | sed 's/^/    /'
+            local screenshots=$(demo_screenshot_count "$wt")
+            if [[ "$screenshots" -gt 0 ]]; then
+                echo -e "    ${GREEN}$screenshots screenshots available in:${NC} $wt/.demo/"
+            fi
+            echo ""
+        fi
+
         # Ask for confirmation
         echo -n "  Merge $name? [Y/n/s(kip)/q(uit)] "
         read -r answer
@@ -442,7 +454,7 @@ EOF
                 echo '```'
             fi
 
-            if [[ -f "$wt/DEMO.md" ]]; then
+            if has_demo_report "$wt"; then
                 echo ""
                 echo "**Demo Report:**"
                 echo ""
