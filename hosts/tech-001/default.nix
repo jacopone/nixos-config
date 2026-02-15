@@ -13,7 +13,7 @@
   ];
 
   # Hostname
-  networking.hostName = "framework-16-jacopo";
+  networking.hostName = "tech-001";
 
   # NVIDIA PRIME Bus IDs
   # IMPORTANT: Update these after running on actual hardware:
