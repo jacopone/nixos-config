@@ -2,6 +2,9 @@
 # This file imports all modular configurations
 { config, pkgs, ... }:
 
+let
+  claude-seccomp = import ../../pkgs/claude-seccomp.nix { inherit pkgs; };
+in
 {
   # Import all modular configurations
   imports = [
@@ -37,6 +40,15 @@
   home.file.".config/fish/functions/build-it.fish".text = builtins.readFile ../../config/fish/functions/build-it.fish;
   home.file.".config/fish/functions/fix-it.fish".text = builtins.readFile ../../config/fish/functions/fix-it.fish;
   home.file.".config/fish/functions/defer-it.fish".text = builtins.readFile ../../config/fish/functions/defer-it.fish;
+
+  # Claude Code seccomp filter - deployed to ~/.claude/seccomp/ for native sandbox
+  # Settings.json references these paths via sandbox.seccomp.bpfPath and applyPath
+  home.file.".claude/seccomp/apply-seccomp".source = "${claude-seccomp}/share/claude-seccomp/apply-seccomp";
+  home.file.".claude/seccomp/unix-block.bpf".source = "${claude-seccomp}/share/claude-seccomp/unix-block.bpf";
+  # Also deploy to npm global fallback path so Claude Code's /sandbox UI check finds them
+  # (the UI check runs before sandbox config is loaded from settings.json)
+  home.file.".npm/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp".source = "${claude-seccomp}/share/claude-seccomp/apply-seccomp";
+  home.file.".npm/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/unix-block.bpf".source = "${claude-seccomp}/share/claude-seccomp/unix-block.bpf";
 
   # Enable bash for compatibility
   programs.bash.enable = true;

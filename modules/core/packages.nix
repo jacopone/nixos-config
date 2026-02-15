@@ -3,6 +3,9 @@
 let
   # Pinned npm versions for reproducibility
   npmVersions = import ./npm-versions.nix;
+
+  # Claude Code seccomp filter (shared derivation - also deployed by Home Manager)
+  claude-seccomp = import ../../pkgs/claude-seccomp.nix { inherit pkgs; };
 in
 {
   imports = [ ../common/packages.nix ];
@@ -21,11 +24,11 @@ in
     xdotool # X11 text input
     dotool # Universal text input
 
-    # Anthropic's sandbox-runtime (srt) - Claude Code sandboxing
-    # Usage: srt claude [args]  OR  srt --settings ~/.srt-settings.json claude [args]
-    # See: https://github.com/anthropic-experimental/sandbox-runtime
-    bubblewrap # Required by srt on Linux - https://github.com/containers/bubblewrap
-    socat # Required by srt for proxy bridging
+    # Claude Code sandbox dependencies (native sandbox uses these directly)
+    bubblewrap # Required by Claude Code sandbox on Linux - https://github.com/containers/bubblewrap
+    socat # Required by Claude Code sandbox for proxy bridging
+    claude-seccomp # Seccomp BPF filter + apply binary (blocks AF_UNIX in sandbox)
+    # srt - External sandbox wrapper (kept for compatibility, native sandbox preferred)
     (pkgs.writeShellScriptBin "srt" ''
       exec ${pkgs.nodejs_20}/bin/npx --yes @anthropic-ai/sandbox-runtime@${npmVersions.srt} "$@"
     '')

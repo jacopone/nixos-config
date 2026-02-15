@@ -31,8 +31,6 @@
       "ahfgeienlihckogmohjhadlkjgocpleb"
       "dbepggeogbaibhgnhhndojpepiihcmeb"
       "jjhefcfbdhnjickkkdbjoemdmbfginb"
-      "fmkadmapgofadopljbjfkapdkoienihi"
-      "mhjhnkcfbdhnjickkkdbjoemdmbfginb"
       "nkbihfbeogaeaoehlefnkodbefgpgknn"
       "fjoaledfpmneenckfbpdfhkmimnjocfa"
       "kbfnbcaeplbcioakkpcpgfkobkghlhen"
@@ -43,7 +41,6 @@
       "niloccemoadcdkdjlinkgdfekeahmflj"
       "ghbmnnjooekpmoecnnnilnnbdlolhkhi"
       "aghfnjkcakhmadgdomlmlhhaocbkloab"
-      "djflhoibgkdhkhhcedjiklpkjnoahfmg"
     ];
   };
 

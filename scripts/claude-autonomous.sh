@@ -9,7 +9,7 @@
 #
 # This will:
 #   1. Create a git worktree for isolated work
-#   2. Launch Claude in srt sandbox with --dangerously-skip-permissions
+#   2. Launch Claude with --dangerously-skip-permissions (native sandbox auto-enabled)
 #   3. Run in background with tmux so you can sleep
 #   4. Log everything for review in the morning
 
@@ -321,9 +321,9 @@ STRICT_EOF
 fi
 
 echo -e "${BLUE}[2/3] Launching Claude in sandbox...${NC}"
-echo -e "  ${YELLOW}Using srt for security isolation${NC}"
+echo -e "  ${YELLOW}Using Claude Code native sandbox (bubblewrap + seccomp)${NC}"
 
-# Launch in tmux with srt sandbox
+# Launch in tmux with native sandbox (--dangerously-skip-permissions auto-enables sandbox)
 tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" \
     "echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
      echo '  Claude Autonomous Session: $TASK_NAME' | tee -a '$LOG_FILE'; \
@@ -331,7 +331,7 @@ tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" \
      echo '  Worktree: $WORKTREE_PATH' | tee -a '$LOG_FILE'; \
      echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
      echo '' | tee -a '$LOG_FILE'; \
-     srt claude '$WORKTREE_PATH' \
+     claude '$WORKTREE_PATH' \
          --dangerously-skip-permissions \
          --print '$PROMPT' \
          2>&1 | tee -a '$LOG_FILE'; \

@@ -8,6 +8,7 @@
     extensions = [
       "cjpalhdlnbpafiamejdnhcphjbkeiagm" # uBlock Origin
       "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+      "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude in Chrome (browser automation)
     ];
   };
 }
