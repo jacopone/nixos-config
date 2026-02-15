@@ -175,6 +175,26 @@
         "type": "github"
       }
     },
+    "nixclaw": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1771174193,
+        "narHash": "sha256-6OIW0v4WQSINR9Y+q1Ff2z1M4z2pznahWQ6FcxISh1c=",
+        "owner": "jacopone",
+        "repo": "nixclaw",
+        "rev": "73f96b878a35cc6a5eba5f2a2c8b3787b0cc1d22",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jacopone",
+        "repo": "nixclaw",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1768397375,
@@ -214,6 +234,7 @@
         "claude-code-nix": "claude-code-nix",
         "code-cursor-nix": "code-cursor-nix",
         "home-manager": "home-manager",
+        "nixclaw": "nixclaw",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "whisper-dictation": "whisper-dictation"
