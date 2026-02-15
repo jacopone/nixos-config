@@ -167,8 +167,8 @@ show_review() {
     echo ""
 
     # Status table header
-    printf "  ${CYAN}%-20s %-12s %-40s${NC}\n" "SESSION" "STATUS" "CHANGES"
-    printf "  %-20s %-12s %-40s\n" "────────────────────" "────────────" "────────────────────────────────────────"
+    printf "  ${CYAN}%-20s %-12s %-8s %-40s${NC}\n" "SESSION" "STATUS" "DEMO" "CHANGES"
+    printf "  %-20s %-12s %-8s %-40s\n" "────────────────────" "────────────" "────────" "────────────────────────────────────────"
 
     local completed_count=0
     local blocked_count=0
@@ -190,7 +190,20 @@ show_review() {
         # Get change summary
         local changes=$(get_changes_summary "$wt" "$branch")
 
-        printf "  %-20s %s %-10s %-40s\n" "$name" "$emoji" "$status" "$changes"
+        # Check for demo report
+        local demo_indicator=""
+        if has_demo_report "$wt"; then
+            local screenshots=$(demo_screenshot_count "$wt")
+            if [[ "$screenshots" -gt 0 ]]; then
+                demo_indicator="${GREEN}${screenshots} img${NC}"
+            else
+                demo_indicator="${CYAN}text${NC}"
+            fi
+        else
+            demo_indicator="${MAGENTA}-${NC}"
+        fi
+
+        printf "  %-20s %s %-10s %b%-6s${NC} %-40s\n" "$name" "$emoji" "$status" "$demo_indicator" "" "$changes"
     done
 
     echo ""
