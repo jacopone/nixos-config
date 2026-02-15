@@ -39,6 +39,14 @@ repos:
         files: ^(rebuild-nixos|scripts/.*\.sh)$
         types: [file]
 
+      # Check for required YAML frontmatter in documentation
+      - id: check-markdown-frontmatter
+        name: Check Markdown frontmatter
+        entry: python3 scripts/check-frontmatter.py
+        language: system
+        files: ^docs/.*\.md$
+        pass_filenames: true
+
       # Warn about temporal markers in documentation
       - id: check-temporal-markers
         name: Warn about temporal markers
