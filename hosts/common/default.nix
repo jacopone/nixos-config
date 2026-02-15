@@ -28,19 +28,16 @@
   programs.chromium = {
     enable = true;
     extensions = [
-      "ahfgeienlihckogmohjhadlkjgocpleb"
-      "dbepggeogbaibhgnhhndojpepiihcmeb"
-      "jjhefcfbdhnjickkkdbjoemdmbfginb"
-      "nkbihfbeogaeaoehlefnkodbefgpgknn"
-      "fjoaledfpmneenckfbpdfhkmimnjocfa"
-      "kbfnbcaeplbcioakkpcpgfkobkghlhen"
-      "pbmlfaiicoikhdbjagjbglnbfcbcojpj"
-      "ohfgljdgelakfkefopgklcohadegdpjf"
-      "ipikiaejjblmdopojhpejjmbedhlibno"
-      "kadmollpgjhjcclemeliidekkajnjaih"
-      "niloccemoadcdkdjlinkgdfekeahmflj"
-      "ghbmnnjooekpmoecnnnilnnbdlolhkhi"
-      "aghfnjkcakhmadgdomlmlhhaocbkloab"
+      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
+      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+      "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN proxy
+      "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly
+      "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
+      "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf
+      "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
+      "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner
+      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+      "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black (dark theme)
     ];
   };
 

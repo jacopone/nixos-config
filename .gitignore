@@ -53,6 +53,7 @@ docs/automation/claude-backup-legacy.md
 
 # Claude Code machine-specific context
 .claude/CLAUDE.local.md
+.claude/agents
 .claude/sessions/
 .claude.json
 .mcp.json
@@ -113,6 +114,12 @@ venv/
 credentials.json
 secrets.json
 *.secret
+
+# Git submodule config (empty, not used)
+.gitmodules
+
+# Ripgrep config (local preference)
+.ripgreprc
 
 # Shell dotfiles (not part of NixOS config)
 .bash_profile
