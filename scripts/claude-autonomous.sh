@@ -285,6 +285,68 @@ If ANY verification step fails:
 - Started: $(date)
 PROMPT_EOF
 
+# Append demo report instructions
+cat >> "$PROMPT_FILE" << 'DEMO_EOF'
+
+## Demo Report (MANDATORY)
+
+After completing your primary task and all verification steps, produce a demo report.
+
+### Step 1: Check for Demo Configuration
+
+Look for `.claude/demo-config.md` in the working directory. This file tells you what to demo visually.
+
+### Step 2a: If `.claude/demo-config.md` EXISTS (Visual Demo)
+
+1. Create a `.demo/` directory in the worktree root
+2. Start the dev server using the command specified in demo-config.md
+3. Wait for the ready signal in stdout before proceeding
+4. Use Playwright MCP tools to:
+   - Navigate to each page affected by your changes
+   - Take a screenshot of each, saving to `.demo/NN-description.png`
+   - If demo-config.md specifies key pages, also screenshot those for context
+5. Stop the dev server when done
+
+### Step 2b: If `.claude/demo-config.md` DOES NOT EXIST (Text-Only Demo)
+
+Skip screenshots. You will still write DEMO.md but without visual evidence.
+
+### Step 3: Write DEMO.md
+
+Create `DEMO.md` at the worktree root with this structure:
+
+```
+# Demo: <task-name>
+**Branch:** <current branch>
+**Date:** <today>
+
+## Summary
+[1-2 sentences: what you built and why]
+
+## Changes Made
+- [List each file changed with a brief description of what changed]
+
+## Visual Demo
+(Only if .claude/demo-config.md exists)
+### [Page/Feature Name]
+![Description](.demo/01-description.png)
+[What this screenshot shows and why it matters]
+
+## Test Results
+- Unit tests: [pass/fail count from actual test run]
+- E2E tests: [pass/fail count, or "not run" if not applicable]
+- Build: [success/failure]
+- Coverage: [percentage if available]
+
+## Open Questions
+- [Anything you were uncertain about or design decisions the reviewer should validate]
+```
+
+IMPORTANT: The demo report is the LAST thing you do. Complete all coding, testing, and verification first. The demo report documents finished work, not work in progress.
+
+Do NOT commit DEMO.md or the .demo/ directory to git. These are review artifacts for the human reviewer, not source code.
+DEMO_EOF
+
 # Add strict mode requirements if enabled
 if [[ "$STRICT_MODE" == "true" ]]; then
     cat >> "$PROMPT_FILE" << 'STRICT_EOF'
