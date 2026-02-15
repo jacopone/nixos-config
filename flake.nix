@@ -70,9 +70,10 @@
     };
 
     # NixClaw - Personal AI agent platform for NixOS
-    # MAINTAINER: @jacopone (YOU)
+    # MAINTAINER: @jacopone (YOU) | LOCAL DEV: path input
+    # Switch to github:jacopone/nixclaw when published
     nixclaw = {
-      url = "github:jacopone/nixclaw";
+      url = "path:/home/YOUR_USERNAME/nixclaw";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

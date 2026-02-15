@@ -118,6 +118,22 @@ get_test_summary() {
     echo "unknown"
 }
 
+# Check if worktree has a demo report
+has_demo_report() {
+    local worktree_path="$1"
+    [[ -f "$worktree_path/DEMO.md" ]]
+}
+
+# Count screenshots in demo
+demo_screenshot_count() {
+    local worktree_path="$1"
+    if [[ -d "$worktree_path/.demo" ]]; then
+        find "$worktree_path/.demo" -name "*.png" 2>/dev/null | wc -l
+    else
+        echo "0"
+    fi
+}
+
 show_review() {
     local repo_path="$1"
     local worktree_base="$repo_path/.worktrees"
@@ -151,8 +167,8 @@ show_review() {
     echo ""
 
     # Status table header
-    printf "  ${CYAN}%-20s %-12s %-40s${NC}\n" "SESSION" "STATUS" "CHANGES"
-    printf "  %-20s %-12s %-40s\n" "────────────────────" "────────────" "────────────────────────────────────────"
+    printf "  ${CYAN}%-20s %-12s %-8s %-40s${NC}\n" "SESSION" "STATUS" "DEMO" "CHANGES"
+    printf "  %-20s %-12s %-8s %-40s\n" "────────────────────" "────────────" "────────" "────────────────────────────────────────"
 
     local completed_count=0
     local blocked_count=0
@@ -174,7 +190,20 @@ show_review() {
         # Get change summary
         local changes=$(get_changes_summary "$wt" "$branch")
 
-        printf "  %-20s %s %-10s %-40s\n" "$name" "$emoji" "$status" "$changes"
+        # Check for demo report
+        local demo_indicator=""
+        if has_demo_report "$wt"; then
+            local screenshots=$(demo_screenshot_count "$wt")
+            if [[ "$screenshots" -gt 0 ]]; then
+                demo_indicator="${GREEN}${screenshots} img${NC}"
+            else
+                demo_indicator="${CYAN}text${NC}"
+            fi
+        else
+            demo_indicator="${MAGENTA}-${NC}"
+        fi
+
+        printf "  %-20s %s %-10s %b%-6s${NC} %-40s\n" "$name" "$emoji" "$status" "$demo_indicator" "" "$changes"
     done
 
     echo ""
@@ -277,6 +306,18 @@ interactive_merge() {
         echo -e "  ${BLUE}Changes:${NC}"
         git -C "$wt" diff --stat "$current_branch...$branch" 2>/dev/null | head -10 | sed 's/^/    /'
         echo ""
+
+        # Show demo report if available
+        if has_demo_report "$wt"; then
+            echo -e "  ${BLUE}Demo Report:${NC}"
+            # Show summary and visual demo sections
+            sed -n '/^## Summary/,/^## [^V]/p' "$wt/DEMO.md" | head -20 | sed 's/^/    /'
+            local screenshots=$(demo_screenshot_count "$wt")
+            if [[ "$screenshots" -gt 0 ]]; then
+                echo -e "    ${GREEN}$screenshots screenshots available in:${NC} $wt/.demo/"
+            fi
+            echo ""
+        fi
 
         # Ask for confirmation
         echo -n "  Merge $name? [Y/n/s(kip)/q(uit)] "
@@ -411,6 +452,25 @@ EOF
                 echo '```'
                 cat "$wt/BLOCKERS.md"
                 echo '```'
+            fi
+
+            if has_demo_report "$wt"; then
+                echo ""
+                echo "**Demo Report:**"
+                echo ""
+                cat "$wt/DEMO.md"
+                echo ""
+                local screenshots=$(demo_screenshot_count "$wt")
+                if [[ "$screenshots" -gt 0 ]]; then
+                    echo "*$screenshots screenshots in .demo/ directory*"
+                    echo ""
+                    echo "View screenshots:"
+                    echo '```'
+                    find "$wt/.demo/" -name "*.png" 2>/dev/null | while read -r img; do
+                        echo "  $(basename "$img")"
+                    done
+                    echo '```'
+                fi
             fi
 
             echo ""

@@ -3,17 +3,12 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Framework EC kernel module (battery charge limit, privacy switches, LEDs)
-  # Auto-enabled by nixos-hardware on kernel >= 6.10, but explicit for clarity
-  hardware.framework.enableKmod = true;
-
   # Framework 16-specific kernel modules
   boot.kernelModules = [ "uinput" ];
 
-  # AMD GPU, NVIDIA, and Framework-specific kernel parameters
+  # AMD GPU and Framework-specific kernel parameters
   boot.kernelParams = [
     "amdgpu.abmlevel=0" # Disable Active Backlight Management for accurate colors
-    "nvme_core.default_ps_max_latency_us=5500" # NVMe power saving for WD_BLACK SN7100
   ];
 
   # Use latest kernel for best AMD/NVIDIA support
@@ -48,8 +43,8 @@
     # Enable nvidia-settings GUI
     nvidiaSettings = true;
 
-    # Open source kernel module (REQUIRED for RTX 5070 Blackwell architecture)
-    open = true;
+    # Open source kernel module (use false for RTX 5070 until better support)
+    open = false;
 
     # PRIME Offload mode (render on NVIDIA, display on AMD)
     # IMPORTANT: Update these bus IDs after running:
@@ -59,10 +54,10 @@
         enable = true;
         enableOffloadCmd = true; # Provides nvidia-offload wrapper
       };
-      # Bus IDs set in hosts/framework-16/default.nix (detected values)
-      # Default fallbacks for Framework 16 with RTX 5070 expansion bay
-      amdgpuBusId = lib.mkDefault "PCI:194:0:0"; # AMD iGPU
-      nvidiaBusId = lib.mkDefault "PCI:193:0:0"; # NVIDIA dGPU
+      # Bus IDs must be set per-machine in hosts/framework-16/default.nix
+      # These are PLACEHOLDERS - update after hardware detection
+      amdgpuBusId = lib.mkDefault "PCI:193:0:0"; # Placeholder
+      nvidiaBusId = lib.mkDefault "PCI:1:0:0"; # Placeholder
     };
   };
 
@@ -87,18 +82,6 @@
   # Use power-profiles-daemon for AMD (NOT TLP)
   services.power-profiles-daemon.enable = true;
   services.tlp.enable = false;
-
-  # Fingerprint reader support
-  services.fprintd.enable = true;
-
-  # Thunderbolt/USB4 hot-plug support
-  services.hardware.bolt.enable = true;
-
-  # Ambient light sensor for auto-brightness
-  hardware.sensor.iio.enable = true;
-
-  # Fan control for quieter operation
-  hardware.fw-fanctrl.enable = true;
 
   # Double suspend workaround (systemd v258+)
   systemd.services.inhibit-sleep-after-resume = {

@@ -35,6 +35,8 @@ Arguments:
 
 Options:
   --strict    Enable strict mode (80% coverage required, security scan)
+  --ralph [N] Enable Ralph loop: re-run prompt up to N times (default: 3)
+              Stops early if COMPLETED.md or BLOCKERS.md appears
   --list      List active autonomous sessions
   --stop      Stop a session: $0 --stop <task-name>
   --cleanup   Remove completed worktrees
@@ -42,6 +44,7 @@ Options:
 Examples:
   $0 ~/myproject feature-auth "Implement JWT authentication"
   $0 --strict ~/myproject auth-system "Implement secure authentication"
+  $0 --ralph 5 ~/myproject refactor-cache "Refactor the cache layer"
   $0 ~/myproject bugfix-123 "Fix the race condition in user service"
 
 The session runs in tmux. Attach with: tmux attach -t claude-<task-name>
@@ -84,6 +87,8 @@ cleanup_worktrees() {
 
 # Parse arguments
 STRICT_MODE=false
+RALPH_MODE=false
+RALPH_MAX=3
 
 case "${1:-}" in
     --list|-l)
@@ -101,6 +106,15 @@ case "${1:-}" in
         ;;
     --strict)
         STRICT_MODE=true
+        shift
+        ;;
+    --ralph)
+        RALPH_MODE=true
+        # Check if next arg is a number (optional max iterations)
+        if [[ "${2:-}" =~ ^[0-9]+$ ]]; then
+            RALPH_MAX="$2"
+            shift
+        fi
         shift
         ;;
     --help|-h|"")
@@ -149,6 +163,9 @@ echo -e "  Branch:      ${GREEN}$BRANCH_NAME${NC}"
 echo -e "  Log:         ${GREEN}$LOG_FILE${NC}"
 if [[ "$STRICT_MODE" == "true" ]]; then
     echo -e "  Mode:        ${YELLOW}STRICT (80% coverage, security scan)${NC}"
+fi
+if [[ "$RALPH_MODE" == "true" ]]; then
+    echo -e "  Ralph Loop:  ${YELLOW}ON (max $RALPH_MAX iterations)${NC}"
 fi
 echo ""
 
@@ -285,6 +302,68 @@ If ANY verification step fails:
 - Started: $(date)
 PROMPT_EOF
 
+# Append demo report instructions
+cat >> "$PROMPT_FILE" << 'DEMO_EOF'
+
+## Demo Report (MANDATORY)
+
+After completing your primary task and all verification steps, produce a demo report.
+
+### Step 1: Check for Demo Configuration
+
+Look for `.claude/demo-config.md` in the working directory. This file tells you what to demo visually.
+
+### Step 2a: If `.claude/demo-config.md` EXISTS (Visual Demo)
+
+1. Create a `.demo/` directory in the worktree root
+2. Start the dev server using the command specified in demo-config.md
+3. Wait for the ready signal in stdout before proceeding
+4. Use Playwright MCP tools to:
+   - Navigate to each page affected by your changes
+   - Take a screenshot of each, saving to `.demo/NN-description.png`
+   - If demo-config.md specifies key pages, also screenshot those for context
+5. Stop the dev server when done
+
+### Step 2b: If `.claude/demo-config.md` DOES NOT EXIST (Text-Only Demo)
+
+Skip screenshots. You will still write DEMO.md but without visual evidence.
+
+### Step 3: Write DEMO.md
+
+Create `DEMO.md` at the worktree root with this structure:
+
+```
+# Demo: <task-name>
+**Branch:** <current branch>
+**Date:** <today>
+
+## Summary
+[1-2 sentences: what you built and why]
+
+## Changes Made
+- [List each file changed with a brief description of what changed]
+
+## Visual Demo
+(Only if .claude/demo-config.md exists)
+### [Page/Feature Name]
+![Description](.demo/01-description.png)
+[What this screenshot shows and why it matters]
+
+## Test Results
+- Unit tests: [pass/fail count from actual test run]
+- E2E tests: [pass/fail count, or "not run" if not applicable]
+- Build: [success/failure]
+- Coverage: [percentage if available]
+
+## Open Questions
+- [Anything you were uncertain about or design decisions the reviewer should validate]
+```
+
+IMPORTANT: The demo report is the LAST thing you do. Complete all coding, testing, and verification first. The demo report documents finished work, not work in progress.
+
+Do NOT commit DEMO.md or the .demo/ directory to git. These are review artifacts for the human reviewer, not source code.
+DEMO_EOF
+
 # Add strict mode requirements if enabled
 if [[ "$STRICT_MODE" == "true" ]]; then
     cat >> "$PROMPT_FILE" << 'STRICT_EOF'
@@ -323,6 +402,32 @@ fi
 echo -e "${BLUE}[2/3] Launching Claude in sandbox...${NC}"
 echo -e "  ${YELLOW}Using Claude Code native sandbox (bubblewrap + seccomp)${NC}"
 
+# Build the Claude invocation command
+# Ralph mode wraps the invocation in a loop that checks for completion markers
+if [[ "$RALPH_MODE" == "true" ]]; then
+    CLAUDE_CMD="for i in \$(seq 1 $RALPH_MAX); do \
+        echo \"  Ralph iteration \$i/$RALPH_MAX\" | tee -a '$LOG_FILE'; \
+        claude '$WORKTREE_PATH' \
+            --dangerously-skip-permissions \
+            --print '$PROMPT' \
+            2>&1 | tee -a '$LOG_FILE'; \
+        if [ -f '$WORKTREE_PATH/COMPLETED.md' ]; then \
+            echo '  Ralph: COMPLETED.md found, stopping loop' | tee -a '$LOG_FILE'; \
+            break; \
+        fi; \
+        if [ -f '$WORKTREE_PATH/BLOCKERS.md' ]; then \
+            echo '  Ralph: BLOCKERS.md found, stopping loop' | tee -a '$LOG_FILE'; \
+            break; \
+        fi; \
+        echo '  Ralph: No completion marker, continuing...' | tee -a '$LOG_FILE'; \
+    done"
+else
+    CLAUDE_CMD="claude '$WORKTREE_PATH' \
+        --dangerously-skip-permissions \
+        --print '$PROMPT' \
+        2>&1 | tee -a '$LOG_FILE'"
+fi
+
 # Launch in tmux with native sandbox (--dangerously-skip-permissions auto-enables sandbox)
 tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" \
     "echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
@@ -331,10 +436,7 @@ tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" \
      echo '  Worktree: $WORKTREE_PATH' | tee -a '$LOG_FILE'; \
      echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
      echo '' | tee -a '$LOG_FILE'; \
-     claude '$WORKTREE_PATH' \
-         --dangerously-skip-permissions \
-         --print '$PROMPT' \
-         2>&1 | tee -a '$LOG_FILE'; \
+     $CLAUDE_CMD; \
      echo '' | tee -a '$LOG_FILE'; \
      echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
      echo '  Session ended: $(date)' | tee -a '$LOG_FILE'; \
