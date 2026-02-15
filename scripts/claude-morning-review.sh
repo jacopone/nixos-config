@@ -8,6 +8,7 @@
 #
 # Scans .worktrees/ for overnight work, shows status, and assists with merge.
 
+# shellcheck disable=SC2155
 set -euo pipefail
 
 # Colors
@@ -215,6 +216,8 @@ show_review() {
     echo -e "  ${BLUE}Next Steps:${NC}"
     if [[ $completed_count -gt 0 ]]; then
         echo -e "    Merge completed: ${CYAN}$0 --merge $repo_path${NC}"
+        echo -e "    Or per-worktree: ${CYAN}cd <worktree> && claude${NC}"
+        echo -e "      then use: ${CYAN}superpowers:finishing-a-development-branch${NC}"
     fi
     if [[ $running_count -gt 0 ]]; then
         echo -e "    Check running:   ${CYAN}tmux list-sessions | grep claude-${NC}"
@@ -353,7 +356,7 @@ generate_report() {
 EOF
 
     # Count statuses
-    local completed=0
+    local completed_n=0
     local blocked=0
     local running=0
     local total=0
@@ -364,7 +367,7 @@ EOF
             local status=$(get_worktree_status "$wt" "$name")
             ((total++))
             case "$status" in
-                completed) ((completed++)) ;;
+                completed) ((completed_n++)) ;;
                 blocked)   ((blocked++)) ;;
                 running)   ((running++)) ;;
             esac
@@ -374,7 +377,7 @@ EOF
     cat <<EOF
 | Status | Count |
 |--------|-------|
-| Completed | $completed |
+| Completed | $completed_n |
 | Blocked | $blocked |
 | Running | $running |
 | **Total** | **$total** |

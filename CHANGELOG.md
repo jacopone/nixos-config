@@ -1235,6 +1235,12 @@ No user-facing changes found since commit d7e14bd.
 
 Skipped commits were internal maintenance (chore, docs, ci, test).
 
+### Added
+- add business installer ISO with RustDesk, fix GC exit handling
+  (Test: `which business` or `business --version`)
+- add hp-pietro host with bootstrap script for remote deployment
+- add playwright-mcp-bridge Chrome extension
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

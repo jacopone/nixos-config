@@ -10,6 +10,7 @@
 # Reads manifest.yaml and task-*.md files from the specified directory,
 # validates file ownership for conflicts, and launches parallel sessions.
 
+# shellcheck disable=SC2155
 set -euo pipefail
 
 # Colors
@@ -319,6 +320,19 @@ launch_batch() {
         if claude-autonomous $strict_flag "$repo" "$session_id" "$prompt"; then
             echo -e "  ${GREEN}✓ Launched successfully${NC}"
             ((launched++))
+
+            # Deploy PROGRESS.md and INVARIANTS.md into worktree (v2 manifests from /export-night)
+            local worktree_path="$repo/.worktrees/$session_id"
+            if [[ -d "$worktree_path" ]]; then
+                if [[ -f "$manifest_dir/PROGRESS.md" ]]; then
+                    cp "$manifest_dir/PROGRESS.md" "$worktree_path/PROGRESS.md"
+                    echo -e "  ${CYAN}  → Deployed PROGRESS.md${NC}"
+                fi
+                if [[ -f "$manifest_dir/INVARIANTS.md" ]]; then
+                    cp "$manifest_dir/INVARIANTS.md" "$worktree_path/INVARIANTS.md"
+                    echo -e "  ${CYAN}  → Deployed INVARIANTS.md${NC}"
+                fi
+            fi
         else
             echo -e "  ${RED}✗ Failed to launch${NC}"
         fi

@@ -69,13 +69,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # NixClaw - Personal AI agent platform for NixOS
+    # MAINTAINER: @jacopone (YOU) | LOCAL DEV: path input
+    # Switch to github:jacopone/nixclaw when published
+    nixclaw = {
+      url = "path:/home/YOUR_USERNAME/nixclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
     # Revisit when mcp-servers package is available in nixpkgs
     # For now, using manual .mcp.json configuration
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, nixclaw, ... }@inputs:
     let
       # Shared overlay: fix GCC 15 / test failures in nixos-unstable
       gccFixOverlay = final: prev: {
@@ -104,8 +112,13 @@
               (import ./overlays/vibetyper.nix)
               # Pencil - Design on canvas, land in code
               (import ./overlays/pencil-dev.nix)
+              # Playwright MCP Bridge - auto-load Chrome extension for browser automation
+              (import ./overlays/playwright-mcp-bridge.nix)
             ];
           }
+
+          # NixClaw AI agent (services.nixclaw options)
+          nixclaw.nixosModules.default
 
           # Home Manager module (tech profile)
           home-manager.nixosModules.home-manager
@@ -127,11 +140,13 @@
           # Host-specific configuration
           ./hosts/${hostname}
 
-          # Allow unfree packages + GCC fix overlay only (no VibeTyper/Pencil)
+          # Allow unfree packages + GCC fix overlay + Playwright MCP Bridge
           {
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [
               gccFixOverlay
+              # Playwright MCP Bridge - auto-load Chrome extension for browser automation
+              (import ./overlays/playwright-mcp-bridge.nix)
             ];
           }
 
@@ -170,9 +185,9 @@
         };
 
         # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070)
-        # Build: nixos-rebuild switch --flake .#framework-16-jacopo
-        framework-16-jacopo = mkTechHost {
-          hostname = "framework-16-jacopo";
+        # Build: nixos-rebuild switch --flake .#tech-001
+        tech-001 = mkTechHost {
+          hostname = "tech-001";
           username = "guyfawkes";
           extraModules = [
             # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
@@ -182,17 +197,26 @@
 
         # ── Business workstations ──────────────────────────────────────
 
-        # Template for new business deployments (copy and customize)
+        # Template for new business deployments
+        # Usage: cp -r hosts/business-template hosts/biz-NNN
+        #        Then add: biz-NNN = mkBusinessHost { hostname = "biz-NNN"; username = "name"; };
         # Build: nixos-rebuild switch --flake .#business-template
         business-template = mkBusinessHost {
           hostname = "business-template";
           username = "user";
         };
 
+        # ThinkPad X1 Carbon (Intel UHD 620 + 8-core) — business profile
+        # Build: nixos-rebuild switch --flake .#biz-001
+        biz-001 = mkBusinessHost {
+          hostname = "biz-001";
+          username = "guyfawkes";
+        };
+
         # HP workstation for Pietro
-        # Build: nixos-rebuild switch --flake .#hp-pietro
-        hp-pietro = mkBusinessHost {
-          hostname = "hp-pietro";
+        # Build: nixos-rebuild switch --flake .#biz-002
+        biz-002 = mkBusinessHost {
+          hostname = "biz-002";
           username = "pietro";
         };
 

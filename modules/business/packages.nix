@@ -8,6 +8,7 @@
   environment.systemPackages = with pkgs; [
     # Business-specific CLI
     less
+    rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
 
     # Python for learning to code (business subset — no rich/pymupdf4llm)
     (python3.withPackages (ps: with ps; [
