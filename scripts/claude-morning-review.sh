@@ -442,6 +442,25 @@ EOF
                 echo '```'
             fi
 
+            if [[ -f "$wt/DEMO.md" ]]; then
+                echo ""
+                echo "**Demo Report:**"
+                echo ""
+                cat "$wt/DEMO.md"
+                echo ""
+                local screenshots=$(demo_screenshot_count "$wt")
+                if [[ "$screenshots" -gt 0 ]]; then
+                    echo "*$screenshots screenshots in .demo/ directory*"
+                    echo ""
+                    echo "View screenshots:"
+                    echo '```'
+                    find "$wt/.demo/" -name "*.png" 2>/dev/null | while read -r img; do
+                        echo "  $(basename "$img")"
+                    done
+                    echo '```'
+                fi
+            fi
+
             echo ""
         fi
     done
