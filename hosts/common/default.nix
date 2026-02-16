@@ -29,13 +29,14 @@
     enable = true;
     extensions = [
       "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
-      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
       "fjoaledfpmneenckfbpdfhkmimnjocfa" # NordVPN proxy
       "kbfnbcaeplbcioakkpcpgfkobkghlhen" # Grammarly
+      "lodbfhdipoipcjmlebjbgmmgekckhpfb" # Harper (private grammar checker)
       "pbmlfaiicoikhdbjagjbglnbfcbcojpj" # Simplify Gmail
       "ohfgljdgelakfkefopgklcohadegdpjf" # Smallpdf
       "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
-      "kadmollpgjhjcclemeliidekkajnjaih" # Project Mariner
+      "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
+      "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude in Chrome (browser automation)
       "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
       "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black (dark theme)
     ];
