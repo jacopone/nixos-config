@@ -182,9 +182,9 @@ show_review() {
 
         # Count by status
         case "$status" in
-            completed) ((completed_count++)) ;;
-            blocked)   ((blocked_count++)) ;;
-            running)   ((running_count++)) ;;
+            completed) ((completed_count++)) || true ;;
+            blocked)   ((blocked_count++)) || true ;;
+            running)   ((running_count++)) || true ;;
         esac
 
         # Get change summary
@@ -406,11 +406,11 @@ EOF
         if [[ -d "$wt" ]]; then
             local name=$(basename "$wt")
             local status=$(get_worktree_status "$wt" "$name")
-            ((total++))
+            ((total++)) || true
             case "$status" in
-                completed) ((completed_n++)) ;;
-                blocked)   ((blocked++)) ;;
-                running)   ((running++)) ;;
+                completed) ((completed_n++)) || true ;;
+                blocked)   ((blocked++)) || true ;;
+                running)   ((running++)) || true ;;
             esac
         fi
     done

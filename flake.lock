@@ -8,11 +8,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770196631,
-        "narHash": "sha256-neRXwIILc8BUFHeT0UM2Mj8Wt1oo4UPpmm4NkfBwQOY=",
+        "lastModified": 1771198383,
+        "narHash": "sha256-mOq7ks7gdWyVStIUAp7U8wztanYKt0GgCnIZtPUJ6n8=",
         "owner": "jacopone",
         "repo": "antigravity-nix",
-        "rev": "acc9baf089a67ef7456117ef31285e34c3294984",
+        "rev": "703d29149cc127d1ec7c1885ff14f85d4e6a01ce",
         "type": "github"
       },
       "original": {
@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1771013219,
-        "narHash": "sha256-EyR1pOL4vWyefDij3/HyZd3qjG6gzfk2BcjbAFQiXdY=",
+        "lastModified": 1771279414,
+        "narHash": "sha256-Ybxd3Hrv9lvqiy+BxBBDmKekV3P5LNmbvpwEaK5Sw9s=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "3f8cff15b530cc4f09ed2497932a66662f7a8422",
+        "rev": "fa2247cbb3a80f9ee70c5cc6111675fe3036001f",
         "type": "github"
       },
       "original": {
@@ -70,11 +70,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770974495,
-        "narHash": "sha256-t/08cC9wYltxVqu2IRxwRdadbXIpH6K2l4kiftxN3fQ=",
+        "lastModified": 1771233868,
+        "narHash": "sha256-eXwiqNLJlZThz6z2Q4FI++0rEeP3xO5KQ0mytICgj1s=",
         "owner": "jacopone",
         "repo": "code-cursor-nix",
-        "rev": "0e1d6b23447f925a01196459e0da457d079428c3",
+        "rev": "44d20ad6a70f2580acde6c83e23a3e048b1b6b9b",
         "type": "github"
       },
       "original": {
@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1771132481,
-        "narHash": "sha256-Tc+YqZ/Q1K35vJK4ji4RbLB/qKGcEq6yh7p4CKoZF60=",
+        "lastModified": 1771269455,
+        "narHash": "sha256-BZ31eN5F99YH6vkc4AhzKGE+tJgJ52kl8f01K7wCs8w=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "1e53254671f36cb7d0e2dcca08730f066d5e69b4",
+        "rev": "5f1d42a97b19803041434f66681d5c44c9ae62e3",
         "type": "github"
       },
       "original": {
@@ -305,11 +305,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770828207,
-        "narHash": "sha256-qAP4jRAto20pC8yQCMmxB11jita23SVz6wTF93zT5Vg=",
+        "lastModified": 1771198514,
+        "narHash": "sha256-5Dd0zVTh+nUf3lxrDpgQSHbr0pU40hGh/hUuRbwG790=",
         "owner": "jacopone",
         "repo": "whisper-dictation",
-        "rev": "a8d9d918d8d203c8c8be1c7b1e99898829814648",
+        "rev": "20190a148d8bce6f0d0b78a56cc22afe02844e8f",
         "type": "github"
       },
       "original": {
