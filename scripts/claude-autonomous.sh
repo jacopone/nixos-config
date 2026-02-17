@@ -34,18 +34,22 @@ Arguments:
   prompt      The task for Claude to complete
 
 Options:
-  --strict    Enable strict mode (80% coverage required, security scan)
-  --ralph [N] Enable Ralph loop: re-run prompt up to N times (default: 3)
-              Stops early if COMPLETED.md or BLOCKERS.md appears
-  --list      List active autonomous sessions
-  --stop      Stop a session: $0 --stop <task-name>
-  --cleanup   Remove completed worktrees
+  --strict        Enable strict mode (80% coverage required, security scan)
+  --max-iter N    Max iterations before stopping (default: 5)
+  --no-ralph      Single-pass mode: run once and exit (no retry loop)
+  --list          List active autonomous sessions
+  --stop          Stop a session: $0 --stop <task-name>
+  --cleanup       Remove completed worktrees
+
+By default, Claude runs in a loop (Ralph mode) up to 5 iterations, stopping
+early when COMPLETED.md or BLOCKERS.md appears. Each iteration gets a fresh
+context window — Claude reads git history to resume where it left off.
 
 Examples:
   $0 ~/myproject feature-auth "Implement JWT authentication"
   $0 --strict ~/myproject auth-system "Implement secure authentication"
-  $0 --ralph 5 ~/myproject refactor-cache "Refactor the cache layer"
-  $0 ~/myproject bugfix-123 "Fix the race condition in user service"
+  $0 --max-iter 10 ~/myproject refactor-cache "Refactor the cache layer"
+  $0 --no-ralph ~/myproject bugfix-123 "Quick single-pass fix"
 
 The session runs in tmux. Attach with: tmux attach -t claude-<task-name>
 EOF
@@ -87,41 +91,46 @@ cleanup_worktrees() {
 
 # Parse arguments
 STRICT_MODE=false
-RALPH_MODE=false
-RALPH_MAX=3
+RALPH_MODE=true
+RALPH_MAX=5
 
-case "${1:-}" in
-    --list|-l)
-        list_sessions
-        exit 0
-        ;;
-    --stop|-s)
-        [[ -z "${2:-}" ]] && { echo "Usage: $0 --stop <task-name>"; exit 1; }
-        stop_session "$2"
-        exit 0
-        ;;
-    --cleanup|-c)
-        cleanup_worktrees "${2:-.}"
-        exit 0
-        ;;
-    --strict)
-        STRICT_MODE=true
-        shift
-        ;;
-    --ralph)
-        RALPH_MODE=true
-        # Check if next arg is a number (optional max iterations)
-        if [[ "${2:-}" =~ ^[0-9]+$ ]]; then
-            RALPH_MAX="$2"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --list|-l)
+            list_sessions
+            exit 0
+            ;;
+        --stop|-s)
+            [[ -z "${2:-}" ]] && { echo "Usage: $0 --stop <task-name>"; exit 1; }
+            stop_session "$2"
+            exit 0
+            ;;
+        --cleanup|-c)
+            cleanup_worktrees "${2:-.}"
+            exit 0
+            ;;
+        --strict)
+            STRICT_MODE=true
             shift
-        fi
-        shift
-        ;;
-    --help|-h|"")
-        usage
-        exit 0
-        ;;
-esac
+            ;;
+        --no-ralph)
+            RALPH_MODE=false
+            shift
+            ;;
+        --max-iter)
+            [[ -z "${2:-}" || ! "${2:-}" =~ ^[0-9]+$ ]] && { echo "Usage: --max-iter N"; exit 1; }
+            RALPH_MAX="$2"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 # Validate arguments
 REPO_PATH="${1:-}"
@@ -166,6 +175,8 @@ if [[ "$STRICT_MODE" == "true" ]]; then
 fi
 if [[ "$RALPH_MODE" == "true" ]]; then
     echo -e "  Ralph Loop:  ${YELLOW}ON (max $RALPH_MAX iterations)${NC}"
+else
+    echo -e "  Ralph Loop:  ${YELLOW}OFF (single pass)${NC}"
 fi
 echo ""
 
@@ -402,46 +413,70 @@ fi
 echo -e "${BLUE}[2/3] Launching Claude in sandbox...${NC}"
 echo -e "  ${YELLOW}Using Claude Code native sandbox (bubblewrap + seccomp)${NC}"
 
-# Build the Claude invocation command
-# Ralph mode wraps the invocation in a loop that checks for completion markers
+# Write the tmux runner script (avoids quoting issues with fish/bash/tmux)
+RUNNER_SCRIPT="${WORKTREE_PATH}/.claude-runner.sh"
+cat > "$RUNNER_SCRIPT" << RUNNER_EOF
+#!/usr/bin/env bash
+set -uo pipefail
+
+# Use Max subscription, not API credits
+unset ANTHROPIC_API_KEY
+
+LOG_FILE='$LOG_FILE'
+WORKTREE_PATH='$WORKTREE_PATH'
+TASK_NAME='$TASK_NAME'
+PROMPT_FILE='$PROMPT_FILE'
+
+echo '═══════════════════════════════════════════════════════════' | tee -a "\$LOG_FILE"
+echo "  Claude Autonomous Session: \$TASK_NAME" | tee -a "\$LOG_FILE"
+echo "  Started: \$(date)" | tee -a "\$LOG_FILE"
+echo "  Worktree: \$WORKTREE_PATH" | tee -a "\$LOG_FILE"
+echo '═══════════════════════════════════════════════════════════' | tee -a "\$LOG_FILE"
+echo '' | tee -a "\$LOG_FILE"
+
+RUNNER_EOF
+
+# Append the Claude invocation (Ralph loop or single pass)
 if [[ "$RALPH_MODE" == "true" ]]; then
-    CLAUDE_CMD="for i in \$(seq 1 $RALPH_MAX); do \
-        echo \"  Ralph iteration \$i/$RALPH_MAX\" | tee -a '$LOG_FILE'; \
-        claude '$WORKTREE_PATH' \
-            --dangerously-skip-permissions \
-            --print '$PROMPT' \
-            2>&1 | tee -a '$LOG_FILE'; \
-        if [ -f '$WORKTREE_PATH/COMPLETED.md' ]; then \
-            echo '  Ralph: COMPLETED.md found, stopping loop' | tee -a '$LOG_FILE'; \
-            break; \
-        fi; \
-        if [ -f '$WORKTREE_PATH/BLOCKERS.md' ]; then \
-            echo '  Ralph: BLOCKERS.md found, stopping loop' | tee -a '$LOG_FILE'; \
-            break; \
-        fi; \
-        echo '  Ralph: No completion marker, continuing...' | tee -a '$LOG_FILE'; \
-    done"
+    cat >> "$RUNNER_SCRIPT" << RALPH_EOF
+for i in \$(seq 1 $RALPH_MAX); do
+    echo "  Ralph iteration \$i/$RALPH_MAX" | tee -a "\$LOG_FILE"
+    cat "\$PROMPT_FILE" | claude "\$WORKTREE_PATH" \\
+        --dangerously-skip-permissions \\
+        2>&1 | tee -a "\$LOG_FILE"
+    if [ -f "\$WORKTREE_PATH/COMPLETED.md" ]; then
+        echo '  Ralph: COMPLETED.md found, stopping loop' | tee -a "\$LOG_FILE"
+        break
+    fi
+    if [ -f "\$WORKTREE_PATH/BLOCKERS.md" ]; then
+        echo '  Ralph: BLOCKERS.md found, stopping loop' | tee -a "\$LOG_FILE"
+        break
+    fi
+    echo '  Ralph: No completion marker, continuing...' | tee -a "\$LOG_FILE"
+done
+RALPH_EOF
 else
-    CLAUDE_CMD="claude '$WORKTREE_PATH' \
-        --dangerously-skip-permissions \
-        --print '$PROMPT' \
-        2>&1 | tee -a '$LOG_FILE'"
+    cat >> "$RUNNER_SCRIPT" << SINGLE_EOF
+cat "\$PROMPT_FILE" | claude "\$WORKTREE_PATH" \\
+    --dangerously-skip-permissions \\
+    2>&1 | tee -a "\$LOG_FILE"
+SINGLE_EOF
 fi
 
-# Launch in tmux with native sandbox (--dangerously-skip-permissions auto-enables sandbox)
-tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" \
-    "echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
-     echo '  Claude Autonomous Session: $TASK_NAME' | tee -a '$LOG_FILE'; \
-     echo '  Started: $(date)' | tee -a '$LOG_FILE'; \
-     echo '  Worktree: $WORKTREE_PATH' | tee -a '$LOG_FILE'; \
-     echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
-     echo '' | tee -a '$LOG_FILE'; \
-     $CLAUDE_CMD; \
-     echo '' | tee -a '$LOG_FILE'; \
-     echo '═══════════════════════════════════════════════════════════' | tee -a '$LOG_FILE'; \
-     echo '  Session ended: $(date)' | tee -a '$LOG_FILE'; \
-     echo '  Press Enter to close...' | tee -a '$LOG_FILE'; \
-     read"
+# Append session footer
+cat >> "$RUNNER_SCRIPT" << 'FOOTER_EOF'
+
+echo '' | tee -a "$LOG_FILE"
+echo '═══════════════════════════════════════════════════════════' | tee -a "$LOG_FILE"
+echo "  Session ended: $(date)" | tee -a "$LOG_FILE"
+echo '  Press Enter to close...' | tee -a "$LOG_FILE"
+read
+FOOTER_EOF
+
+chmod +x "$RUNNER_SCRIPT"
+
+# Launch in tmux using the runner script (shell-agnostic)
+tmux new-session -d -s "$SESSION_NAME" -c "$WORKTREE_PATH" "$RUNNER_SCRIPT"
 
 echo -e "  ${GREEN}✓ Claude launched in tmux session${NC}"
 
