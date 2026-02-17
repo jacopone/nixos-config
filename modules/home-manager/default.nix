@@ -21,6 +21,11 @@ in
   # Home Manager state version
   home.stateVersion = "24.05";
 
+  # Environment variables for Claude Code
+  home.sessionVariables = {
+    CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
+  };
+
   # Home packages (minimal - most tools are system-wide)
   home.packages = [
     # Project-specific packages go here
