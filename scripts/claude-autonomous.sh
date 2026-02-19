@@ -197,6 +197,30 @@ else
     echo -e "  ${GREEN}✓ Worktree created${NC}"
 fi
 
+# Override .mcp.json with headless Playwright (no --extension flag)
+# Interactive sessions use --extension mode (connects to running Chrome),
+# but autonomous sessions run unattended and need headless mode.
+cat > "${WORKTREE_PATH}/.mcp.json" << 'MCP_EOF'
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}
+MCP_EOF
+echo -e "  ${GREEN}✓ Headless Playwright MCP configured${NC}"
+
+# Copy demo credentials if available (gitignored local file)
+if [[ -f "${REPO_PATH}/.claude/demo-credentials.local" ]]; then
+    cp "${REPO_PATH}/.claude/demo-credentials.local" "${WORKTREE_PATH}/.claude/demo-credentials.local" 2>/dev/null || {
+        mkdir -p "${WORKTREE_PATH}/.claude"
+        cp "${REPO_PATH}/.claude/demo-credentials.local" "${WORKTREE_PATH}/.claude/demo-credentials.local"
+    }
+    echo -e "  ${GREEN}✓ Demo credentials copied${NC}"
+fi
+
 # Check if session already running
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     echo -e "${YELLOW}⚠ Session already running. Attach with: tmux attach -t ${SESSION_NAME}${NC}"
@@ -329,11 +353,28 @@ Look for `.claude/demo-config.md` in the working directory. This file tells you 
 1. Create a `.demo/` directory in the worktree root
 2. Start the dev server using the command specified in demo-config.md
 3. Wait for the ready signal in stdout before proceeding
-4. Use Playwright MCP tools to:
+4. **Authenticate**: Check for `.claude/demo-credentials.local` in the working directory.
+   If it exists, read it for per-role login credentials. The file has sections like:
+   ```
+   ## client
+   - login_tab: Cliente
+   - email: user@example.com
+   - password: Pass123!
+   - role: client_admin
+   - pages: /client-area, /my-portal
+   ```
+   To log in:
+   - Navigate to /auth
+   - Click the correct tab (e.g., "Contabile" or "Cliente" matching `login_tab`)
+   - Fill email and password fields
+   - Click the login button
+   - Choose the role whose `pages` list best matches the pages affected by your changes
+   - If your changes affect multiple roles, log in as each role and screenshot their pages
+5. Use Playwright MCP tools to:
    - Navigate to each page affected by your changes
    - Take a screenshot of each, saving to `.demo/NN-description.png`
    - If demo-config.md specifies key pages, also screenshot those for context
-5. Stop the dev server when done
+6. Stop the dev server when done
 
 ### Step 2b: If `.claude/demo-config.md` DOES NOT EXIST (Text-Only Demo)
 
@@ -341,7 +382,7 @@ Skip screenshots. You will still write DEMO.md but without visual evidence.
 
 ### Step 3: Write DEMO.md
 
-Create `DEMO.md` at the worktree root with this structure:
+Create `.demo/DEMO.md` (inside the `.demo/` directory alongside the screenshots) with this structure:
 
 ```
 # Demo: <task-name>
