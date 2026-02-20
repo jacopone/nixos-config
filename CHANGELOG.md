@@ -1241,6 +1241,20 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - add hp-pietro host with bootstrap script for remote deployment
 - add playwright-mcp-bridge Chrome extension
 
+### Added
+- migrate Claude sandbox to native bubblewrap+seccomp, update flake inputs
+  (Test: `which migrate` or `migrate --version`)
+- add demo report instructions to agent prompt
+- add demo report detection helpers
+- show demo report column in status table
+- include demo reports in generated report
+- add --ralph flag for iterative loop mode
+- set CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000 via Home Manager
+- headless Playwright + demo credentials for autonomous sessions
+
+### Changed
+- rename hosts to asset-tag convention (biz-NNN/tech-NNN) (restructured)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

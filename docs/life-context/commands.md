@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2026-01-16
-updated: 2026-01-16
+updated: 2026-02-20
 type: reference
 lifecycle: persistent
 ---
@@ -10,9 +10,19 @@ lifecycle: persistent
 
 ## Overview
 
-The `/life` command is your interface to the Life Context System. It reads and writes to `~/obsidian_brain/Life Context.md`.
+The `/life` command is your interface to the Life Context System. It reads from multiple files in `~/obsidian_brain/` depending on the subcommand — see the file map below.
 
 **Language**: Commands in English, conversations in Italian.
+
+### File Map
+
+| File | Read by |
+|------|---------|
+| `Life Context.md` | All subcommands |
+| `plan.md` | sod, goals |
+| `inbox.md` | inbox, eod |
+| `journal/2026/2026-WXX.md` | sod (previous), eod (current), journal |
+| `projects/*.md` | project [name] |
 
 ---
 
@@ -20,8 +30,10 @@ The `/life` command is your interface to the Life Context System. It reads and w
 
 ### `/life` - Summary View
 
-Shows a quick snapshot:
-- Today's commitments
+Shows a quick snapshot from Life Context.md only:
+- Today's date and day of week
+- Quick Capture items (if any)
+- Active projects status
 - Current energy levels
 - Top waiting-for items
 - Any conflicts
@@ -34,13 +46,16 @@ Shows a quick snapshot:
 
 ### `/life sod` - Start of Day
 
-Interactive 5-minute morning ritual.
+Interactive 5-minute morning ritual. Reads hub + plan.md + previous journal.
 
 **Flow**:
-1. Claude presents today's context
-2. Asks: "Buongiorno! C'è qualcosa di nuovo da ieri sera?"
-3. Asks: "Qual è la tua priorità #1 oggi?"
-4. Suggests actions aligned with goals
+1. Create this week's journal file if it doesn't exist (ISO week calculation)
+2. Present today's commitments across all domains (events first)
+3. Alignment nudge: "Oggi contribuisce a: [annual goal] → [quarterly OKR]"
+4. Capture check: "C'è qualcosa di nuovo da ieri sera?"
+5. Energy check and update
+6. Recurring reminders from System Preferences
+7. Priority setting: "Qual è la tua priorità #1 oggi?"
 
 ```
 /life sod
@@ -50,13 +65,20 @@ Interactive 5-minute morning ritual.
 
 ### `/life eod` - End of Day
 
-Interactive 5-minute evening ritual.
+Interactive 5-minute evening ritual. Reads hub + inbox.md + today's journal.
 
 **Flow**:
-1. Claude asks: "Com'è andata oggi? Qualcosa da catturare?"
-2. Asks about new commitments and waiting-for updates
-3. Processes Quick Capture → proper sections
-4. Suggests priorities for tomorrow
+1. Day review: "Com'è andata oggi? Qualcosa da catturare?"
+2. Process Quick Capture:
+   - Completed (✅) → today's journal `### Completati`
+   - Untriaged → inbox.md
+   - Project-specific → relevant project file
+   - Enforce max 5 rule (target 0-2 after EOD)
+3. Journal entry: write 1-2 line reflection in today's `### Log`
+4. Waiting-for update
+5. Energy assessment
+6. Tomorrow preview with conflict check
+7. Optional: Desktop/Screenshots/Downloads cleanup
 
 ```
 /life eod
@@ -64,9 +86,9 @@ Interactive 5-minute evening ritual.
 
 ---
 
-### `/life add` - Quick Capture
+### `/life add [text]` - Quick Capture
 
-Add an item to Quick Capture section.
+Add an item to Quick Capture section. Warns if already at 5 items.
 
 **Syntax**:
 ```
@@ -88,21 +110,25 @@ Add an item to Quick Capture section.
 
 ---
 
-### `/life goals` - Goals Review
+### `/life goals` - Goals & Alignment Review
 
-Show and optionally update quarterly goals.
+Reads `plan.md` and displays the full alignment chain:
+
+- **Vision** (10-Year Vision)
+- **Annual Goals** (by domain)
+- **Quarterly OKRs** (with progress status)
+
+Offers interactive mode to fill placeholder sections (Life Chapters, Vision, Critical Aspects, Fears). Shows which goals have active OKRs and which are neglected.
 
 ```
 /life goals
 ```
 
-Displays goals by domain with progress indicators.
-
 ---
 
 ### `/life week` - Week View
 
-Show commitments chronologically for the week.
+Show commitments chronologically for the week from This Week section.
 
 ```
 /life week
@@ -110,20 +136,20 @@ Show commitments chronologically for the week.
 
 **Output format**:
 ```
-This Week (Jan 16 - Jan 22):
+This Week (Feb 17 - Feb 23):
 
-Thu Jan 16 (Today):
+Mon Feb 17 (Today):
 - 📅 14:00 | Doctor checkup | @Dr.Rossi | #self
 
-Fri Jan 17:
-- 📅 19:00 | Dinner with parents | @Mom @Dad | #family
+Tue Feb 18:
+- ☐ Send proposal | @Pietro | #work
 ```
 
 ---
 
 ### `/life waiting` - Waiting-For View
 
-Show all blocked items with aging.
+Show all blocked items with aging from the Waiting-For table.
 
 ```
 /life waiting
@@ -131,24 +157,55 @@ Show all blocked items with aging.
 
 **Output format**:
 ```
-⚠️ OVERDUE (>7 days):
-- Vacation dates | @Partner | 8 days | blocks: Work PTO
+⚠️ IN RITARDO (>7 giorni):
+- Item | @Who | X giorni | blocca: Y
 
-ACTIVE:
-- Budget approval | @Finance | 4 days | blocks: Project kickoff
+ATTIVI:
+- Item | @Who | X giorni | blocca: Y
 ```
 
 ---
 
-## Session Start Hook
+### `/life inbox` - Triage Inbox
 
-If urgent items exist, Claude mentions them automatically:
+Interactive triage of items in `inbox.md`.
+
+For each item, asks:
+- "Questo va in This Week, un progetto, o lo eliminiamo?"
+- Options: This Week / Project [which?] / Eliminare / Lasciare in inbox
+
+Moves items to the chosen destination and updates inbox.md.
 
 ```
-[Life Context] Oggi: Dottore alle 14:00 (conflitto con standup)
+/life inbox
 ```
 
-Silent if nothing urgent.
+---
+
+### `/life project [name]` - Project View
+
+View and update a specific project file from `projects/`.
+
+- With name: fuzzy-matches the project file and displays status, open tasks, deadlines
+- Without name: lists all project files
+- Asks: "Vuoi aggiornare qualcosa?"
+
+```
+/life project amatino
+/life project
+```
+
+---
+
+### `/life journal [text]` - Quick Journal Entry
+
+Append a timestamped entry to today's `### Log` section in the current week's journal file.
+
+```
+/life journal Called Pietro about TeamSystem pricing
+```
+
+Entry format: `- HH:MM | [text]`
 
 ---
 
