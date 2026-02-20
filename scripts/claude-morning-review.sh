@@ -121,14 +121,14 @@ get_test_summary() {
 # Check if worktree has a demo report
 has_demo_report() {
     local worktree_path="$1"
-    [[ -f "$worktree_path/DEMO.md" ]]
+    [[ -f "$worktree_path/DEMO.md" ]] || [[ -f "$worktree_path/.demo/DEMO.md" ]]
 }
 
 # Count screenshots in demo
 demo_screenshot_count() {
     local worktree_path="$1"
     if [[ -d "$worktree_path/.demo" ]]; then
-        find "$worktree_path/.demo" -name "*.png" 2>/dev/null | wc -l
+        find "$worktree_path/.demo" \( -name "*.png" -o -name "*.jpeg" -o -name "*.jpg" \) 2>/dev/null | wc -l
     else
         echo "0"
     fi
@@ -311,7 +311,9 @@ interactive_merge() {
         if has_demo_report "$wt"; then
             echo -e "  ${BLUE}Demo Report:${NC}"
             # Show summary and visual demo sections
-            sed -n '/^## Summary/,/^## [^V]/p' "$wt/DEMO.md" | head -20 | sed 's/^/    /'
+            local demo_file="$wt/DEMO.md"
+            [[ -f "$wt/.demo/DEMO.md" ]] && demo_file="$wt/.demo/DEMO.md"
+            sed -n '/^## Summary/,/^## [^V]/p' "$demo_file" | head -20 | sed 's/^/    /'
             local screenshots=$(demo_screenshot_count "$wt")
             if [[ "$screenshots" -gt 0 ]]; then
                 echo -e "    ${GREEN}$screenshots screenshots available in:${NC} $wt/.demo/"
@@ -458,7 +460,11 @@ EOF
                 echo ""
                 echo "**Demo Report:**"
                 echo ""
-                cat "$wt/DEMO.md"
+                if [[ -f "$wt/.demo/DEMO.md" ]]; then
+                    cat "$wt/.demo/DEMO.md"
+                elif [[ -f "$wt/DEMO.md" ]]; then
+                    cat "$wt/DEMO.md"
+                fi
                 echo ""
                 local screenshots=$(demo_screenshot_count "$wt")
                 if [[ "$screenshots" -gt 0 ]]; then
@@ -466,7 +472,7 @@ EOF
                     echo ""
                     echo "View screenshots:"
                     echo '```'
-                    find "$wt/.demo/" -name "*.png" 2>/dev/null | while read -r img; do
+                    find "$wt/.demo/" \( -name "*.png" -o -name "*.jpeg" -o -name "*.jpg" \) 2>/dev/null | while read -r img; do
                         echo "  $(basename "$img")"
                     done
                     echo '```'

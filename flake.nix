@@ -112,8 +112,6 @@
               (import ./overlays/vibetyper.nix)
               # Pencil - Design on canvas, land in code
               (import ./overlays/pencil-dev.nix)
-              # Playwright MCP Bridge - auto-load Chrome extension for browser automation
-              (import ./overlays/playwright-mcp-bridge.nix)
             ];
           }
 
@@ -140,13 +138,11 @@
           # Host-specific configuration
           ./hosts/${hostname}
 
-          # Allow unfree packages + GCC fix overlay + Playwright MCP Bridge
+          # Allow unfree packages + GCC fix overlay
           {
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [
               gccFixOverlay
-              # Playwright MCP Bridge - auto-load Chrome extension for browser automation
-              (import ./overlays/playwright-mcp-bridge.nix)
             ];
           }
 
@@ -169,6 +165,10 @@
         # Custom installer ISO with RustDesk for remote business setup
         # Build: nix build .#business-installer-iso
         business-installer-iso = self.nixosConfigurations.business-installer.config.system.build.isoImage;
+
+        # T2 Mac installer ISO — Apple keyboard/trackpad/SSD work out of the box
+        # Build: nix build .#t2-installer-iso
+        t2-installer-iso = self.nixosConfigurations.t2-installer.config.system.build.isoImage;
       };
 
       # NixOS System Configurations
@@ -220,8 +220,19 @@
           username = "pietro";
         };
 
-        # ── Installer ISO ──────────────────────────────────────────
-        # Custom NixOS GNOME installer with RustDesk for remote setup
+        # MacBook Air 2018 (Intel, T2 chip) — business profile
+        # Build: nixos-rebuild switch --flake .#biz-003
+        biz-003 = mkBusinessHost {
+          hostname = "biz-003";
+          username = "guyfawkes";
+          extraModules = [
+            nixos-hardware.nixosModules.apple-t2
+          ];
+        };
+
+        # ── Installer ISOs ─────────────────────────────────────────
+
+        # Generic business installer with RustDesk for remote setup
         # Build ISO: nix build .#business-installer-iso
         # Flow: business user boots USB → Calamares install → opens RustDesk → tech admin takes over
         business-installer = nixpkgs.lib.nixosSystem {
@@ -233,6 +244,44 @@
                 rustdesk-flutter # Remote desktop (TeamViewer-like)
                 git # For cloning flake repo during install
               ];
+            })
+          ];
+        };
+
+        # T2 Mac installer — patched for Apple keyboard, trackpad, and NVMe
+        # Build ISO: nix build .#t2-installer-iso
+        # Flow: boot USB on MacBook → CLI install → reboot → plug ethernet → flake rebuild
+        t2-installer = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
+            nixos-hardware.nixosModules.apple-t2
+            ({ pkgs, ... }: {
+              # iwd backend — wpa_supplicant 2.11 has a T2 Broadcom regression
+              networking.networkmanager.wifi.backend = "iwd";
+              networking.wireless.iwd.enable = true;
+              boot.kernelParams = [ "brcmfmac.feature_disable=0x82000" ];
+
+              # Apple keyboard tweaks for the live environment
+              boot.extraModprobeConfig = ''
+                options hid_apple fnmode=2
+                options hid_apple swap_opt_cmd=1
+              '';
+
+              # Pre-installed tools for manual CLI install
+              environment.systemPackages = with pkgs; [
+                git
+                gh
+                google-chrome
+                inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+                rustdesk-flutter
+              ];
+
+              # Enable flakes in the live environment
+              nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+              nixpkgs.config.allowUnfree = true;
             })
           ];
         };
