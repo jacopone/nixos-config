@@ -9,6 +9,7 @@
       "cjpalhdlnbpafiamejdnhcphjbkeiagm" # uBlock Origin
       "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
       "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude in Chrome (browser automation)
+      "mmlmfjhmonkocbjadbfplnigmagldckm" # Playwright MCP Bridge (browser automation for Claude Code)
     ];
   };
 }

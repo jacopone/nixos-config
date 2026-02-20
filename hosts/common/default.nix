@@ -37,6 +37,7 @@
       "ipikiaejjblmdopojhpejjmbedhlibno" # SwiftRead
       "jjhefcfhmnkfeepcpnilbbkaadhngkbi" # Readwise Highlighter
       "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude in Chrome (browser automation)
+      "mmlmfjhmonkocbjadbfplnigmagldckm" # Playwright MCP Bridge (browser automation for Claude Code)
       "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
       "aghfnjkcakhmadgdomlmlhhaocbkloab" # Just Black (dark theme)
     ];
