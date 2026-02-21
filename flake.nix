@@ -257,7 +257,17 @@
           modules = [
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
             nixos-hardware.nixosModules.apple-t2
+            # Broadcom WiFi+BT firmware (Apple servers return 403, using GitHub mirror)
+            ./overlays/apple-bcm-firmware.nix
             ({ pkgs, ... }: {
+              # Force-load T2 modules in initrd: keyboard, trackpad, SSD, WiFi
+              boot.initrd.kernelModules = [ "apple-bce" ];
+              boot.kernelModules = [ "apple-bce" "hid_apple" "brcmfmac" ];
+
+              # Ensure all other firmware is available too
+              hardware.enableAllFirmware = true;
+              hardware.enableRedistributableFirmware = true;
+
               # iwd backend — wpa_supplicant 2.11 has a T2 Broadcom regression
               networking.networkmanager.wifi.backend = "iwd";
               networking.wireless.iwd.enable = true;
@@ -269,13 +279,15 @@
                 options hid_apple swap_opt_cmd=1
               '';
 
-              # Pre-installed tools for manual CLI install
+              # Pre-installed tools for manual CLI install + WiFi debugging
               environment.systemPackages = with pkgs; [
                 git
                 gh
                 google-chrome
                 inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
                 rustdesk-flutter
+                iw # WiFi debugging
+                wirelesstools # iwconfig
               ];
 
               # Enable flakes in the live environment
