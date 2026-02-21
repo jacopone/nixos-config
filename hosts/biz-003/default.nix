@@ -8,6 +8,7 @@
     ../../modules/business/packages.nix
     ../../modules/business/chrome-extensions.nix
     ../../modules/hardware/macbook-air-t2.nix
+    ../../overlays/apple-bcm-firmware.nix
   ];
 
   environment.variables.EDITOR = "code"; # VS Code (not Helix)
