@@ -64,6 +64,8 @@ docs/automation/claude-backup-legacy.md
 .claude/settings.local.json
 .claude/.changelog-last-processed
 CLAUDE.md
+# But track the business-template CLAUDE.md (it's a deployable template, not auto-generated)
+!hosts/business-template/CLAUDE.md
 
 # Demo recordings (personal, large binary files)
 docs/assets/*.gif

@@ -189,6 +189,20 @@
       alias gd='git diff'
       alias gst='git status'
       alias gl='git log --oneline --graph --decorate'
+
+      # ClaudeOS greeting — only show in interactive terminals, not inside Claude
+      if not _is_automated_context
+          echo ""
+          echo "  Need to install or change something?"
+          echo "  Type:  claude"
+          echo ""
+      end
+
+      # Launch Claude Code in nixos-config directory
+      function claude --description "Open Claude Code in your system config"
+          builtin cd ~/nixos-config
+          command claude
+      end
     '';
 
     # Simplified abbreviations (~15 vs 60+ in tech profile)
