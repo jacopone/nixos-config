@@ -1,5 +1,5 @@
 ---
-status: draft
+status: active
 created: 2026-02-21
 updated: 2026-02-21
 type: planning
