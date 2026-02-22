@@ -45,9 +45,9 @@
   services.thermald.enable = true;
 
   # Lid switch behavior
-  services.logind = {
-    lidSwitch = "suspend";
-    lidSwitchExternalPower = "lock";
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "lock";
   };
 
   # Diagnostic tools for hardware debugging
