@@ -52,6 +52,8 @@
     settings = {
       # Rewrite SSH URLs to HTTPS for GitHub (fixes plugin marketplace cloning)
       url."https://github.com/".insteadOf = "git@github.com:";
+      # Use GitHub CLI as credential helper (gh auth login is enough)
+      credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
     };
   };
 
