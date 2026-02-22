@@ -4,6 +4,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Enable all firmware (including non-redistributable) for T2 Bluetooth support
+  hardware.enableAllFirmware = true;
+
+  # Load apple-bce in initrd for keyboard/trackpad/SSD access during early boot
+  boot.initrd.kernelModules = [ "apple-bce" ];
+
   # T2 Broadcom WiFi workaround: disable problematic firmware features
   # Without this, brcmfmac causes intermittent disconnects and firmware crashes
   boot.kernelParams = [
@@ -28,10 +34,28 @@
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-      intel-media-driver # VA-API for Intel UHD 617
+      intel-media-driver    # VA-API for Intel UHD 617
       libva
+      libva-vdpau-driver    # VDPAU via VA-API
+      libvdpau-va-gl        # OpenGL-based VDPAU
     ];
   };
+
+  # Intel thermal management (helps with single-fan MacBook Air thermals)
+  services.thermald.enable = true;
+
+  # Lid switch behavior
+  services.logind = {
+    lidSwitch = "suspend";
+    lidSwitchExternalPower = "lock";
+  };
+
+  # Diagnostic tools for hardware debugging
+  environment.systemPackages = with pkgs; [
+    pciutils     # lspci
+    usbutils     # lsusb
+    lm_sensors   # sensors
+  ];
 
   # Power management via TLP (good for MacBook battery life)
   services.tlp = {
