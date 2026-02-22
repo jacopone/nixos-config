@@ -71,6 +71,17 @@
   };
   services.power-profiles-daemon.enable = false;
 
+  # Memory management for 8GB RAM
+  # Higher zram ratio to effectively double usable memory
+  zramSwap.memoryPercent = lib.mkForce 50; # ~4GB compressed → ~8GB effective
+  # Raise swappiness so the kernel uses zram/swap before OOM-killing
+  boot.kernel.sysctl."vm.swappiness" = lib.mkForce 60;
+  # 4GB swapfile as safety net when zram fills up
+  swapDevices = [{
+    device = "/var/lib/swapfile";
+    size = 4096; # MB
+  }];
+
   # Nix build settings for dual-core i5 with 8GB RAM
   nix.settings = {
     cores = 2;
