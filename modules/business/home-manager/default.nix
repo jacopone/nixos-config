@@ -9,6 +9,7 @@
     ../../home-manager/terminal/kitty.nix # Kitty terminal (shared)
     ../../home-manager/terminal/starship.nix # Starship prompt (shared)
     ../../home-manager/development/tools.nix # direnv, git, delta, atuin, broot (shared)
+    ../../home-manager/desktop/gnome.nix # GNOME desktop (Dash to Dock)
   ];
 
   home.stateVersion = "24.05";
