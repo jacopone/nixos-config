@@ -71,11 +71,12 @@
 
     # NixClaw - Personal AI agent platform for NixOS
     # MAINTAINER: @jacopone (YOU) | LOCAL DEV: path input
-    # Switch to github:jacopone/nixclaw when published
-    nixclaw = {
-      url = "path:/home/guyfawkes/nixclaw";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # TEMPORARILY DISABLED: path input breaks on machines without ~/nixclaw
+    # Re-enable when published to GitHub: url = "github:jacopone/nixclaw";
+    # nixclaw = {
+    #   url = "path:/home/guyfawkes/nixclaw";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
     # Revisit when mcp-servers package is available in nixpkgs
@@ -83,7 +84,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, nixclaw, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
     let
       # Shared overlay: fix GCC 15 / test failures in nixos-unstable
       gccFixOverlay = final: prev: {
@@ -116,7 +117,8 @@
           }
 
           # NixClaw AI agent (services.nixclaw options)
-          nixclaw.nixosModules.default
+          # TEMPORARILY DISABLED: nixclaw input commented out
+          # nixclaw.nixosModules.default
 
           # Home Manager module (tech profile)
           home-manager.nixosModules.home-manager
