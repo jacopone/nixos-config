@@ -175,23 +175,6 @@
         "type": "github"
       }
     },
-    "nixclaw": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1771174380,
-        "narHash": "sha256-4HGJaSo3hl9mEzHKGG6Gu2/oamiOnMCe2OvINt/rlV0=",
-        "path": "/home/guyfawkes/nixclaw",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/guyfawkes/nixclaw",
-        "type": "path"
-      }
-    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1768397375,
@@ -231,7 +214,6 @@
         "claude-code-nix": "claude-code-nix",
         "code-cursor-nix": "code-cursor-nix",
         "home-manager": "home-manager",
-        "nixclaw": "nixclaw",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "whisper-dictation": "whisper-dictation"
