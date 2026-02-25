@@ -1,51 +1,62 @@
 # Periodic backup of local configs to Google Drive via rclone
-# Syncs SSH, GH CLI, rclone config, and Claude Code data every 30 minutes
+# Syncs critical user data every 30 minutes
 # Backup path: gdrive:backups/<hostname>/<config-name>/
+# Matches existing backup structure from backup-thinkpad-20260211
 { config, pkgs, lib, ... }:
 
 let
-  hostname = config.home.sessionVariables.BACKUP_HOSTNAME or "unknown";
-
   # Script that syncs all critical configs to Google Drive
   backup-script = pkgs.writeShellScript "backup-configs-to-gdrive" ''
     set -euo pipefail
-    export PATH="${lib.makeBinPath [ pkgs.rclone pkgs.coreutils ]}"
+    export PATH="${lib.makeBinPath [ pkgs.rclone pkgs.coreutils pkgs.hostname ]}"
 
-    HOSTNAME="$(${pkgs.hostname}/bin/hostname)"
+    HOSTNAME="$(hostname)"
     BASE="gdrive:backups/$HOSTNAME"
     LOG="$HOME/.local/share/rclone/backup-sync.log"
 
     log() { echo "[$(date -Iseconds)] $*" >> "$LOG"; }
 
+    sync_dir() {
+      local src="$1" dest="$2" label="$3"
+      if [ -d "$src" ]; then
+        rclone sync "$src/" "$BASE/$dest/" \
+          --transfers 2 --quiet 2>>"$LOG" && \
+          log "$label: synced" || log "$label: FAILED"
+      fi
+    }
+
+    sync_file() {
+      local src="$1" dest="$2" label="$3"
+      if [ -f "$src" ]; then
+        rclone copyto "$src" "$BASE/$dest" \
+          --quiet 2>>"$LOG" && \
+          log "$label: synced" || log "$label: FAILED"
+      fi
+    }
+
     log "Starting backup sync for $HOSTNAME"
 
-    # SSH keys and config
-    if [ -d "$HOME/.ssh" ]; then
-      rclone sync "$HOME/.ssh/" "$BASE/ssh/" \
-        --transfers 2 --quiet 2>>"$LOG" && \
-        log "SSH: synced" || log "SSH: FAILED"
-    fi
+    # Identity and auth
+    sync_dir "$HOME/.ssh" "ssh" "SSH"
+    sync_dir "$HOME/.config/gh" "gh" "GitHub CLI"
+    sync_dir "$HOME/.gnupg" "gnupg" "GPG keys"
+    sync_dir "$HOME/.config/rclone" "rclone" "rclone config"
 
-    # GitHub CLI config
-    if [ -d "$HOME/.config/gh" ]; then
-      rclone sync "$HOME/.config/gh/" "$BASE/gh-config/" \
-        --transfers 2 --quiet 2>>"$LOG" && \
-        log "GH: synced" || log "GH: FAILED"
-    fi
+    # Claude Code (settings, permissions, memory, sessions)
+    sync_dir "$HOME/.claude" "claude" "Claude Code"
 
-    # rclone config (the config itself)
-    if [ -d "$HOME/.config/rclone" ]; then
-      rclone sync "$HOME/.config/rclone/" "$BASE/rclone-config/" \
-        --transfers 2 --quiet 2>>"$LOG" && \
-        log "rclone: synced" || log "rclone: FAILED"
-    fi
+    # Shell and terminal
+    sync_dir "$HOME/.local/share/atuin" "atuin" "Atuin history"
+    sync_dir "$HOME/.config/fish" "fish" "Fish config"
 
-    # Claude Code config (settings, permissions, memory, projects)
-    if [ -d "$HOME/.claude" ]; then
-      rclone sync "$HOME/.claude/" "$BASE/claude-config/" \
-        --transfers 2 --quiet 2>>"$LOG" && \
-        log "Claude: synced" || log "Claude: FAILED"
-    fi
+    # Cloud and dev tools
+    sync_dir "$HOME/.config/gcloud" "gcloud" "Google Cloud"
+
+    # Desktop data
+    sync_dir "$HOME/.local/share/keyrings" "keyrings" "GNOME keyrings"
+
+    # Custom scripts
+    sync_dir "$HOME/.local/bin" "local-bin" "Local scripts"
 
     log "Backup sync complete"
   '';
