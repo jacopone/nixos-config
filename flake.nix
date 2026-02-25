@@ -86,14 +86,18 @@
 
   outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
     let
-      # Shared overlay: fix GCC 15 / test failures in nixos-unstable
+      # Shared overlay: fix test failures / missing deps in nixos-unstable
+      # Uses interpreter override (not overrideScope) so python3.withPackages sees fixes
+      pyFixups = pyFinal: pyPrev: {
+        llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
+        picosvg = pyPrev.picosvg.overridePythonAttrs (old: { doCheck = false; });
+        pymupdf4llm = pyPrev.pymupdf4llm.overridePythonAttrs (old: {
+          dependencies = (old.dependencies or [ ]) ++ [ pyFinal.tabulate ];
+        });
+      };
       gccFixOverlay = final: prev: {
-        python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-          llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-        });
-        python312Packages = prev.python312Packages.overrideScope (pyFinal: pyPrev: {
-          llm = pyPrev.llm.overridePythonAttrs (old: { doCheck = false; });
-        });
+        python313 = prev.python313.override { packageOverrides = pyFixups; };
+        python312 = prev.python312.override { packageOverrides = pyFixups; };
       };
 
       # Tech profile helper — full power-user setup (350+ packages, AI orchestration)
