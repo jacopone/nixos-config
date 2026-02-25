@@ -192,6 +192,7 @@ in
     (python3.withPackages (ps: with ps; [
       rich # Rich - Python terminal UI library (for BASB system)
       pymupdf4llm # PyMuPDF for LLM-optimized PDF processing
+      tabulate # Pretty-print tabular data (required by pymupdf4llm)
       # markitdown # DISABLED: pulls in ctranslate2 which fails on GCC 15
       pytest # Testing framework for Python
       pydantic # Data validation using Python type hints
@@ -199,6 +200,7 @@ in
     ])) # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
     ninja # Build system for faster compilation (required by numpy/aider)
     google-cloud-sdk # Google Cloud SDK for gcloud CLI and cloud operations
+    (pkgs.callPackage ../../pkgs/gogcli.nix { }) # Google Suite CLI (Gmail, Calendar, Drive, Contacts) - https://github.com/steipete/gogcli
 
     # system tools
     fastfetch # A neofetch-like tool for fetching system information and displaying them in a pretty way
@@ -235,7 +237,7 @@ in
 
     # Database development tools (AI-friendly CLI clients)
     pgcli # PostgreSQL client with autocompletion and syntax highlighting
-    mycli # MySQL/MariaDB client with smart completion
+    # mycli # TEMP: Disabled - sqlglot==27.* not satisfied by nixpkgs sqlglot 28.x
     usql # Universal database CLI for multiple database types
 
     # Advanced API development
