@@ -234,6 +234,16 @@
           ];
         };
 
+        # MacBook Air 7,2 (Early 2015, Intel Broadwell) — business profile
+        # Build: nixos-rebuild switch --flake .#biz-004
+        biz-004 = mkBusinessHost {
+          hostname = "biz-004";
+          username = "bernie";
+          extraModules = [
+            nixos-hardware.nixosModules.apple-macbook-air-7
+          ];
+        };
+
         # ── Installer ISOs ─────────────────────────────────────────
 
         # Generic business installer with RustDesk for remote setup
