@@ -68,6 +68,19 @@ let
     # Yuka food/cosmetics product database
     sync_dir "$HOME/bimby-hacking/yuka/database" "yuka-db" "Yuka DB"
 
+    # Albo commercialisti (117K+ members, leads, campaigns)
+    sync_dir "$HOME/albo-commercialisti/data" "gitignored-critical/albo-commercialisti/data" "Albo data"
+    sync_file "$HOME/albo-commercialisti/.env" "gitignored-critical/albo-commercialisti/.env" "Albo env"
+
+    # Google Suite CLI credentials (gogcli)
+    sync_dir "$HOME/.config/gogcli" "gogcli" "gogcli credentials"
+
+    # Birthday manager events database
+    sync_file "$HOME/birthday-manager-ts/\$HOME/.local/share/birthday-manager/events.db" "birthday-manager/events.db" "Birthday events"
+
+    # PTA ledger (financial data)
+    sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
+
     log "Backup sync complete"
   '';
 in
