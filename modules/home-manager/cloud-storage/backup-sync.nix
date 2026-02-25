@@ -58,6 +58,16 @@ let
     # Custom scripts
     sync_dir "$HOME/.local/bin" "local-bin" "Local scripts"
 
+    # Project databases (irreplaceable user data)
+    # WhatsApp message archive (258K+ messages)
+    sync_dir "$HOME/whatsapp-mcp/whatsapp-bridge/store" "whatsapp-db" "WhatsApp DB"
+
+    # Bimby nutritionist (10K+ recipes, meal plans, grocery data)
+    sync_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "bimby-nutritionist/recipes.sqlite" "Bimby recipes"
+
+    # Yuka food/cosmetics product database
+    sync_dir "$HOME/bimby-hacking/yuka/database" "yuka-db" "Yuka DB"
+
     log "Backup sync complete"
   '';
 in
