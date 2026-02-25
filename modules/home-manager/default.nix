@@ -14,6 +14,7 @@ in
     ./file-management/yazi.nix # Yazi file manager
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)
     ./cloud-storage/rclone.nix # Google Drive mount via rclone
+    ./cloud-storage/backup-sync.nix # Periodic backup to Google Drive
     ./desktop/gnome.nix # GNOME desktop (Dash to Dock)
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
     # Using manual .mcp.json instead (already configured with MCP-NixOS + Playwright)

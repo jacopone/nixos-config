@@ -1255,6 +1255,17 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 ### Changed
 - rename hosts to asset-tag convention (biz-NNN/tech-NNN) (restructured)
 
+### Added
+- add biz-003 MacBook Air T2 host with installer ISO
+- add fish greeting and claude alias for business users
+- add CLAUDE.md template for business self-service
+
+### Fixed
+- use GitHub-sourced Broadcom firmware for T2 Macs
+  (Test: Verify the previous issue is resolved)
+- hardware config and T2 optimizations
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
