@@ -6,6 +6,7 @@
   claude-flow = "3.0.0-alpha.42"; # AI orchestration platform
   bmad-method = "4.44.3"; # Universal AI agent framework
   gemini-cli = "0.23.0"; # @google/gemini-cli
+  chrome-devtools-mcp = "0.17.3"; # Chrome DevTools MCP server for AI browser automation
   jules = "0.1.42"; # @google/jules async coding agent
   openspec = "0.18.0"; # @fission-ai/openspec spec-driven dev
   jscpd = "4.0.5"; # JavaScript clone detection
