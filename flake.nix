@@ -111,8 +111,6 @@
               gccFixOverlay
               # VibeTyper - AI voice typing with speech-to-text
               (import ./overlays/vibetyper.nix)
-              # Pencil - Design on canvas, land in code
-              (import ./overlays/pencil-dev.nix)
             ];
           }
 
