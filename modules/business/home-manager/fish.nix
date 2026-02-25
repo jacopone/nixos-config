@@ -1,8 +1,16 @@
 # Simplified Fish shell for business profile
 # Keeps: smart commands (context-aware cat/ls/grep/cd/find), git aliases, zoxide
 # Drops: atuin keybindings, broot, bench/loc, API key loading, EOD cleanup, power-user functions
-{ config, pkgs, ... }:
+{ config, pkgs, lib, aiProfile ? "google", ... }:
 
+let
+  isGoogle = aiProfile == "google" || aiProfile == "both";
+  isClaude = aiProfile == "claude" || aiProfile == "both";
+  greetingText =
+    if aiProfile == "both" then "  Type:  gemini  or  claude"
+    else if aiProfile == "claude" then "  Type:  claude"
+    else "  Type:  gemini";
+in
 {
   # Zoxide shell integration - creates `z` and `zi` commands
   programs.zoxide = {
@@ -29,7 +37,7 @@
 
           # PRIORITY 2: Check full process tree (not just immediate parent)
           set -l process_tree (ps -o comm= -p $fish_pid -p (ps -o ppid= -p $fish_pid 2>/dev/null) 2>/dev/null || echo "")
-          if string match -qr '(claude|cursor|vscode|agent|copilot)' $process_tree
+          if string match -qr '(claude|gemini|cursor|vscode|agent|copilot)' $process_tree
               return 0  # true - automated
           end
 
@@ -190,19 +198,28 @@
       alias gst='git status'
       alias gl='git log --oneline --graph --decorate'
 
-      # ClaudeOS greeting — only show in interactive terminals, not inside Claude
+      # AI assistant greeting — only show in interactive terminals
       if not _is_automated_context
           echo ""
           echo "  Need to install or change something?"
-          echo "  Type:  claude"
+          echo "${greetingText}"
           echo ""
       end
 
+      ${lib.optionalString isGoogle ''
+      # Launch Gemini CLI in nixos-config directory
+      function gemini --description "Open Gemini CLI in your system config"
+          builtin cd ~/nixos-config
+          command gemini
+      end
+      ''}
+      ${lib.optionalString isClaude ''
       # Launch Claude Code in nixos-config directory
       function claude --description "Open Claude Code in your system config"
           builtin cd ~/nixos-config
           command claude
       end
+      ''}
     '';
 
     # Simplified abbreviations (~15 vs 60+ in tech profile)

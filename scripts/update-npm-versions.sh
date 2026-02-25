@@ -40,6 +40,7 @@ check_version() {
 check_version "claude-flow" "claude-flow"
 check_version "bmad-method" "bmad-method"
 check_version "gemini-cli" "@google/gemini-cli"
+check_version "chrome-devtools-mcp" "chrome-devtools-mcp"
 check_version "jules" "@google/jules"
 check_version "openspec" "@fission-ai/openspec"
 check_version "jscpd" "jscpd"
