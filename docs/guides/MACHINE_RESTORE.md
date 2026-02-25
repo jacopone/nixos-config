@@ -18,9 +18,16 @@ Google Drive path: `gdrive:backups/<hostname>/`
 backups/
 └── thinkpad-x1-jacopo/     # (or framework-16, biz-003, etc.)
     ├── ssh/                 # SSH keys, config, known_hosts
-    ├── gh-config/           # GitHub CLI auth tokens
-    ├── rclone-config/       # rclone remote definitions
-    └── claude-config/       # Claude Code settings, permissions, sessions, memory
+    ├── gh/                  # GitHub CLI auth tokens
+    ├── gnupg/               # GPG keys and trust database
+    ├── rclone/              # rclone remote definitions
+    ├── claude/              # Claude Code settings, permissions, sessions, memory
+    ├── atuin/               # Shell command history (Atuin)
+    ├── fish/                # Fish shell config
+    ├── gcloud/              # Google Cloud SDK config
+    ├── keyrings/            # GNOME keyrings (WiFi passwords, etc.)
+    ├── local-bin/           # Custom scripts (~/.local/bin)
+    └── ...                  # Other data (Downloads, Pictures, etc.)
 ```
 
 Backups run automatically every 30 minutes via `backup-configs` systemd timer (defined in `modules/home-manager/cloud-storage/backup-sync.nix`).
@@ -58,11 +65,31 @@ chmod 644 ~/.ssh/*.pub 2>/dev/null
 
 # GitHub CLI
 mkdir -p ~/.config/gh
-rclone sync "gdrive:backups/$SOURCE_HOST/gh-config/" ~/.config/gh/
+rclone sync "gdrive:backups/$SOURCE_HOST/gh/" ~/.config/gh/
+
+# GPG keys
+mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+rclone sync "gdrive:backups/$SOURCE_HOST/gnupg/" ~/.gnupg/
 
 # Claude Code config
 mkdir -p ~/.claude
-rclone sync "gdrive:backups/$SOURCE_HOST/claude-config/" ~/.claude/
+rclone sync "gdrive:backups/$SOURCE_HOST/claude/" ~/.claude/
+
+# Atuin shell history
+mkdir -p ~/.local/share/atuin
+rclone sync "gdrive:backups/$SOURCE_HOST/atuin/" ~/.local/share/atuin/
+
+# Fish config
+mkdir -p ~/.config/fish
+rclone sync "gdrive:backups/$SOURCE_HOST/fish/" ~/.config/fish/
+
+# GNOME keyrings (WiFi passwords, etc.)
+mkdir -p ~/.local/share/keyrings
+rclone sync "gdrive:backups/$SOURCE_HOST/keyrings/" ~/.local/share/keyrings/
+
+# Custom scripts
+mkdir -p ~/.local/bin
+rclone sync "gdrive:backups/$SOURCE_HOST/local-bin/" ~/.local/bin/
 ```
 
 ## Step 3: Clone and install NixOS config

@@ -15,7 +15,11 @@ cleanup() {
     rm -f /tmp/nixos-build-$$ /tmp/nixbuild-output-$$.tmp /tmp/changelog-draft-$$.md /tmp/changelog-updated-$$.md /tmp/gc-output-$$.tmp 2>/dev/null
     if [ "$exit_code" -ne 0 ] && [ "$exit_code" -ne 130 ]; then
         echo ""
-        echo -e "\033[0;31m⚠️  Rebuild interrupted or failed (exit code: $exit_code)\033[0m"
+        if [ "${REBUILD_ACTIVATED:-false}" = true ]; then
+            echo -e "\033[1;33m⚠️  Post-rebuild cleanup had issues (exit code: $exit_code) — system was activated successfully\033[0m"
+        else
+            echo -e "\033[0;31m⚠️  Rebuild interrupted or failed (exit code: $exit_code)\033[0m"
+        fi
     fi
     exit "$exit_code"
 }
@@ -1126,6 +1130,7 @@ else
     CURRENT_SYSTEM=$(readlink /run/current-system)
 
     if [ -n "$NEW_GEN" ]; then
+        REBUILD_ACTIVATED=true
         log_success "Configuration activated (generation $NEW_GEN)"
         log_step "System: $(basename "$CURRENT_SYSTEM")"
         add_action "NixOS configuration activated (gen $NEW_GEN)"
