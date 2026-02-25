@@ -135,9 +135,9 @@
       };
 
       # Business profile helper — curated setup (~40 packages, office + learning to code)
-      mkBusinessHost = { hostname, username, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
+      mkBusinessHost = { hostname, username, system ? "x86_64-linux", aiProfile ? "google", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs username; };
+        specialArgs = { inherit inputs username aiProfile; };
         modules = [
           # Host-specific configuration
           ./hosts/${hostname}
@@ -156,7 +156,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs username; };
+            home-manager.extraSpecialArgs = { inherit inputs username aiProfile; };
             home-manager.users.${username} = import ./modules/business/home-manager;
           }
         ] ++ extraModules;
