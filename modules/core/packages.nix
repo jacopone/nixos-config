@@ -16,8 +16,6 @@ in
     # zed-editor # TEMP: Disabled - requires source compilation, causes system slowdown on rebuild
     inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
-    pencil-dev # Design on canvas, land in code - IDE-integrated design tool - https://pencil.dev
-
     # Speech-to-text
     vibetyper # AI voice typing with speech-to-text - https://vibetyper.com
     wtype # Wayland text input
