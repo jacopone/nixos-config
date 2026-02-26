@@ -21,6 +21,15 @@
     packages = with pkgs; [ ];
   };
 
+  # SSH access (tech hosts only)
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
   # Packages
   nixpkgs.config.allowUnfree = true;
 
