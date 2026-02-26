@@ -1,5 +1,5 @@
-# Periodic backup of local configs to Google Drive via rclone
-# Syncs critical user data every 30 minutes
+# Daily backup of local configs to Google Drive via rclone
+# Syncs critical user data once per day
 # Backup path: gdrive:backups/<hostname>/<config-name>/
 # Matches existing backup structure from backup-thinkpad-20260211
 { config, pkgs, lib, ... }:
@@ -104,16 +104,16 @@ in
     };
   };
 
-  # Timer: run every 30 minutes, with randomized delay to avoid thundering herd
+  # Timer: run daily, with randomized delay to spread load
   systemd.user.timers.backup-configs = {
     Unit = {
-      Description = "Periodic backup of configs to Google Drive";
+      Description = "Daily backup of configs to Google Drive";
     };
 
     Timer = {
       OnBootSec = "5min";
-      OnUnitActiveSec = "30min";
-      RandomizedDelaySec = "5min";
+      OnCalendar = "daily";
+      RandomizedDelaySec = "1h";
       Persistent = true;
     };
 
