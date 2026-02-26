@@ -13,7 +13,7 @@
   ];
 
   # Hostname
-  networking.hostName = "tech-001";
+  networking.hostName = "ama-tech-001";
 
   # NVIDIA PRIME Bus IDs (from lspci: c1:00.0 = NVIDIA, c2:00.0 = AMD)
   hardware.nvidia.prime = {

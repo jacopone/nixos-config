@@ -1,4 +1,4 @@
-# MacBook Air 2018 (Intel i5, T2 chip) — business workstation
+# MacBook Air 7,2 (Early 2015, Intel i5) — business workstation
 { config, pkgs, inputs, username, ... }:
 
 {
@@ -7,8 +7,7 @@
     ../common/base.nix
     ../../modules/business/packages.nix
     ../../modules/business/chrome-extensions.nix
-    ../../modules/hardware/macbook-air-t2.nix
-    ../../overlays/apple-bcm-firmware.nix
+    ../../modules/hardware/macbook-air-7.nix
   ];
 
   environment.variables.EDITOR = "code"; # VS Code (not Helix)
@@ -17,19 +16,12 @@
     isNormalUser = true;
     description = "Business User";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
+    initialPassword = "changeme";
   };
-
-  # Additional users can be added here:
-  # users.users.another = {
-  #   isNormalUser = true;
-  #   description = "Another User";
-  #   extraGroups = [ "networkmanager" "wheel" ];
-  #   initialPassword = "changeme";
-  # };
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "biz-003";
+  networking.hostName = "tl-biz-004";
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 }
