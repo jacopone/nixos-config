@@ -14,7 +14,7 @@
       font-size = 12;
 
       # Catppuccin Mocha theme
-      theme = "catppuccin-mocha";
+      theme = "Catppuccin Mocha";
 
       # Window
       window-padding-x = 4;
