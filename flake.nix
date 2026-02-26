@@ -188,10 +188,10 @@
           username = "guyfawkes";
         };
 
-        # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070)
-        # Build: nixos-rebuild switch --flake .#tech-001
-        tech-001 = mkTechHost {
-          hostname = "tech-001";
+        # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070) — Amatino
+        # Build: nixos-rebuild switch --flake .#ama-tech-001
+        ama-tech-001 = mkTechHost {
+          hostname = "ama-tech-001";
           username = "guyfawkes";
           extraModules = [
             # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
@@ -202,42 +202,42 @@
         # ── Business workstations ──────────────────────────────────────
 
         # Template for new business deployments
-        # Usage: cp -r hosts/business-template hosts/biz-NNN
-        #        Then add: biz-NNN = mkBusinessHost { hostname = "biz-NNN"; username = "name"; };
+        # Usage: cp -r hosts/business-template hosts/{company}-biz-NNN
+        #        Then add: {company}-biz-NNN = mkBusinessHost { hostname = "{company}-biz-NNN"; username = "name"; };
         # Build: nixos-rebuild switch --flake .#business-template
         business-template = mkBusinessHost {
           hostname = "business-template";
           username = "user";
         };
 
-        # ThinkPad X1 Carbon (Intel UHD 620 + 8-core) — business profile
-        # Build: nixos-rebuild switch --flake .#biz-001
-        biz-001 = mkBusinessHost {
-          hostname = "biz-001";
+        # ThinkPad X1 Carbon (Intel UHD 620 + 8-core) — Tenuta Larnianone
+        # Build: nixos-rebuild switch --flake .#tl-biz-001
+        tl-biz-001 = mkBusinessHost {
+          hostname = "tl-biz-001";
           username = "guyfawkes";
         };
 
-        # HP workstation for Pietro
-        # Build: nixos-rebuild switch --flake .#biz-002
-        biz-002 = mkBusinessHost {
-          hostname = "biz-002";
+        # HP workstation for Pietro — Amatino
+        # Build: nixos-rebuild switch --flake .#ama-biz-001
+        ama-biz-001 = mkBusinessHost {
+          hostname = "ama-biz-001";
           username = "pietro";
         };
 
-        # MacBook Air 2018 (Intel, T2 chip) — business profile
-        # Build: nixos-rebuild switch --flake .#biz-003
-        biz-003 = mkBusinessHost {
-          hostname = "biz-003";
+        # MacBook Air 2018 (Intel, T2 chip) — Tenuta Larnianone
+        # Build: nixos-rebuild switch --flake .#tl-biz-003
+        tl-biz-003 = mkBusinessHost {
+          hostname = "tl-biz-003";
           username = "guyfawkes";
           extraModules = [
             nixos-hardware.nixosModules.apple-t2
           ];
         };
 
-        # MacBook Air 7,2 (Early 2015, Intel Broadwell) — business profile
-        # Build: nixos-rebuild switch --flake .#biz-004
-        biz-004 = mkBusinessHost {
-          hostname = "biz-004";
+        # MacBook Air 7,2 (Early 2015, Intel Broadwell) — Tenuta Larnianone
+        # Build: nixos-rebuild switch --flake .#tl-biz-004
+        tl-biz-004 = mkBusinessHost {
+          hostname = "tl-biz-004";
           username = "bernie";
           extraModules = [
             nixos-hardware.nixosModules.apple-macbook-air-7

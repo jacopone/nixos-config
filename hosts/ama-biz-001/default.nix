@@ -1,4 +1,4 @@
-# MacBook Air 7,2 (Early 2015, Intel i5) — business workstation
+# HP workstation for Pietro
 { config, pkgs, inputs, username, ... }:
 
 {
@@ -7,21 +7,20 @@
     ../common/base.nix
     ../../modules/business/packages.nix
     ../../modules/business/chrome-extensions.nix
-    ../../modules/hardware/macbook-air-7.nix
   ];
 
   environment.variables.EDITOR = "code"; # VS Code (not Helix)
 
   users.users.${username} = {
     isNormalUser = true;
-    description = "Business User";
+    description = "Pietro";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    initialPassword = "changeme";
+    initialPassword = "changeme"; # Safety net — Pietro should change this after first login
   };
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "biz-004";
+  networking.hostName = "ama-biz-001";
 
-  system.stateVersion = "25.11";
+  system.stateVersion = "24.11";
 }
