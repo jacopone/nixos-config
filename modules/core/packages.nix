@@ -226,7 +226,6 @@ in
     procs # Modern process viewer (better than ps)
     entr # File watcher for automated rebuilds/tests
     just # Modern command runner (better than make)
-    bottom # Modern system monitor (btm command)
     ast-grep # Structural search and replace for code
     semgrep # Static analysis for pattern matching
     xh # Fast HTTPie alternative in Rust
@@ -256,7 +255,7 @@ in
     k9s # Kubernetes cluster management
     podman # Docker alternative
     nmap # Network discovery and security auditing
-    wireshark # Network protocol analyzer
+    # wireshark - use nix-shell -p wireshark when needed
     tcpdump # Command-line packet analyzer
 
     # NordVPN via WireGuard
