@@ -8,9 +8,6 @@
     # AI Assistant
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Claude Code
 
-    # Editors
-    vscode-fhs # Visual Studio Code in FHS environment
-
     # Version control
     git
     gh

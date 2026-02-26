@@ -1,4 +1,4 @@
-# Ghostty terminal emulator configuration (trial alongside Kitty)
+# Ghostty terminal emulator configuration
 { pkgs, ... }:
 
 {

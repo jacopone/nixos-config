@@ -27,6 +27,7 @@
     geary # email client
     seahorse # password manager
     decibels # audio editor
+    gnome-console # terminal (replaced by Ghostty)
 
     # these should be self explanatory
     gnome-calculator
