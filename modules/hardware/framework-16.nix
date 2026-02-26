@@ -83,7 +83,20 @@
   services.power-profiles-daemon.enable = true;
   services.tlp.enable = false;
 
+  # Disable GNOME idle suspend — the PIXA3854 touchpad has a kernel bug where
+  # valid touches are discarded as "touch jumps", making GNOME think the user
+  # is idle while they're actively using the touchpad. This triggers false
+  # idle suspends that crash the GNOME session on resume.
+  # Lid close still suspends normally (HandleLidSwitch = "suspend").
+  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+    [org.gnome.settings-daemon.plugins.power]
+    sleep-inactive-ac-type='nothing'
+    sleep-inactive-battery-type='nothing'
+  '';
+
   # Double suspend workaround (systemd v258+)
+  # On resume, block sleep for 10s so the system doesn't immediately re-suspend.
+  # Uses --who to namespace the inhibitor and avoid "already running" conflicts.
   systemd.services.inhibit-sleep-after-resume = {
     description = "Temporary sleep inhibitor after resume";
     wantedBy = [ "post-resume.target" ];
@@ -93,8 +106,9 @@
       ${pkgs.systemd}/bin/systemd-inhibit \
         --mode=block \
         --what=sleep:idle \
-        --why="Workaround: avoid second suspend" \
-        ${pkgs.coreutils}/bin/sleep 60
+        --who="inhibit-sleep-after-resume" \
+        --why="Prevent immediate re-suspend after resume" \
+        ${pkgs.coreutils}/bin/sleep 10 || true
     '';
   };
 
