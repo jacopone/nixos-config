@@ -81,6 +81,13 @@ let
     # PTA ledger (financial data)
     sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
 
+    # Restore guide — top-level in backups/ (not per-host)
+    if [ -f "$HOME/nixos-config/docs/guides/MACHINE_RESTORE.md" ]; then
+      rclone copyto "$HOME/nixos-config/docs/guides/MACHINE_RESTORE.md" \
+        "gdrive:backups/MACHINE_RESTORE.md" --quiet 2>>"$LOG" && \
+        log "Restore guide: synced" || log "Restore guide: FAILED"
+    fi
+
     log "Backup sync complete"
   '';
 in
