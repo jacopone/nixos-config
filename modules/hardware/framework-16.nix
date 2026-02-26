@@ -9,6 +9,8 @@
   # AMD GPU and Framework-specific kernel parameters
   boot.kernelParams = [
     "amdgpu.abmlevel=0" # Disable Active Backlight Management for accurate colors
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # Preserve VRAM across suspend/resume
+    "nvidia.NVreg_TemporaryFilePath=/var/tmp" # Temp storage for VRAM save/restore
   ];
 
   # Use latest kernel for best AMD/NVIDIA support
@@ -36,15 +38,18 @@
     # Modesetting required for Wayland
     modesetting.enable = true;
 
-    # Power management (experimental but needed for laptops)
+    # Power management
     powerManagement.enable = true;
-    powerManagement.finegrained = false; # RTX 5070 may not support fine-grained
+    powerManagement.finegrained = true; # RTD3 dynamic power management (Turing+)
+
+    # Keep GPU state initialized so nvidia-smi/nvtop can query the device
+    nvidiaPersistenced = true;
 
     # Enable nvidia-settings GUI
     nvidiaSettings = true;
 
-    # Open source kernel module (use false for RTX 5070 until better support)
-    open = false;
+    # Blackwell (GB206M / RTX 5070) requires the open-source kernel modules
+    open = true;
 
     # PRIME Offload mode (render on NVIDIA, display on AMD)
     # IMPORTANT: Update these bus IDs after running:
@@ -112,10 +117,15 @@
     '';
   };
 
+  # LED Matrix input modules (installs inputmodule-control + udev rules)
+  hardware.inputmodule.enable = true;
+
+  # Fingerprint reader (Goodix 27c6:609c)
+  services.fprintd.enable = true;
+
   # Framework-specific packages
   environment.systemPackages = with pkgs; [
     framework-tool # Swiss army knife for Framework laptops
-    inputmodule-control # LED Matrix control
     nvtopPackages.nvidia # NVIDIA GPU monitoring
     powertop # Power consumption analysis
   ];

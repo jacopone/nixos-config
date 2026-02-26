@@ -17,7 +17,7 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Primary User";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" "adbusers" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" "adbusers" "dialout" ];
     packages = with pkgs; [ ];
   };
 
