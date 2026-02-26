@@ -30,7 +30,7 @@ backups/
     └── ...                  # Other data (Downloads, Pictures, etc.)
 ```
 
-Backups run automatically every 30 minutes via `backup-configs` systemd timer (defined in `modules/home-manager/cloud-storage/backup-sync.nix`).
+Backups run automatically once per day via `backup-configs` systemd timer (defined in `modules/home-manager/cloud-storage/backup-sync.nix`). Run `systemctl --user start backup-configs` for an immediate sync before travel or risky changes.
 
 ## Prerequisites
 
