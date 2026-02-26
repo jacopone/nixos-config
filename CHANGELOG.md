@@ -1266,6 +1266,33 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - hardware config and T2 optimizations
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add zram + swapfile for 8GB RAM
+- add Dash to Dock for macOS-style always-visible dock
+- add auto-backup timer and machine restore guide
+  (Test: `which auto-backup` or `auto-backup --version`)
+- add biz-004 MacBook Air 7,2 (Early 2015) for bernie
+- add chrome-devtools-mcp to npm version pins
+- add aiProfile parameter to mkBusinessHost
+- conditional AI packages based on aiProfile
+  (Test: `which conditional` or `conditional --version`)
+- conditional Chrome extensions based on aiProfile
+- adaptive fish greeting and AI functions based on aiProfile
+- add GEMINI.md business template for Google AI profile
+
+### Changed
+- remove pencil-dev design tool
+
+### Fixed
+- use renamed logind lid switch options
+  (Test: Verify the previous issue is resolved)
+- configure gh as git credential helper for NixOS
+  (Test: Verify the previous issue is resolved)
+- import Dash to Dock module in business profile
+  (Test: Verify the previous issue is resolved)
+- overlay for picosvg test failures and pymupdf4llm missing tabulate
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

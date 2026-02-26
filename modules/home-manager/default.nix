@@ -10,6 +10,7 @@ in
   imports = [
     ./shell/fish.nix # Fish shell with smart commands
     ./terminal/kitty.nix # Kitty terminal emulator
+    ./terminal/ghostty.nix # Ghostty terminal emulator (trial)
     ./terminal/starship.nix # Starship prompt
     ./file-management/yazi.nix # Yazi file manager
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)

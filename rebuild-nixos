@@ -16,9 +16,9 @@ cleanup() {
     if [ "$exit_code" -ne 0 ] && [ "$exit_code" -ne 130 ]; then
         echo ""
         if [ "${REBUILD_ACTIVATED:-false}" = true ]; then
-            echo -e "\033[1;33m⚠️  Post-rebuild cleanup had issues (exit code: $exit_code) — system was activated successfully\033[0m"
+            echo -e "\033[1;33m⚠️  Post-rebuild step had issues (exit code: $exit_code) — system was activated successfully\033[0m"
         else
-            echo -e "\033[0;31m⚠️  Rebuild interrupted or failed (exit code: $exit_code)\033[0m"
+            echo -e "\033[0;31m❌ Rebuild failed (exit code: $exit_code)\033[0m"
         fi
     fi
     exit "$exit_code"
@@ -1094,6 +1094,11 @@ fi
 if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
     : # skip
 else
+    # Temporarily disable set -e for the activation pipeline.
+    # switch-to-configuration returns exit code 4 for non-fatal unit activation issues
+    # (e.g., a service restarting during switch). With set -e + pipefail, this would
+    # abort the script before we can inspect the exit code.
+    set +e
     if [ "$VERBOSE" = true ]; then
         # Verbose mode - show all output, capture exit code properly
         # shellcheck disable=SC2086  # NIXOS_REBUILD_OPTS may contain multiple flags
@@ -1114,9 +1119,16 @@ else
         wait $ACTIVATE_PID
         ACTIVATE_EXIT=$?
     fi
+    set -e
 
     # Check activation result
-    if [ "$ACTIVATE_EXIT" -ne 0 ]; then
+    # Exit code 4 from switch-to-configuration = some units had non-fatal activation
+    # issues (e.g., a service briefly interrupted during switch). The system switched fine.
+    if [ "$ACTIVATE_EXIT" -eq 4 ]; then
+        echo ""
+        log_warning "Some systemd units had non-fatal activation issues (exit code 4)"
+        log_step "This is common and harmless — check 'journalctl -b --priority=warning' if curious"
+    elif [ "$ACTIVATE_EXIT" -ne 0 ]; then
         echo ""  # Ensure we're on a new line
         log_error "Activation failed (exit code: $ACTIVATE_EXIT)"
         echo "📁 Check logs: $LOG_FILE"
