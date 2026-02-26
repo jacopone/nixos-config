@@ -15,14 +15,10 @@
   # Hostname
   networking.hostName = "tech-001";
 
-  # NVIDIA PRIME Bus IDs
-  # IMPORTANT: Update these after running on actual hardware:
-  # nix-shell -p pciutils --run 'lspci | grep -E "VGA|3D"'
-  # Convert hex (e.g., c1:00.0) to decimal using:
-  # echo "ibase=16; C1" | bc  (gives 193)
+  # NVIDIA PRIME Bus IDs (from lspci: c1:00.0 = NVIDIA, c2:00.0 = AMD)
   hardware.nvidia.prime = {
-    amdgpuBusId = "PCI:193:0:0"; # Update after lspci
-    nvidiaBusId = "PCI:1:0:0"; # Update after lspci
+    amdgpuBusId = "PCI:194:0:0";
+    nvidiaBusId = "PCI:193:0:0";
   };
 
   # State version - set to NixOS version at installation time
