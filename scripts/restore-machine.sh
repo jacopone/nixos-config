@@ -101,6 +101,7 @@ print_phase "Phase 1: Clone GitHub repos"
 
 cloned=0
 skipped=0
+clone_failed=0
 
 while IFS=$'\t' read -r name ssh_url; do
     if [[ "$name" == "nixos-config" ]]; then
@@ -122,11 +123,12 @@ while IFS=$'\t' read -r name ssh_url; do
         cloned=$((cloned + 1))
     else
         fail "$name (clone failed)"
+        clone_failed=$((clone_failed + 1))
     fi
 done < <(gh repo list "$GITHUB_USER" --limit 200 --json name,sshUrl --jq '.[] | [.name, .sshUrl] | @tsv')
 
 echo ""
-echo -e "  ${BOLD}Phase 1 summary:${NC} cloned $cloned, skipped $skipped"
+echo -e "  ${BOLD}Phase 1 summary:${NC} cloned $cloned, skipped $skipped, failed $clone_failed"
 
 # ============================================================================
 # Phase 2: Restore gitignored data from Drive backup
@@ -136,6 +138,7 @@ print_phase "Phase 2: Restore gitignored data from Drive backup ($SOURCE_HOST)"
 
 restored=0
 phase2_skipped=0
+restore_failed=0
 
 # Restore a directory: restore_dir <drive_subpath> <local_path> <label>
 restore_dir() {
@@ -159,11 +162,12 @@ restore_dir() {
 
     mkdir -p "$local_path"
     echo -e "  Restoring ${BOLD}$label${NC}..."
-    if rclone sync "$drive_path/" "$local_path/" --transfers 4 --quiet 2>/dev/null; then
+    if rclone copy "$drive_path/" "$local_path/" --transfers 4 --quiet 2>/dev/null; then
         info "$label"
         restored=$((restored + 1))
     else
         fail "$label"
+        restore_failed=$((restore_failed + 1))
     fi
 }
 
@@ -193,6 +197,7 @@ restore_file() {
         restored=$((restored + 1))
     else
         fail "$label"
+        restore_failed=$((restore_failed + 1))
     fi
 }
 
@@ -254,11 +259,21 @@ else
 fi
 
 echo ""
-echo -e "  ${BOLD}Phase 2 summary:${NC} restored $restored, skipped $phase2_skipped"
+echo -e "  ${BOLD}Phase 2 summary:${NC} restored $restored, skipped $phase2_skipped, failed $restore_failed"
 
 # ============================================================================
 # Done
 # ============================================================================
+
+total_failed=$((clone_failed + restore_failed))
+if [[ $total_failed -gt 0 ]]; then
+    echo ""
+    echo -e "${BOLD}${RED}════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}${RED}  Restore finished with $total_failed failure(s). Review output above.${NC}"
+    echo -e "${BOLD}${RED}════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    exit 1
+fi
 
 echo ""
 echo -e "${BOLD}${GREEN}════════════════════════════════════════════════════════════${NC}"

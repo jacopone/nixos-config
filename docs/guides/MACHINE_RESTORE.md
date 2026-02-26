@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2026-02-25
-updated: 2026-02-25
+updated: 2026-02-26
 type: guide
 lifecycle: persistent
 ---
@@ -16,18 +16,26 @@ Google Drive path: `gdrive:backups/<hostname>/`
 
 ```
 backups/
-└── thinkpad-x1-jacopo/     # (or framework-16, biz-003, etc.)
-    ├── ssh/                 # SSH keys, config, known_hosts
-    ├── gh/                  # GitHub CLI auth tokens
-    ├── gnupg/               # GPG keys and trust database
-    ├── rclone/              # rclone remote definitions
-    ├── claude/              # Claude Code settings, permissions, sessions, memory
-    ├── atuin/               # Shell command history (Atuin)
-    ├── fish/                # Fish shell config
-    ├── gcloud/              # Google Cloud SDK config
-    ├── keyrings/            # GNOME keyrings (WiFi passwords, etc.)
-    ├── local-bin/           # Custom scripts (~/.local/bin)
-    └── ...                  # Other data (Downloads, Pictures, etc.)
+├── MACHINE_RESTORE.md          # This guide (auto-synced)
+└── thinkpad-x1-jacopo/         # (or framework-16, biz-003, etc.)
+    ├── ssh/                     # SSH keys, config, known_hosts
+    ├── gh/                      # GitHub CLI auth tokens
+    ├── gnupg/                   # GPG keys and trust database
+    ├── rclone/                  # rclone remote definitions
+    ├── claude/                  # Claude Code settings, permissions, sessions, memory
+    ├── atuin/                   # Shell command history (Atuin)
+    ├── fish/                    # Fish shell config
+    ├── gcloud/                  # Google Cloud SDK config
+    ├── keyrings/                # GNOME keyrings (WiFi passwords, etc.)
+    ├── local-bin/               # Custom scripts (~/.local/bin)
+    ├── whatsapp-db/             # WhatsApp message archive
+    ├── bimby-nutritionist/      # Bimby recipes database
+    ├── yuka-db/                 # Yuka food/cosmetics DB
+    ├── gitignored-critical/     # Albo data, .env files
+    ├── birthday-manager/        # Birthday events database
+    ├── pta-ledger/              # PTA financial ledger
+    ├── gogcli/                  # Google Suite CLI credentials
+    └── ...                      # Other data (Downloads, Pictures, etc.)
 ```
 
 Backups run automatically once per day via `backup-configs` systemd timer (defined in `modules/home-manager/cloud-storage/backup-sync.nix`). Run `systemctl --user start backup-configs` for an immediate sync before travel or risky changes.
@@ -110,6 +118,26 @@ sudo nixos-install --flake .#<host-name>
 # Copy repo to final location first
 # sudo nixos-rebuild switch --flake .#<host-name>
 ```
+
+## Step 3.5: Clone repos and restore project data
+
+After NixOS is rebuilt and you've logged in:
+
+```bash
+cd ~/nixos-config
+
+# Clone all GitHub repos + restore gitignored data (databases, .env files)
+./scripts/restore-machine.sh <source-hostname>
+
+# Example:
+./scripts/restore-machine.sh thinkpad-x1-jacopo
+```
+
+This clones all repos from GitHub that aren't already present in `~/`, then
+restores gitignored project data (databases, credentials) from the Drive backup
+into the correct repo directories.
+
+Requires: `gh auth login` completed, rclone configured (Steps 1-2).
 
 ## Step 4: Post-install verification
 
