@@ -1,5 +1,5 @@
 ---
-status: draft
+status: archived
 created: 2026-02-26
 updated: 2026-02-26
 type: planning
@@ -8,7 +8,9 @@ lifecycle: persistent
 
 # KDE Plasma 6 for Business Hosts
 
-## Status: Active
+## Status: Shelved
+
+**Reason:** rclone/Google Drive integration is critical for business users. GVFS (GNOME) vs KIO (Plasma) difference creates migration risk. RAM savings (~200-400MB) don't justify the risk. Revisit if MacBook RAM pressure becomes a real problem.
 
 ## Context
 
