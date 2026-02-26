@@ -61,6 +61,22 @@ in
   # Enable bash for compatibility
   programs.bash.enable = true;
 
+  # XDG user directories — disable unused defaults to keep ~ clean
+  # On fresh installs, GNOME creates Desktop, Documents, Music, Templates, etc.
+  # We only keep Downloads and Pictures; everything else points to $HOME (disabled).
+  xdg.userDirs = {
+    enable = true;
+    createDirectories = true;
+    desktop = "$HOME";
+    documents = "$HOME";
+    download = "$HOME/Downloads";
+    music = "$HOME";
+    pictures = "$HOME/Pictures";
+    publicShare = "$HOME";
+    templates = "$HOME";
+    videos = "$HOME";
+  };
+
   # Smart Office Open - desktop application for Google Drive files
   # Opens Google native files (0 byte) in browser, regular files with OnlyOffice
   xdg.desktopEntries.smart-office-open = {
