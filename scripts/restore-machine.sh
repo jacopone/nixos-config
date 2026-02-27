@@ -149,6 +149,15 @@ restore_config "keyrings"  "$HOME/.local/share/keyrings" "GNOME keyrings"
 # Custom scripts
 restore_config "local-bin" "$HOME/.local/bin"            "Local scripts"
 
+# Clean up stale lock files from the source machine
+# Chrome Singleton files contain the old hostname/PID and block launch
+for f in SingletonLock SingletonCookie SingletonSocket; do
+    if [[ -e "$HOME/.config/google-chrome/$f" ]]; then
+        rm -f "$HOME/.config/google-chrome/$f"
+        info "Removed stale Chrome $f"
+    fi
+done
+
 echo ""
 echo -e "  ${BOLD}Phase 1 summary:${NC} restored $config_restored, failed $config_failed"
 
