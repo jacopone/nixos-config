@@ -5,6 +5,7 @@
 # Phase 1: Restore system configs (SSH, GPG, Claude, shell history, etc.)
 # Phase 2: Clone all GitHub repos
 # Phase 3: Restore gitignored project data (databases, .env files)
+# Phase 4: Verify restore (functional + existence checks)
 #
 # Usage: ./scripts/restore-machine.sh <source-hostname>
 
@@ -318,6 +319,202 @@ fi
 
 echo ""
 echo -e "  ${BOLD}Phase 3 summary:${NC} restored $restored, skipped $phase2_skipped, failed $restore_failed"
+
+# ============================================================================
+# Phase 4: Verify restore
+# ============================================================================
+
+print_phase "Phase 4: Verify restore"
+
+verify_ok=0
+verify_warn=0
+
+check_ok()   { info "$*"; verify_ok=$((verify_ok + 1)); }
+check_warn() { skip "$*"; verify_warn=$((verify_warn + 1)); }
+
+# --- Phase 1: System configs ---
+
+echo -e "  ${BOLD}System configs${NC}"
+
+# SSH: functional check (ssh -T exits 1 on success with GitHub)
+if ssh -T git@github.com 2>&1 | grep -qi "successfully authenticated"; then
+    check_ok "SSH → GitHub authenticated"
+elif [[ -f "$HOME/.ssh/id_ed25519" ]] || [[ -f "$HOME/.ssh/id_rsa" ]]; then
+    check_warn "SSH → key exists but GitHub auth failed (check known_hosts or key registration)"
+else
+    check_warn "SSH → no key found"
+fi
+
+# GitHub CLI
+if gh auth status &>/dev/null; then
+    check_ok "GitHub CLI → authenticated"
+else
+    check_warn "GitHub CLI → not authenticated"
+fi
+
+# GPG
+if gpg --list-secret-keys --keyid-format LONG 2>/dev/null | grep -q sec; then
+    check_ok "GPG → secret keys present"
+else
+    check_warn "GPG → no secret keys found"
+fi
+
+# rclone
+if rclone listremotes 2>/dev/null | grep -q "gdrive:"; then
+    check_ok "rclone → gdrive remote configured"
+else
+    check_warn "rclone → gdrive remote not found"
+fi
+
+# Claude Code
+if [[ -f "$HOME/.claude/settings.json" ]]; then
+    check_ok "Claude Code → settings.json exists"
+else
+    check_warn "Claude Code → settings.json missing"
+fi
+
+# Atuin
+if [[ -f "$HOME/.local/share/atuin/history.db" ]]; then
+    check_ok "Atuin → history.db exists"
+else
+    check_warn "Atuin → history.db missing"
+fi
+
+# Fish
+if [[ -f "$HOME/.config/fish/fish_variables" ]]; then
+    check_ok "Fish → fish_variables exists"
+else
+    check_warn "Fish → fish_variables missing"
+fi
+
+# gcloud
+if [[ -d "$HOME/.config/gcloud" ]] && [[ -n "$(ls -A "$HOME/.config/gcloud" 2>/dev/null)" ]]; then
+    check_ok "gcloud → config directory has files"
+else
+    check_warn "gcloud → config directory empty or missing"
+fi
+
+# Keyrings
+if [[ -d "$HOME/.local/share/keyrings" ]] && [[ -n "$(ls -A "$HOME/.local/share/keyrings" 2>/dev/null)" ]]; then
+    check_ok "GNOME keyrings → keyring files present"
+else
+    check_warn "GNOME keyrings → no keyring files found"
+fi
+
+# Local scripts
+if [[ -d "$HOME/.local/bin" ]] && [[ -n "$(ls -A "$HOME/.local/bin" 2>/dev/null)" ]]; then
+    check_ok "Local scripts → ~/.local/bin has files"
+else
+    check_warn "Local scripts → ~/.local/bin empty or missing"
+fi
+
+# --- Phase 2: GitHub repos ---
+
+echo ""
+echo -e "  ${BOLD}GitHub repos${NC}"
+
+gh_count=$(gh repo list "$GITHUB_USER" --limit 200 --json name --jq 'length' 2>/dev/null || echo "0")
+# Count directories in $HOME that are git repos (excluding common non-repo dirs)
+local_repos=0
+for d in "$HOME"/*/; do
+    if [[ -d "$d/.git" ]]; then
+        local_repos=$((local_repos + 1))
+    fi
+done
+
+if [[ "$local_repos" -ge "$gh_count" ]] && [[ "$gh_count" -gt 0 ]]; then
+    check_ok "Repos → $local_repos local git repos (GitHub has $gh_count)"
+elif [[ "$gh_count" -gt 0 ]]; then
+    check_warn "Repos → $local_repos local git repos vs $gh_count on GitHub ($(( gh_count - local_repos )) missing)"
+else
+    check_warn "Repos → could not query GitHub repo count"
+fi
+
+# --- Phase 3: Project data ---
+
+echo ""
+echo -e "  ${BOLD}Project data${NC}"
+
+# Helper: check file exists (skip if parent repo missing)
+check_project_file() {
+    local file_path="$1"
+    local label="$2"
+    local repo_dir
+    repo_dir=$(echo "$file_path" | sed "s|^$HOME/||" | cut -d'/' -f1)
+    repo_dir="$HOME/$repo_dir"
+
+    if [[ ! -d "$repo_dir" ]]; then
+        check_warn "$label → repo not cloned, skipped"
+        return
+    fi
+
+    if [[ -f "$file_path" ]]; then
+        check_ok "$label"
+    else
+        check_warn "$label → file missing"
+    fi
+}
+
+# Helper: check directory has files (skip if parent repo missing)
+check_project_dir() {
+    local dir_path="$1"
+    local label="$2"
+    local repo_dir
+    repo_dir=$(echo "$dir_path" | sed "s|^$HOME/||" | cut -d'/' -f1)
+    repo_dir="$HOME/$repo_dir"
+
+    if [[ ! -d "$repo_dir" ]]; then
+        check_warn "$label → repo not cloned, skipped"
+        return
+    fi
+
+    if [[ -d "$dir_path" ]] && [[ -n "$(ls -A "$dir_path" 2>/dev/null)" ]]; then
+        check_ok "$label"
+    else
+        check_warn "$label → directory empty or missing"
+    fi
+}
+
+check_project_dir  "$HOME/whatsapp-mcp/whatsapp-bridge/store"  "WhatsApp DB"
+check_project_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "Bimby recipes"
+check_project_dir  "$HOME/bimby-hacking/yuka/database"         "Yuka DB"
+check_project_dir  "$HOME/albo-commercialisti/data"             "Albo data"
+check_project_file "$HOME/albo-commercialisti/.env"             "Albo .env"
+check_project_file "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" "Birthday events"
+check_project_dir  "$HOME/pta-ledger/ledger"                    "PTA ledger"
+
+# gogcli is a config dir, not inside a repo
+if [[ -d "$HOME/.config/gogcli" ]] && [[ -n "$(ls -A "$HOME/.config/gogcli" 2>/dev/null)" ]]; then
+    check_ok "gogcli credentials"
+else
+    check_warn "gogcli credentials → missing or empty"
+fi
+
+# --- System services ---
+
+echo ""
+echo -e "  ${BOLD}System services${NC}"
+
+if systemctl --user is-active rclone-gdrive &>/dev/null; then
+    check_ok "rclone-gdrive mount → active"
+else
+    check_warn "rclone-gdrive mount → not active (may need nixos-rebuild first)"
+fi
+
+if systemctl --user is-active backup-configs.timer &>/dev/null; then
+    check_ok "backup-configs timer → active"
+else
+    check_warn "backup-configs timer → not active (run: systemctl --user enable --now backup-configs.timer)"
+fi
+
+# --- Verification summary ---
+
+echo ""
+echo -e "  ${BOLD}Phase 4 summary:${NC} $verify_ok passed, $verify_warn warnings"
+
+if [[ $verify_warn -gt 0 ]]; then
+    echo -e "  ${YELLOW}Review warnings above. Some may resolve after nixos-rebuild or reboot.${NC}"
+fi
 
 # ============================================================================
 # Done

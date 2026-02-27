@@ -88,10 +88,11 @@ cd ~/nixos-config
 ./scripts/restore-machine.sh thinkpad-x1-jacopo
 ```
 
-The script runs three phases:
+The script runs four phases:
 1. **System configs** — SSH keys, GPG, Claude Code, Atuin history, Fish, keyrings, gcloud, rclone, custom scripts (with correct permissions)
 2. **GitHub repos** — clones all repos from GitHub to `~/`
 3. **Gitignored project data** — databases, .env files, credentials from Drive backup into repos
+4. **Verification** — functional checks (SSH, gh, GPG, rclone) and existence checks for all restored data
 
 Requires: rclone configured (Step 1). The script restores `gh` credentials in Phase 1,
 so `gh auth login` is not needed separately.
@@ -119,22 +120,20 @@ mkdir -p ~/.local/bin && rclone sync "gdrive:backups/$SOURCE_HOST/local-bin/" ~/
 
 ## Step 4: Post-install verification
 
+The restore script runs automated verification in Phase 4, checking every restored
+item with functional tests (SSH, gh, GPG, rclone) and existence checks (databases,
+config files). Review its output for any warnings.
+
+For manual spot-checks or debugging:
+
 ```bash
-# Verify rclone mount
-systemctl --user status rclone-gdrive
-
-# Verify auto-backup timer
-systemctl --user status backup-configs.timer
-systemctl --user list-timers backup-configs
-
-# Verify SSH
-ssh -T git@github.com
-
-# Verify GitHub CLI
-gh auth status
-
-# Verify Claude Code
-claude --version
+ssh -T git@github.com              # SSH auth
+gh auth status                     # GitHub CLI
+gpg --list-secret-keys             # GPG keys
+rclone listremotes                 # rclone remotes
+systemctl --user status rclone-gdrive       # Drive mount
+systemctl --user status backup-configs.timer # Backup timer
+claude --version                   # Claude Code
 ```
 
 ## Step 5: Set up auto-backup for the NEW machine
