@@ -76,7 +76,7 @@ let
     sync_dir "$HOME/.config/gogcli" "gogcli" "gogcli credentials"
 
     # Birthday manager events database
-    sync_file "$HOME/birthday-manager-ts/\$HOME/.local/share/birthday-manager/events.db" "birthday-manager/events.db" "Birthday events"
+    sync_file "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" "birthday-manager/events.db" "Birthday events"
 
     # PTA ledger (financial data)
     sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
