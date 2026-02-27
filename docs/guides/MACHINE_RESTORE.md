@@ -1,7 +1,7 @@
 ---
 status: active
 created: 2026-02-25
-updated: 2026-02-26
+updated: 2026-02-27
 type: guide
 lifecycle: persistent
 ---
@@ -59,54 +59,10 @@ rclone config
 # Choose: n (new remote) → name: gdrive → type: drive → follow OAuth prompts
 ```
 
-## Step 2: Restore configs from Google Drive
+## Step 2: Clone NixOS config and install
 
 ```bash
-# Decide source: use the hostname of the machine you're restoring FROM
-SOURCE_HOST="thinkpad-x1-jacopo"  # or whichever backup to restore
-
-# SSH keys (restore first - needed for git clone)
-mkdir -p ~/.ssh && chmod 700 ~/.ssh
-rclone sync "gdrive:backups/$SOURCE_HOST/ssh/" ~/.ssh/
-chmod 600 ~/.ssh/id_* 2>/dev/null
-chmod 644 ~/.ssh/*.pub 2>/dev/null
-
-# GitHub CLI
-mkdir -p ~/.config/gh
-rclone sync "gdrive:backups/$SOURCE_HOST/gh/" ~/.config/gh/
-
-# GPG keys
-mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-rclone sync "gdrive:backups/$SOURCE_HOST/gnupg/" ~/.gnupg/
-
-# Claude Code config
-mkdir -p ~/.claude
-rclone sync "gdrive:backups/$SOURCE_HOST/claude/" ~/.claude/
-
-# Atuin shell history
-mkdir -p ~/.local/share/atuin
-rclone sync "gdrive:backups/$SOURCE_HOST/atuin/" ~/.local/share/atuin/
-
-# Fish config
-mkdir -p ~/.config/fish
-rclone sync "gdrive:backups/$SOURCE_HOST/fish/" ~/.config/fish/
-
-# GNOME keyrings (WiFi passwords, etc.)
-mkdir -p ~/.local/share/keyrings
-rclone sync "gdrive:backups/$SOURCE_HOST/keyrings/" ~/.local/share/keyrings/
-
-# Custom scripts
-mkdir -p ~/.local/bin
-rclone sync "gdrive:backups/$SOURCE_HOST/local-bin/" ~/.local/bin/
-```
-
-## Step 3: Clone and install NixOS config
-
-```bash
-# Test SSH access to GitHub
-ssh -T git@github.com
-
-# If SSH fails, use HTTPS for initial clone
+# Use HTTPS for initial clone (SSH keys not restored yet)
 git clone https://github.com/jacopone/nixos-config.git /tmp/nixos-config
 cd /tmp/nixos-config
 git checkout personal
@@ -119,25 +75,47 @@ sudo nixos-install --flake .#<host-name>
 # sudo nixos-rebuild switch --flake .#<host-name>
 ```
 
-## Step 3.5: Clone repos and restore project data
+## Step 3: Run restore script
 
-After NixOS is rebuilt and you've logged in:
+After NixOS is rebuilt and you've logged in, the restore script handles everything:
+system configs, GitHub repos, and project data.
 
 ```bash
 cd ~/nixos-config
-
-# Clone all GitHub repos + restore gitignored data (databases, .env files)
 ./scripts/restore-machine.sh <source-hostname>
 
 # Example:
 ./scripts/restore-machine.sh thinkpad-x1-jacopo
 ```
 
-This clones all repos from GitHub that aren't already present in `~/`, then
-restores gitignored project data (databases, credentials) from the Drive backup
-into the correct repo directories.
+The script runs three phases:
+1. **System configs** — SSH keys, GPG, Claude Code, Atuin history, Fish, keyrings, gcloud, rclone, custom scripts (with correct permissions)
+2. **GitHub repos** — clones all repos from GitHub to `~/`
+3. **Gitignored project data** — databases, .env files, credentials from Drive backup into repos
 
-Requires: `gh auth login` completed, rclone configured (Steps 1-2).
+Requires: rclone configured (Step 1). The script restores `gh` credentials in Phase 1,
+so `gh auth login` is not needed separately.
+
+### Manual fallback (if script fails)
+
+If the restore script is unavailable, restore configs manually:
+
+```bash
+SOURCE_HOST="thinkpad-x1-jacopo"
+
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+rclone sync "gdrive:backups/$SOURCE_HOST/ssh/" ~/.ssh/
+chmod 600 ~/.ssh/id_* 2>/dev/null && chmod 644 ~/.ssh/*.pub 2>/dev/null
+
+mkdir -p ~/.config/gh && rclone sync "gdrive:backups/$SOURCE_HOST/gh/" ~/.config/gh/
+mkdir -p ~/.gnupg && chmod 700 ~/.gnupg && rclone sync "gdrive:backups/$SOURCE_HOST/gnupg/" ~/.gnupg/
+mkdir -p ~/.claude && rclone sync "gdrive:backups/$SOURCE_HOST/claude/" ~/.claude/
+mkdir -p ~/.local/share/atuin && rclone sync "gdrive:backups/$SOURCE_HOST/atuin/" ~/.local/share/atuin/
+mkdir -p ~/.config/fish && rclone sync "gdrive:backups/$SOURCE_HOST/fish/" ~/.config/fish/
+mkdir -p ~/.config/gcloud && rclone sync "gdrive:backups/$SOURCE_HOST/gcloud/" ~/.config/gcloud/
+mkdir -p ~/.local/share/keyrings && rclone sync "gdrive:backups/$SOURCE_HOST/keyrings/" ~/.local/share/keyrings/
+mkdir -p ~/.local/bin && rclone sync "gdrive:backups/$SOURCE_HOST/local-bin/" ~/.local/bin/
+```
 
 ## Step 4: Post-install verification
 

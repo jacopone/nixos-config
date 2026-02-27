@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Restore a machine after fresh NixOS install.
-# Run after MACHINE_RESTORE.md Step 3 (NixOS rebuilt, gh + rclone working).
+# Run after MACHINE_RESTORE.md Step 1 (rclone bootstrapped).
 #
-# Phase 1: Clone all GitHub repos
-# Phase 2: Restore gitignored data from Drive backup
+# Phase 1: Restore system configs (SSH, GPG, Claude, shell history, etc.)
+# Phase 2: Clone all GitHub repos
+# Phase 3: Restore gitignored project data (databases, .env files)
 #
 # Usage: ./scripts/restore-machine.sh <source-hostname>
 
@@ -94,10 +95,67 @@ fi
 info "Backup exists: $BACKUP_BASE"
 
 # ============================================================================
-# Phase 1: Clone all GitHub repos
+# Phase 1: Restore system configs from Drive backup
 # ============================================================================
 
-print_phase "Phase 1: Clone GitHub repos"
+print_phase "Phase 1: Restore system configs from $SOURCE_HOST"
+
+config_restored=0
+config_failed=0
+
+# restore_config: like restore_dir but no repo-exists check (system dirs)
+restore_config() {
+    local drive_path="$BACKUP_BASE/$1"
+    local local_path="$2"
+    local label="$3"
+
+    mkdir -p "$local_path"
+    echo -e "  Restoring ${BOLD}$label${NC}..."
+    if rclone copy "$drive_path/" "$local_path/" --transfers 4 --quiet 2>/dev/null; then
+        info "$label"
+        config_restored=$((config_restored + 1))
+    else
+        fail "$label"
+        config_failed=$((config_failed + 1))
+    fi
+}
+
+# Identity and auth
+restore_config "ssh"       "$HOME/.ssh"                  "SSH keys"
+restore_config "gh"        "$HOME/.config/gh"            "GitHub CLI"
+restore_config "gnupg"     "$HOME/.gnupg"                "GPG keys"
+restore_config "rclone"    "$HOME/.config/rclone"        "rclone config"
+
+# Fix permissions (SSH and GPG require strict perms)
+chmod 700 "$HOME/.ssh" 2>/dev/null || true
+chmod 600 "$HOME/.ssh"/id_* 2>/dev/null || true
+chmod 644 "$HOME/.ssh"/*.pub 2>/dev/null || true
+chmod 700 "$HOME/.gnupg" 2>/dev/null || true
+
+# Claude Code (settings, permissions, memory, sessions)
+restore_config "claude"    "$HOME/.claude"               "Claude Code"
+
+# Shell and terminal
+restore_config "atuin"     "$HOME/.local/share/atuin"    "Atuin history"
+restore_config "fish"      "$HOME/.config/fish"          "Fish config"
+
+# Cloud and dev tools
+restore_config "gcloud"    "$HOME/.config/gcloud"        "Google Cloud"
+
+# Desktop data
+restore_config "keyrings"  "$HOME/.local/share/keyrings" "GNOME keyrings"
+
+# Custom scripts
+restore_config "local-bin" "$HOME/.local/bin"            "Local scripts"
+
+echo ""
+echo -e "  ${BOLD}Phase 1 summary:${NC} restored $config_restored, failed $config_failed"
+
+# ============================================================================
+# Phase 2: Clone all GitHub repos
+# ============================================================================
+
+print_phase "Phase 2: Clone GitHub repos"
 
 cloned=0
 skipped=0
@@ -128,13 +186,13 @@ while IFS=$'\t' read -r name ssh_url; do
 done < <(gh repo list "$GITHUB_USER" --limit 200 --json name,sshUrl --jq '.[] | [.name, .sshUrl] | @tsv')
 
 echo ""
-echo -e "  ${BOLD}Phase 1 summary:${NC} cloned $cloned, skipped $skipped, failed $clone_failed"
+echo -e "  ${BOLD}Phase 2 summary:${NC} cloned $cloned, skipped $skipped, failed $clone_failed"
 
 # ============================================================================
-# Phase 2: Restore gitignored data from Drive backup
+# Phase 3: Restore gitignored project data from Drive backup
 # ============================================================================
 
-print_phase "Phase 2: Restore gitignored data from Drive backup ($SOURCE_HOST)"
+print_phase "Phase 3: Restore gitignored project data from $SOURCE_HOST"
 
 restored=0
 phase2_skipped=0
@@ -259,13 +317,13 @@ else
 fi
 
 echo ""
-echo -e "  ${BOLD}Phase 2 summary:${NC} restored $restored, skipped $phase2_skipped, failed $restore_failed"
+echo -e "  ${BOLD}Phase 3 summary:${NC} restored $restored, skipped $phase2_skipped, failed $restore_failed"
 
 # ============================================================================
 # Done
 # ============================================================================
 
-total_failed=$((clone_failed + restore_failed))
+total_failed=$((config_failed + clone_failed + restore_failed))
 if [[ $total_failed -gt 0 ]]; then
     echo ""
     echo -e "${BOLD}${RED}════════════════════════════════════════════════════════════${NC}"
