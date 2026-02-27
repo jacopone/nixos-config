@@ -237,7 +237,7 @@ restore_file \
 # Note: the repo has a literal $HOME directory inside it (not expanded)
 restore_file \
     "birthday-manager/events.db" \
-    "$HOME/birthday-manager-ts/\$HOME/.local/share/birthday-manager/events.db" \
+    "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" \
     "Birthday manager events"
 
 # PTA ledger
