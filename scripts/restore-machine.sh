@@ -328,11 +328,24 @@ fi
 
 # Chrome extension data (Simplify Gmail settings)
 # Special case: Chrome extension storage, not inside a repo clone
+# Chrome must be closed or it overwrites restored data on exit
 if [[ -d "$HOME/.config/google-chrome/Default/Local Extension Settings" ]]; then
+    if pgrep -f "google-chrome" &>/dev/null; then
+        echo -e "  ${YELLOW}Closing Chrome to restore extension data...${NC}"
+        pkill -TERM -f "google-chrome" 2>/dev/null
+        sleep 3
+        # Force kill if still running
+        pkill -9 -f "google-chrome" 2>/dev/null || true
+        sleep 1
+    fi
     restore_dir \
         "chrome-extensions/simplify-gmail" \
         "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" \
         "Simplify Gmail settings"
+    # Clean up stale lock files from source machine
+    for f in SingletonLock SingletonCookie SingletonSocket; do
+        rm -f "$HOME/.config/google-chrome/$f" 2>/dev/null
+    done
 else
     skip "Simplify Gmail settings (Chrome extension storage not found)"
     phase2_skipped=$((phase2_skipped + 1))
