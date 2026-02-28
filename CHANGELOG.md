@@ -1545,6 +1545,16 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - switch to open kernel modules for RTX 5070 Blackwell GPU
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add system config restore to restore-machine.sh (Phase 1)
+- add automated verification phase to restore-machine.sh
+
+### Fixed
+- use correct repo name birthday-manager (not birthday-manager-ts)
+  (Test: Verify the previous issue is resolved)
+- remove stale Chrome lock files during restore
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
