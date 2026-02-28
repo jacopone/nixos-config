@@ -326,6 +326,31 @@ else
     phase2_skipped=$((phase2_skipped + 1))
 fi
 
+# Chrome extension data (Simplify Gmail settings)
+# Special case: Chrome extension storage, not inside a repo clone
+# Chrome must be closed or it overwrites restored data on exit
+if [[ -d "$HOME/.config/google-chrome/Default/Local Extension Settings" ]]; then
+    if pgrep -f "google-chrome" &>/dev/null; then
+        echo -e "  ${YELLOW}Closing Chrome to restore extension data...${NC}"
+        pkill -TERM -f "google-chrome" 2>/dev/null
+        sleep 3
+        # Force kill if still running
+        pkill -9 -f "google-chrome" 2>/dev/null || true
+        sleep 1
+    fi
+    restore_dir \
+        "chrome-extensions/simplify-gmail" \
+        "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" \
+        "Simplify Gmail settings"
+    # Clean up stale lock files from source machine
+    for f in SingletonLock SingletonCookie SingletonSocket; do
+        rm -f "$HOME/.config/google-chrome/$f" 2>/dev/null
+    done
+else
+    skip "Simplify Gmail settings (Chrome extension storage not found)"
+    phase2_skipped=$((phase2_skipped + 1))
+fi
+
 echo ""
 echo -e "  ${BOLD}Phase 3 summary:${NC} restored $restored, skipped $phase2_skipped, failed $restore_failed"
 
@@ -497,6 +522,14 @@ if [[ -d "$HOME/.config/gogcli" ]] && [[ -n "$(ls -A "$HOME/.config/gogcli" 2>/d
     check_ok "gogcli credentials"
 else
     check_warn "gogcli credentials → missing or empty"
+fi
+
+# Simplify Gmail extension data
+simplify_dir="$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj"
+if [[ -d "$simplify_dir" ]] && [[ -n "$(ls -A "$simplify_dir" 2>/dev/null)" ]]; then
+    check_ok "Simplify Gmail settings"
+else
+    check_warn "Simplify Gmail settings → missing or empty"
 fi
 
 # --- System services ---

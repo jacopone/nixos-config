@@ -81,6 +81,9 @@ let
     # PTA ledger (financial data)
     sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
 
+    # Chrome extension data (Simplify Gmail settings/customizations)
+    sync_dir "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" "chrome-extensions/simplify-gmail" "Simplify Gmail"
+
     # Restore guide — top-level in backups/ (not per-host)
     if [ -f "$HOME/nixos-config/docs/guides/MACHINE_RESTORE.md" ]; then
       rclone copyto "$HOME/nixos-config/docs/guides/MACHINE_RESTORE.md" \
