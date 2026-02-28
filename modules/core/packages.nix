@@ -254,6 +254,7 @@ in
     uv # Extremely fast Python package manager (provides uvx for MCP servers)
     k9s # Kubernetes cluster management
     podman # Docker alternative
+    gnupg # GNU Privacy Guard — encryption, signing, key management
     nmap # Network discovery and security auditing
     # wireshark - use nix-shell -p wireshark when needed
     tcpdump # Command-line packet analyzer
