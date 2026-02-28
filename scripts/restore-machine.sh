@@ -133,6 +133,19 @@ chmod 600 "$HOME/.ssh"/id_* 2>/dev/null || true
 chmod 644 "$HOME/.ssh"/*.pub 2>/dev/null || true
 chmod 700 "$HOME/.gnupg" 2>/dev/null || true
 
+# Register SSH key with GitHub (new machine needs the key associated)
+if gh auth status &>/dev/null; then
+    pub_key=$(find "$HOME/.ssh" -name "*.pub" -type f | head -1)
+    if [[ -n "$pub_key" ]]; then
+        key_name="$(hostname)-$(date +%Y%m%d)"
+        if gh ssh-key add "$pub_key" --title "$key_name" 2>/dev/null; then
+            info "SSH key registered with GitHub as $key_name"
+        else
+            skip "SSH key already registered with GitHub (or scope missing)"
+        fi
+    fi
+fi
+
 # Claude Code (settings, permissions, memory, sessions)
 restore_config "claude"    "$HOME/.claude"               "Claude Code"
 
