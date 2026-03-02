@@ -127,6 +127,15 @@ restore_config "gh"        "$HOME/.config/gh"            "GitHub CLI"
 restore_config "gnupg"     "$HOME/.gnupg"                "GPG keys"
 restore_config "rclone"    "$HOME/.config/rclone"        "rclone config"
 
+# Git global config
+echo -e "  Restoring ${BOLD}Git config${NC}..."
+if rclone copyto "$BACKUP_BASE/gitconfig" "$HOME/.gitconfig" --quiet 2>/dev/null; then
+    info "Git config"
+    config_restored=$((config_restored + 1))
+else
+    skip "Git config (not found in backup)"
+fi
+
 # Fix permissions (SSH and GPG require strict perms)
 chmod 700 "$HOME/.ssh" 2>/dev/null || true
 chmod 600 "$HOME/.ssh"/id_* 2>/dev/null || true
@@ -161,6 +170,22 @@ restore_config "keyrings"  "$HOME/.local/share/keyrings" "GNOME keyrings"
 
 # Custom scripts
 restore_config "local-bin" "$HOME/.local/bin"            "Local scripts"
+
+# GNOME desktop settings (keybindings, favorites, workspace config)
+restore_config "dconf"     "$HOME/.config/dconf"         "GNOME dconf settings"
+
+# Account Harmony GCP service account keys
+restore_config "account-harmony-secrets" "$HOME/.config/account-harmony-ai/secrets" "Account Harmony secrets"
+
+# Chrome bookmarks
+echo -e "  Restoring ${BOLD}Chrome bookmarks${NC}..."
+mkdir -p "$HOME/.config/google-chrome/Default"
+if rclone copyto "$BACKUP_BASE/chrome-bookmarks/Default-Bookmarks.json" "$HOME/.config/google-chrome/Default/Bookmarks" --quiet 2>/dev/null; then
+    info "Chrome bookmarks"
+    config_restored=$((config_restored + 1))
+else
+    skip "Chrome bookmarks (not found in backup)"
+fi
 
 # Clean up stale lock files from the source machine
 # Chrome Singleton files contain the old hostname/PID and block launch
@@ -282,6 +307,46 @@ restore_file() {
     fi
 }
 
+# Restore a non-git directory (no repo check, Drive is the only copy)
+restore_nonrepo_dir() {
+    local drive_path="$BACKUP_BASE/$1"
+    local local_path="$2"
+    local label="$3"
+
+    mkdir -p "$local_path"
+    echo -e "  Restoring ${BOLD}$label${NC}..."
+    if rclone copy "$drive_path/" "$local_path/" --transfers 4 --quiet 2>/dev/null; then
+        info "$label"
+        restored=$((restored + 1))
+    else
+        fail "$label"
+        restore_failed=$((restore_failed + 1))
+    fi
+}
+
+# Restore all gitignored data for a project (.env files, databases, etc.)
+# Copies entire gitignored-critical/<project>/ back to ~/<project>/, preserving structure
+restore_project_data() {
+    local project="$1" label="$2"
+    local local_dir="$HOME/$project"
+    local drive_dir="$BACKUP_BASE/gitignored-critical/$project"
+
+    if [[ ! -d "$local_dir" ]]; then
+        skip "$label (repo $local_dir not found)"
+        phase2_skipped=$((phase2_skipped + 1))
+        return
+    fi
+
+    echo -e "  Restoring ${BOLD}$label${NC}..."
+    if rclone copy "$drive_dir/" "$local_dir/" --transfers 4 --quiet 2>/dev/null; then
+        info "$label"
+        restored=$((restored + 1))
+    else
+        fail "$label"
+        restore_failed=$((restore_failed + 1))
+    fi
+}
+
 # --- Restore mappings (inverse of backup-sync.nix) ---
 
 # WhatsApp message archive
@@ -314,18 +379,37 @@ restore_file \
     "$HOME/albo-commercialisti/.env" \
     "Albo commercialisti .env"
 
-# Birthday manager events database
-# Note: the repo has a literal $HOME directory inside it (not expanded)
-restore_file \
-    "birthday-manager/events.db" \
-    "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" \
-    "Birthday manager events"
+# Birthday manager (events DB, triage DB, auth tokens, rollback backups)
+# Data lives in XDG data dir, not inside the repo
+restore_config "birthday-manager" "$HOME/.local/share/birthday-manager" "Birthday manager"
 
 # PTA ledger
 restore_dir \
     "pta-ledger" \
     "$HOME/pta-ledger/ledger" \
     "PTA ledger"
+
+# Non-git directories (Drive is the only backup)
+restore_nonrepo_dir "downloads" "$HOME/Downloads" "Downloads"
+restore_nonrepo_dir "obsidian" "$HOME/obsidian_brain" "Obsidian vault"
+restore_nonrepo_dir "yc-application" "$HOME/yc-application" "YC application"
+
+# Additional project databases + .env files (gitignored secrets)
+# restore_project_data copies entire gitignored-critical/<project>/ back,
+# which includes both database files and auto-discovered .env files
+restore_project_data "credit-finder" "Credit Finder data"
+restore_project_data "financial-advisor" "Financial Advisor data"
+restore_project_data "bimby-nutritionist" "Bimby Nutritionist data"
+restore_project_data "susilo" "Susilo data"
+restore_project_data "account-harmony-ai-37599577" "Account Harmony data"
+restore_project_data "HealthSafe-Journal" "HealthSafe Journal data"
+restore_project_data "moving-agent" "Moving Agent data"
+restore_project_data "pediatra-digitale" "Pediatra Digitale data"
+restore_project_data "banca-piemonte-analysis" "Banca Piemonte data"
+restore_project_data "food-assistant" "Food Assistant data"
+restore_project_data "legis-hub" "Legis Hub data"
+restore_project_data "mcp-sunsama" "MCP Sunsama data"
+restore_project_data "mutuo-rapido-italia" "Mutuo Rapido data"
 
 # gogcli credentials
 # Special case: ~/.config/gogcli is not inside a repo clone
@@ -455,6 +539,34 @@ else
     check_warn "Local scripts → ~/.local/bin empty or missing"
 fi
 
+# Git config
+if [[ -f "$HOME/.gitconfig" ]]; then
+    check_ok "Git config → .gitconfig exists"
+else
+    check_warn "Git config → .gitconfig missing"
+fi
+
+# GNOME dconf settings
+if [[ -d "$HOME/.config/dconf" ]] && [[ -n "$(ls -A "$HOME/.config/dconf" 2>/dev/null)" ]]; then
+    check_ok "GNOME dconf settings → present"
+else
+    check_warn "GNOME dconf settings → missing or empty"
+fi
+
+# Account Harmony secrets
+if [[ -d "$HOME/.config/account-harmony-ai/secrets" ]] && [[ -n "$(ls -A "$HOME/.config/account-harmony-ai/secrets" 2>/dev/null)" ]]; then
+    check_ok "Account Harmony secrets → present"
+else
+    check_warn "Account Harmony secrets → missing or empty"
+fi
+
+# Chrome bookmarks
+if [[ -f "$HOME/.config/google-chrome/Default/Bookmarks" ]]; then
+    check_ok "Chrome bookmarks → present"
+else
+    check_warn "Chrome bookmarks → missing"
+fi
+
 # --- Phase 2: GitHub repos ---
 
 echo ""
@@ -527,7 +639,12 @@ check_project_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "Bimby recipes
 check_project_dir  "$HOME/bimby-hacking/yuka/database"         "Yuka DB"
 check_project_dir  "$HOME/albo-commercialisti/data"             "Albo data"
 check_project_file "$HOME/albo-commercialisti/.env"             "Albo .env"
-check_project_file "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" "Birthday events"
+# Birthday manager (XDG data dir, not inside repo)
+if [[ -f "$HOME/.local/share/birthday-manager/events.db" ]]; then
+    check_ok "Birthday manager events"
+else
+    check_warn "Birthday manager events → missing"
+fi
 check_project_dir  "$HOME/pta-ledger/ledger"                    "PTA ledger"
 
 # gogcli is a config dir, not inside a repo
@@ -544,6 +661,26 @@ if [[ -d "$simplify_dir" ]] && [[ -n "$(ls -A "$simplify_dir" 2>/dev/null)" ]]; 
 else
     check_warn "Simplify Gmail settings → missing or empty"
 fi
+
+# Non-git directories
+if [[ -d "$HOME/obsidian_brain" ]] && [[ -n "$(ls -A "$HOME/obsidian_brain" 2>/dev/null)" ]]; then
+    check_ok "Obsidian vault"
+else
+    check_warn "Obsidian vault → missing or empty"
+fi
+
+if [[ -d "$HOME/yc-application" ]] && [[ -n "$(ls -A "$HOME/yc-application" 2>/dev/null)" ]]; then
+    check_ok "YC application"
+else
+    check_warn "YC application → missing or empty"
+fi
+
+# Additional databases
+check_project_file "$HOME/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
+check_project_dir  "$HOME/financial-advisor/data"                   "Financial Advisor DBs"
+check_project_file "$HOME/bimby-nutritionist/data/nutritionist.db"  "Bimby nutritionist DB"
+check_project_file "$HOME/bimby-nutritionist/data/bimby.db"         "Bimby DB"
+check_project_file "$HOME/susilo/data/susilo.sqlite"                "Susilo DB"
 
 # --- System services ---
 
