@@ -308,6 +308,8 @@ restore_file() {
 }
 
 # Restore a non-git directory (no repo check, Drive is the only copy)
+# Uses --ignore-errors so duplicate directories on Google Drive (allowed there,
+# not on local FS) don't cause a false failure for the entire copy.
 restore_nonrepo_dir() {
     local drive_path="$BACKUP_BASE/$1"
     local local_path="$2"
@@ -315,12 +317,25 @@ restore_nonrepo_dir() {
 
     mkdir -p "$local_path"
     echo -e "  Restoring ${BOLD}$label${NC}..."
-    if rclone copy "$drive_path/" "$local_path/" --transfers 4 --quiet 2>/dev/null; then
+    local log
+    log=$(rclone copy "$drive_path/" "$local_path/" --transfers 4 --ignore-errors 2>&1)
+    local rc=$?
+    if [[ $rc -eq 0 ]]; then
         info "$label"
         restored=$((restored + 1))
     else
-        fail "$label"
-        restore_failed=$((restore_failed + 1))
+        # Check if the only issues were duplicate entries (benign on Google Drive)
+        local real_errors
+        real_errors=$(echo "$log" | grep -c "^.*ERROR.*" || true)
+        local dup_errors
+        dup_errors=$(echo "$log" | grep -c "Duplicate.*found in source\|chtimes.*no such file" || true)
+        if [[ $real_errors -le $dup_errors ]]; then
+            info "$label (with $dup_errors duplicate-path warnings)"
+            restored=$((restored + 1))
+        else
+            fail "$label"
+            restore_failed=$((restore_failed + 1))
+        fi
     fi
 }
 
