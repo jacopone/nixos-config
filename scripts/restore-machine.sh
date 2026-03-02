@@ -390,9 +390,9 @@ restore_dir \
     "PTA ledger"
 
 # Non-git directories (Drive is the only backup)
-restore_nonrepo_dir "downloads" "$HOME/Downloads" "Downloads"
+restore_nonrepo_dir "Downloads" "$HOME/Downloads" "Downloads"
 restore_nonrepo_dir "Kooha" "$HOME/Kooha" "Kooha recordings"
-restore_nonrepo_dir "obsidian" "$HOME/obsidian_brain" "Obsidian vault"
+restore_nonrepo_dir "obsidian_brain" "$HOME/obsidian_brain" "Obsidian vault"
 restore_nonrepo_dir "yc-application" "$HOME/yc-application" "YC application"
 
 # Additional project databases + .env files (gitignored secrets)
