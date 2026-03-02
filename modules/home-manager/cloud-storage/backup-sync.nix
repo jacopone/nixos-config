@@ -61,7 +61,20 @@ let
     sync_file "$HOME/.gitconfig" "gitconfig" "Git config"
 
     # Claude Code (settings, permissions, memory, sessions)
-    sync_dir "$HOME/.claude" "claude" "Claude Code"
+    # Skip ephemeral dirs (debug, shell-snapshots, statsig) and files
+    # modified in the last 5 min (active session transcripts) to avoid
+    # rclone errors from files being written mid-upload.
+    # Skipped files sync on the next run after the session ends.
+    if [ -d "$HOME/.claude" ]; then
+      rclone sync "$HOME/.claude/" "$BASE/claude/" \
+        --transfers 8 --drive-chunk-size 64M --quiet \
+        --exclude "debug/**" \
+        --exclude "shell-snapshots/**" \
+        --exclude "statsig/**" \
+        --min-age 5m \
+        2>>"$LOG" && \
+        log "Claude Code: synced" || log "Claude Code: FAILED"
+    fi
 
     # Shell and terminal
     sync_dir "$HOME/.local/share/atuin" "atuin" "Atuin history"
