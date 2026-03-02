@@ -8,7 +8,7 @@ let
   # Script that syncs all critical configs to Google Drive
   backup-script = pkgs.writeShellScript "backup-configs-to-gdrive" ''
     set -euo pipefail
-    export PATH="${lib.makeBinPath [ pkgs.rclone pkgs.coreutils pkgs.hostname ]}"
+    export PATH="${lib.makeBinPath [ pkgs.rclone pkgs.coreutils pkgs.findutils pkgs.gnused pkgs.hostname ]}"
 
     HOSTNAME="$(hostname)"
     BASE="gdrive:backups/$HOSTNAME"
@@ -20,7 +20,7 @@ let
       local src="$1" dest="$2" label="$3"
       if [ -d "$src" ]; then
         rclone sync "$src/" "$BASE/$dest/" \
-          --transfers 2 --quiet 2>>"$LOG" && \
+          --transfers 8 --drive-chunk-size 64M --quiet 2>>"$LOG" && \
           log "$label: synced" || log "$label: FAILED"
       fi
     }
@@ -34,6 +34,23 @@ let
       fi
     }
 
+    # Sync all .env* files from a project, preserving directory structure
+    sync_envs() {
+      local project="$1" label="$2"
+      local src="$HOME/$project"
+      if [ -d "$src" ]; then
+        find "$src" -maxdepth 3 -name ".env*" -type f \
+          ! -path "*/node_modules/*" ! -path "*/.devenv/*" ! -path "*/.git/*" \
+          2>/dev/null | while IFS= read -r f; do
+          local rel
+          rel=$(echo "$f" | sed "s|^$HOME/||")
+          rclone copyto "$f" "$BASE/gitignored-critical/$rel" \
+            --quiet 2>>"$LOG"
+        done
+        log "$label .env files: synced"
+      fi
+    }
+
     log "Starting backup sync for $HOSTNAME"
 
     # Identity and auth
@@ -41,6 +58,7 @@ let
     sync_dir "$HOME/.config/gh" "gh" "GitHub CLI"
     sync_dir "$HOME/.gnupg" "gnupg" "GPG keys"
     sync_dir "$HOME/.config/rclone" "rclone" "rclone config"
+    sync_file "$HOME/.gitconfig" "gitconfig" "Git config"
 
     # Claude Code (settings, permissions, memory, sessions)
     sync_dir "$HOME/.claude" "claude" "Claude Code"
@@ -75,14 +93,49 @@ let
     # Google Suite CLI credentials (gogcli)
     sync_dir "$HOME/.config/gogcli" "gogcli" "gogcli credentials"
 
-    # Birthday manager events database
-    sync_file "$HOME/birthday-manager/\$HOME/.local/share/birthday-manager/events.db" "birthday-manager/events.db" "Birthday events"
+    # Birthday manager (events DB, triage DB, auth tokens, rollback backups)
+    sync_dir "$HOME/.local/share/birthday-manager" "birthday-manager" "Birthday manager"
+
+    # Account Harmony GCP service account keys
+    sync_dir "$HOME/.config/account-harmony-ai/secrets" "account-harmony-secrets" "Account Harmony secrets"
+
+    # GNOME desktop settings (keybindings, favorites, night light, workspace config)
+    sync_dir "$HOME/.config/dconf" "dconf" "GNOME dconf settings"
+
+    # Chrome bookmarks (in case Chrome Sync is not active)
+    sync_file "$HOME/.config/google-chrome/Default/Bookmarks" "chrome-bookmarks/Default-Bookmarks.json" "Chrome bookmarks"
 
     # PTA ledger (financial data)
     sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
 
     # Chrome extension data (Simplify Gmail settings/customizations)
     sync_dir "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" "chrome-extensions/simplify-gmail" "Simplify Gmail"
+
+    # Non-git directories (Drive is the only backup — no GitHub repo exists)
+    sync_dir "$HOME/Downloads" "downloads" "Downloads"
+    sync_dir "$HOME/obsidian_brain" "obsidian" "Obsidian vault"
+    sync_dir "$HOME/yc-application" "yc-application" "YC application"
+
+    # Additional project databases (gitignored, not in GitHub)
+    # Paths mirror home dir structure under gitignored-critical/ for clean restore
+    sync_file "$HOME/credit-finder/data/credit_finder.sqlite" "gitignored-critical/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
+    sync_dir "$HOME/financial-advisor/data" "gitignored-critical/financial-advisor/data" "Financial Advisor DBs"
+    sync_file "$HOME/bimby-nutritionist/data/nutritionist.db" "gitignored-critical/bimby-nutritionist/data/nutritionist.db" "Bimby nutritionist DB"
+    sync_file "$HOME/bimby-nutritionist/data/bimby.db" "gitignored-critical/bimby-nutritionist/data/bimby.db" "Bimby DB"
+    sync_file "$HOME/susilo/data/susilo.sqlite" "gitignored-critical/susilo/data/susilo.sqlite" "Susilo DB"
+
+    # Project .env files (gitignored secrets, auto-discovered per project)
+    sync_envs "account-harmony-ai-37599577" "Account Harmony"
+    sync_envs "HealthSafe-Journal" "HealthSafe Journal"
+    sync_envs "moving-agent" "Moving Agent"
+    sync_envs "pediatra-digitale" "Pediatra Digitale"
+    sync_envs "bimby-nutritionist" "Bimby Nutritionist"
+    sync_envs "banca-piemonte-analysis" "Banca Piemonte"
+    sync_envs "credit-finder" "Credit Finder"
+    sync_envs "food-assistant" "Food Assistant"
+    sync_envs "legis-hub" "Legis Hub"
+    sync_envs "mcp-sunsama" "MCP Sunsama"
+    sync_envs "mutuo-rapido-italia" "Mutuo Rapido"
 
     # Restore guide — top-level in backups/ (not per-host)
     if [ -f "$HOME/nixos-config/docs/guides/MACHINE_RESTORE.md" ]; then
