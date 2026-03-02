@@ -18,18 +18,13 @@
 - `nix flake check` - Validate configuration syntax
 - `nix develop` or `devenv shell` - Enter development environment
 
-### Claude Code Sandboxing
+### Claude Code Autonomous
 - `claude` - Normal interactive use (full access)
-- `claude-sandboxed [project-dir]` - Kernel-level isolation with network (for autonomous tasks)
-- `claude-airgapped [project-dir]` - Full isolation, no network (for code review)
+- `scripts/claude-autonomous.sh <repo> <task> "<prompt>"` - Autonomous worker in git worktree + tmux
 
-Use `claude-sandboxed` when running with `--dangerously-skip-permissions` for long-running autonomous tasks. It provides:
-- Process/IPC/UTS namespace isolation
-- Filesystem restricted to project + ~/.claude only
-- All Linux capabilities dropped
-- Network access preserved for API calls
-
-Use `claude-airgapped` for pure offline code review with zero network access.
+The autonomous script creates an isolated worktree, launches Claude with `--dangerously-skip-permissions` (native sandbox auto-enabled), and runs in a Ralph loop (up to 5 iterations). Native sandbox provides:
+- bubblewrap namespace isolation + seccomp BPF
+- Spawned processes inherit sandbox (kernel-enforced)
 
 ## Project Structure
 - `flake.nix` - Main configuration entry point

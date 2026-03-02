@@ -45,5 +45,13 @@
       # Click behavior
       click-action = "focus-minimize-or-previews";
     };
+
+    # Disable idle suspend — enforced at user level because extraGSettingsOverrides
+    # only sets the system default and gets overridden by user dconf.
+    # Lid close still suspends normally (HandleLidSwitch in logind).
+    "org/gnome/settings-daemon/plugins/power" = {
+      sleep-inactive-ac-type = "nothing";
+      sleep-inactive-battery-type = "nothing";
+    };
   };
 }

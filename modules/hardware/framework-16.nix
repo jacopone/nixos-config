@@ -57,20 +57,23 @@
   # Disable GNOME idle suspend — PIXA3854 touchpad kernel bug discards valid
   # touches as "touch jumps", triggering false idle detection.
   # Lid close still suspends normally (HandleLidSwitch = "suspend").
-  services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+  services.desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.settings-daemon.plugins.power]
     sleep-inactive-ac-type='nothing'
     sleep-inactive-battery-type='nothing'
   '';
 
   # Double suspend workaround (systemd v258+)
-  # Block sleep for 10s after resume to prevent immediate re-suspend.
+  # On resume, block sleep for 10s so the system doesn't immediately re-suspend.
+  # Waits 1s for the suspend operation to fully complete before taking the inhibit
+  # lock — without this, systemd-inhibit fails with "already running".
   systemd.services.inhibit-sleep-after-resume = {
     description = "Temporary sleep inhibitor after resume";
     wantedBy = [ "post-resume.target" ];
     after = [ "post-resume.target" ];
     serviceConfig.Type = "oneshot";
     script = ''
+      ${pkgs.coreutils}/bin/sleep 1
       ${pkgs.systemd}/bin/systemd-inhibit \
         --mode=block \
         --what=sleep:idle \
