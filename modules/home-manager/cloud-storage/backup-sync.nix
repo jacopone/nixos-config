@@ -112,8 +112,9 @@ let
     sync_dir "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" "chrome-extensions/simplify-gmail" "Simplify Gmail"
 
     # Non-git directories (Drive is the only backup — no GitHub repo exists)
-    sync_dir "$HOME/Downloads" "downloads" "Downloads"
-    sync_dir "$HOME/obsidian_brain" "obsidian" "Obsidian vault"
+    sync_dir "$HOME/Downloads" "Downloads" "Downloads"
+    sync_dir "$HOME/Kooha" "Kooha" "Kooha recordings"
+    sync_dir "$HOME/obsidian_brain" "obsidian_brain" "Obsidian vault"
     sync_dir "$HOME/yc-application" "yc-application" "YC application"
 
     # Additional project databases (gitignored, not in GitHub)
