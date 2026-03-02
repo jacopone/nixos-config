@@ -127,6 +127,7 @@ let
     # Non-git directories (Drive is the only backup — no GitHub repo exists)
     sync_dir "$HOME/Downloads" "Downloads" "Downloads"
     sync_dir "$HOME/Kooha" "Kooha" "Kooha recordings"
+    sync_dir "$HOME/Pictures" "Pictures" "Pictures"
     sync_dir "$HOME/obsidian_brain" "obsidian_brain" "Obsidian vault"
     sync_dir "$HOME/yc-application" "yc-application" "YC application"
 

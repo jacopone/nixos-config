@@ -392,6 +392,7 @@ restore_dir \
 # Non-git directories (Drive is the only backup)
 restore_nonrepo_dir "Downloads" "$HOME/Downloads" "Downloads"
 restore_nonrepo_dir "Kooha" "$HOME/Kooha" "Kooha recordings"
+restore_nonrepo_dir "Pictures" "$HOME/Pictures" "Pictures"
 restore_nonrepo_dir "obsidian_brain" "$HOME/obsidian_brain" "Obsidian vault"
 restore_nonrepo_dir "yc-application" "$HOME/yc-application" "YC application"
 
@@ -668,6 +669,12 @@ if [[ -d "$HOME/Kooha" ]] && [[ -n "$(ls -A "$HOME/Kooha" 2>/dev/null)" ]]; then
     check_ok "Kooha recordings"
 else
     check_warn "Kooha recordings → missing or empty"
+fi
+
+if [[ -d "$HOME/Pictures" ]] && [[ -n "$(ls -A "$HOME/Pictures" 2>/dev/null)" ]]; then
+    check_ok "Pictures"
+else
+    check_warn "Pictures → missing or empty"
 fi
 
 if [[ -d "$HOME/obsidian_brain" ]] && [[ -n "$(ls -A "$HOME/obsidian_brain" 2>/dev/null)" ]]; then
