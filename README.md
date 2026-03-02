@@ -56,15 +56,13 @@ Adding a host is three lines in `flake.nix`:
 my-host = mkTechHost { hostname = "my-host"; username = "me"; };
 ```
 
-### Sandboxed Claude Code
+### Autonomous Claude Code
 
-Autonomous AI coding requires isolation. This config provides two modes,
-both kernel-enforced:
+Autonomous AI coding requires isolation. `scripts/claude-autonomous.sh` creates
+a git worktree, launches Claude with `--dangerously-skip-permissions` in tmux,
+and runs a Ralph loop (up to 5 iterations with fresh context each pass).
 
-- **`claude-sandboxed`** -- Namespace isolation + seccomp BPF, network preserved.
-  For long-running autonomous tasks with `--dangerously-skip-permissions`.
-- **`claude-airgapped`** -- Full isolation, zero network. For offline code review.
-
+Native sandbox (bubblewrap + seccomp BPF) activates automatically on Linux.
 Spawned processes inherit the sandbox. No escape via `bash -c` or subprocess chains.
 
 ### AI toolchain
