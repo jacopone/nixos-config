@@ -215,6 +215,7 @@
         tl-biz-001 = mkBusinessHost {
           hostname = "tl-biz-001";
           username = "guyfawkes";
+          aiProfile = "claude";
         };
 
         # HP workstation for Pietro — Amatino
