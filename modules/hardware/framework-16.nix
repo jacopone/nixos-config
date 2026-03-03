@@ -10,10 +10,15 @@
 {
   boot.kernelModules = [ "uinput" ];
 
-  # NVIDIA-specific kernel parameters (AMD params handled by nixos-hardware)
   boot.kernelParams = [
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # Preserve VRAM across suspend/resume
-    "nvidia.NVreg_TemporaryFilePath=/var/tmp" # Temp storage for VRAM save/restore
+    # NVIDIA VRAM preservation across suspend/resume
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    "nvidia.NVreg_TemporaryFilePath=/var/tmp"
+    # Override nixos-hardware's amd_pstate=active. Active mode CPPC is broken on
+    # Strix Point / kernel 6.19: EPP hints ignored, CPU locks at 605 MHz.
+    "amd_pstate=passive"
+    # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
+    "pcie_aspm=off"
   ];
 
   # Always use latest kernel (nixos-hardware only sets this conditionally for < 6.15)
@@ -27,6 +32,13 @@
     # Disable keyboard/trackpad USB wake (prevents backpack wake)
     ''
       SUBSYSTEM=="usb", DRIVERS=="usb", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0012", ATTR{power/wakeup}="disabled"
+    ''
+    # Auto-switch power profile: performance on AC, power-saver on battery
+    ''
+      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ENV{POWER_SUPPLY_ONLINE}=="1", ACTION=="change", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
+    ''
+    ''
+      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ENV{POWER_SUPPLY_ONLINE}=="0", ACTION=="change", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
     ''
   ];
 
@@ -82,6 +94,69 @@
         ${pkgs.coreutils}/bin/sleep 10 || true
     '';
   };
+
+  # Fix CPU frequency stuck at base clock after resume.
+  # Cycle PPD profiles to force EC to re-evaluate TDP limits, then set governor
+  # to performance on AC (passive mode needs explicit governor, unlike active mode).
+  systemd.services.fix-cpu-freq-after-resume = {
+    description = "Reset CPU frequency scaling after resume";
+    after = [ "post-resume.target" ];
+    wantedBy = [ "post-resume.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver
+      ${pkgs.coreutils}/bin/sleep 1
+      if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance
+      else
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced
+      fi
+      # In passive mode, explicitly set governor after PPD profile change
+      for gov in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+        if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
+          echo performance > "$gov" 2>/dev/null || true
+        else
+          echo schedutil > "$gov" 2>/dev/null || true
+        fi
+      done
+    '';
+  };
+
+  # Battery charge limit — preserve battery health when mostly plugged in.
+  # 80% ≈ 2-3x cycle life vs 100%. Reapplied after boot and resume because
+  # the EC resets the threshold on power state changes.
+  systemd.services.battery-charge-limit = {
+    description = "Set battery charge limit to 80%";
+    after = [ "multi-user.target" "post-resume.target" ];
+    wantedBy = [ "multi-user.target" "post-resume.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      if [ -f /sys/class/power_supply/BAT1/charge_control_end_threshold ]; then
+        echo 80 > /sys/class/power_supply/BAT1/charge_control_end_threshold
+      fi
+    '';
+  };
+
+  # Set performance profile + governor at boot.
+  # Uses graphical.target to avoid ordering cycle with PPD via multi-user.target.
+  systemd.services.power-profile-boot = {
+    description = "Set power profile based on AC state at boot";
+    wantedBy = [ "graphical.target" ];
+    after = [ "power-profiles-daemon.service" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.coreutils}/bin/sleep 2
+      if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance
+        echo performance | ${pkgs.coreutils}/bin/tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null
+      else
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced
+      fi
+    '';
+  };
+
+  # VA-API driver for AMD iGPU hardware video decode (used by Chrome, Firefox)
+  environment.variables.LIBVA_DRIVER_NAME = "radeonsi";
 
   # LED Matrix input modules
   hardware.inputmodule.enable = true;
