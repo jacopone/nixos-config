@@ -62,22 +62,16 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  -v, --verbose    Show detailed output during build"
             echo "  -n, --dry-run    Show what would happen without making changes"
-            echo "  -q, --quick      Skip security checks and cleanup (fastest rebuild)"
+            echo "  -q, --quick      Skip changelog and cleanup (fastest rebuild)"
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
             echo "  -f, --fresh      Clear and bypass eval-cache (use when changes seem ignored)"
             echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
             echo "  -h, --help       Show this help message"
             echo ""
-            echo "Security:"
-            echo "  By default, rebuild-nixos runs supply chain security checks:"
-            echo "    - Git vs tarball comparison (detects XZ-style backdoors)"
-            echo "    - Reproducibility verification of critical packages"
-            echo "  Use --quick to skip these checks, --audit for full forensic export."
-            echo ""
             echo "Examples:"
-            echo "  ./rebuild-nixos              # Full rebuild with security checks"
-            echo "  ./rebuild-nixos --quick      # Fastest: skip security + cleanup"
+            echo "  ./rebuild-nixos              # Full rebuild"
+            echo "  ./rebuild-nixos --quick      # Fastest: skip changelog + cleanup"
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
             echo "  ./rebuild-nixos --fresh      # Bypass eval-cache for clean rebuild"
             echo "  ./rebuild-nixos --audit      # Include forensic audit trail export"
@@ -564,294 +558,11 @@ if command -v nvd &>/dev/null; then
     fi
 fi
 
-# === PHASE 2.7: Supply Chain Security Checks ===
-# Security-first approach: detect XZ-style backdoors by DEFAULT
-# Based on: https://nixcademy.com/posts/secure-supply-chain-with-nix/
-#
-# Default mode: Runs security checks (fast, ~3-5 min)
-#   - Git vs Tarball comparison (catches XZ-style attacks)
-#   - Reproducibility verification
-#
-# --audit flag: Adds forensic audit trail (slow, 30-60 min)
-#   - Source manifest export
-#   - Full closure export (~5GB)
-#
-# --quick flag: Skips security checks (fastest rebuild)
-
-if [ "$QUICK" = true ]; then
-    log_step "Skipping supply chain security checks (--quick mode)"
-else
-    log_step "Running supply chain security checks..."
-
-    AUDIT_DIR="$HOME/.nixos-audit"
-    mkdir -p "$AUDIT_DIR"
-    SECURITY_ISSUES=0
-
-    # Resolve flake-pinned nixpkgs store path (not the system channel)
-    # This ensures security checks target the SAME package set we're building
-    # Uses nix flake archive which is fast (~60ms) and gives input store paths
-    FLAKE_NIXPKGS=$(nix flake archive --json 2>/dev/null | jq -r '.inputs.nixpkgs.path' 2>/dev/null || true)
-    if [ -n "$FLAKE_NIXPKGS" ] && [ -d "$FLAKE_NIXPKGS" ]; then
-        log_step "Using flake-pinned nixpkgs: $(basename "$FLAKE_NIXPKGS")"
-        NIXPKGS_EXPR="(import $FLAKE_NIXPKGS {})"
-    else
-        log_warning "Could not resolve flake-pinned nixpkgs, falling back to <nixpkgs>"
-        FLAKE_NIXPKGS=""
-        NIXPKGS_EXPR="(import <nixpkgs> {})"
-    fi
-
-    # === PHASE 2.7.1: Git vs Tarball Comparison (PRIMARY SECURITY CHECK) ===
-    # Detects XZ-style attacks where malicious code is in tarballs but not git
-    # This check would have caught CVE-2024-3094
-    log_step "Checking for XZ-style backdoors (git vs tarball comparison)..."
-
-    GIT_TARBALL_DIR="$AUDIT_DIR/git-tarball-compare-$TIMESTAMP"
-    mkdir -p "$GIT_TARBALL_DIR"
-
-    # Critical packages with their git repositories
-    declare -A CRITICAL_PKG_REPOS=(
-        ["xz"]="https://github.com/tukaani-project/xz"
-        ["gzip"]="https://git.savannah.gnu.org/git/gzip.git"
-        ["bzip2"]="https://gitlab.com/bzip2/bzip2.git"
-        ["openssh"]="https://github.com/openssh/openssh-portable"
-        ["openssl"]="https://github.com/openssl/openssl"
-    )
-
-    GIT_TARBALL_PASSED=0
-    GIT_TARBALL_FAILED=0
-    GIT_TARBALL_SKIPPED=0
-
-    for pkg in "${!CRITICAL_PKG_REPOS[@]}"; do
-        GIT_REPO="${CRITICAL_PKG_REPOS[$pkg]}"
-        PKG_WORK_DIR="$GIT_TARBALL_DIR/$pkg"
-        mkdir -p "$PKG_WORK_DIR"
-
-        echo -n "  Checking $pkg... "
-
-        # Get the package version from nixpkgs
-        VERSION=$(nix eval --impure --expr "${NIXPKGS_EXPR}.${pkg}.version" 2>/dev/null | tr -d '"') || true
-
-        if [ -z "$VERSION" ]; then
-            echo "skipped (couldn't get version)"
-            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-            continue
-        fi
-
-        # Fetch and unpack the tarball source used by nixpkgs
-        TARBALL_PATH=$(nix-build --expr "${NIXPKGS_EXPR}.${pkg}.src" --no-out-link 2>/dev/null) || true
-        if [ -z "$TARBALL_PATH" ]; then
-            echo "skipped (couldn't fetch tarball)"
-            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-            continue
-        fi
-
-        # Unpack if it's a compressed file
-        TARBALL_DIR="$PKG_WORK_DIR/tarball"
-        mkdir -p "$TARBALL_DIR"
-        if [ -f "$TARBALL_PATH" ]; then
-            case "$TARBALL_PATH" in
-                *.tar.xz|*.txz)  tar -xJf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
-                *.tar.gz|*.tgz)  tar -xzf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
-                *.tar.bz2|*.tbz) tar -xjf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
-                *.tar)           tar -xf "$TARBALL_PATH" -C "$TARBALL_DIR" --strip-components=1 2>/dev/null ;;
-                *)
-                    echo "skipped (unknown archive format)"
-                    GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-                    continue
-                    ;;
-            esac
-        elif [ -d "$TARBALL_PATH" ]; then
-            TARBALL_DIR="$TARBALL_PATH"
-        else
-            echo "skipped (source not found)"
-            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-            continue
-        fi
-
-        if [ ! -d "$TARBALL_DIR" ] || [ -z "$(ls -A "$TARBALL_DIR" 2>/dev/null)" ]; then
-            echo "skipped (extraction failed)"
-            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-            continue
-        fi
-
-        # Clone git repo at the same version tag
-        # Different projects use different tag formats, so we try multiple
-        GIT_DIR="$PKG_WORK_DIR/git"
-
-        # Build list of tag formats to try for this package
-        case "$pkg" in
-            openssh)
-                # OpenSSH uses V_X_Y_P1 format (e.g., V_9_9_P1 for 9.9p1)
-                TAG_NORMALIZED=$(echo "$VERSION" | tr '.' '_' | sed 's/p/_P/g' | tr '[:lower:]' '[:upper:]')
-                TAG_FORMATS="V_$TAG_NORMALIZED V_$(echo "$VERSION" | tr '.' '_') v$VERSION $VERSION"
-                ;;
-            bzip2)
-                # bzip2 uses bzip2-X.Y.Z format
-                TAG_FORMATS="bzip2-$VERSION v$VERSION $VERSION"
-                ;;
-            openssl)
-                # OpenSSL uses openssl-X.Y.Z format
-                TAG_FORMATS="openssl-$VERSION v$VERSION $VERSION"
-                ;;
-            *)
-                TAG_FORMATS="v$VERSION $VERSION"
-                ;;
-        esac
-
-        # Try each tag format until one works
-        for GIT_TAG in $TAG_FORMATS; do
-            if timeout 60 git clone --depth 1 --branch "$GIT_TAG" "$GIT_REPO" "$GIT_DIR" 2>/dev/null; then
-                break
-            fi
-        done
-
-        if [ ! -d "$GIT_DIR" ]; then
-            echo "skipped (couldn't clone git at version $VERSION)"
-            GIT_TARBALL_SKIPPED=$((GIT_TARBALL_SKIPPED + 1))
-            continue
-        fi
-
-        # Compare source files, excluding auto-generated content
-        DIFF_LOG="$PKG_WORK_DIR/diff.log"
-
-        # Auto-generated directories to exclude (gnulib, autotools, etc.)
-        EXCLUDE_DIRS="lib/|build-aux/|gnulib/|gnulib-lib/|m4/|po/|doc/|tests/"
-        # Auto-generated files to exclude
-        EXCLUDE_FILES="ltmain.sh|config.sub|config.guess|config.h.in|aclocal.m4|Makefile.in|compile|depcomp|install-sh|missing|test-driver|ylwrap"
-
-        # Find source files in tarball (excluding auto-generated paths)
-        find "$TARBALL_DIR" -type f \( -name "*.c" -o -name "*.h" -o -name "*.sh" -o -name "*.S" \) \
-            ! -name "config.h" ! -name "configure" 2>/dev/null | \
-            grep -vE "$EXCLUDE_DIRS" | \
-            grep -vE "$EXCLUDE_FILES" | \
-            sort > "$PKG_WORK_DIR/tarball-files.txt"
-
-        # Find source files in git
-        find "$GIT_DIR" -type f \( -name "*.c" -o -name "*.h" -o -name "*.sh" -o -name "*.S" \) \
-            ! -path "*/.git/*" 2>/dev/null | \
-            grep -vE "$EXCLUDE_DIRS" | \
-            sort > "$PKG_WORK_DIR/git-files.txt"
-
-        SUSPICIOUS_FILES=0
-        TARBALL_ONLY_FILES=""
-
-        # Check for tarball-only files (potential hidden malicious code)
-        while IFS= read -r tarball_file; do
-            base_name=$(basename "$tarball_file")
-            # Skip known auto-generated files
-            if echo "$base_name" | grep -qE "^($EXCLUDE_FILES)$"; then
-                continue
-            fi
-            if ! grep -q "/$base_name\$" "$PKG_WORK_DIR/git-files.txt" 2>/dev/null; then
-                if file "$tarball_file" 2>/dev/null | grep -qE "text|script"; then
-                    TARBALL_ONLY_FILES="$TARBALL_ONLY_FILES$base_name "
-                    SUSPICIOUS_FILES=$((SUSPICIOUS_FILES + 1))
-                fi
-            fi
-        done < "$PKG_WORK_DIR/tarball-files.txt"
-
-        # Count content differences in matching files
-        CONTENT_DIFFS=0
-        TOTAL_COMPARED=0
-        while IFS= read -r tarball_file; do
-            base_name=$(basename "$tarball_file")
-            git_file=$(grep "/$base_name\$" "$PKG_WORK_DIR/git-files.txt" 2>/dev/null | head -1)
-            if [ -n "$git_file" ] && [ -f "$git_file" ]; then
-                TOTAL_COMPARED=$((TOTAL_COMPARED + 1))
-                if ! diff -q "$tarball_file" "$git_file" >/dev/null 2>&1; then
-                    echo "DIFFERS: $base_name" >> "$DIFF_LOG"
-                    CONTENT_DIFFS=$((CONTENT_DIFFS + 1))
-                fi
-            fi
-        done < "$PKG_WORK_DIR/tarball-files.txt"
-
-        # Calculate diff percentage (only flag if >20% of files differ)
-        if [ "$TOTAL_COMPARED" -gt 0 ]; then
-            DIFF_PERCENT=$((CONTENT_DIFFS * 100 / TOTAL_COMPARED))
-        else
-            DIFF_PERCENT=0
-        fi
-
-        # Flag as suspicious only if:
-        # - Any tarball-only source files in main tree (not auto-generated), OR
-        # - More than 20% of comparable files differ (suggests major tampering)
-        if [ "$SUSPICIOUS_FILES" -gt 0 ]; then
-            echo -e "${RED}SUSPICIOUS${NC} ($SUSPICIOUS_FILES tarball-only source files)"
-            echo "    Tarball-only files: $TARBALL_ONLY_FILES" >> "$DIFF_LOG"
-            log_warning "$pkg: Found $SUSPICIOUS_FILES source files in tarball not in git!"
-            GIT_TARBALL_FAILED=$((GIT_TARBALL_FAILED + 1))
-        elif [ "$DIFF_PERCENT" -gt 20 ]; then
-            echo -e "${RED}SUSPICIOUS${NC} ($CONTENT_DIFFS/$TOTAL_COMPARED files differ - ${DIFF_PERCENT}%)"
-            log_warning "$pkg: ${DIFF_PERCENT}% of source files differ from git!"
-            GIT_TARBALL_FAILED=$((GIT_TARBALL_FAILED + 1))
-        elif [ "$CONTENT_DIFFS" -gt 0 ]; then
-            echo -e "${YELLOW}MINOR DIFFS${NC} ($CONTENT_DIFFS/$TOTAL_COMPARED files differ - ${DIFF_PERCENT}%)"
-            GIT_TARBALL_PASSED=$((GIT_TARBALL_PASSED + 1))
-        else
-            echo -e "${GREEN}CLEAN ✓${NC}"
-            GIT_TARBALL_PASSED=$((GIT_TARBALL_PASSED + 1))
-        fi
-
-        rm -rf "$GIT_DIR"
-    done
-
-    add_stat "Git vs Tarball: $GIT_TARBALL_PASSED clean, $GIT_TARBALL_FAILED suspicious, $GIT_TARBALL_SKIPPED skipped"
-
-    if [ "$GIT_TARBALL_FAILED" -gt 0 ]; then
-        log_error "SECURITY WARNING: Some packages have suspicious tarball-only content!"
-        log_warning "This is how the XZ backdoor (CVE-2024-3094) was hidden."
-        log_warning "Review: $GIT_TARBALL_DIR"
-        SECURITY_ISSUES=$((SECURITY_ISSUES + GIT_TARBALL_FAILED))
-    fi
-
-    # === PHASE 2.7.2: Reproducibility Check ===
-    log_step "Checking critical package reproducibility..."
-
-    CRITICAL_PKGS="xz gzip bzip2 coreutils"
-    REPRO_PASSED=0
-    REPRO_FAILED=0
-    REPRO_SKIPPED=0
-
-    for pkg in $CRITICAL_PKGS; do
-        PKG_PATH=$(nix-build --expr "${NIXPKGS_EXPR}.${pkg}" --no-out-link 2>/dev/null) || true
-
-        if [ -n "$PKG_PATH" ]; then
-            CHECK_OUTPUT=$(nix-build --expr "${NIXPKGS_EXPR}.${pkg}" --check 2>&1) || true
-
-            if echo "$CHECK_OUTPUT" | grep -q "checking outputs"; then
-                log_success "$pkg: reproducible ✓"
-                REPRO_PASSED=$((REPRO_PASSED + 1))
-            elif echo "$CHECK_OUTPUT" | grep -q "differs"; then
-                log_warning "$pkg: OUTPUT DIFFERS - check manually"
-                REPRO_FAILED=$((REPRO_FAILED + 1))
-            else
-                log_success "$pkg: verified ✓"
-                REPRO_PASSED=$((REPRO_PASSED + 1))
-            fi
-        else
-            echo "  ⏭️  $pkg: skipped (not in store)"
-            REPRO_SKIPPED=$((REPRO_SKIPPED + 1))
-        fi
-    done
-
-    add_stat "Reproducibility: $REPRO_PASSED passed, $REPRO_FAILED failed, $REPRO_SKIPPED skipped"
-
-    if [ "$REPRO_FAILED" -gt 0 ]; then
-        log_warning "Some packages failed reproducibility check - review before continuing"
-        SECURITY_ISSUES=$((SECURITY_ISSUES + REPRO_FAILED))
-    fi
-
-    # === PHASE 2.7.3: Security Summary ===
-    echo ""
-    if [ "$SECURITY_ISSUES" -eq 0 ]; then
-        log_success "All security checks passed!"
-        add_action "Supply chain security checks passed"
-    else
-        log_error "Found $SECURITY_ISSUES security issue(s) - review before proceeding!"
-        add_action "Supply chain security checks: $SECURITY_ISSUES issue(s) found"
-    fi
-fi
-# End of default security checks (skipped with --quick)
+# Supply chain security: relies on flake.lock pinning + cache.nixos.org signing.
+# DIY git-vs-tarball and reproducibility checks were removed — they gave false
+# confidence (only covered 5 of thousands of packages, excluded the exact dirs
+# where XZ hid its backdoor, and couldn't distinguish nixpkgs patches from attacks).
+# For real supply chain guarantees, consider Determinate Systems' FlakeHub.
 
 # === PHASE 2.7.4-2.7.5: Audit Trail Export (--audit flag only) ===
 # These are slow forensic operations, only run when explicitly requested
@@ -872,14 +583,8 @@ if [ "$AUDIT" = true ]; then
     add_stat "Source derivations: $FOD_COUNT"
 
     # === PHASE 2.7.5: Optional Closure Export (audit trail) ===
-    # Only offer after security checks, with appropriate warning
     echo ""
-    if [ "$SECURITY_ISSUES" -gt 0 ]; then
-        log_warning "Security issues detected above. Closure export is for forensic analysis only."
-        EXPORT_PROMPT="Export source closure for forensic analysis? (y/n)"
-    else
-        EXPORT_PROMPT="Export source closure for audit trail (~5GB, 30-60 min)? (y/n)"
-    fi
+    EXPORT_PROMPT="Export source closure for audit trail (~5GB, 30-60 min)? (y/n)"
 
     if prompt_user "$EXPORT_PROMPT"; then
         log_step "Realizing source derivations (this may take a while)..."
@@ -1300,10 +1005,10 @@ else
             log_step "Rolling back to previous configuration..."
             sudo nixos-rebuild switch --rollback --flake ".#$NIXOS_HOSTNAME"
             log_success "Rollback complete"
+            exit 0
         else
             log_warning "Rollback cancelled — system remains on new configuration"
         fi
-        exit 0
     fi
 fi
 
