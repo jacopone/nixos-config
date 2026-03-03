@@ -317,9 +317,8 @@ restore_nonrepo_dir() {
 
     mkdir -p "$local_path"
     echo -e "  Restoring ${BOLD}$label${NC}..."
-    local log
-    log=$(rclone copy "$drive_path/" "$local_path/" --transfers 4 --ignore-errors 2>&1)
-    local rc=$?
+    local log rc
+    log=$(rclone copy "$drive_path/" "$local_path/" --transfers 4 --ignore-errors 2>&1) && rc=0 || rc=$?
     if [[ $rc -eq 0 ]]; then
         info "$label"
         restored=$((restored + 1))
