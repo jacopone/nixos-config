@@ -7,7 +7,7 @@
 # Phase 3: Restore gitignored project data (databases, .env files)
 # Phase 4: Verify restore (functional + existence checks)
 #
-# Usage: ./scripts/restore-machine.sh <source-hostname>
+# Usage: ./scripts/restore-machine.sh <source-hostname> [--business]
 
 set -euo pipefail
 
@@ -42,9 +42,12 @@ fail()  { echo -e "  ${RED}[ERROR]${NC} $*"; }
 # ============================================================================
 
 show_usage() {
-    echo "Usage: $0 <source-hostname>"
+    echo "Usage: $0 <source-hostname> [--business]"
     echo ""
     echo "Restore repos and gitignored data from a Drive backup."
+    echo ""
+    echo "Options:"
+    echo "  --business  Restore only business-relevant configs, repos, and data"
     echo ""
     echo "Available backups on gdrive:backups/:"
     rclone lsd gdrive:backups/ 2>/dev/null | awk '{print "  " $NF}' || {
@@ -60,10 +63,21 @@ if [[ -z "$SOURCE_HOST" ]]; then
     show_usage
 fi
 
+BUSINESS_MODE=false
+if [[ "${2:-}" == "--business" ]]; then
+    BUSINESS_MODE=true
+fi
+
 # ============================================================================
 # Preflight checks
 # ============================================================================
 
+echo ""
+if $BUSINESS_MODE; then
+    echo -e "${BOLD}${CYAN}Mode: BUSINESS (subset restore)${NC}"
+else
+    echo -e "${BOLD}Mode: FULL (all repos and data)${NC}"
+fi
 echo ""
 echo -e "${BOLD}Preflight checks${NC}"
 
@@ -174,26 +188,67 @@ restore_config "local-bin" "$HOME/.local/bin"            "Local scripts"
 # GNOME desktop settings (keybindings, favorites, workspace config)
 restore_config "dconf"     "$HOME/.config/dconf"         "GNOME dconf settings"
 
-# Account Harmony GCP service account keys
-restore_config "account-harmony-secrets" "$HOME/.config/account-harmony-ai/secrets" "Account Harmony secrets"
+# Account Harmony GCP service account keys (personal project, skip for business)
+if ! $BUSINESS_MODE; then
+    restore_config "account-harmony-secrets" "$HOME/.config/account-harmony-ai/secrets" "Account Harmony secrets"
+fi
 
-# Chrome bookmarks
-echo -e "  Restoring ${BOLD}Chrome bookmarks${NC}..."
-mkdir -p "$HOME/.config/google-chrome/Default"
-if rclone copyto "$BACKUP_BASE/chrome-bookmarks/Default-Bookmarks.json" "$HOME/.config/google-chrome/Default/Bookmarks" --quiet 2>/dev/null; then
-    info "Chrome bookmarks"
+# Chrome profiles (all profiles: bookmarks, passwords, cookies, settings)
+# Chrome must be closed or it overwrites restored data on exit
+if pgrep -f "google-chrome" &>/dev/null; then
+    echo -e "  ${YELLOW}Closing Chrome to restore profile data...${NC}"
+    pkill -TERM -f "google-chrome" 2>/dev/null
+    sleep 3
+    pkill -9 -f "google-chrome" 2>/dev/null || true
+    sleep 1
+fi
+
+CHROME_DIR="$HOME/.config/google-chrome"
+mkdir -p "$CHROME_DIR"
+
+# Restore Local State (profile registry — tells Chrome about all profiles)
+echo -e "  Restoring ${BOLD}Chrome Local State${NC}..."
+if rclone copyto "$BACKUP_BASE/chrome-profiles/Local State" "$CHROME_DIR/Local State" --quiet 2>/dev/null; then
+    info "Chrome Local State (profile registry)"
     config_restored=$((config_restored + 1))
 else
-    skip "Chrome bookmarks (not found in backup)"
+    skip "Chrome Local State (not found in backup)"
+fi
+
+# Restore each profile's essential files
+chrome_profiles_restored=0
+while IFS= read -r profile_name; do
+    mkdir -p "$CHROME_DIR/$profile_name"
+    echo -e "  Restoring ${BOLD}Chrome $profile_name${NC}..."
+
+    # Restore individual files (Bookmarks, Login Data, Cookies, etc.)
+    for fname in Bookmarks Preferences "Login Data" Cookies "Web Data" "Secure Preferences" Favicons; do
+        rclone copyto "$BACKUP_BASE/chrome-profiles/$profile_name/$fname" \
+            "$CHROME_DIR/$profile_name/$fname" --quiet 2>/dev/null || true
+    done
+
+    # Restore extension data
+    if rclone lsd "$BACKUP_BASE/chrome-profiles/$profile_name/Local Extension Settings" &>/dev/null; then
+        mkdir -p "$CHROME_DIR/$profile_name/Local Extension Settings"
+        rclone copy "$BACKUP_BASE/chrome-profiles/$profile_name/Local Extension Settings/" \
+            "$CHROME_DIR/$profile_name/Local Extension Settings/" --transfers 4 --quiet 2>/dev/null || true
+    fi
+
+    info "Chrome $profile_name"
+    chrome_profiles_restored=$((chrome_profiles_restored + 1))
+done < <(rclone lsf "$BACKUP_BASE/chrome-profiles/" --dirs-only 2>/dev/null | sed 's|/$||' | grep -v "^$")
+
+if [[ $chrome_profiles_restored -gt 0 ]]; then
+    config_restored=$((config_restored + 1))
+    info "Chrome: $chrome_profiles_restored profiles restored"
+else
+    skip "Chrome profiles (not found in backup)"
 fi
 
 # Clean up stale lock files from the source machine
 # Chrome Singleton files contain the old hostname/PID and block launch
 for f in SingletonLock SingletonCookie SingletonSocket; do
-    if [[ -e "$HOME/.config/google-chrome/$f" ]]; then
-        rm -f "$HOME/.config/google-chrome/$f"
-        info "Removed stale Chrome $f"
-    fi
+    rm -f "$CHROME_DIR/$f" 2>/dev/null
 done
 
 echo ""
@@ -209,18 +264,23 @@ cloned=0
 skipped=0
 clone_failed=0
 
-while IFS=$'\t' read -r name ssh_url; do
+# Business mode: only clone repos needed for TL operations
+BUSINESS_REPOS=(nixos-config tl-operations clawnix whatsapp-mcp)
+
+clone_repo() {
+    local name="$1" ssh_url="$2"
+
     if [[ "$name" == "nixos-config" ]]; then
         skip "$name (already present from Step 3)"
         skipped=$((skipped + 1))
-        continue
+        return
     fi
 
-    target="$HOME/$name"
+    local target="$HOME/$name"
     if [[ -d "$target" ]]; then
         skip "$name (already exists)"
         skipped=$((skipped + 1))
-        continue
+        return
     fi
 
     echo -e "  Cloning ${BOLD}$name${NC}..."
@@ -231,7 +291,18 @@ while IFS=$'\t' read -r name ssh_url; do
         fail "$name (clone failed)"
         clone_failed=$((clone_failed + 1))
     fi
-done < <(gh repo list "$GITHUB_USER" --limit 200 --json name,sshUrl --jq '.[] | [.name, .sshUrl] | @tsv')
+}
+
+if $BUSINESS_MODE; then
+    for repo in "${BUSINESS_REPOS[@]}"; do
+        ssh_url="git@github.com:$GITHUB_USER/$repo.git"
+        clone_repo "$repo" "$ssh_url"
+    done
+else
+    while IFS=$'\t' read -r name ssh_url; do
+        clone_repo "$name" "$ssh_url"
+    done < <(gh repo list "$GITHUB_USER" --limit 200 --json name,sshUrl --jq '.[] | [.name, .sshUrl] | @tsv')
+fi
 
 echo ""
 echo -e "  ${BOLD}Phase 2 summary:${NC} cloned $cloned, skipped $skipped, failed $clone_failed"
@@ -363,105 +434,90 @@ restore_project_data() {
 
 # --- Restore mappings (inverse of backup-sync.nix) ---
 
-# WhatsApp message archive
+# WhatsApp message archive (needed by both personal and business)
 restore_dir \
     "whatsapp-db" \
     "$HOME/whatsapp-mcp/whatsapp-bridge/store" \
     "WhatsApp DB"
 
-# Bimby nutritionist recipes
-restore_file \
-    "bimby-nutritionist/recipes.sqlite" \
-    "$HOME/bimby-nutritionist/data/recipes.sqlite" \
-    "Bimby recipes"
-
-# Yuka food/cosmetics database
-restore_dir \
-    "yuka-db" \
-    "$HOME/bimby-hacking/yuka/database" \
-    "Yuka DB"
-
-# Albo commercialisti data directory
-restore_dir \
-    "gitignored-critical/albo-commercialisti/data" \
-    "$HOME/albo-commercialisti/data" \
-    "Albo commercialisti data"
-
-# Albo commercialisti .env
-restore_file \
-    "gitignored-critical/albo-commercialisti/.env" \
-    "$HOME/albo-commercialisti/.env" \
-    "Albo commercialisti .env"
-
-# Birthday manager (events DB, triage DB, auth tokens, rollback backups)
-# Data lives in XDG data dir, not inside the repo
-restore_config "birthday-manager" "$HOME/.local/share/birthday-manager" "Birthday manager"
-
-# PTA ledger
-restore_dir \
-    "pta-ledger" \
-    "$HOME/pta-ledger/ledger" \
-    "PTA ledger"
-
-# Non-git directories (Drive is the only backup)
-restore_nonrepo_dir "Downloads" "$HOME/Downloads" "Downloads"
-restore_nonrepo_dir "Kooha" "$HOME/Kooha" "Kooha recordings"
-restore_nonrepo_dir "Pictures" "$HOME/Pictures" "Pictures"
-restore_nonrepo_dir "obsidian_brain" "$HOME/obsidian_brain" "Obsidian vault"
-restore_nonrepo_dir "yc-application" "$HOME/yc-application" "YC application"
-
-# Additional project databases + .env files (gitignored secrets)
-# restore_project_data copies entire gitignored-critical/<project>/ back,
-# which includes both database files and auto-discovered .env files
-restore_project_data "credit-finder" "Credit Finder data"
-restore_project_data "financial-advisor" "Financial Advisor data"
-restore_project_data "bimby-nutritionist" "Bimby Nutritionist data"
-restore_project_data "susilo" "Susilo data"
-restore_project_data "account-harmony-ai-37599577" "Account Harmony data"
-restore_project_data "HealthSafe-Journal" "HealthSafe Journal data"
-restore_project_data "moving-agent" "Moving Agent data"
-restore_project_data "pediatra-digitale" "Pediatra Digitale data"
-restore_project_data "banca-piemonte-analysis" "Banca Piemonte data"
-restore_project_data "food-assistant" "Food Assistant data"
-restore_project_data "legis-hub" "Legis Hub data"
-restore_project_data "mcp-sunsama" "MCP Sunsama data"
-restore_project_data "mutuo-rapido-italia" "Mutuo Rapido data"
-
-# gogcli credentials
-# Special case: ~/.config/gogcli is not inside a repo clone
-if [[ -d "$HOME/.config" ]]; then
-    restore_dir \
-        "gogcli" \
-        "$HOME/.config/gogcli" \
-        "gogcli credentials"
+if $BUSINESS_MODE; then
+    # Business: only TL-specific data + obsidian vault
+    restore_project_data "tl-operations" "TL Operations data"
+    restore_nonrepo_dir "obsidian_brain" "$HOME/obsidian_brain" "Obsidian vault"
 else
-    skip "gogcli credentials (~/.config not found)"
-    phase2_skipped=$((phase2_skipped + 1))
-fi
+    # Full restore: all project data
 
-# Chrome extension data (Simplify Gmail settings)
-# Special case: Chrome extension storage, not inside a repo clone
-# Chrome must be closed or it overwrites restored data on exit
-if [[ -d "$HOME/.config/google-chrome/Default/Local Extension Settings" ]]; then
-    if pgrep -f "google-chrome" &>/dev/null; then
-        echo -e "  ${YELLOW}Closing Chrome to restore extension data...${NC}"
-        pkill -TERM -f "google-chrome" 2>/dev/null
-        sleep 3
-        # Force kill if still running
-        pkill -9 -f "google-chrome" 2>/dev/null || true
-        sleep 1
+    # Bimby nutritionist recipes
+    restore_file \
+        "bimby-nutritionist/recipes.sqlite" \
+        "$HOME/bimby-nutritionist/data/recipes.sqlite" \
+        "Bimby recipes"
+
+    # Yuka food/cosmetics database
+    restore_dir \
+        "yuka-db" \
+        "$HOME/bimby-hacking/yuka/database" \
+        "Yuka DB"
+
+    # Albo commercialisti data directory
+    restore_dir \
+        "gitignored-critical/albo-commercialisti/data" \
+        "$HOME/albo-commercialisti/data" \
+        "Albo commercialisti data"
+
+    # Albo commercialisti .env
+    restore_file \
+        "gitignored-critical/albo-commercialisti/.env" \
+        "$HOME/albo-commercialisti/.env" \
+        "Albo commercialisti .env"
+
+    # Birthday manager (events DB, triage DB, auth tokens, rollback backups)
+    # Data lives in XDG data dir, not inside the repo
+    restore_config "birthday-manager" "$HOME/.local/share/birthday-manager" "Birthday manager"
+
+    # PTA ledger
+    restore_dir \
+        "pta-ledger" \
+        "$HOME/pta-ledger/ledger" \
+        "PTA ledger"
+
+    # Non-git directories (Drive is the only backup)
+    restore_nonrepo_dir "Downloads" "$HOME/Downloads" "Downloads"
+    restore_nonrepo_dir "Kooha" "$HOME/Kooha" "Kooha recordings"
+    restore_nonrepo_dir "Pictures" "$HOME/Pictures" "Pictures"
+    restore_nonrepo_dir "obsidian_brain" "$HOME/obsidian_brain" "Obsidian vault"
+    restore_nonrepo_dir "yc-application" "$HOME/yc-application" "YC application"
+
+    # Additional project databases + .env files (gitignored secrets)
+    # restore_project_data copies entire gitignored-critical/<project>/ back,
+    # which includes both database files and auto-discovered .env files
+    restore_project_data "credit-finder" "Credit Finder data"
+    restore_project_data "financial-advisor" "Financial Advisor data"
+    restore_project_data "bimby-nutritionist" "Bimby Nutritionist data"
+    restore_project_data "susilo" "Susilo data"
+    restore_project_data "account-harmony-ai-37599577" "Account Harmony data"
+    restore_project_data "HealthSafe-Journal" "HealthSafe Journal data"
+    restore_project_data "moving-agent" "Moving Agent data"
+    restore_project_data "pediatra-digitale" "Pediatra Digitale data"
+    restore_project_data "banca-piemonte-analysis" "Banca Piemonte data"
+    restore_project_data "food-assistant" "Food Assistant data"
+    restore_project_data "legis-hub" "Legis Hub data"
+    restore_project_data "mcp-sunsama" "MCP Sunsama data"
+    restore_project_data "mutuo-rapido-italia" "Mutuo Rapido data"
+
+    # gogcli credentials
+    # Special case: ~/.config/gogcli is not inside a repo clone
+    if [[ -d "$HOME/.config" ]]; then
+        restore_dir \
+            "gogcli" \
+            "$HOME/.config/gogcli" \
+            "gogcli credentials"
+    else
+        skip "gogcli credentials (~/.config not found)"
+        phase2_skipped=$((phase2_skipped + 1))
     fi
-    restore_dir \
-        "chrome-extensions/simplify-gmail" \
-        "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" \
-        "Simplify Gmail settings"
-    # Clean up stale lock files from source machine
-    for f in SingletonLock SingletonCookie SingletonSocket; do
-        rm -f "$HOME/.config/google-chrome/$f" 2>/dev/null
-    done
-else
-    skip "Simplify Gmail settings (Chrome extension storage not found)"
-    phase2_skipped=$((phase2_skipped + 1))
+
+    # Note: Chrome extension data is now restored per-profile in Phase 1
 fi
 
 echo ""
@@ -569,18 +625,26 @@ else
     check_warn "GNOME dconf settings → missing or empty"
 fi
 
-# Account Harmony secrets
-if [[ -d "$HOME/.config/account-harmony-ai/secrets" ]] && [[ -n "$(ls -A "$HOME/.config/account-harmony-ai/secrets" 2>/dev/null)" ]]; then
-    check_ok "Account Harmony secrets → present"
-else
-    check_warn "Account Harmony secrets → missing or empty"
+# Account Harmony secrets (personal project, skip for business)
+if ! $BUSINESS_MODE; then
+    if [[ -d "$HOME/.config/account-harmony-ai/secrets" ]] && [[ -n "$(ls -A "$HOME/.config/account-harmony-ai/secrets" 2>/dev/null)" ]]; then
+        check_ok "Account Harmony secrets → present"
+    else
+        check_warn "Account Harmony secrets → missing or empty"
+    fi
 fi
 
-# Chrome bookmarks
-if [[ -f "$HOME/.config/google-chrome/Default/Bookmarks" ]]; then
-    check_ok "Chrome bookmarks → present"
+# Chrome profiles
+chrome_profile_count=0
+for d in "$HOME/.config/google-chrome"/Default "$HOME/.config/google-chrome"/Profile\ *; do
+    if [[ -d "$d" ]] && [[ -f "$d/Bookmarks" || -f "$d/Login Data" ]]; then
+        chrome_profile_count=$((chrome_profile_count + 1))
+    fi
+done
+if [[ $chrome_profile_count -gt 0 ]]; then
+    check_ok "Chrome → $chrome_profile_count profile(s) restored"
 else
-    check_warn "Chrome bookmarks → missing"
+    check_warn "Chrome → no profiles found"
 fi
 
 # --- Phase 2: GitHub repos ---
@@ -588,21 +652,34 @@ fi
 echo ""
 echo -e "  ${BOLD}GitHub repos${NC}"
 
-gh_count=$(gh repo list "$GITHUB_USER" --limit 200 --json name --jq 'length' 2>/dev/null || echo "0")
-# Count directories in $HOME that are git repos (excluding common non-repo dirs)
-local_repos=0
-for d in "$HOME"/*/; do
-    if [[ -d "$d/.git" ]]; then
-        local_repos=$((local_repos + 1))
-    fi
-done
-
-if [[ "$local_repos" -ge "$gh_count" ]] && [[ "$gh_count" -gt 0 ]]; then
-    check_ok "Repos → $local_repos local git repos (GitHub has $gh_count)"
-elif [[ "$gh_count" -gt 0 ]]; then
-    check_warn "Repos → $local_repos local git repos vs $gh_count on GitHub ($(( gh_count - local_repos )) missing)"
+if $BUSINESS_MODE; then
+    # Verify only the business repos were cloned
+    biz_missing=0
+    for repo in "${BUSINESS_REPOS[@]}"; do
+        if [[ -d "$HOME/$repo" ]]; then
+            check_ok "Repo → $repo"
+        else
+            check_warn "Repo → $repo missing"
+            biz_missing=$((biz_missing + 1))
+        fi
+    done
 else
-    check_warn "Repos → could not query GitHub repo count"
+    gh_count=$(gh repo list "$GITHUB_USER" --limit 200 --json name --jq 'length' 2>/dev/null || echo "0")
+    # Count directories in $HOME that are git repos (excluding common non-repo dirs)
+    local_repos=0
+    for d in "$HOME"/*/; do
+        if [[ -d "$d/.git" ]]; then
+            local_repos=$((local_repos + 1))
+        fi
+    done
+
+    if [[ "$local_repos" -ge "$gh_count" ]] && [[ "$gh_count" -gt 0 ]]; then
+        check_ok "Repos → $local_repos local git repos (GitHub has $gh_count)"
+    elif [[ "$gh_count" -gt 0 ]]; then
+        check_warn "Repos → $local_repos local git repos vs $gh_count on GitHub ($(( gh_count - local_repos )) missing)"
+    else
+        check_warn "Repos → could not query GitHub repo count"
+    fi
 fi
 
 # --- Phase 3: Project data ---
@@ -650,65 +727,73 @@ check_project_dir() {
     fi
 }
 
+# WhatsApp DB (restored in both modes)
 check_project_dir  "$HOME/whatsapp-mcp/whatsapp-bridge/store"  "WhatsApp DB"
-check_project_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "Bimby recipes"
-check_project_dir  "$HOME/bimby-hacking/yuka/database"         "Yuka DB"
-check_project_dir  "$HOME/albo-commercialisti/data"             "Albo data"
-check_project_file "$HOME/albo-commercialisti/.env"             "Albo .env"
-# Birthday manager (XDG data dir, not inside repo)
-if [[ -f "$HOME/.local/share/birthday-manager/events.db" ]]; then
-    check_ok "Birthday manager events"
-else
-    check_warn "Birthday manager events → missing"
-fi
-check_project_dir  "$HOME/pta-ledger/ledger"                    "PTA ledger"
 
-# gogcli is a config dir, not inside a repo
-if [[ -d "$HOME/.config/gogcli" ]] && [[ -n "$(ls -A "$HOME/.config/gogcli" 2>/dev/null)" ]]; then
-    check_ok "gogcli credentials"
-else
-    check_warn "gogcli credentials → missing or empty"
-fi
+if $BUSINESS_MODE; then
+    # Business: only verify business-relevant data
+    check_project_dir "$HOME/tl-operations" "TL Operations"
 
-# Simplify Gmail extension data
-simplify_dir="$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj"
-if [[ -d "$simplify_dir" ]] && [[ -n "$(ls -A "$simplify_dir" 2>/dev/null)" ]]; then
-    check_ok "Simplify Gmail settings"
+    if [[ -d "$HOME/obsidian_brain" ]] && [[ -n "$(ls -A "$HOME/obsidian_brain" 2>/dev/null)" ]]; then
+        check_ok "Obsidian vault"
+    else
+        check_warn "Obsidian vault → missing or empty"
+    fi
 else
-    check_warn "Simplify Gmail settings → missing or empty"
-fi
+    # Full: verify everything
+    check_project_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "Bimby recipes"
+    check_project_dir  "$HOME/bimby-hacking/yuka/database"         "Yuka DB"
+    check_project_dir  "$HOME/albo-commercialisti/data"             "Albo data"
+    check_project_file "$HOME/albo-commercialisti/.env"             "Albo .env"
+    # Birthday manager (XDG data dir, not inside repo)
+    if [[ -f "$HOME/.local/share/birthday-manager/events.db" ]]; then
+        check_ok "Birthday manager events"
+    else
+        check_warn "Birthday manager events → missing"
+    fi
+    check_project_dir  "$HOME/pta-ledger/ledger"                    "PTA ledger"
 
-# Non-git directories
-if [[ -d "$HOME/Kooha" ]] && [[ -n "$(ls -A "$HOME/Kooha" 2>/dev/null)" ]]; then
-    check_ok "Kooha recordings"
-else
-    check_warn "Kooha recordings → missing or empty"
-fi
+    # gogcli is a config dir, not inside a repo
+    if [[ -d "$HOME/.config/gogcli" ]] && [[ -n "$(ls -A "$HOME/.config/gogcli" 2>/dev/null)" ]]; then
+        check_ok "gogcli credentials"
+    else
+        check_warn "gogcli credentials → missing or empty"
+    fi
 
-if [[ -d "$HOME/Pictures" ]] && [[ -n "$(ls -A "$HOME/Pictures" 2>/dev/null)" ]]; then
-    check_ok "Pictures"
-else
-    check_warn "Pictures → missing or empty"
-fi
+    # Note: Chrome extension data is now verified as part of Chrome profiles in Phase 1
 
-if [[ -d "$HOME/obsidian_brain" ]] && [[ -n "$(ls -A "$HOME/obsidian_brain" 2>/dev/null)" ]]; then
-    check_ok "Obsidian vault"
-else
-    check_warn "Obsidian vault → missing or empty"
-fi
+    # Non-git directories
+    if [[ -d "$HOME/Kooha" ]] && [[ -n "$(ls -A "$HOME/Kooha" 2>/dev/null)" ]]; then
+        check_ok "Kooha recordings"
+    else
+        check_warn "Kooha recordings → missing or empty"
+    fi
 
-if [[ -d "$HOME/yc-application" ]] && [[ -n "$(ls -A "$HOME/yc-application" 2>/dev/null)" ]]; then
-    check_ok "YC application"
-else
-    check_warn "YC application → missing or empty"
-fi
+    if [[ -d "$HOME/Pictures" ]] && [[ -n "$(ls -A "$HOME/Pictures" 2>/dev/null)" ]]; then
+        check_ok "Pictures"
+    else
+        check_warn "Pictures → missing or empty"
+    fi
 
-# Additional databases
-check_project_file "$HOME/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
-check_project_dir  "$HOME/financial-advisor/data"                   "Financial Advisor DBs"
-check_project_file "$HOME/bimby-nutritionist/data/nutritionist.db"  "Bimby nutritionist DB"
-check_project_file "$HOME/bimby-nutritionist/data/bimby.db"         "Bimby DB"
-check_project_file "$HOME/susilo/data/susilo.sqlite"                "Susilo DB"
+    if [[ -d "$HOME/obsidian_brain" ]] && [[ -n "$(ls -A "$HOME/obsidian_brain" 2>/dev/null)" ]]; then
+        check_ok "Obsidian vault"
+    else
+        check_warn "Obsidian vault → missing or empty"
+    fi
+
+    if [[ -d "$HOME/yc-application" ]] && [[ -n "$(ls -A "$HOME/yc-application" 2>/dev/null)" ]]; then
+        check_ok "YC application"
+    else
+        check_warn "YC application → missing or empty"
+    fi
+
+    # Additional databases
+    check_project_file "$HOME/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
+    check_project_dir  "$HOME/financial-advisor/data"                   "Financial Advisor DBs"
+    check_project_file "$HOME/bimby-nutritionist/data/nutritionist.db"  "Bimby nutritionist DB"
+    check_project_file "$HOME/bimby-nutritionist/data/bimby.db"         "Bimby DB"
+    check_project_file "$HOME/susilo/data/susilo.sqlite"                "Susilo DB"
+fi
 
 # --- System services ---
 
