@@ -256,7 +256,15 @@
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
             ({ pkgs, ... }: {
               environment.systemPackages = with pkgs; [
-                rustdesk-flutter # Remote desktop (TeamViewer-like)
+                # RustDesk forced to X11 to bypass Wayland screen-share dialog
+                (symlinkJoin {
+                  name = "rustdesk-flutter-x11";
+                  paths = [ rustdesk-flutter ];
+                  nativeBuildInputs = [ makeWrapper ];
+                  postBuild = ''
+                    wrapProgram $out/bin/rustdesk --set GDK_BACKEND x11
+                  '';
+                })
                 git # For cloning flake repo during install
               ];
             })
@@ -300,7 +308,15 @@
                 gh
                 google-chrome
                 inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-                rustdesk-flutter
+                # RustDesk forced to X11 to bypass Wayland screen-share dialog
+                (symlinkJoin {
+                  name = "rustdesk-flutter-x11";
+                  paths = [ rustdesk-flutter ];
+                  nativeBuildInputs = [ makeWrapper ];
+                  postBuild = ''
+                    wrapProgram $out/bin/rustdesk --set GDK_BACKEND x11
+                  '';
+                })
                 iw # WiFi debugging
                 wirelesstools # iwconfig
               ];
