@@ -35,9 +35,9 @@
           { run = "glow \"$@\""; desc = "View with Glow"; block = true; }
           { run = "hx \"$@\""; desc = "Edit with Helix"; block = true; }
         ];
-        # Images - Eye of GNOME as primary, feh as lightweight fallback
+        # Images - Loupe (GNOME) as primary, feh as lightweight fallback
         image = [
-          { run = "eog \"$@\""; desc = "View with Eye of GNOME"; orphan = true; }
+          { run = "loupe \"$@\""; desc = "View with Loupe"; orphan = true; }
           { run = "feh \"$@\""; desc = "View with feh"; orphan = true; }
         ];
         # PDFs - Okular as default
