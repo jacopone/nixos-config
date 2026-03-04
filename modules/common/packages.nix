@@ -56,7 +56,15 @@
     nix-output-monitor # Build visualization (nom)
 
     # Remote support (TeamViewer-like, connects via ID + password)
-    rustdesk-flutter
+    # Forced to X11 backend to bypass Wayland's repeated screen-share permission dialog
+    (symlinkJoin {
+      name = "rustdesk-flutter-x11";
+      paths = [ rustdesk-flutter ];
+      nativeBuildInputs = [ makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/rustdesk --set GDK_BACKEND x11
+      '';
+    })
 
     # System utilities
     p7zip
