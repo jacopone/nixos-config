@@ -40,9 +40,9 @@
           { run = "loupe \"$@\""; desc = "View with Loupe"; orphan = true; }
           { run = "feh \"$@\""; desc = "View with feh"; orphan = true; }
         ];
-        # PDFs - Okular as default
+        # PDFs - Foliate as default
         pdf = [
-          { run = "/run/current-system/sw/bin/okular \"$@\""; desc = "View with Okular"; orphan = true; }
+          { run = "foliate \"$@\""; desc = "View with Foliate"; orphan = true; }
         ];
         # Office documents - smart-office-open handles Google Drive files automatically
         office = [
