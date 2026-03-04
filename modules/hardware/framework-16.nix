@@ -5,24 +5,35 @@
 # PRIME offload, Blackwell open modules) comes from:
 #   nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
 # imported in flake.nix. This file adds NVIDIA tuning, workarounds, and extras.
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
+  # Disable nixos-hardware's amd_pstate module — it sets amd_pstate=active for
+  # kernel >= 6.3, but having both active and passive on the cmdline corrupts
+  # CPPC initialization on Strix Point (CPU locks at 605 MHz).
+  disabledModules = [ "${inputs.nixos-hardware}/common/cpu/amd/pstate.nix" ];
+
+  # Re-add the microcode update that pstate.nix's parent (default.nix) provides,
+  # since disabling pstate.nix also removes its import of default.nix.
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   boot.kernelModules = [ "uinput" ];
 
   boot.kernelParams = [
     # NVIDIA VRAM preservation across suspend/resume
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
     "nvidia.NVreg_TemporaryFilePath=/var/tmp"
-    # Override nixos-hardware's amd_pstate=active. Active mode CPPC is broken on
-    # Strix Point / kernel 6.19: EPP hints ignored, CPU locks at 605 MHz.
-    "amd_pstate=passive"
+    # Guided mode: OS sets min/max bounds, firmware picks optimal frequency.
+    # Passive/active modes fail on Strix Point — firmware ignores CPPC requests.
+    # Guided cooperates with the firmware's autonomous frequency control.
+    "amd_pstate=guided"
     # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
     "pcie_aspm=off"
   ];
 
-  # Always use latest kernel (nixos-hardware only sets this conditionally for < 6.15)
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Use default kernel (6.18 LTS) instead of latest (6.19) — 6.19 has critical
+  # amdgpu regressions on Strix Point. 6.18 includes AMD HFI for proper
+  # heterogeneous Zen 5/5c core scheduling.
+  # boot.kernelPackages = pkgs.linuxPackages_latest;  # Uncomment to return to bleeding edge
 
   services.udev.extraRules = lib.mkMerge [
     # uinput for Wayland input automation
@@ -33,12 +44,9 @@
     ''
       SUBSYSTEM=="usb", DRIVERS=="usb", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0012", ATTR{power/wakeup}="disabled"
     ''
-    # Auto-switch power profile: performance on AC, power-saver on battery
+    # Auto-switch power profile on AC plug/unplug via systemd service trigger
     ''
-      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ENV{POWER_SUPPLY_ONLINE}=="1", ACTION=="change", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
-    ''
-    ''
-      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ENV{POWER_SUPPLY_ONLINE}=="0", ACTION=="change", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver"
+      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ACTION=="change", TAG+="systemd", ENV{SYSTEMD_WANTS}="set-power-profile-ac.service"
     ''
   ];
 
@@ -95,9 +103,8 @@
     '';
   };
 
-  # Fix CPU frequency stuck at base clock after resume.
-  # Cycle PPD profiles to force EC to re-evaluate TDP limits, then set governor
-  # to performance on AC (passive mode needs explicit governor, unlike active mode).
+  # Fix CPU frequency after resume — cycle PPD profile to force EC to
+  # re-evaluate TDP limits (CPPC registers can corrupt during shallow suspend).
   systemd.services.fix-cpu-freq-after-resume = {
     description = "Reset CPU frequency scaling after resume";
     after = [ "post-resume.target" ];
@@ -111,14 +118,6 @@
       else
         ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced
       fi
-      # In passive mode, explicitly set governor after PPD profile change
-      for gov in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
-        if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
-          echo performance > "$gov" 2>/dev/null || true
-        else
-          echo schedutil > "$gov" 2>/dev/null || true
-        fi
-      done
     '';
   };
 
@@ -137,7 +136,21 @@
     '';
   };
 
-  # Set performance profile + governor at boot.
+  # Set power profile when AC state changes (triggered by udev).
+  systemd.services.set-power-profile-ac = {
+    description = "Set power profile based on AC state";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.coreutils}/bin/sleep 1
+      if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance
+      else
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver
+      fi
+    '';
+  };
+
+  # Set power profile at boot based on AC state.
   # Uses graphical.target to avoid ordering cycle with PPD via multi-user.target.
   systemd.services.power-profile-boot = {
     description = "Set power profile based on AC state at boot";
@@ -148,7 +161,6 @@
       ${pkgs.coreutils}/bin/sleep 2
       if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
         ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance
-        echo performance | ${pkgs.coreutils}/bin/tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null
       else
         ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced
       fi
