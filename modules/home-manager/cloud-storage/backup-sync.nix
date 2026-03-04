@@ -115,14 +115,36 @@ let
     # GNOME desktop settings (keybindings, favorites, night light, workspace config)
     sync_dir "$HOME/.config/dconf" "dconf" "GNOME dconf settings"
 
-    # Chrome bookmarks (in case Chrome Sync is not active)
-    sync_file "$HOME/.config/google-chrome/Default/Bookmarks" "chrome-bookmarks/Default-Bookmarks.json" "Chrome bookmarks"
+    # Chrome profiles (all profiles: bookmarks, passwords, cookies, settings)
+    # Passwords and cookies are encrypted with GNOME Keyring (backed up above)
+    CHROME_DIR="$HOME/.config/google-chrome"
+    CHROME_FILES="Bookmarks Preferences Login?Data Cookies Web?Data Secure?Preferences Favicons"
+    if [ -d "$CHROME_DIR" ]; then
+      sync_file "$CHROME_DIR/Local State" "chrome-profiles/Local State" "Chrome Local State"
+      for profile_dir in "$CHROME_DIR"/Default "$CHROME_DIR"/Profile\ *; do
+        [ -d "$profile_dir" ] || continue
+        profile_name="$(basename "$profile_dir")"
+        # Skip backup artifacts
+        case "$profile_name" in *backup*|*~) continue ;; esac
+        for pattern in $CHROME_FILES; do
+          # Use glob to resolve ? wildcards (e.g. Login?Data -> Login Data)
+          for f in "$profile_dir"/$pattern; do
+            [ -f "$f" ] || continue
+            fname="$(basename "$f")"
+            sync_file "$f" "chrome-profiles/$profile_name/$fname" "Chrome $profile_name/$fname"
+          done
+        done
+        # Extension data (per profile)
+        if [ -d "$profile_dir/Local Extension Settings" ]; then
+          sync_dir "$profile_dir/Local Extension Settings" \
+            "chrome-profiles/$profile_name/Local Extension Settings" \
+            "Chrome $profile_name extensions"
+        fi
+      done
+    fi
 
     # PTA ledger (financial data)
     sync_dir "$HOME/pta-ledger/ledger" "pta-ledger" "PTA ledger"
-
-    # Chrome extension data (Simplify Gmail settings/customizations)
-    sync_dir "$HOME/.config/google-chrome/Default/Local Extension Settings/pbmlfaiicoikhdbjagjbglnbfcbcojpj" "chrome-extensions/simplify-gmail" "Simplify Gmail"
 
     # Non-git directories (Drive is the only backup — no GitHub repo exists)
     sync_dir "$HOME/Downloads" "Downloads" "Downloads"
