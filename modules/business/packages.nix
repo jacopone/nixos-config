@@ -24,6 +24,8 @@ in
       rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
       maestral # Open-source Dropbox client - https://maestral.app/
       maestral-gui # GUI/tray icon for Maestral Dropbox client
+      apostrophe # Distraction-free Markdown reader/editor (GTK/GNOME)
+      foliate # EPUB/ebook reader (GTK/GNOME)
 
       # Python for learning to code (business subset)
       (python3.withPackages (ps: with ps; [
