@@ -6,6 +6,13 @@ let
   npmVersions = import ../core/npm-versions.nix;
   isGoogle = aiProfile == "google" || aiProfile == "both";
   isClaude = aiProfile == "claude" || aiProfile == "both";
+  inherit (pkgs) writeShellScriptBin;
+  npmPrefix = "/tmp/nix-npm-prefix";
+  mkNpxWrapper = name: pkg: writeShellScriptBin name ''
+    mkdir -p ${npmPrefix}/lib
+    export npm_config_prefix=${npmPrefix}
+    exec ${pkgs.nodejs_20}/bin/npx --yes ${pkg} "$@"
+  '';
 in
 {
   imports = [ ../common/packages.nix ];
@@ -25,12 +32,8 @@ in
     ]
     # Google AI stack
     ++ lib.optionals isGoogle [
-      (writeShellScriptBin "gemini" ''
-        exec ${pkgs.nodejs_20}/bin/npx --yes @google/gemini-cli@${npmVersions.gemini-cli} "$@"
-      '')
-      (writeShellScriptBin "chrome-devtools-mcp" ''
-        exec ${pkgs.nodejs_20}/bin/npx --yes chrome-devtools-mcp@${npmVersions.chrome-devtools-mcp} "$@"
-      '')
+      (mkNpxWrapper "gemini" "@google/gemini-cli@${npmVersions.gemini-cli}")
+      (mkNpxWrapper "chrome-devtools-mcp" "chrome-devtools-mcp@${npmVersions.chrome-devtools-mcp}")
     ]
     # Claude AI stack
     ++ lib.optionals isClaude [
