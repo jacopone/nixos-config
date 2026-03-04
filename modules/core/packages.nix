@@ -289,7 +289,8 @@ in
 
     # File viewers and openers for yazi
     feh # Lightweight image viewer (yazi secondary opener)
-    kdePackages.okular # Full-featured PDF/markdown/ePub viewer with annotations
+    foliate # Modern e-book reader (ePub, MOBI, PDF) - https://johnfactotum.github.io/foliate/
+    apostrophe # Distraction-free Markdown editor - https://apps.gnome.org/Apostrophe/
     file-roller # Archive manager for GNOME
   ];
 }

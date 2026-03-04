@@ -23,7 +23,7 @@
     simple-scan # document scanner
     totem # video player (legacy)
     showtime # video player (GTK4, GNOME 49+) - redundant with VLC
-    evince # document viewer (replaced by Okular)
+    evince # document viewer (replaced by Foliate)
     yelp # help viewer
     geary # email client
     seahorse # password manager
