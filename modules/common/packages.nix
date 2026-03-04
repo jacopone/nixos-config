@@ -69,7 +69,6 @@
     # System utilities
     p7zip
     wl-clipboard # Wayland clipboard (wl-copy, wl-paste)
-    gedit # Simple text editor
 
     # Fonts
     dejavu_fonts

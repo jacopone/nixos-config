@@ -288,9 +288,8 @@ in
     imagemagick # Image processing for previews
 
     # File viewers and openers for yazi
-    eog # Eye of GNOME - default GNOME image viewer
     feh # Lightweight image viewer (yazi secondary opener)
-    kdePackages.okular # Full-featured PDF viewer with annotations
+    kdePackages.okular # Full-featured PDF/markdown/ePub viewer with annotations
     file-roller # Archive manager for GNOME
   ];
 }

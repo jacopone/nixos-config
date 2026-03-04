@@ -1555,6 +1555,25 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - remove stale Chrome lock files during restore
   (Test: Verify the previous issue is resolved)
 
+### Added
+- backup and restore Simplify Gmail extension settings
+- auto-register SSH key with GitHub during restore
+- add gnupg to system packages
+  (Test: `which gnupg` or `gnupg --version`)
+- comprehensive backup coverage and restore fixes
+- add Pictures to backup, clean up stale Drive folders
+- set tl-biz-001 to Claude AI profile
+
+### Fixed
+- skip volatile .claude files during backup sync
+  (Test: Verify the previous issue is resolved)
+- remove stale claude-sandboxed/airgapped references
+  (Test: Verify the previous issue is resolved)
+- prevent suspend loop on resume and tolerate Drive duplicates in restore
+  (Test: Verify the previous issue is resolved)
+- remove security theater from rebuild, fix generation cleanup
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
