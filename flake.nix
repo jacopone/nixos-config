@@ -223,6 +223,7 @@
         ama-biz-001 = mkBusinessHost {
           hostname = "ama-biz-001";
           username = "hp-pietro";
+          aiProfile = "claude";
         };
 
         # MacBook Air 2018 (Intel, T2 chip) — Tenuta Larnianone
