@@ -6,6 +6,17 @@ let
 
   # Claude Code seccomp filter (shared derivation - also deployed by Home Manager)
   claude-seccomp = import ../../pkgs/claude-seccomp.nix { inherit pkgs; };
+
+  # Workaround: nixpkgs nodejs_20 uses nodejs-slim for its node binary shebang.
+  # npm resolves its global prefix from process.execPath (nodejs-slim), then tries
+  # to lstat <prefix>/lib which doesn't exist in nodejs-slim. Setting npm_config_prefix
+  # to a writable directory with /lib bypasses this.
+  npmPrefix = "/tmp/nix-npm-prefix";
+  mkNpxWrapper = name: pkg: pkgs.writeShellScriptBin name ''
+    mkdir -p ${npmPrefix}/lib
+    export npm_config_prefix=${npmPrefix}
+    exec ${pkgs.nodejs_20}/bin/npx --yes ${pkg} "$@"
+  '';
 in
 {
   imports = [ ../common/packages.nix ];
@@ -27,9 +38,7 @@ in
     socat # Required by Claude Code sandbox for proxy bridging
     claude-seccomp # Seccomp BPF filter + apply binary (blocks AF_UNIX in sandbox)
     # srt - External sandbox wrapper (kept for compatibility, native sandbox preferred)
-    (pkgs.writeShellScriptBin "srt" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes @anthropic-ai/sandbox-runtime@${npmVersions.srt} "$@"
-    '')
+    (mkNpxWrapper "srt" "@anthropic-ai/sandbox-runtime@${npmVersions.srt}")
     # Claude Autonomous Workflow Trilogy
     # 1. claude-autonomous - Single task launcher (foundation)
     # 2. claude-night-batch - Multi-task batch launcher from manifest
@@ -40,32 +49,19 @@ in
     (pkgs.writeShellScriptBin "claude-morning-review" (builtins.readFile ../../scripts/claude-morning-review.sh))
 
     # AI Tools - Pinned versions for reproducibility (see npm-versions.nix)
-    # Claude Flow - AI orchestration platform
-    (pkgs.writeShellScriptBin "claude-flow" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes claude-flow@${npmVersions.claude-flow} "$@"
-    '')
-    # BMAD-METHOD - Universal AI agent framework for Agentic Agile Driven Development
-    (pkgs.writeShellScriptBin "bmad-method" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes bmad-method@${npmVersions.bmad-method} "$@"
-    '')
-    # Gemini CLI - Google's Gemini CLI
-    (pkgs.writeShellScriptBin "gemini-cli" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes @google/gemini-cli@${npmVersions.gemini-cli} "$@"
-    '')
-    # Jules - Google's asynchronous coding agent CLI
-    (pkgs.writeShellScriptBin "jules" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes @google/jules@${npmVersions.jules} "$@"
-    '')
-    # OpenSpec - Spec-driven development for AI coding assistants
-    (pkgs.writeShellScriptBin "openspec" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes @fission-ai/openspec@${npmVersions.openspec} "$@"
-    '')
+    (mkNpxWrapper "claude-flow" "claude-flow@${npmVersions.claude-flow}")
+    (mkNpxWrapper "bmad-method" "bmad-method@${npmVersions.bmad-method}")
+    (mkNpxWrapper "gemini-cli" "@google/gemini-cli@${npmVersions.gemini-cli}")
+    (mkNpxWrapper "jules" "@google/jules@${npmVersions.jules}")
+    (mkNpxWrapper "openspec" "@fission-ai/openspec@${npmVersions.openspec}")
     # Agent Browser - Vercel Labs headless browser CLI for AI agents
     # Uses system Chrome to avoid NixOS binary compatibility issues
     playwright-driver.browsers # Provides Playwright-managed browsers for NixOS
     (pkgs.writeShellScriptBin "agent-browser" ''
       export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
       export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+      mkdir -p ${npmPrefix}/lib
+      export npm_config_prefix=${npmPrefix}
       exec ${pkgs.nodejs_20}/bin/npx --yes agent-browser@${npmVersions.agent-browser} "$@"
     '')
 
@@ -247,9 +243,7 @@ in
     python312Packages.lizard # Code complexity analysis (CCN < 10)
     python312Packages.radon # Python code metrics and complexity analysis
     # jscpd - JavaScript/TypeScript clone detection (pinned version)
-    (pkgs.writeShellScriptBin "jscpd" ''
-      exec ${pkgs.nodejs_20}/bin/npx --yes jscpd@${npmVersions.jscpd} "$@"
-    '')
+    (mkNpxWrapper "jscpd" "jscpd@${npmVersions.jscpd}")
     ruff # Lightning-fast Python linter/formatter
     uv # Extremely fast Python package manager (provides uvx for MCP servers)
     k9s # Kubernetes cluster management
