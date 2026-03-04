@@ -5,6 +5,7 @@
 
 {
   imports = [
+    ../../home-manager/claude-code # Company-wide Claude Code policies, commands, sandbox
     ./fish.nix # Simplified fish (business-specific)
     ../../home-manager/terminal/ghostty.nix # Ghostty terminal (shared)
     ../../home-manager/terminal/starship.nix # Starship prompt (shared)
