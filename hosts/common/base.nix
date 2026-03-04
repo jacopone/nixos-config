@@ -70,11 +70,8 @@
     memoryPercent = 25;
   };
 
-  # Automatic Updates
-  system.autoUpgrade = {
-    enable = true;
-    dates = "monthly";
-  };
+  # Automatic Updates (disabled — broken without flake attr on flake-based systems)
+  system.autoUpgrade.enable = false;
 
   # Time and Locale
   services.localtimed.enable = true;
