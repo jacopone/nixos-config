@@ -222,7 +222,7 @@
         # Build: nixos-rebuild switch --flake .#ama-biz-001
         ama-biz-001 = mkBusinessHost {
           hostname = "ama-biz-001";
-          username = "pietro";
+          username = "hp-pietro";
         };
 
         # MacBook Air 2018 (Intel, T2 chip) — Tenuta Larnianone

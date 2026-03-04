@@ -55,6 +55,7 @@
   fonts.packages = [
     pkgs.nerd-fonts._0xproto
     pkgs.nerd-fonts.droid-sans-mono
+    pkgs.nerd-fonts.jetbrains-mono
     pkgs.noto-fonts-color-emoji # Color emoji for terminal and apps
   ];
 }
