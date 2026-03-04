@@ -26,6 +26,10 @@
     # Passive/active modes fail on Strix Point — firmware ignores CPPC requests.
     # Guided cooperates with the firmware's autonomous frequency control.
     "amd_pstate=guided"
+    # Disable CWSR on iGPU — kernel 6.18/6.19 CWSR bug causes MES ring
+    # saturation and GPU reset loops on Strix Point under compute workloads.
+    # No downside for display-only iGPU usage.
+    "amdgpu.cwsr_enable=0"
     # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
     "pcie_aspm=off"
   ];
@@ -118,6 +122,20 @@
       else
         ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced
       fi
+    '';
+  };
+
+  # Restart NetworkManager after resume — shallow suspends on Strix Point can
+  # cause wpa_supplicant to fully deinit (nl80211 teardown) instead of pausing,
+  # leaving WiFi dead after resume. Restarting NM re-initializes the stack.
+  systemd.services.fix-wifi-after-resume = {
+    description = "Restart NetworkManager after resume";
+    after = [ "post-resume.target" ];
+    wantedBy = [ "post-resume.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.coreutils}/bin/sleep 3
+      ${pkgs.systemd}/bin/systemctl restart NetworkManager
     '';
   };
 
