@@ -12,6 +12,7 @@
     ../../home-manager/development/tools.nix # direnv, git, delta, atuin, broot (shared)
     ../../home-manager/desktop/gnome.nix # GNOME desktop (Dash to Dock)
     ../../home-manager/cloud-storage/rclone.nix # Google Drive mount via rclone
+    ../../home-manager/desktop/smart-office-open.nix # Default handler for office files
   ];
 
   home.stateVersion = "24.05";
