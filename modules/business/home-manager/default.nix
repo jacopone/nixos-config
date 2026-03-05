@@ -1,6 +1,6 @@
 # Business profile Home Manager entry point
 # Reuses ghostty, starship, and dev tools from tech profile; adds simplified fish
-# No yazi, rclone, command-tracking, idea/bug functions, or smart-office-open
+# No yazi, command-tracking, idea/bug functions, or smart-office-open
 { config, pkgs, ... }:
 
 {
@@ -11,6 +11,7 @@
     ../../home-manager/terminal/starship.nix # Starship prompt (shared)
     ../../home-manager/development/tools.nix # direnv, git, delta, atuin, broot (shared)
     ../../home-manager/desktop/gnome.nix # GNOME desktop (Dash to Dock)
+    ../../home-manager/cloud-storage/rclone.nix # Google Drive mount via rclone
   ];
 
   home.stateVersion = "24.05";
