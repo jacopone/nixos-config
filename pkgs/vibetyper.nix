@@ -17,9 +17,12 @@ let
   pname = "vibetyper";
   version = "1.1.2";
 
+  # Rolling URL (no versioned downloads available) — hash breaks on every upstream release.
+  # To update: nix-prefetch-url https://cdn.vibetyper.com/releases/linux/VibeTyper.AppImage
+  # then: nix-hash --to-sri --type sha256 <output>
   src = fetchurl {
     url = "https://cdn.vibetyper.com/releases/linux/VibeTyper.AppImage";
-    sha256 = "sha256-vge+CTfoApolH5h4+bDpwuzo2DHK84MbpFSv61Lel8M=";
+    sha256 = "sha256-wMx2tK4/aiKQrgICgNjRn2l1rHa5+bSvzB1e6WtB7sg=";
   };
 
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
@@ -66,7 +69,8 @@ appimageTools.wrapType2 {
       --set GDK_BACKEND x11 \
       --set VK_ICD_FILENAMES /run/opengl-driver/share/vulkan/icd.d/lvp_icd.x86_64.json \
       --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib \
-      --set ALSA_PLUGIN_DIR "${alsa-plugins}/lib/alsa-lib"
+      --set ALSA_PLUGIN_DIR "${alsa-plugins}/lib/alsa-lib" \
+      --set ELECTRON_NO_UPDATER 1
   '';
 
   extraPkgs = pkgs: with pkgs; [
