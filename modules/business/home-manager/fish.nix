@@ -207,16 +207,12 @@ in
       end
 
       ${lib.optionalString isGoogle ''
-      # Launch Gemini CLI in nixos-config directory
-      function gemini --description "Open Gemini CLI in your system config"
-          builtin cd ~/nixos-config
+      function gemini --description "Open Gemini CLI"
           command gemini
       end
       ''}
       ${lib.optionalString isClaude ''
-      # Launch Claude Code in nixos-config directory
-      function claude --description "Open Claude Code in your system config"
-          builtin cd ~/nixos-config
+      function claude --description "Open Claude Code"
           command claude
       end
       ''}
