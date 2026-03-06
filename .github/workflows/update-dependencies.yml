@@ -34,10 +34,7 @@ jobs:
         run: |
           echo "Updating flake inputs..."
 
-          # Create backup
-          cp flake.lock flake.lock.backup
-
-          # Update all flake inputs
+          # Update all flake inputs (git restore handles rollback on failure)
           nix flake update
 
           # Check what changed
@@ -101,10 +98,8 @@ jobs:
       - name: Restore on failure
         if: failure()
         run: |
-          if [ -f flake.lock.backup ]; then
-            mv flake.lock.backup flake.lock
-            echo "Restored flake.lock from backup"
-          fi
+          git checkout flake.lock
+          echo "Restored flake.lock from git"
 
   cleanup:
     name: Cleanup stale branches
