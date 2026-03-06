@@ -480,8 +480,12 @@ elif [ "$USE_NOM" = true ]; then
     # The internal-json format works without -v and gives nom what it needs
     BUILD_LINK="/tmp/nixos-build-$$"
     echo ""
+    # Temporarily disable set -e: nom/tee can exit before nix finishes writing,
+    # causing SIGPIPE (exit 141) which pipefail would treat as a fatal error.
+    set +e
     NIXPKGS_ALLOW_UNFREE=1 nix build --log-format internal-json --out-link "$BUILD_LINK" --impure .#nixosConfigurations."$NIXOS_HOSTNAME".config.system.build.toplevel 2>&1 | nom --json 2>&1 | tee -a "$LOG_FILE"
     BUILD_EXIT=${PIPESTATUS[0]}
+    set -e
 
     if [ "$BUILD_EXIT" -ne 0 ]; then
         log_error "Test build failed (exit code: $BUILD_EXIT)"
