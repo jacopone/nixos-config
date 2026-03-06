@@ -5,6 +5,7 @@
 {
   home.packages = [
     pkgs.gnomeExtensions.dash-to-dock
+    pkgs.gnomeExtensions.appindicator
   ];
 
   dconf.settings = {
@@ -12,6 +13,7 @@
     "org/gnome/shell" = {
       enabled-extensions = [
         "dash-to-dock@micxgx.gmail.com"
+        "appindicatorsupport@rgcjonas.gmail.com"
       ];
     };
 
