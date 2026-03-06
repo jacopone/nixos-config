@@ -1574,6 +1574,310 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - remove security theater from rebuild, fix generation cleanup
   (Test: Verify the previous issue is resolved)
 
+### Added
+- add command tracking system to home-manager
+- integrate automation updates and add transparency to rebuild-nixos
+- re-enable pymupdf4llm and improve automation transparency
+  (Test: `which pymupdf4llm` or `pymupdf4llm --version`)
+- enhance rebuild-nixos with MCP session utilization display
+- show global vs project-level MCP server breakdown in rebuild
+- show project-level MCP server locations in rebuild
+- optimize MCP scope, add AI tools, integrate adaptive learning
+  (Test: `which AI` or `AI --version`)
+- integrate intelligent data lifecycle management into rebuild-nixos
+  (Test: `which integrate` or `integrate --version`)
+- use local flake for all automation commands in rebuild-nixos
+- add opencode AI agent and improve rebuild-nixos error handling
+  (Test: `which opencode` or `opencode --version`)
+- add tool usage analytics and fix rebuild-nixos stat extraction
+- Update cursor-nix with Chrome browser automation support
+- add NordVPN support via wgnord WireGuard client
+  (Test: `which NordVPN` or `NordVPN --version`)
+- add Google Antigravity IDE and enhance document processing
+  (Test: `which Google` or `Google --version`)
+- add Google Antigravity IDE with FHS environment
+- enable ADB for Android development
+  (Test: Connect Android device, run `adb devices`)
+- add wl-clipboard and kooha, simplify fish config
+  (Test: Launch from application menu, verify recording works)
+- add changelog generation workflow to rebuild-nixos
+- add automatic hook deployment to Phase 8
+- add ThinkPad power and GPU optimizations
+- add nom build visualization and polished UX
+  (Test: `which nom` or `nom --version`)
+- add context hook, session recording, and optimization notes
+  (Test: `which context` or `context --version`)
+- add personal→master auto-sync with sanitization
+- handle file deletions in sync workflow
+- add uv package manager for MCP server support
+  (Test: `which uv` or `uv --version`)
+- add bubblewrap sandboxing for Claude Code
+  (Test: `which bubblewrap` or `bubblewrap --version`)
+- implement 8-layer supply chain hardening
+- add NixOS wrapper for Anthropic sandbox-runtime
+  (Test: `which NixOS` or `NixOS --version`)
+- add claude-autonomous worker and improve rebuild-nixos
+  (Test: `which claude-autonomous` or `claude-autonomous --version`)
+- add multi-host support for Framework 16 laptop
+- add --fresh flag to bypass eval-cache
+- add Handy speech-to-text package for NixOS
+  (Test: `which Handy` or `Handy --version`)
+- add testing infrastructure for rebuild-nixos
+- add life-context system, EOD workflows, and handy fixes
+- replace handy with vibetyper for speech-to-text
+  (Test: `which replace` or `replace --version`)
+- add pencil-dev package and update vibetyper to v1.1.2
+  (Test: `which pencil-dev` or `pencil-dev --version`)
+- add Google Drive integration with rclone mount and smart-office-open
+  (Test: `which Google` or `Google --version`)
+- add agent-browser CLI wrapper with Playwright support
+  (Test: `which agent-browser` or `agent-browser --version`)
+- add business profile with symmetric mkTechHost/mkBusinessHost helpers
+  (Test: `which business` or `business --version`)
+- add business installer ISO with RustDesk, fix GC exit handling
+  (Test: `which business` or `business --version`)
+- add hp-pietro host with bootstrap script for remote deployment
+- add playwright-mcp-bridge Chrome extension
+- migrate Claude sandbox to native bubblewrap+seccomp, update flake inputs
+  (Test: `which migrate` or `migrate --version`)
+- add demo report instructions to agent prompt
+- add demo report detection helpers
+- show demo report column in status table
+- include demo reports in generated report
+- add --ralph flag for iterative loop mode
+- set CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000 via Home Manager
+- headless Playwright + demo credentials for autonomous sessions
+- add biz-003 MacBook Air T2 host with installer ISO
+- add fish greeting and claude alias for business users
+- add CLAUDE.md template for business self-service
+- add zram + swapfile for 8GB RAM
+- add Dash to Dock for macOS-style always-visible dock
+- add auto-backup timer and machine restore guide
+  (Test: `which auto-backup` or `auto-backup --version`)
+- add biz-004 MacBook Air 7,2 (Early 2015) for bernie
+- add chrome-devtools-mcp to npm version pins
+- add aiProfile parameter to mkBusinessHost
+- conditional AI packages based on aiProfile
+  (Test: `which conditional` or `conditional --version`)
+- conditional Chrome extensions based on aiProfile
+- adaptive fish greeting and AI functions based on aiProfile
+- add GEMINI.md business template for Google AI profile
+- add auto-backup timer and machine restore guide
+- add ghostty terminal emulator to tech profile
+- enable SSH on tech hosts with key-only auth
+- replace placeholder hardware config with actual values
+- add company prefixes to host names
+- add restore-machine.sh for repo cloning + gitignored data restore
+- sync MACHINE_RESTORE.md to Drive backup root
+- declare XDG user directories to prevent unwanted defaults
+- add system config restore to restore-machine.sh (Phase 1)
+- add automated verification phase to restore-machine.sh
+- backup and restore Simplify Gmail extension settings
+- auto-register SSH key with GitHub during restore
+- add gnupg to system packages
+  (Test: `which gnupg` or `gnupg --version`)
+- comprehensive backup coverage and restore fixes
+- add Pictures to backup, clean up stale Drive folders
+- set tl-biz-001 to Claude AI profile
+- fix Framework 16 performance — CPU, NVMe, video decode
+- backup all Chrome profiles (bookmarks, passwords, cookies, extensions)
+- add --business mode to restore-machine, upgrade Chrome restore
+- add Maestral Dropbox client for business hosts
+  (Test: `which Maestral` or `Maestral --version`)
+- replace Okular with Foliate and Apostrophe
+  (Test: `which replace` or `replace --version`)
+- add Apostrophe and Foliate for business users
+  (Test: `which Apostrophe` or `Apostrophe --version`)
+
+### Changed
+- consolidate Python invocations in session lifecycle (600ms speedup) (performance improvement)
+- modularize home-manager config & security fixes (restructured)
+- add Claude Code configuration analysis and update system state
+- major code quality improvements - portability, security, and organization (restructured)
+- install pre-commit hooks and apply code quality fixes
+- add openspec tool and simplify rebuild script
+- add OnlyOffice and improve rebuild GC output
+- remove personal content for public adoption
+- remove 8 redundant CLI tools
+- remove 3 more redundant tools
+- remove redundant image viewers
+- remove redundant packages, exclude GNOME Showtime
+- replace custom bubblewrap with Anthropic srt (restructured)
+- remove Spec Kit, relax shellcheck CI, update flake deps
+- rename hosts to model-user convention for fleet management (restructured)
+- extract shared packages into modules/common/packages.nix (restructured)
+- rename hosts to asset-tag convention (biz-NNN/tech-NNN) (restructured)
+- remove pencil-dev design tool
+- remove bottom, comment out wireshark from system packages
+
+### Fixed
+- add complete YAML frontmatter to slash command files
+  (Test: Verify the previous issue is resolved)
+- handle grep -c exit code in warning count extraction
+  (Test: Verify the previous issue is resolved)
+- parse MCP stats from .claude/mcp-analytics.md instead of CLAUDE.md
+  (Test: Verify the previous issue is resolved)
+- extract system tools stats from CLAUDE.md instead of automation logs
+  (Test: Verify the previous issue is resolved)
+- handle grep -c exit code in server count extraction
+  (Test: Verify the previous issue is resolved)
+- remove timeout from adaptive learning cycle for interactive mode
+  (Test: Verify the previous issue is resolved)
+- use local flake for check-data-health instead of GitHub
+  (Test: Verify the previous issue is resolved)
+- improve MCP statistics display and lifecycle warning accuracy
+  (Test: Verify the previous issue is resolved)
+- resolve Fish variable expansion in GitHub workflow functions
+  (Test: Verify the previous issue is resolved)
+- add smart flake update logic to prevent stale cache issues
+  (Test: Verify the previous issue is resolved)
+- resolve pre-commit NixOS compatibility issue
+  (Test: Verify the previous issue is resolved)
+- resolve nix flake check failure in GitHub Actions
+  (Test: Verify the previous issue is resolved)
+- replace deprecated pkgs.system with pkgs.stdenv.hostPlatform.system
+  (Test: Verify the previous issue is resolved)
+- resolve antigravity-nix narHash mismatch in rebuild script
+  (Test: Verify the previous issue is resolved)
+- update script paths for claude-nixos-automation refactor
+  (Test: Verify the previous issue is resolved)
+- use nix run for health check in rebuild script
+  (Test: Verify the previous issue is resolved)
+- use nix run for tool analytics invocation
+  (Test: Verify the previous issue is resolved)
+- skip path inputs in update-dependencies workflow
+  (Test: Verify the previous issue is resolved)
+- convert path inputs to GitHub URLs for CI compatibility
+  (Test: Verify the previous issue is resolved)
+- correct broken THE_CLOSED_LOOP.md link in README
+  (Test: Verify the previous issue is resolved)
+- resolve critical issues from system review
+  (Test: Verify the previous issue is resolved)
+- remove thermald (ThinkPad DYTC handles thermals)
+  (Test: Verify the previous issue is resolved)
+- tune i915 kernel params for video playback stability
+  (Test: Verify the previous issue is resolved)
+- stabilize bluetooth audio and battery charging
+  (Test: Verify the previous issue is resolved)
+- disable WirePlumber auto headset profile switching
+  (Test: Verify the previous issue is resolved)
+- keep feh as yazi secondary opener, remove sxiv
+  (Test: Verify the previous issue is resolved)
+- resolve UI glitches in rebuild-nixos summary
+  (Test: Verify the previous issue is resolved)
+- use --out-link for nom build visualization
+  (Test: Verify the previous issue is resolved)
+- clean nom output and zoxide shell integration
+  (Test: Verify the previous issue is resolved)
+- always sanitize CLAUDE.md USER_MEMORY section
+  (Test: Verify the previous issue is resolved)
+- use commit-based filtering instead of date-based
+  (Test: Verify the previous issue is resolved)
+- use merge-base for diverged branch comparison
+  (Test: Verify the previous issue is resolved)
+- allow workflow files through personal paths filter
+  (Test: Verify the previous issue is resolved)
+- detect files only on master for deletion
+  (Test: Verify the previous issue is resolved)
+- actually delete npm cache instead of fake clean
+  (Test: Verify the previous issue is resolved)
+- commit devenv.lock for reproducible environments
+  (Test: Verify the previous issue is resolved)
+- escape dots in skip patterns to not match devenv.lock
+  (Test: Verify the previous issue is resolved)
+- resolve GCC 15 and nixos-unstable build failures
+  (Test: Verify the previous issue is resolved)
+- add disk cleanup for performance benchmark
+  (Test: Verify the previous issue is resolved)
+- add --fallback and better error reporting for benchmark
+  (Test: Verify the previous issue is resolved)
+- make performance benchmark non-blocking on upstream issues
+  (Test: Verify the previous issue is resolved)
+- add devenv hook for use_devenv support
+  (Test: Verify the previous issue is resolved)
+- replace deprecated programs.adb with android-tools package
+  (Test: Verify the previous issue is resolved)
+- reduce verbose shell output
+  (Test: Verify the previous issue is resolved)
+- keep 30 days of generations instead of only 2
+  (Test: Verify the previous issue is resolved)
+- rebuild-nixos reliability and automation updates
+  (Test: Verify the previous issue is resolved)
+- prevent pipefail exit on grep pattern mismatches
+  (Test: Verify the previous issue is resolved)
+- rebuild-nixos exit code and generation detection
+  (Test: Verify the previous issue is resolved)
+- protect all fd pipelines against pipefail exit code 1
+  (Test: Verify the previous issue is resolved)
+- source environment.d secrets in rebuild-nixos
+  (Test: Verify the previous issue is resolved)
+- comprehensive pipefail protection audit
+  (Test: Verify the previous issue is resolved)
+- export ANTHROPIC_API_KEY after sourcing from environment.d
+  (Test: Verify the previous issue is resolved)
+- accept 'a' shortcut for automatic generation cleanup
+  (Test: Verify the previous issue is resolved)
+- update hash for latest AppImage
+  (Test: Verify the previous issue is resolved)
+- use GitHub-sourced Broadcom firmware for T2 Macs
+  (Test: Verify the previous issue is resolved)
+- hardware config and T2 optimizations
+  (Test: Verify the previous issue is resolved)
+- use renamed logind lid switch options
+  (Test: Verify the previous issue is resolved)
+- configure gh as git credential helper for NixOS
+  (Test: Verify the previous issue is resolved)
+- import Dash to Dock module in business profile
+  (Test: Verify the previous issue is resolved)
+- overlay for picosvg test failures and pymupdf4llm missing tabulate
+  (Test: Verify the previous issue is resolved)
+- handle exit code 4 from nixos-rebuild switch gracefully
+  (Test: Verify the previous issue is resolved)
+- remove Dash to Dock from tech profile (business-only)
+  (Test: Verify the previous issue is resolved)
+- disable idle suspend and fix re-suspend loop
+  (Test: Verify the previous issue is resolved)
+- correct Catppuccin theme name
+  (Test: Verify the previous issue is resolved)
+- switch to open kernel modules for RTX 5070 Blackwell GPU
+  (Test: Verify the previous issue is resolved)
+- use correct repo name birthday-manager (not birthday-manager-ts)
+  (Test: Verify the previous issue is resolved)
+- remove stale Chrome lock files during restore
+  (Test: Verify the previous issue is resolved)
+- skip volatile .claude files during backup sync
+  (Test: Verify the previous issue is resolved)
+- remove stale claude-sandboxed/airgapped references
+  (Test: Verify the previous issue is resolved)
+- prevent suspend loop on resume and tolerate Drive duplicates in restore
+  (Test: Verify the previous issue is resolved)
+- remove security theater from rebuild, fix generation cleanup
+  (Test: Verify the previous issue is resolved)
+- resolve nodejs-slim ENOENT breaking all npx wrappers
+  (Test: Verify the previous issue is resolved)
+- switch to kernel 6.18 + guided mode for Strix Point CPU fix
+  (Test: Verify the previous issue is resolved)
+- disable broken autoUpgrade that caused emergency mode on boot
+  (Test: Verify the previous issue is resolved)
+- replace ama-biz-001 placeholder hardware-config with real one
+  (Test: Verify the previous issue is resolved)
+- WiFi recovery after resume + preventive iGPU CWSR workaround
+  (Test: Verify the previous issue is resolved)
+- replace ama-biz-001 placeholder hardware-config with real one
+  (Test: Verify the previous issue is resolved)
+- force RustDesk to X11 backend to bypass Wayland screen-share dialog
+  (Test: Verify the previous issue is resolved)
+- correct ama-biz-001 hardware-config UUIDs from /etc/nixos original
+  (Test: Verify the previous issue is resolved)
+- replace eog/gedit/evince with modern alternatives
+  (Test: Verify the previous issue is resolved)
+- restore hp-pietro username for ama-biz-001 + register JetBrains font
+  (Test: Verify the previous issue is resolved)
+- Chrome extension policies, username, fonts for ama-biz-001
+  (Test: Verify the previous issue is resolved)
+- correct /boot partition UUID for ama-biz-001 (00D2-88F6 → 00D2-8BF6)
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks

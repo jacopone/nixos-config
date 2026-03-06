@@ -23,7 +23,17 @@ in
       less
       rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
       maestral # Open-source Dropbox client - https://maestral.app/
-      maestral-gui # GUI/tray icon for Maestral Dropbox client
+      # maestral-gui wrapped with GTK schemas (NixOS needs explicit XDG_DATA_DIRS)
+      (symlinkJoin {
+        name = "maestral-gui-wrapped";
+        paths = [ maestral-gui ];
+        buildInputs = [ makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/maestral_qt \
+            --prefix XDG_DATA_DIRS : ${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name} \
+            --prefix XDG_DATA_DIRS : ${gtk3}/share/gsettings-schemas/${gtk3.name}
+        '';
+      })
       apostrophe # Distraction-free Markdown reader/editor (GTK/GNOME)
       foliate # EPUB/ebook reader (GTK/GNOME)
 
