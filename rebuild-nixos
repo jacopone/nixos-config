@@ -255,13 +255,26 @@ show_progress() {
     fi
 }
 
+# Detect business vs admin host from hostname pattern (*-biz-*)
+# Business hosts get a streamlined rebuild: build → activate → cleanup only
+NIXOS_HOSTNAME_EARLY=$(hostname)
+if [[ "$NIXOS_HOSTNAME_EARLY" == *-biz-* ]]; then
+    IS_BUSINESS_HOST=true
+else
+    IS_BUSINESS_HOST=false
+fi
+
 # Step counter for "Step X/Y" progress indicator
 # Dynamically count phases based on flags and available tools
-TOTAL_STEPS=4  # Core: Update inputs, Build, Activate, Claude config check
+if [ "$IS_BUSINESS_HOST" = true ]; then
+    TOTAL_STEPS=2  # Business: Build, Activate
+else
+    TOTAL_STEPS=4  # Admin: Update inputs, Build, Activate, Claude config check
+fi
 # nvd diff preview adds a step (nvd is installed on this system)
 command -v nvd &>/dev/null && TOTAL_STEPS=$((TOTAL_STEPS + 1))
-# Bootstrap verification adds a step with --verify-bootstrap
-[ "$VERIFY_BOOTSTRAP" = true ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+# Bootstrap verification adds a step with --verify-bootstrap (admin only)
+[ "$VERIFY_BOOTSTRAP" = true ] && [ "$IS_BUSINESS_HOST" = false ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 CURRENT_STEP=0
 
 # Track total rebuild duration
@@ -290,6 +303,8 @@ echo "║            NixOS System Rebuild & Configuration            ║"
 echo "╠════════════════════════════════════════════════════════════╣"
 if [ "$DRY_RUN" = true ]; then
 echo "║  Mode: Dry-run (no changes will be made)                   ║"
+elif [ "$IS_BUSINESS_HOST" = true ]; then
+echo "║  Mode: Business (streamlined rebuild)                      ║"
 elif [ "$QUICK" = true ] && [ "$YES" = true ]; then
 echo "║  Mode: Quick + Auto-accept (fastest)                       ║"
 elif [ "$QUICK" = true ]; then
@@ -415,12 +430,16 @@ manage_eval_cache() {
 # Run eval-cache management
 manage_eval_cache
 
-# === PHASE 1: Update Flake Inputs ===
+# === PHASE 1: Update Flake Inputs (admin only) ===
 # Updates nix flake lock file to get latest package versions
 # SMART UPDATE: Uses --refresh for locally-maintained repos to bypass cache
 # Side effects: Modifies flake.lock, may pull in breaking changes
 # Exit on failure: Yes (can't build without valid inputs)
+# Business hosts skip this — admin pushes flake.lock updates
 
+if [ "$IS_BUSINESS_HOST" = true ]; then
+    log_step "Skipping flake update (business host — admin manages inputs)"
+else
 step "Updating flake inputs"
 
 if dry_run_skip "update flake inputs (nixpkgs, home-manager, local repos)"; then
@@ -453,6 +472,7 @@ else
     log_success "Flake inputs updated (local repos refreshed)"
     add_action "Updated flake.lock with cache bypass for local repos"
 fi
+fi  # End admin-only Phase 1
 
 # === PHASE 2: Test Build ===
 # Builds new configuration WITHOUT activating it (safe to fail)
@@ -861,9 +881,10 @@ else
     fi
 fi
 
-# === PHASE 4: Claude Config Check ===
+# === PHASE 4: Claude Config Check (admin only) ===
 # Claude configs are now hand-maintained (~/.claude/CLAUDE.md, settings.json)
 # No automation needed - just verify files exist
+if [ "$IS_BUSINESS_HOST" = false ]; then
 step "Checking Claude configs"
 
 if dry_run_skip "check Claude Code configurations"; then
@@ -877,15 +898,18 @@ else
         log_warning "Claude config files missing - check ~/.claude/CLAUDE.md and ~/.claude/settings.json"
     fi
 fi
+fi  # End admin-only Phase 4
 
-# === PHASE 7: Changelog Draft Generation ===
+# === PHASE 7: Changelog Draft Generation (admin only) ===
 # Generates draft changelog entries from commits since last update
 # Exit on failure: No (non-critical, system already activated)
 # User interaction: Yes (review and approve draft)
-# Skip with: --quick flag
+# Skip with: --quick flag or business host
 echo ""
 
-if [ "$QUICK" = true ]; then
+if [ "$IS_BUSINESS_HOST" = true ]; then
+    : # Skip silently on business hosts
+elif [ "$QUICK" = true ]; then
     log_step "Skipping changelog generation (--quick mode)"
 elif dry_run_skip "generate changelog draft from recent commits"; then
     : # skip
@@ -1123,6 +1147,10 @@ elif [ "$DRY_RUN" = false ]; then
     fi
 fi
 
+# === PHASES 11-14: Admin Maintenance (admin only) ===
+# Business hosts skip disk analysis, cache cleanup, and Claude temp/backup cleanup
+if [ "$IS_BUSINESS_HOST" = false ]; then
+
 # === PHASE 11: Disk Space Analysis ===
 # Scans for problematic disk usage patterns:
 # - Oversized logs (>100MB = investigate)
@@ -1337,6 +1365,8 @@ elif [ "$DRY_RUN" = false ] && [ -d .backups ]; then
         fi
     fi
 fi
+
+fi  # End admin-only Phases 11-14
 
 # Calculate total duration
 REBUILD_END_TIME=$(date +%s)
