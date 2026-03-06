@@ -147,6 +147,8 @@
             nixpkgs.config.allowUnfree = true;
             nixpkgs.overlays = [
               gccFixOverlay
+              # VibeTyper - AI voice typing with speech-to-text
+              (import ./overlays/vibetyper.nix)
             ];
           }
 
