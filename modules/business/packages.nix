@@ -19,6 +19,12 @@ in
 
   environment.systemPackages = with pkgs;
     [
+      # Speech-to-text
+      vibetyper # AI voice typing with speech-to-text - https://vibetyper.com
+      wtype # Wayland text input
+      xdotool # X11 text input
+      dotool # Universal text input
+
       # Business-specific CLI
       less
       rclone # Cloud storage sync and mount tool - Google Drive, S3, etc. - https://rclone.org/
