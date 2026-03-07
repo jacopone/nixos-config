@@ -15,8 +15,8 @@
     ../../home-manager/desktop/smart-office-open.nix # Default handler for office files
   ];
 
-  # Override company-wide CLAUDE.md with business-specific branch+PR workflow
-  home.file.".claude/CLAUDE.md".source = lib.mkForce ./business-policies.md;
+  # Business-specific git workflow (extends company CLAUDE.md via rules, not mkForce)
+  home.file.".claude/rules/business-workflow.md".source = ./business-workflow.md;
 
   home.stateVersion = "24.05";
 
