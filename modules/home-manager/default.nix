@@ -11,6 +11,7 @@
     ./terminal/starship.nix # Starship prompt
     ./file-management/yazi.nix # Yazi file manager
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)
+    ./development/lsp.nix # LSP servers for Claude Code plugins (TS, Python, Nix, JSON, YAML, Bash)
     ./cloud-storage/rclone.nix # Google Drive mount via rclone
     ./cloud-storage/backup-sync.nix # Periodic backup to Google Drive
     ./desktop/smart-office-open.nix # Default handler for office files
