@@ -46,34 +46,45 @@ Base branch: `gcp-minimal`. Full dev environment via devenv.
 
 ### First-time setup
 ```
-git clone https://github.com/jacopone/account-harmony-ai-37599577.git
+git clone https://github.com/AmatinoTeam/account-harmony-ai-37599577.git
 cd account-harmony-ai-37599577
-# direnv activates devenv automatically — wait for it
-npm install
+direnv allow
+# devenv activates automatically — wait for npm install to finish
 cd backend && npm install && cd ..
 ```
 
-### Development workflow
-1. **Start from latest `gcp-minimal`**:
+### MANDATORY: Always work on a feature branch
+
+**BEFORE making ANY change** — even a single line — you MUST create a feature branch.
+NEVER edit files while on `gcp-minimal`. Check which branch you are on first:
+
+```
+git branch --show-current
+```
+
+If the output is `gcp-minimal`, create a branch BEFORE doing anything else:
+
+1. **Pull latest**:
    ```
    git checkout gcp-minimal
    git pull
    ```
 
-2. **Create a feature branch**:
+2. **Create a feature branch** (MANDATORY before any edit):
    ```
    git checkout -b feat/<short-description>
    ```
    Prefixes: `fix/`, `feat/`, `refactor/`, `style/`, `test/`
+   Example: `fix/button-color`, `feat/add-export-pdf`, `style/header-spacing`
 
-3. **Run local dev server to preview changes**:
+3. **THEN start making changes**. Run local dev server to preview:
    ```
    npm run dev
    ```
    Opens frontend at http://localhost:5173. Backend connects to staging API.
 
-4. **Make changes, verify**:
-   - Run `npm run lint` and `npm run typecheck` before committing
+4. **Before committing, verify**:
+   - Run `npm run lint` and `npm run typecheck`
    - Run `npm test` to verify tests pass
    - Git hooks run automatically on commit (lint, security, tests)
 
@@ -85,12 +96,20 @@ cd backend && npm install && cd ..
 
 6. **Wait for review**: Jacopo must approve before merge. CI must pass.
 
+7. **After PR is merged**, start fresh for the next change:
+   ```
+   git checkout gcp-minimal
+   git pull
+   ```
+
 ### Restrictions
+- NEVER edit files while on `gcp-minimal` — always create a branch first
 - NEVER push to `gcp-minimal` — branch protection will reject it
 - NEVER merge your own PRs
 - NEVER modify: `.github/workflows/`, `Dockerfile*`, `devenv.nix`, deploy scripts
 - NEVER change environment variables, secrets, or database migrations
 - NEVER bypass git hooks with `--no-verify`
+- NEVER download random files into the repo directory
 - If tests fail, fix them — don't skip
 
 ## General Rules
