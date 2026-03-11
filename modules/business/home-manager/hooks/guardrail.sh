@@ -44,8 +44,25 @@ case "$TOOL_NAME" in
     fi
 
     # --- Catastrophic file deletion ---
+    # Block rm -rf on root, home, current dir
     if echo "$CMD" | grep -qE '\brm\b.*-[a-zA-Z]*r' && echo "$CMD" | grep -qE '\brm\b.*\s(/|~|\.)(\s|$)'; then
       block "Recursive delete on root/home/project directory blocked. Be specific about what to delete."
+    fi
+    # Block rm -rf * (glob expansion wipes everything)
+    if echo "$CMD" | grep -qE '\brm\b.*-[a-zA-Z]*r[a-zA-Z]*f.*\s\*'; then
+      block "rm -rf * blocked — deletes everything in current directory. Be specific."
+    fi
+    # Block git rm -rf (removes files from git AND filesystem)
+    if echo "$CMD" | grep -qE 'git\s+rm\s+.*-[a-zA-Z]*r'; then
+      block "git rm -r blocked — removes files from git and filesystem. Ask admin."
+    fi
+    # Block find -delete (recursive file deletion)
+    if echo "$CMD" | grep -qE '\bfind\b.*-delete'; then
+      block "find -delete blocked — recursively deletes files. Use rm on specific files instead."
+    fi
+    # Block scripted deletion (node/python shutil)
+    if echo "$CMD" | grep -qE '(rmSync|rmdirSync|shutil\.rmtree|os\.removedirs)'; then
+      block "Scripted recursive deletion blocked. Use rm on specific files instead."
     fi
 
     # --- Publishing and deploying ---
