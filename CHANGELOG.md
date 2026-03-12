@@ -1574,6 +1574,66 @@ Skipped commits were internal maintenance (chore, docs, ci, test).
 - remove security theater from rebuild, fix generation cleanup
   (Test: Verify the previous issue is resolved)
 
+### Added
+- fix Framework 16 performance — CPU, NVMe, video decode
+- backup all Chrome profiles (bookmarks, passwords, cookies, extensions)
+- add --business mode to restore-machine, upgrade Chrome restore
+- add Maestral Dropbox client for business hosts
+  (Test: `which Maestral` or `Maestral --version`)
+- replace Okular with Foliate and Apostrophe
+  (Test: `which replace` or `replace --version`)
+- add Apostrophe and Foliate for business users
+  (Test: `which Apostrophe` or `Apostrophe --version`)
+- add rclone Google Drive mount to business profile
+- add smart-office-open to business profile
+- add business-specific CLAUDE.md policies with branch+PR workflow
+- add vibetyper speech-to-text to all business hosts
+  (Test: `which vibetyper` or `vibetyper --version`)
+- auto-detect business hosts and skip admin phases in rebuild-nixos
+- wrap maestral-gui with GTK schemas, add appindicator, update vibetyper
+  (Test: `which appindicator` or `appindicator --version`)
+- add LSP servers for Claude Code plugins (tech profile only)
+
+### Fixed
+- resolve nodejs-slim ENOENT breaking all npx wrappers
+  (Test: Verify the previous issue is resolved)
+- switch to kernel 6.18 + guided mode for Strix Point CPU fix
+  (Test: Verify the previous issue is resolved)
+- disable broken autoUpgrade that caused emergency mode on boot
+  (Test: Verify the previous issue is resolved)
+- replace ama-biz-001 placeholder hardware-config with real one
+  (Test: Verify the previous issue is resolved)
+- WiFi recovery after resume + preventive iGPU CWSR workaround
+  (Test: Verify the previous issue is resolved)
+- replace ama-biz-001 placeholder hardware-config with real one
+  (Test: Verify the previous issue is resolved)
+- force RustDesk to X11 backend to bypass Wayland screen-share dialog
+  (Test: Verify the previous issue is resolved)
+- correct ama-biz-001 hardware-config UUIDs from /etc/nixos original
+  (Test: Verify the previous issue is resolved)
+- replace eog/gedit/evince with modern alternatives
+  (Test: Verify the previous issue is resolved)
+- restore hp-pietro username for ama-biz-001 + register JetBrains font
+  (Test: Verify the previous issue is resolved)
+- Chrome extension policies, username, fonts for ama-biz-001
+  (Test: Verify the previous issue is resolved)
+- correct /boot partition UUID for ama-biz-001 (00D2-88F6 → 00D2-8BF6)
+  (Test: Verify the previous issue is resolved)
+- prevent SIGPIPE (exit 141) in rebuild-nixos test build pipeline
+  (Test: Verify the previous issue is resolved)
+- remove flake.lock.backup from dependency update workflow
+  (Test: Verify the previous issue is resolved)
+
+### Added
+- add Claude Code guardrail hooks for business profile
+- add Claude Code guardrail hooks for business profile
+
+### Fixed
+- remove auto-cd from claude/gemini shell functions
+  (Test: Verify the previous issue is resolved)
+- enforce mandatory branch creation before any edits
+  (Test: Verify the previous issue is resolved)
+
 ### Planned
 - User policies merge refactoring for claude-automation
 - Justfile for common tasks
