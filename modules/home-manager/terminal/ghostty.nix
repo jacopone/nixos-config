@@ -26,8 +26,11 @@
       cursor-style = "block";
       cursor-style-blink = true;
 
-      # Scrollback (large for AI sessions)
-      scrollback-limit = 50000;
+      # Scrollback in bytes (large for AI sessions — ~10MB)
+      scrollback-limit = 10000000;
+
+      # Trackpad scroll speed (precision=touchpad, discrete=mouse wheel)
+      mouse-scroll-multiplier = "precision:3,discrete:3";
 
       # Clipboard
       copy-on-select = "clipboard";
