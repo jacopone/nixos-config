@@ -32,6 +32,12 @@
     "amdgpu.cwsr_enable=0"
     # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
     "pcie_aspm=off"
+    # Explicitly disable NVIDIA dynamic power management (RTD3).
+    # Open kernel modules (565+) default to 0x03 (fine-grained) on laptops,
+    # which causes UCSI link drops on the USB-C DP alt-mode path.
+    # Must be set explicitly — finegrained=false alone just removes NixOS's
+    # override, letting the driver pick an even more aggressive default.
+    "nvidia.NVreg_DynamicPowerManagement=0x00"
   ];
 
   # Use default kernel (6.18 LTS) instead of latest (6.19) — 6.19 has critical
