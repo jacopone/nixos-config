@@ -58,7 +58,11 @@
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.production;
     modesetting.enable = true; # Required for Wayland
-    powerManagement.finegrained = true; # RTD3 dynamic power management (Turing+)
+    # RTD3 fine-grained PM disabled — causes UCSI link drops on the rear USB-C
+    # expansion bay DP alt-mode path, leading to external monitor disconnects.
+    # The GPU power-state transitions disturb the EC's UCSI layer (error 256),
+    # which cascades into display hotplug storms and amdgpu DP encoder timeouts.
+    powerManagement.finegrained = false;
     nvidiaPersistenced = true; # Keep GPU initialized for nvidia-smi/nvtop
     nvidiaSettings = true;
   };
@@ -136,6 +140,45 @@
     script = ''
       ${pkgs.coreutils}/bin/sleep 3
       ${pkgs.systemd}/bin/systemctl restart NetworkManager
+    '';
+  };
+
+  # Display recovery watchdog — Framework 16 with NVIDIA expansion bay GPU
+  # experiences intermittent display drops from multiple triggers:
+  # 1. UCSI error 256 (EC USB-C PD policy conflict) → DP alt-mode link drop
+  # 2. amdgpu enc1_stream_encoder_dp_blank timeout during display reconfiguration
+  # 3. Unknown triggers (possibly NVIDIA RTD3 or DRM hotplug race conditions)
+  #
+  # All paths produce the same amdgpu DP encoder timeout, after which Mutter
+  # loses logical monitor state and may leave the external monitor dark.
+  #
+  # This watchdog monitors the kernel log for the amdgpu DP encoder timeout
+  # (the common signal across all trigger paths), waits for the reconfiguration
+  # storm to settle, then forces Mutter to re-initialize all displays via VT
+  # switch (release + reclaim DRM master, re-read monitors.xml).
+  # The user sees a ~1s flash to a text console, then displays restore correctly.
+  systemd.services.display-recovery-watchdog = {
+    description = "Recover display after amdgpu DP encoder timeout";
+    wantedBy = [ "graphical.target" ];
+    after = [ "graphical.target" ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 5;
+    };
+    script = ''
+      ${pkgs.systemd}/bin/journalctl -kf --no-pager \
+        | ${pkgs.gnugrep}/bin/grep --line-buffered 'stream_encoder_dp_blank' \
+        | while read -r line; do
+          echo "amdgpu DP encoder timeout detected, waiting 5s for storm to settle..."
+          ${pkgs.coreutils}/bin/sleep 5
+          echo "Forcing Mutter display re-initialization via VT switch"
+          ${pkgs.kbd}/bin/chvt 3
+          ${pkgs.coreutils}/bin/sleep 1
+          ${pkgs.kbd}/bin/chvt 2
+          echo "Display recovery complete, debouncing 60s"
+          ${pkgs.coreutils}/bin/sleep 60
+        done
     '';
   };
 
