@@ -50,17 +50,6 @@ Configuration and optimization for specific tools.
 | [Kitty Terminal](tools/kitty-optimization-guide.md) | Terminal optimization guide |
 | [Yazi File Manager](tools/yazi-file-associations.md) | File associations and keybindings |
 
-## Archive
-
-Historical documentation (kept for reference, may be outdated).
-
-| Document | Description |
-|----------|-------------|
-| [2025-10 Planning](archive/planning-2025-10/) | HN launch planning docs |
-| [Documentation Audit](archive/DOCUMENTATION_AUDIT_2025-10-06.md) | October 2025 audit report |
-
----
-
 ## Related
 
 - [README](../README.md) - Project overview
