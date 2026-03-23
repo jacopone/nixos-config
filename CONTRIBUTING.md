@@ -84,8 +84,4 @@ environment.systemPackages = with pkgs; [fd ripgrep bat eza];  # No descriptions
 - **Bug reports**: [Issues](https://github.com/jacopone/nixos-config/issues)
 - **NixOS help**: [NixOS Discourse](https://discourse.nixos.org/)
 
-## Recognition
-
-Contributors are recognized in release notes and the README acknowledgments section.
-
 Thanks for your interest in improving this project.

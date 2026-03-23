@@ -37,6 +37,10 @@ Options:
   --strict        Enable strict mode (80% coverage required, security scan)
   --max-iter N    Max iterations before stopping (default: 5)
   --no-ralph      Single-pass mode: run once and exit (no retry loop)
+  --research      Research mode: autonomous optimize-measure-keep/revert loop
+  --metric CMD    Metric command (required with --research). Must output a number.
+  --scope FILES   Comma-separated files the agent can modify (optional)
+  --higher        Higher metric = better (default: lower = better)
   --list          List active autonomous sessions
   --stop          Stop a session: $0 --stop <task-name>
   --cleanup       Remove completed worktrees
@@ -45,11 +49,17 @@ By default, Claude runs in a loop (Ralph mode) up to 5 iterations, stopping
 early when COMPLETED.md or BLOCKERS.md appears. Each iteration gets a fresh
 context window — Claude reads git history to resume where it left off.
 
+Research mode (--research) follows the autoresearch pattern: Claude loops
+internally, modifying code, measuring a metric, keeping improvements and
+reverting regressions. Runs until interrupted.
+
 Examples:
   $0 ~/myproject feature-auth "Implement JWT authentication"
   $0 --strict ~/myproject auth-system "Implement secure authentication"
   $0 --max-iter 10 ~/myproject refactor-cache "Refactor the cache layer"
   $0 --no-ralph ~/myproject bugfix-123 "Quick single-pass fix"
+  $0 --research --metric "./measure.sh" ~/myproject optimize-perf "Reduce latency"
+  $0 --research --metric "nix flake check 2>&1 | wc -l" --scope modules/core/packages.nix ~/nixos-config slim-packages "Reduce closure size"
 
 The session runs in tmux. Attach with: tmux attach -t claude-<task-name>
 EOF
@@ -93,6 +103,10 @@ cleanup_worktrees() {
 STRICT_MODE=false
 RALPH_MODE=true
 RALPH_MAX=5
+RESEARCH_MODE=false
+METRIC_CMD=""
+SCOPE_FILES=""
+METRIC_DIRECTION="lower" # lower = better (like autoresearch)
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -122,6 +136,25 @@ while [[ $# -gt 0 ]]; do
             RALPH_MAX="$2"
             shift 2
             ;;
+        --research)
+            RESEARCH_MODE=true
+            RALPH_MODE=false  # Agent loops internally, not the shell
+            shift
+            ;;
+        --metric)
+            [[ -z "${2:-}" ]] && { echo "Usage: --metric '<command>'"; exit 1; }
+            METRIC_CMD="$2"
+            shift 2
+            ;;
+        --scope)
+            [[ -z "${2:-}" ]] && { echo "Usage: --scope 'file1,file2'"; exit 1; }
+            SCOPE_FILES="$2"
+            shift 2
+            ;;
+        --higher)
+            METRIC_DIRECTION="higher"
+            shift
+            ;;
         --help|-h)
             usage
             exit 0
@@ -148,12 +181,21 @@ if [[ ! -d "$REPO_PATH/.git" ]]; then
     exit 1
 fi
 
+if [[ "$RESEARCH_MODE" == "true" ]] && [[ -z "$METRIC_CMD" ]]; then
+    echo -e "${RED}Error: --research requires --metric '<command>'${NC}"
+    exit 1
+fi
+
 # Setup paths
 REPO_PATH=$(realpath "$REPO_PATH")
 REPO_NAME=$(basename "$REPO_PATH")
 WORKTREE_BASE="${REPO_PATH}/.worktrees"
 WORKTREE_PATH="${WORKTREE_BASE}/${TASK_NAME}"
-BRANCH_NAME="autonomous/${TASK_NAME}"
+if [[ "$RESEARCH_MODE" == "true" ]]; then
+    BRANCH_NAME="autoresearch/${TASK_NAME}"
+else
+    BRANCH_NAME="autonomous/${TASK_NAME}"
+fi
 LOG_DIR="${HOME}/.claude/autonomous-logs"
 LOG_FILE="${LOG_DIR}/${REPO_NAME}-${TASK_NAME}-$(date +%Y%m%d-%H%M%S).log"
 SESSION_NAME="claude-${TASK_NAME}"
@@ -173,7 +215,12 @@ echo -e "  Log:         ${GREEN}$LOG_FILE${NC}"
 if [[ "$STRICT_MODE" == "true" ]]; then
     echo -e "  Mode:        ${YELLOW}STRICT (80% coverage, security scan)${NC}"
 fi
-if [[ "$RALPH_MODE" == "true" ]]; then
+if [[ "$RESEARCH_MODE" == "true" ]]; then
+    echo -e "  Mode:        ${YELLOW}RESEARCH (autoresearch pattern)${NC}"
+    echo -e "  Metric:      ${YELLOW}${METRIC_CMD}${NC}"
+    echo -e "  Direction:   ${YELLOW}${METRIC_DIRECTION} is better${NC}"
+    [[ -n "$SCOPE_FILES" ]] && echo -e "  Scope:       ${YELLOW}${SCOPE_FILES}${NC}"
+elif [[ "$RALPH_MODE" == "true" ]]; then
     echo -e "  Ralph Loop:  ${YELLOW}ON (max $RALPH_MAX iterations)${NC}"
 else
     echo -e "  Ralph Loop:  ${YELLOW}OFF (single pass)${NC}"
@@ -229,6 +276,103 @@ fi
 
 # Create the prompt file for Claude
 PROMPT_FILE="${WORKTREE_PATH}/.claude-task.md"
+
+if [[ "$RESEARCH_MODE" == "true" ]]; then
+# ─── Research mode prompt (autoresearch pattern) ───
+SCOPE_INSTRUCTION=""
+if [[ -n "$SCOPE_FILES" ]]; then
+    SCOPE_INSTRUCTION="You may ONLY modify these files: ${SCOPE_FILES//,/, }. Everything else is read-only."
+else
+    SCOPE_INSTRUCTION="You may modify any file in the repository."
+fi
+
+if [[ "$METRIC_DIRECTION" == "lower" ]]; then
+    COMPARE_OP="lower than"
+    IMPROVE_WORD="decreased"
+else
+    COMPARE_OP="higher than"
+    IMPROVE_WORD="increased"
+fi
+
+cat > "$PROMPT_FILE" << RESEARCH_EOF
+# Research: ${TASK_NAME}
+
+## Goal
+
+${PROMPT}
+
+## Setup
+
+1. Read the repository to understand context. If CLAUDE.md exists, read it first.
+2. Read the in-scope files for full context.
+3. Run the baseline measurement (see below) and record the result.
+4. Create \`results.tsv\` with the header: \`commit\tmetric\tstatus\tdescription\`
+5. Log the baseline as the first row with status \`baseline\`.
+6. Begin experimentation immediately.
+
+## Metric
+
+Run this command to measure:
+
+\`\`\`bash
+${METRIC_CMD}
+\`\`\`
+
+This should output a number. **${METRIC_DIRECTION^} is better.**
+
+To run an experiment and capture the metric:
+
+\`\`\`bash
+${METRIC_CMD} > run.log 2>&1
+\`\`\`
+
+Then extract the metric — look for the last numeric value in run.log.
+
+## Scope
+
+${SCOPE_INSTRUCTION}
+
+## The Experiment Loop
+
+LOOP FOREVER:
+
+1. **Think**: Review results.tsv. What's been tried? What worked? What angles remain?
+2. **Modify**: Change the in-scope files with an experimental idea.
+3. **Commit**: \`git commit -am "experiment: <short description>"\`
+4. **Measure**: Run the metric command, redirect to run.log.
+5. **Extract**: Get the metric value from run.log.
+6. **Decide**:
+   - If metric ${COMPARE_OP} the current best → **keep**. Log as \`keep\` in results.tsv.
+   - If metric equal or worse → **revert**: \`git reset --hard HEAD~1\`. Log as \`discard\`.
+   - If command crashed → **revert**: \`git reset --hard HEAD~1\`. Log as \`crash\`.
+     Read \`tail -50 run.log\` to understand why. Try a different approach.
+7. **Log**: Append to results.tsv (tab-separated):
+   \`\`\`
+   <commit-hash-7char>\t<metric-value>\t<keep|discard|crash>\t<short description>
+   \`\`\`
+8. **Repeat**: Go to step 1. Do NOT stop.
+
+## Rules
+
+- **NEVER STOP.** Run until you are manually interrupted. The human may be asleep.
+  If you run out of ideas, re-read the code, try combinations of near-misses,
+  try more radical changes, or try simplifications.
+- **Simplicity criterion**: All else equal, simpler is better. Removing code for
+  equal results is a win. A tiny improvement that adds ugly complexity is not worth it.
+- **Do NOT commit results.tsv** — keep it untracked.
+- **Do NOT modify files outside scope.**
+- **Do NOT ask questions.** You are autonomous.
+- **Do NOT install new packages or add dependencies** unless the goal requires it.
+
+## Context
+
+- Working in git worktree: ${WORKTREE_PATH}
+- Branch: ${BRANCH_NAME}
+- Started: $(date)
+RESEARCH_EOF
+
+else
+# ─── Task mode prompt (existing TDD pattern) ───
 cat > "$PROMPT_FILE" << PROMPT_EOF
 # Autonomous Task: ${TASK_NAME}
 
@@ -292,6 +436,12 @@ If INVARIANTS.md exists in the worktree, before EVERY commit verify:
 - [ ] No INVARIANTS.md violations
 - [ ] All tests passing
 - [ ] Coverage not decreased from baseline
+
+### Prior Session Context
+If PRIOR-SESSIONS.md exists in the worktree, read it before starting work.
+It contains summaries of what previous sessions in this batch have already built.
+Use this context to ensure your work integrates well with theirs and avoid
+duplicating or conflicting with their changes.
 
 ## Verification Requirements (MANDATORY)
 
@@ -450,6 +600,8 @@ This task runs in STRICT mode with enhanced verification:
 - No commits with failing tests allowed
 STRICT_EOF
 fi
+
+fi  # end task mode (else branch of RESEARCH_MODE)
 
 echo -e "${BLUE}[2/3] Launching Claude in sandbox...${NC}"
 echo -e "  ${YELLOW}Using Claude Code native sandbox (bubblewrap + seccomp)${NC}"

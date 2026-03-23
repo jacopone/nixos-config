@@ -164,6 +164,7 @@ in
         exit 1
       fi
     '')
+    bun # JavaScript runtime required by Claude Code Channels (Telegram/Discord bridge)
     atuin # Neural network-powered shell history
     broot # Interactive tree navigation with fuzzy search
 

@@ -74,7 +74,6 @@ each pinned, reproducible, and auto-updated:
 - **Cursor** -- AI editor (via [`code-cursor-nix`](https://github.com/jacopone/code-cursor-nix), maintained by this repo's author)
 - **Antigravity** -- Google's agentic IDE (via [`antigravity-nix`](https://github.com/jacopone/antigravity-nix), maintained by this repo's author)
 - **Whisper Dictation** -- Local speech-to-text (via [`whisper-dictation`](https://github.com/jacopone/whisper-dictation), maintained by this repo's author)
-- **NixClaw** -- Personal AI agent platform (in development)
 
 ### Tested and CI'd
 
@@ -117,6 +116,7 @@ nixos-config/
 ├── overlays/                     # Custom Nix package overlays
 ├── scripts/                      # Automation helpers
 ├── tests/bash/                   # BATS unit tests
+├── docs/                         # Guides, architecture, tool configs
 └── .github/workflows/            # CI: tests, security, dependency updates
 ```
 
