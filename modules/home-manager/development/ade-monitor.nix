@@ -4,7 +4,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  project-root = "/home/YOUR_USERNAME/amatino/amatino-f24-compilazione";
+  project-root = "${config.home.homeDirectory}/amatino/amatino-f24-compilazione";
   monitor-script = "${project-root}/scripts/ade_monitor_cron.sh";
 in
 {
