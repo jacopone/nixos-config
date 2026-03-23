@@ -74,6 +74,7 @@ each pinned, reproducible, and auto-updated:
 - **Cursor** -- AI editor (via [`code-cursor-nix`](https://github.com/jacopone/code-cursor-nix), maintained by this repo's author)
 - **Antigravity** -- Google's agentic IDE (via [`antigravity-nix`](https://github.com/jacopone/antigravity-nix), maintained by this repo's author)
 - **Whisper Dictation** -- Local speech-to-text (via [`whisper-dictation`](https://github.com/jacopone/whisper-dictation), maintained by this repo's author)
+- **ClawNix** -- Self-evolving AI agent platform for NixOS (via [`clawnix`](https://github.com/jacopone/clawnix), maintained by this repo's author)
 
 ### Tested and CI'd
 
@@ -127,6 +128,7 @@ nixos-config/
 | [antigravity-nix](https://github.com/jacopone/antigravity-nix) | Nix packaging for Google Antigravity IDE |
 | [code-cursor-nix](https://github.com/jacopone/code-cursor-nix) | Nix packaging for Cursor editor |
 | [whisper-dictation](https://github.com/jacopone/whisper-dictation) | Local speech-to-text for NixOS |
+| [clawnix](https://github.com/jacopone/clawnix) | Self-evolving AI agent platform for NixOS |
 
 ## License
 
