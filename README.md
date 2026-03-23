@@ -1,40 +1,43 @@
 # nixos-config
 
-NixOS as a Claude Code-native operating system -- built with Claude, optimized for Claude, evolving with Claude.
+NixOS configuration designed for autonomous AI coding -- declarative system state
+that AI agents can reason about, kernel-level sandboxing for safe unattended
+execution, and atomic rollbacks when things go wrong.
 
 [![NixOS](https://img.shields.io/badge/NixOS-25.11-blue.svg?style=flat-square&logo=nixos)](https://nixos.org)
 [![CI](https://img.shields.io/github/actions/workflow/status/jacopone/nixos-config/test.yml?style=flat-square&label=CI)](https://github.com/jacopone/nixos-config/actions)
 [![License](https://img.shields.io/github/license/jacopone/nixos-config?style=flat-square)](LICENSE)
 
-This configuration turns NixOS into the ideal platform for AI-assisted development.
-Every module, every tool choice, every workflow has been shaped through
-hundreds of Claude Code sessions. The result is a system where the OS and
-the AI agent reinforce each other -- reproducible environments that Claude
-can reason about, sandboxed execution that makes autonomous coding safe,
-and declarative configuration that eliminates the drift AI tools struggle with.
-
-## Why NixOS is the ideal OS for AI agents
-
-Traditional operating systems fight AI-assisted development:
+## Why NixOS for AI agents
 
 | Problem | Traditional OS | NixOS |
 |---------|---------------|-------|
-| "Works on my machine" | Claude generates code that depends on implicit system state | Declarative config = Claude knows exactly what's installed |
-| Dangerous autonomy | `--dangerously-skip-permissions` or click "approve" 50 times | Kernel-level sandboxing with network access preserved |
+| "Works on my machine" | AI generates code depending on implicit system state | Declarative config = AI knows exactly what's installed |
+| Dangerous autonomy | `--dangerously-skip-permissions` or click "approve" 50 times | Kernel-level sandbox (bubblewrap + seccomp BPF) |
 | Configuration drift | AI edits dotfiles, things break silently | Single source of truth, atomic rollbacks |
 | Environment setup | "Install X, then Y, hope versions align" | `nix develop` -- reproducible, every time |
-| Testing changes | Every install is permanent | Ephemeral shells -- test anything, discard instantly |
+| Packaging AI tools | Pip/npm version hell, broken dependencies | Flake inputs, pinned and auto-updated |
 
-NixOS gives AI agents what they need: a system they can fully understand,
-safely modify, and reliably reproduce. This configuration is the implementation
-of that idea.
+## What this gives you
 
-## What's inside
+### Autonomous AI coding with isolation
 
-### Multi-profile architecture
+```bash
+# Launch Claude Code in a sandboxed git worktree with auto-retry loop
+./scripts/claude-autonomous.sh my-repo feature/add-auth "implement OAuth2 login"
+```
 
-One repository, multiple machine roles. Two helper functions -- `mkTechHost` and
-`mkBusinessHost` -- compose the right modules for each profile:
+This creates an isolated worktree, launches Claude with `--dangerously-skip-permissions`
+in tmux, and runs up to 5 iterations with fresh context each pass. Native sandbox
+(bubblewrap + seccomp BPF) activates automatically -- spawned processes inherit
+the sandbox, no escape via `bash -c` or subprocess chains.
+
+If something goes wrong: `nixos-rebuild switch --rollback`. Done.
+
+### Multi-machine, one repo
+
+Two helper functions -- `mkTechHost` and `mkBusinessHost` -- compose the right
+modules for each role:
 
 ```
                      hosts/common/base.nix
@@ -46,55 +49,62 @@ One repository, multiple machine roles. Two helper functions -- `mkTechHost` and
                |                         |
     350+ packages, full           ~40 packages, office
     AI toolchain, Fish 60+        + learning-to-code
-    abbreviations, custom         simplified shell,
-    overlays                      remote setup via ISO
+    abbreviations                 simplified shell
 ```
 
-Adding a host is three lines in `flake.nix`:
+Adding a machine is one line:
 
 ```nix
 my-host = mkTechHost { hostname = "my-host"; username = "me"; };
 ```
 
-### Autonomous Claude Code
+Business machines deploy remotely via custom live ISO + RustDesk -- the end
+user never touches a terminal. See [INSTALL.md](INSTALL.md) for the full
+walkthrough.
 
-Autonomous AI coding requires isolation. `scripts/claude-autonomous.sh` creates
-a git worktree, launches Claude with `--dangerously-skip-permissions` in tmux,
-and runs a Ralph loop (up to 5 iterations with fresh context each pass).
+### AI toolchain (all as flake inputs)
 
-Native sandbox (bubblewrap + seccomp BPF) activates automatically on Linux.
-Spawned processes inherit the sandbox. No escape via `bash -c` or subprocess chains.
+Every tool pinned, reproducible, and auto-updated via CI:
 
-### AI toolchain
+- **Claude Code** -- Primary agent (via `claude-code-nix`)
+- **Cursor** -- AI editor (via [`code-cursor-nix`](https://github.com/jacopone/code-cursor-nix))
+- **Antigravity** -- Google's agentic IDE (via [`antigravity-nix`](https://github.com/jacopone/antigravity-nix))
+- **Whisper Dictation** -- Local speech-to-text (via [`whisper-dictation`](https://github.com/jacopone/whisper-dictation))
+- **ClawNix** -- Self-evolving AI agent platform (via [`clawnix`](https://github.com/jacopone/clawnix))
 
-The tech profile includes a complete AI development stack as flake inputs --
-each pinned, reproducible, and auto-updated:
+### Supply chain hardening
 
-- **Claude Code** -- Primary development tool (via `claude-code-nix`)
-- **Cursor** -- AI editor (via [`code-cursor-nix`](https://github.com/jacopone/code-cursor-nix), maintained by this repo's author)
-- **Antigravity** -- Google's agentic IDE (via [`antigravity-nix`](https://github.com/jacopone/antigravity-nix), maintained by this repo's author)
-- **Whisper Dictation** -- Local speech-to-text (via [`whisper-dictation`](https://github.com/jacopone/whisper-dictation), maintained by this repo's author)
-- **ClawNix** -- Self-evolving AI agent platform for NixOS (via [`clawnix`](https://github.com/jacopone/clawnix), maintained by this repo's author)
+8-layer verification built into `rebuild-nixos`:
+
+```bash
+./rebuild-nixos --audit          # Export fixed-output derivation manifest
+./rebuild-nixos --verify-bootstrap  # Deep reproducibility check (xz, gzip, coreutils)
+```
+
+NPM tools version-pinned in `modules/core/npm-versions.nix`. Reproducibility
+tracked against [r13y.com](https://r13y.com).
 
 ### Tested and CI'd
 
-Unusual for a dotfiles repo: this configuration has automated testing.
+Unusual for a dotfiles repo:
 
-- **ShellCheck** -- Static analysis for all shell scripts
-- **BATS** -- Unit tests for `rebuild-nixos` and helper scripts
-- **GitHub Actions** -- CI runs on every push and PR
-- **Security scanning** -- Automated dependency audits
+- **ShellCheck** on all shell scripts
+- **BATS** unit tests for `rebuild-nixos`
+- **GitHub Actions** on every push
+- **Automated security scanning** and dependency updates
 
 ## Quick start
 
 ```bash
 git clone https://github.com/jacopone/nixos-config.git ~/nixos-config
 cd ~/nixos-config
-./rebuild-nixos
-```
 
-Requires NixOS with Flakes enabled. The `rebuild-nixos` script handles
-validation, building, and optional permission learning in a single interactive flow.
+# For an existing NixOS machine with flakes:
+./rebuild-nixos
+
+# For a new machine, see the full guide:
+# INSTALL.md covers fresh install, Framework 16, remote business deploy
+```
 
 ## Repository structure
 
@@ -104,18 +114,16 @@ nixos-config/
 ├── rebuild-nixos                 # Multi-phase rebuild with safety checks
 ├── hosts/
 │   ├── common/base.nix           # Shared foundation (boot, nix, GNOME, Docker)
-│   ├── tech-001/                 # Framework 16 (AMD + NVIDIA RTX 5070)
-│   ├── thinkpad-x1-jacopo/       # ThinkPad X1 Carbon
-│   ├── biz-001/                  # Business workstation
-│   ├── biz-002/                  # Business workstation (remote deploy)
-│   └── business-template/        # Template for new business deployments
+│   ├── tech-001/                 # Framework 16 (AMD Ryzen AI + NVIDIA RTX 5070)
+│   ├── biz-001/, biz-002/        # Business workstations
+│   └── business-template/        # Template for new deployments
 ├── modules/
-│   ├── core/packages.nix         # Tech profile packages (350+)
+│   ├── core/packages.nix         # System packages (350+)
 │   ├── business/                 # Business profile (packages, shell, HM)
-│   ├── hardware/                 # Vendor-specific hardware modules
-│   └── home-manager/             # Tech Home Manager config
-├── overlays/                     # Custom Nix package overlays
-├── scripts/                      # Automation helpers
+│   ├── hardware/                 # Framework 16, ThinkPad, MacBook modules
+│   └── home-manager/             # Fish, Kitty, Yazi, dev tools
+├── overlays/                     # Custom package overlays
+├── scripts/                      # claude-autonomous.sh, rebuild helpers
 ├── tests/bash/                   # BATS unit tests
 ├── docs/                         # Guides, architecture, tool configs
 └── .github/workflows/            # CI: tests, security, dependency updates
@@ -123,12 +131,12 @@ nixos-config/
 
 ## Related repositories
 
-| Repository | What it does |
+| Repository | Description |
 |------------|-------------|
+| [clawnix](https://github.com/jacopone/clawnix) | Self-evolving AI agent platform for NixOS |
 | [antigravity-nix](https://github.com/jacopone/antigravity-nix) | Nix packaging for Google Antigravity IDE |
 | [code-cursor-nix](https://github.com/jacopone/code-cursor-nix) | Nix packaging for Cursor editor |
 | [whisper-dictation](https://github.com/jacopone/whisper-dictation) | Local speech-to-text for NixOS |
-| [clawnix](https://github.com/jacopone/clawnix) | Self-evolving AI agent platform for NixOS |
 
 ## License
 
