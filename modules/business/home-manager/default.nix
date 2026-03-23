@@ -18,6 +18,7 @@ in
     ../../home-manager/desktop/gnome.nix # GNOME desktop (Dash to Dock)
     ../../home-manager/cloud-storage/rclone.nix # Google Drive mount via rclone
     ../../home-manager/desktop/smart-office-open.nix # Default handler for office files
+    ./amatino-repos.nix # Amatino project repos, env vars, Claude Code plugins
   ];
 
   # Business-specific git workflow (extends company CLAUDE.md via rules, not mkForce)
