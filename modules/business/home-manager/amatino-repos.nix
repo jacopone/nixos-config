@@ -7,7 +7,7 @@
 # 3. Initializes the devenv venv (pip install) on first rebuild
 # 4. Creates ~/.config/f24/config.toml template (if not present)
 # 5. Registers the AmatinoTeam plugin marketplace in Claude Code settings
-# 6. Enables the send-f24 plugin
+# 6. Enables the send-f24 and passaggio-contabile plugins
 { config, pkgs, lib, ... }:
 
 let
@@ -96,8 +96,9 @@ ${configTemplate}TOMLEOF
             "repo": "AmatinoTeam/amatino-plugins"
           }
         } |
-        # Enable send-f24 plugin
-        .enabledPlugins["send-f24@amatino"] = true
+        # Enable Amatino plugins
+        .enabledPlugins["send-f24@amatino"] = true |
+        .enabledPlugins["passaggio-contabile@amatino"] = true
       ' "$SETTINGS" > "''${SETTINGS}.tmp" \
       && mv "''${SETTINGS}.tmp" "$SETTINGS"
     fi
