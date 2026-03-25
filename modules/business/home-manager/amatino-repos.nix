@@ -2,17 +2,17 @@
 # For business-profile machines (Pietro's workstation, etc.)
 #
 # What this does:
-# 1. Sets $AMATINO_F24_DIR so the send-f24 plugin can find the engine
-# 2. Clones amatino-f24-compilazione on first rebuild (if not present)
+# 1. Sets $AMATINO_F24_DIR and $AMATINO_PLUGINS_DIR env vars
+# 2. Clones amatino-f24-compilazione and amatino-plugins on first rebuild
 # 3. Initializes the devenv venv (pip install) on first rebuild
 # 4. Creates ~/.config/f24/config.toml template (if not present)
-# 5. Registers the AmatinoTeam plugin marketplace in Claude Code settings
-# 6. Enables the send-f24 and passaggio-contabile plugins
+# 5. Enables the send-f24 and passaggio-contabile plugins (local paths)
 { config, pkgs, lib, ... }:
 
 let
   amatinoDir = "${config.home.homeDirectory}/amatino";
   f24Dir = "${amatinoDir}/amatino-f24-compilazione";
+  pluginsDir = "${amatinoDir}/amatino-plugins";
   configDir = "${config.home.homeDirectory}/.config/f24";
   configFile = "${configDir}/config.toml";
 
@@ -52,6 +52,7 @@ in
   # Environment variables — available in all shells and to Claude Code
   home.sessionVariables = {
     AMATINO_F24_DIR = f24Dir;
+    AMATINO_PLUGINS_DIR = pluginsDir;
   };
 
   # Clone repos + initialize venv + create config template on rebuild
@@ -63,6 +64,15 @@ in
         https://github.com/AmatinoTeam/amatino-f24-compilazione.git \
         "${f24Dir}"
       $VERBOSE_ECHO "Cloned amatino-f24-compilazione"
+    fi
+
+    # Clone plugins repo if not present
+    if [ ! -d "${pluginsDir}" ]; then
+      $DRY_RUN_CMD mkdir -p "${amatinoDir}"
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone \
+        https://github.com/AmatinoTeam/amatino-plugins.git \
+        "${pluginsDir}"
+      $VERBOSE_ECHO "Cloned amatino-plugins"
     fi
 
     # Initialize devenv venv if not present
@@ -83,22 +93,17 @@ ${configTemplate}TOMLEOF
     fi
   '';
 
-  # Register Amatino plugin marketplace + enable send-f24 in Claude Code settings
+  # Enable Amatino plugins via local paths in Claude Code settings
   home.activation.amatino-claude-plugins = lib.hm.dag.entryAfter [ "writeBoundary" "claude-settings-merge" ] ''
     SETTINGS="$HOME/.claude/settings.json"
+    PLUGINS="${pluginsDir}"
 
     if [ -f "$SETTINGS" ]; then
-      $DRY_RUN_CMD ${pkgs.jq}/bin/jq '
-        # Add Amatino marketplace (AmatinoTeam/amatino-plugins repo on GitHub)
-        .extraKnownMarketplaces.amatino = {
-          "source": {
-            "source": "github",
-            "repo": "AmatinoTeam/amatino-plugins"
-          }
-        } |
-        # Enable Amatino plugins
-        .enabledPlugins["send-f24@amatino"] = true |
-        .enabledPlugins["passaggio-contabile@amatino"] = true
+      $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
+        --arg plugins "$PLUGINS" \
+        '
+        .enabledPlugins[($plugins + "/send-f24")] = true |
+        .enabledPlugins[($plugins + "/passaggio-contabile")] = true
       ' "$SETTINGS" > "''${SETTINGS}.tmp" \
       && mv "''${SETTINGS}.tmp" "$SETTINGS"
     fi
