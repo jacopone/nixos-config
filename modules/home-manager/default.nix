@@ -52,6 +52,7 @@
   # We only keep Downloads and Pictures; everything else points to $HOME (disabled).
   xdg.userDirs = {
     enable = true;
+    setSessionVariables = false;
     createDirectories = true;
     desktop = "$HOME";
     documents = "$HOME";
