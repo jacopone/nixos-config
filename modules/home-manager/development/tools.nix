@@ -49,6 +49,7 @@
   # Git configuration
   programs.git = {
     enable = true;
+    signing.format = null;
     settings = {
       user.name = "Jacopone";
       user.email = "jacopo.anselmi@gmail.com";
