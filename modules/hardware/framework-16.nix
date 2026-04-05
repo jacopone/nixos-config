@@ -18,6 +18,13 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   boot.kernelModules = [ "uinput" ];
 
+  # Blacklist ucsi_acpi — the UCSI driver fires error 256 on every boot, resume,
+  # and random EC PD renegotiation, causing DP alt-mode link drops and display
+  # flickers. The Framework EC handles all USB-C PD autonomously; the UCSI driver
+  # is a read-only status reporter that causes more harm than value.
+  # Only loss: /sys/class/typec/ entries disappear (no OS visibility into PD state).
+  boot.blacklistedKernelModules = [ "ucsi_acpi" ];
+
   boot.kernelParams = [
     # NVIDIA VRAM preservation across suspend/resume
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
@@ -40,6 +47,16 @@
     "nvidia.NVreg_DynamicPowerManagement=0x00"
   ];
 
+  # Override NixOS's nvidia-drm.fbdev=1 (unconditionally set by nixos/modules/
+  # hardware/video/nvidia.nix when modesetting + driver >= 545). With PRIME
+  # offload the AMD iGPU owns all displays; the NVIDIA fbdev is redundant and
+  # can cause DRM contention during VT switches and suspend/resume.
+  # Must use modprobe options — kernel cmdline param is silently overridden
+  # because NixOS appends fbdev=1 AFTER our params (last-wins).
+  boot.extraModprobeConfig = ''
+    options nvidia-drm fbdev=0
+  '';
+
   # Use default kernel (6.18 LTS) instead of latest (6.19) — 6.19 has critical
   # amdgpu regressions on Strix Point. 6.18 includes AMD HFI for proper
   # heterogeneous Zen 5/5c core scheduling.
@@ -53,6 +70,14 @@
     # Disable keyboard/trackpad USB wake (prevents backpack wake)
     ''
       SUBSYSTEM=="usb", DRIVERS=="usb", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0012", ATTR{power/wakeup}="disabled"
+    ''
+    # Disable USB autosuspend on the MT7925 Bluetooth controller (0e8d:0717).
+    # The MT7925 firmware handles USB remote wakeup poorly — the controller
+    # becomes unresponsive during Bluetooth audio streaming, causing A2DP
+    # transport failures ("Failure in Bluetooth audio transport").
+    # Default is autosuspend=2s with control=auto, which is far too aggressive.
+    ''
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", ATTR{power/autosuspend}="-1"
     ''
     # Auto-switch power profile on AC plug/unplug via systemd service trigger
     ''
@@ -98,22 +123,22 @@
   '';
 
   # Double suspend workaround (systemd v258+)
-  # On resume, block sleep for 10s so the system doesn't immediately re-suspend.
-  # Waits 1s for the suspend operation to fully complete before taking the inhibit
-  # lock — without this, systemd-inhibit fails with "already running".
+  # On resume, block sleep for 15s so the system doesn't immediately re-suspend.
+  # Uses Type=simple with exec so systemd-inhibit acquires the lock immediately
+  # (within ms of service start) — the previous oneshot+sleep-1 approach left a
+  # 1-second window where the second suspend could fire before the lock existed.
   systemd.services.inhibit-sleep-after-resume = {
     description = "Temporary sleep inhibitor after resume";
     wantedBy = [ "post-resume.target" ];
     after = [ "post-resume.target" ];
-    serviceConfig.Type = "oneshot";
+    serviceConfig.Type = "simple";
     script = ''
-      ${pkgs.coreutils}/bin/sleep 1
-      ${pkgs.systemd}/bin/systemd-inhibit \
+      exec ${pkgs.systemd}/bin/systemd-inhibit \
         --mode=block \
         --what=sleep:idle \
         --who="inhibit-sleep-after-resume" \
         --why="Prevent immediate re-suspend after resume" \
-        ${pkgs.coreutils}/bin/sleep 10 || true
+        ${pkgs.coreutils}/bin/sleep 15
     '';
   };
 

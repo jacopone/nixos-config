@@ -364,11 +364,11 @@ manage_eval_cache() {
     elif [ -d "$EVAL_CACHE_DIR" ]; then
         # Find files older than threshold
         local stale_files
-        stale_files=$(find "$EVAL_CACHE_DIR" -type f -mtime +"$CACHE_MAX_AGE_DAYS" 2>/dev/null | head -1)
+        stale_files=$(find "$EVAL_CACHE_DIR" -type f -mtime +"$CACHE_MAX_AGE_DAYS" -print -quit 2>/dev/null)
         if [ -n "$stale_files" ]; then
             # Get the oldest file's age for reporting
             local oldest_file
-            oldest_file=$(find "$EVAL_CACHE_DIR" -type f -printf '%T+ %p\n' 2>/dev/null | sort | head -1 | cut -d' ' -f2)
+            oldest_file=$(find "$EVAL_CACHE_DIR" -type f -printf '%T+ %p\n' 2>/dev/null | sort | head -1 | cut -d' ' -f2 || true)
             if [ -n "$oldest_file" ]; then
                 local oldest_age
                 oldest_age=$(stat -c %Y "$oldest_file" 2>/dev/null)
