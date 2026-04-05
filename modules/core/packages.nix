@@ -234,7 +234,7 @@ in
     # Database development tools (AI-friendly CLI clients)
     pgcli # PostgreSQL client with autocompletion and syntax highlighting
     # mycli # TEMP: Disabled - sqlglot==27.* not satisfied by nixpkgs sqlglot 28.x
-    usql # Universal database CLI for multiple database types
+    # usql # TEMP: Disabled - cockroachdb/swiss uses Go runtime internals removed in Go 1.25
 
     # Advanced API development
     hurl # HTTP testing with file-based test definitions
