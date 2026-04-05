@@ -39,6 +39,9 @@
       gtk-single-instance = true;
       window-save-state = "always";
 
+      # Bell — disable attention hint to prevent GNOME dock notification badge
+      bell-features = "no-system,no-audio,no-attention,title,no-border";
+
       # Working directory
       working-directory = "~/nixos-config";
     };
