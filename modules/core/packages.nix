@@ -196,7 +196,6 @@ in
       jinja2 # Jinja2 templating engine (for claude-nixos-automation)
     ])) # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
     ninja # Build system for faster compilation (required by numpy/aider)
-    google-cloud-sdk # Google Cloud SDK for gcloud CLI and cloud operations
     (pkgs.callPackage ../../pkgs/gogcli.nix { }) # Google Suite CLI (Gmail, Calendar, Drive, Contacts) - https://github.com/steipete/gogcli
 
     # system tools
