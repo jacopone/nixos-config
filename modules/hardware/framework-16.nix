@@ -79,6 +79,16 @@
     ''
       SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", ATTR{power/autosuspend}="-1"
     ''
+    # Disable USB autosuspend on the Goodix fingerprint sensor (27c6:609c).
+    # The Goodix firmware's USB runtime PM is flaky: it auto-suspends after 2s
+    # idle and fails to wake cleanly, causing repeated xhci resets ("usb 3-4.1:
+    # reset full-speed USB device") that correlate with cros-ec LPC channel
+    # overflow ("cros-ec-dev: Some logs may have been dropped"). Observed in
+    # every boot regardless of whether fprintd is active. Default is
+    # autosuspend=2s with control=auto, which is far too aggressive.
+    ''
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="27c6", ATTRS{idProduct}=="609c", ATTR{power/autosuspend}="-1"
+    ''
     # Auto-switch power profile on AC plug/unplug via systemd service trigger
     ''
       SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ACTION=="change", TAG+="systemd", ENV{SYSTEMD_WANTS}="set-power-profile-ac.service"
