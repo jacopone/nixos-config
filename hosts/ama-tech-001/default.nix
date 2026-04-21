@@ -1,6 +1,7 @@
 # Framework Laptop 16 host configuration
-# AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070 + 64GB DDR5-5600
-{ config, pkgs, inputs, username, lib, ... }:
+# AMD Ryzen AI 9 HX 370 + 64GB DDR5-5600
+# Optional: NVIDIA RTX 5070 Expansion Bay (toggle via enableDGPU in flake.nix)
+{ config, pkgs, inputs, username, enableDGPU ? false, lib, ... }:
 
 {
   imports = [
@@ -16,7 +17,8 @@
   networking.hostName = "ama-tech-001";
 
   # NVIDIA PRIME Bus IDs (from lspci: c1:00.0 = NVIDIA, c2:00.0 = AMD)
-  hardware.nvidia.prime = {
+  # Only applied when the expansion bay is installed.
+  hardware.nvidia.prime = lib.mkIf enableDGPU {
     amdgpuBusId = "PCI:194:0:0";
     nvidiaBusId = "PCI:193:0:0";
   };

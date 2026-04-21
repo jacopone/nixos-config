@@ -101,9 +101,11 @@
       };
 
       # Tech profile helper — full power-user setup (350+ packages, AI orchestration)
-      mkTechHost = { hostname, username, system ? "x86_64-linux", extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
+      # enableDGPU: threaded through specialArgs so framework-16.nix and host files can
+      # gate NVIDIA configuration when the expansion bay is physically absent.
+      mkTechHost = { hostname, username, system ? "x86_64-linux", enableDGPU ? false, extraModules ? [ ] }: nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs username; };
+        specialArgs = { inherit inputs username enableDGPU; };
         modules = [
           # Host-specific configuration
           ./hosts/${hostname}
@@ -190,16 +192,24 @@
           username = "guyfawkes";
         };
 
-        # Framework Laptop 16 (AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070) — Amatino
+        # Framework Laptop 16 (AMD Ryzen AI 9 HX 370, optional RTX 5070 bay) — Amatino
         # Build: nixos-rebuild switch --flake .#ama-tech-001
-        ama-tech-001 = mkTechHost {
-          hostname = "ama-tech-001";
-          username = "guyfawkes";
-          extraModules = [
-            # NixOS Hardware module for Framework 16 with AMD AI 300 + NVIDIA
-            nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
-          ];
-        };
+        # Flip enableDGPU to true when the NVIDIA expansion bay is installed.
+        ama-tech-001 =
+          let
+            enableDGPU = false;
+          in
+          mkTechHost {
+            hostname = "ama-tech-001";
+            username = "guyfawkes";
+            inherit enableDGPU;
+            extraModules = [
+              # Pick the nixos-hardware variant matching the expansion bay state
+              (if enableDGPU
+              then nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
+              else nixos-hardware.nixosModules.framework-16-amd-ai-300-series)
+            ];
+          };
 
         # ── Business workstations ──────────────────────────────────────
 
