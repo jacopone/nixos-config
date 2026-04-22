@@ -24,6 +24,8 @@ in
   # Claude Code environment
   home.sessionVariables = {
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
+    CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
+    CLAUDE_CODE_EFFORT_LEVEL = "max";
   };
 
   # Merge company config into settings.json on every rebuild.
@@ -38,6 +40,10 @@ in
 
     if [ ! -f "$SETTINGS" ]; then
       # First setup: create settings with company config + sandbox paths
+      # Note: effort level and adaptive-thinking flags are managed via
+      # home.sessionVariables (CLAUDE_CODE_EFFORT_LEVEL, CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING)
+      # — env vars override settings.json and bypass the Zod schema, which
+      # currently rejects "max" as an effortLevel value.
       $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
         --arg home "$HOME" \
         '. + {

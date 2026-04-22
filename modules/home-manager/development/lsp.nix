@@ -5,7 +5,7 @@
 {
   home.packages = with pkgs; [
     # TypeScript/JavaScript/TSX/JSX — account-harmony, digital-invoice-to-pdf
-    nodePackages.typescript-language-server
+    typescript-language-server
 
     # Python — automation scripts, scrapers, experiments
     pyright
@@ -20,6 +20,6 @@
     yaml-language-server
 
     # Bash/Shell — scripts, CI
-    nodePackages.bash-language-server
+    bash-language-server
   ];
 }

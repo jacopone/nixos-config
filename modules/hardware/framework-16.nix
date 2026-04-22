@@ -1,11 +1,11 @@
 # Framework Laptop 16 — extras beyond nixos-hardware
-# AMD Ryzen AI 9 HX 370 + NVIDIA RTX 5070 Expansion Bay
+# AMD Ryzen AI 9 HX 370 + optional NVIDIA RTX 5070 Expansion Bay
 #
-# Base hardware support (AMD GPU params, fingerprint, PPD, QMK, fwupd,
-# PRIME offload, Blackwell open modules) comes from:
-#   nixos-hardware.nixosModules.framework-16-amd-ai-300-series-nvidia
-# imported in flake.nix. This file adds NVIDIA tuning, workarounds, and extras.
-{ config, pkgs, lib, inputs, ... }:
+# Base hardware support (AMD GPU params, fingerprint, PPD, QMK, fwupd, PRIME
+# offload if applicable, Blackwell open modules) comes from the matching
+# nixos-hardware module, chosen in flake.nix based on enableDGPU.
+# This file adds shared Framework 16 tuning plus NVIDIA bits gated on enableDGPU.
+{ config, pkgs, lib, inputs, enableDGPU ? false, ... }:
 
 {
   # Disable nixos-hardware's amd_pstate module — it sets amd_pstate=active for
@@ -26,9 +26,6 @@
   boot.blacklistedKernelModules = [ "ucsi_acpi" ];
 
   boot.kernelParams = [
-    # NVIDIA VRAM preservation across suspend/resume
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-    "nvidia.NVreg_TemporaryFilePath=/var/tmp"
     # Guided mode: OS sets min/max bounds, firmware picks optimal frequency.
     # Passive/active modes fail on Strix Point — firmware ignores CPPC requests.
     # Guided cooperates with the firmware's autonomous frequency control.
@@ -39,6 +36,10 @@
     "amdgpu.cwsr_enable=0"
     # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
     "pcie_aspm=off"
+  ] ++ lib.optionals enableDGPU [
+    # NVIDIA VRAM preservation across suspend/resume
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    "nvidia.NVreg_TemporaryFilePath=/var/tmp"
     # Explicitly disable NVIDIA dynamic power management (RTD3).
     # Open kernel modules (565+) default to 0x03 (fine-grained) on laptops,
     # which causes UCSI link drops on the USB-C DP alt-mode path.
@@ -53,7 +54,7 @@
   # can cause DRM contention during VT switches and suspend/resume.
   # Must use modprobe options — kernel cmdline param is silently overridden
   # because NixOS appends fbdev=1 AFTER our params (last-wins).
-  boot.extraModprobeConfig = ''
+  boot.extraModprobeConfig = lib.optionalString enableDGPU ''
     options nvidia-drm fbdev=0
   '';
 
@@ -79,6 +80,16 @@
     ''
       SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", ATTR{power/autosuspend}="-1"
     ''
+    # Disable USB autosuspend on the Goodix fingerprint sensor (27c6:609c).
+    # The Goodix firmware's USB runtime PM is flaky: it auto-suspends after 2s
+    # idle and fails to wake cleanly, causing repeated xhci resets ("usb 3-4.1:
+    # reset full-speed USB device") that correlate with cros-ec LPC channel
+    # overflow ("cros-ec-dev: Some logs may have been dropped"). Observed in
+    # every boot regardless of whether fprintd is active. Default is
+    # autosuspend=2s with control=auto, which is far too aggressive.
+    ''
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="27c6", ATTRS{idProduct}=="609c", ATTR{power/autosuspend}="-1"
+    ''
     # Auto-switch power profile on AC plug/unplug via systemd service trigger
     ''
       SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ACTION=="change", TAG+="systemd", ENV{SYSTEMD_WANTS}="set-power-profile-ac.service"
@@ -86,7 +97,7 @@
   ];
 
   # NVIDIA tuning (driver, modesetting, offload, open modules handled by nixos-hardware)
-  hardware.nvidia = {
+  hardware.nvidia = lib.mkIf enableDGPU {
     package = config.boot.kernelPackages.nvidiaPackages.production;
     modesetting.enable = true; # Required for Wayland
     # RTD3 fine-grained PM disabled — causes UCSI link drops on the rear USB-C
@@ -98,7 +109,7 @@
     nvidiaSettings = true;
   };
 
-  # Vulkan + VA-API support for AMD iGPU and NVIDIA dGPU
+  # Vulkan + VA-API support for AMD iGPU (plus NVIDIA dGPU when present)
   hardware.graphics = {
     enable = true;
     enable32Bit = true; # Steam/gaming compatibility
@@ -106,6 +117,7 @@
       libva
       vulkan-loader
       vulkan-validation-layers
+    ] ++ lib.optionals enableDGPU [
       nvidia-vaapi-driver
     ];
     extraPackages32 = with pkgs.pkgsi686Linux; [
@@ -268,8 +280,9 @@
   # Framework-specific packages
   environment.systemPackages = with pkgs; [
     framework-tool
-    nvtopPackages.nvidia
     powertop
+  ] ++ lib.optionals enableDGPU [
+    nvtopPackages.nvidia
   ];
 
   # Build settings for 12-core AMD / 64GB RAM
