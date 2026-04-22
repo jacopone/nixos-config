@@ -69,6 +69,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Google Workspace CLI (gws) - Unified CLI for all Google Workspace APIs
+    # MAINTAINER: @googleworkspace | AUTO-UPDATE: Via rebuild-nixos --refresh
+    gws = {
+      url = "github:googleworkspace/cli";
+    };
+
     # NixClaw - Personal AI agent platform for NixOS
     # MAINTAINER: @jacopone (YOU) | LOCAL DEV: path input
     # TEMPORARILY DISABLED: path input breaks on machines without ~/nixclaw
@@ -84,7 +90,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, gws, ... }@inputs:
     let
       # Shared overlay: fix test failures / missing deps in nixos-unstable
       # Uses interpreter override (not overrideScope) so python3.withPackages sees fixes

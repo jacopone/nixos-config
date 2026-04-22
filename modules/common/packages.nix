@@ -8,6 +8,10 @@
     # AI Assistant
     inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Claude Code
 
+    # Google Workspace CLI - Unified CLI for Drive, Gmail, Calendar, etc.
+    inputs.gws.packages.${pkgs.stdenv.hostPlatform.system}.default
+    google-cloud-sdk # Google Cloud SDK (gcloud CLI) — needed by gws auth setup
+
     # Version control
     git
     gh
