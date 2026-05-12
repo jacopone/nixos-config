@@ -64,8 +64,13 @@
         ${pkgs.coreutils}/bin/uname -a || true
         echo ""
         echo "=== Framework EC console (cros_ec, if exposed via debugfs) ==="
+        # console_log is a streaming endpoint on this EC driver — plain `cat`
+        # blocks indefinitely waiting for new bytes. Cap at 5s with `timeout`
+        # so the snapshot service can finish and reach `active`.
         if [ -e /sys/kernel/debug/cros_ec/console_log ]; then
-          ${pkgs.coreutils}/bin/cat /sys/kernel/debug/cros_ec/console_log || true
+          ${pkgs.coreutils}/bin/timeout 5s \
+            ${pkgs.coreutils}/bin/cat /sys/kernel/debug/cros_ec/console_log || \
+            echo "(read aborted after 5s — streaming source, captured what was buffered)"
         else
           echo "(cros_ec console_log not exposed; debugfs may not be mounted)"
         fi
