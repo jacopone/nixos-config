@@ -100,6 +100,14 @@
         pymupdf4llm = pyPrev.pymupdf4llm.overridePythonAttrs (old: {
           dependencies = (old.dependencies or [ ]) ++ [ pyFinal.tabulate ];
         });
+        # nixpkgs#514500: 3 ANSI styling tests fail against newer Pygments
+        cli-helpers = pyPrev.cli-helpers.overridePythonAttrs (old: {
+          disabledTests = (old.disabledTests or [ ]) ++ [
+            "test_style_output"
+            "test_style_output_with_newlines"
+            "test_style_output_custom_tokens"
+          ];
+        });
       };
       gccFixOverlay = final: prev: {
         python313 = prev.python313.override { packageOverrides = pyFixups; };

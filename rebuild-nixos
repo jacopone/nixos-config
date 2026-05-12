@@ -16,7 +16,11 @@ cleanup() {
     if [ "$exit_code" -ne 0 ] && [ "$exit_code" -ne 130 ]; then
         echo ""
         if [ "${REBUILD_ACTIVATED:-false}" = true ]; then
-            echo -e "\033[1;33m⚠️  Post-rebuild step had issues (exit code: $exit_code) — system was activated successfully\033[0m"
+            if [ "${BOOT_MODE:-false}" = true ]; then
+                echo -e "\033[1;33m⚠️  Post-rebuild step had issues (exit code: $exit_code) — build staged for next boot successfully\033[0m"
+            else
+                echo -e "\033[1;33m⚠️  Post-rebuild step had issues (exit code: $exit_code) — system was activated successfully\033[0m"
+            fi
         else
             echo -e "\033[0;31m❌ Rebuild failed (exit code: $exit_code)\033[0m"
         fi
@@ -46,6 +50,7 @@ YES=false
 AUDIT=false
 VERIFY_BOOTSTRAP=false
 FRESH=false
+BOOT_MODE=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,6 +61,7 @@ while [[ $# -gt 0 ]]; do
         --audit|-a) AUDIT=true; shift ;;
         --verify-bootstrap) VERIFY_BOOTSTRAP=true; shift ;;
         --fresh|-f) FRESH=true; shift ;;
+        --boot|-b) BOOT_MODE=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
@@ -66,6 +72,8 @@ while [[ $# -gt 0 ]]; do
             echo "  -y, --yes        Auto-accept all prompts (non-interactive)"
             echo "  -f, --fresh      Clear and bypass eval-cache (use when changes seem ignored)"
             echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
+            echo "  -b, --boot       Stage for next boot instead of live activation"
+            echo "                   (use when switch inhibitor blocks dbus/init/glibc swap)"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
             echo "  -h, --help       Show this help message"
             echo ""
@@ -75,6 +83,7 @@ while [[ $# -gt 0 ]]; do
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
             echo "  ./rebuild-nixos --fresh      # Bypass eval-cache for clean rebuild"
             echo "  ./rebuild-nixos --audit      # Include forensic audit trail export"
+            echo "  ./rebuild-nixos --boot       # Stage for next reboot (not live)"
             exit 0
             ;;
         *)
@@ -129,6 +138,21 @@ add_action() {
 
 add_stat() {
     STATS+=("$1")
+}
+
+# Called at the end of a successful --boot rebuild instead of the switch-mode
+# "Are you satisfied? / rollback" prompt. The new generation is staged in the
+# bootloader but not yet running, so testing happens after reboot. We surface
+# the rollback commands explicitly so the user can cancel before rebooting
+# without having to remember the two-step bootloader-pointer dance.
+handle_boot_mode_completion() {
+    local new_gen=$1
+    add_action "Staged generation $new_gen for next boot"
+
+    log_success "Build complete. Generation $new_gen will activate on next reboot."
+    log_step "To cancel before rebooting:"
+    echo "    sudo nix-env -p /nix/var/nix/profiles/system --rollback"
+    echo "    sudo /run/current-system/bin/switch-to-configuration boot"
 }
 
 # Major step indicator with "Step X/Y" format
@@ -820,7 +844,12 @@ if [ "$DRY_RUN" = false ]; then
     sudo -v || { log_error "Failed to refresh sudo access"; exit 1; }
 fi
 
-if dry_run_skip "activate new NixOS configuration (nixos-rebuild switch)"; then
+REBUILD_MODE="switch"
+if [ "$BOOT_MODE" = true ]; then
+    REBUILD_MODE="boot"
+fi
+
+if dry_run_skip "activate new NixOS configuration (nixos-rebuild $REBUILD_MODE)"; then
     : # skip
 else
     # Temporarily disable set -e for the activation pipeline.
@@ -831,18 +860,18 @@ else
     if [ "$VERBOSE" = true ]; then
         # Verbose mode - show all output, capture exit code properly
         # shellcheck disable=SC2086  # NIXOS_REBUILD_OPTS may contain multiple flags
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | tee -a "$LOG_FILE"
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild "$REBUILD_MODE" --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | tee -a "$LOG_FILE"
         ACTIVATE_EXIT=${PIPESTATUS[0]}
     elif [ "$USE_NOM" = true ]; then
         # Use nix-output-monitor for beautiful activation visualization
         echo ""
         # shellcheck disable=SC2086  # NIXOS_REBUILD_OPTS may contain multiple flags
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | nom | tee -a "$LOG_FILE"
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild "$REBUILD_MODE" --flake . --impure $NIXOS_REBUILD_OPTS 2>&1 | nom | tee -a "$LOG_FILE"
         ACTIVATE_EXIT=${PIPESTATUS[0]}
     else
         # Fallback: custom progress indicator (capture both stdout and stderr)
         # shellcheck disable=SC2086,SC2024  # word splitting intended; redirect on backgrounded process
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake . --impure $NIXOS_REBUILD_OPTS >>"$LOG_FILE" 2>&1 &
+        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild "$REBUILD_MODE" --flake . --impure $NIXOS_REBUILD_OPTS >>"$LOG_FILE" 2>&1 &
         ACTIVATE_PID=$!
         show_progress "activation" $ACTIVATE_PID
         wait $ACTIVATE_PID
@@ -872,9 +901,15 @@ else
 
     if [ -n "$NEW_GEN" ]; then
         REBUILD_ACTIVATED=true
-        log_success "Configuration activated (generation $NEW_GEN)"
-        log_step "System: $(basename "$CURRENT_SYSTEM")"
-        add_action "NixOS configuration activated (gen $NEW_GEN)"
+        if [ "$BOOT_MODE" = true ]; then
+            log_success "Configuration staged for next boot (generation $NEW_GEN)"
+            log_step "Currently running: $(basename "$CURRENT_SYSTEM")"
+            add_action "NixOS configuration staged for boot (gen $NEW_GEN)"
+        else
+            log_success "Configuration activated (generation $NEW_GEN)"
+            log_step "System: $(basename "$CURRENT_SYSTEM")"
+            add_action "NixOS configuration activated (gen $NEW_GEN)"
+        fi
     else
         log_warning "Could not determine current generation"
         log_step "Current: $(basename "$CURRENT_SYSTEM")"
@@ -1018,6 +1053,12 @@ echo ""
 
 if [ "$DRY_RUN" = true ]; then
     log_step "Dry-run complete. No changes were made."
+elif [ "$BOOT_MODE" = true ]; then
+    # In boot mode the new system isn't live — user can't test yet.
+    # The switch-mode "Are you satisfied? / rollback" flow doesn't apply:
+    # rollback before reboot means pointing the bootloader at the previous
+    # generation, not running `switch --rollback` (which would activate it).
+    handle_boot_mode_completion "$NEW_GEN"
 else
     log_step "Configuration activated. Please test the changes now."
     if [ "$YES" = true ]; then

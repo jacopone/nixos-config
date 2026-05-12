@@ -11,6 +11,8 @@
     ../common
     # Framework 16 hardware optimizations
     ../../modules/hardware/framework-16.nix
+    # Diagnostic capture for spontaneous reboot investigation (delete once root-caused)
+    ./crash-diagnostics.nix
   ];
 
   # Hostname

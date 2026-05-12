@@ -44,6 +44,7 @@ check_version "chrome-devtools-mcp" "chrome-devtools-mcp"
 check_version "jules" "@google/jules"
 check_version "openspec" "@fission-ai/openspec"
 check_version "jscpd" "jscpd"
+check_version "codex" "@openai/codex"
 
 echo ""
 echo "To update, edit $VERSIONS_FILE manually"

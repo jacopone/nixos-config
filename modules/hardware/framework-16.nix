@@ -25,27 +25,55 @@
   # Only loss: /sys/class/typec/ entries disappear (no OS visibility into PD state).
   boot.blacklistedKernelModules = [ "ucsi_acpi" ];
 
-  boot.kernelParams = [
-    # Guided mode: OS sets min/max bounds, firmware picks optimal frequency.
-    # Passive/active modes fail on Strix Point — firmware ignores CPPC requests.
-    # Guided cooperates with the firmware's autonomous frequency control.
-    "amd_pstate=guided"
-    # Disable CWSR on iGPU — kernel 6.18/6.19 CWSR bug causes MES ring
-    # saturation and GPU reset loops on Strix Point under compute workloads.
-    # No downside for display-only iGPU usage.
-    "amdgpu.cwsr_enable=0"
-    # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
-    "pcie_aspm=off"
-  ] ++ lib.optionals enableDGPU [
-    # NVIDIA VRAM preservation across suspend/resume
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-    "nvidia.NVreg_TemporaryFilePath=/var/tmp"
-    # Explicitly disable NVIDIA dynamic power management (RTD3).
-    # Open kernel modules (565+) default to 0x03 (fine-grained) on laptops,
-    # which causes UCSI link drops on the USB-C DP alt-mode path.
-    # Must be set explicitly — finegrained=false alone just removes NixOS's
-    # override, letting the driver pick an even more aggressive default.
-    "nvidia.NVreg_DynamicPowerManagement=0x00"
+  boot.kernelParams = lib.mkMerge [
+    ([
+      # Guided mode: OS sets min/max bounds, firmware picks optimal frequency.
+      # Passive/active modes fail on Strix Point — firmware ignores CPPC requests.
+      # Guided cooperates with the firmware's autonomous frequency control.
+      "amd_pstate=guided"
+      # Disable CWSR on iGPU — kernel 6.18/6.19 CWSR bug causes MES ring
+      # saturation and GPU reset loops on Strix Point under compute workloads.
+      # No downside for display-only iGPU usage.
+      "amdgpu.cwsr_enable=0"
+      # Force NVMe to stay at full PCIe link speed (prevents Gen 3 fallback)
+      "pcie_aspm=off"
+    ] ++ lib.optionals enableDGPU [
+      # NVIDIA VRAM preservation across suspend/resume
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+      "nvidia.NVreg_TemporaryFilePath=/var/tmp"
+      # Explicitly disable NVIDIA dynamic power management (RTD3).
+      # Open kernel modules (565+) default to 0x03 (fine-grained) on laptops,
+      # which causes UCSI link drops on the USB-C DP alt-mode path.
+      # Must be set explicitly — finegrained=false alone just removes NixOS's
+      # override, letting the driver pick an even more aggressive default.
+      "nvidia.NVreg_DynamicPowerManagement=0x00"
+    ])
+    # Override nixos-hardware/framework/16-inch/amd-ai-300-series/default.nix
+    # (which sets amdgpu.dcdebugmask=0x410). Both definitions appear on the
+    # kernel cmdline; amdgpu's module_param uint parsing is last-wins, so the
+    # mkAfter value below is what the kernel actually uses.
+    #
+    # Bit reference — drivers/gpu/drm/amd/include/amd_shared.h @ kernel v6.18:
+    #   0x10    DC_DISABLE_PSR            disables PSR v1 AND PSR-SU (per docstring)
+    #   0x400   DC_DISABLE_REPLAY         what nixos-hardware's 0x410 actually sets
+    #   0x800   DC_DISABLE_IPS            IPS off always (incl. suspend)
+    #   0x1000  DC_DISABLE_IPS_DYNAMIC    IPS off at runtime, allowed in suspend
+    #   0x2000  DC_DISABLE_IPS2_DYNAMIC   only deeper IPS2 stage off, IPS1 allowed
+    #   0x4000  DC_FORCE_IPS_ENABLE       the actual force-IPS bit
+    #
+    # Symptom on this host: silent horizontal-band flicker on the BOE
+    # NE160QDM-NZ6 eDP panel. No kernel events when it fires (rules out GPU
+    # faults and DP encoder timeouts), which points to a panel-side power-state
+    # transition. PSR/PSR-SU is already disabled by 0x10, so the remaining
+    # suspect is IPS state-transition glitches on DCN 3.5.
+    #
+    (lib.mkAfter [
+      # WHY: IPS2-stage transitions on DCN 3.5 are the prime suspect for
+      # the BOE panel flicker. Disabling only IPS2 (bit 0x2000) keeps IPS1
+      # power savings while removing the suspected glitch path. Escalate
+      # to 0x1010 (full runtime IPS disable) if flicker persists.
+      "amdgpu.dcdebugmask=0x2010"
+    ])
   ];
 
   # Override NixOS's nvidia-drm.fbdev=1 (unconditionally set by nixos/modules/
