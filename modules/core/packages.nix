@@ -25,7 +25,7 @@ in
     # dev tools (tech-only editors and AI IDEs)
     helix # A post-modern modal text editor - https://helix-editor.com/
     # zed-editor # TEMP: Disabled - requires source compilation, causes system slowdown on rebuild
-    inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # Cursor - Auto-updating AI Code Editor - https://cursor.com/
+    # inputs.code-cursor-nix.packages.${pkgs.stdenv.hostPlatform.system}.cursor # TEMP: Disabled 2026-05-04 — Cursor.com replaced 3.2.21 AppImage in-place, fork SHA needs refresh (expected: nkGxpo..., got: 1OtumC...). Re-enable after updating ~/code-cursor-nix.
     inputs.antigravity-nix.packages.${pkgs.stdenv.hostPlatform.system}.default # Google Antigravity - Next-generation agentic IDE - https://antigravity.google
     # Speech-to-text
     vibetyper # AI voice typing with speech-to-text - https://vibetyper.com
@@ -54,6 +54,7 @@ in
     (mkNpxWrapper "gemini-cli" "@google/gemini-cli@${npmVersions.gemini-cli}")
     (mkNpxWrapper "jules" "@google/jules@${npmVersions.jules}")
     (mkNpxWrapper "openspec" "@fission-ai/openspec@${npmVersions.openspec}")
+    (mkNpxWrapper "codex" "@openai/codex@${npmVersions.codex}")
     # Agent Browser - Vercel Labs headless browser CLI for AI agents
     # Uses system Chrome to avoid NixOS binary compatibility issues
     playwright-driver.browsers # Provides Playwright-managed browsers for NixOS
