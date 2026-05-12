@@ -11,9 +11,11 @@
   programs.fish = {
     enable = true;
 
-    # Add ~/.local/bin to PATH for TDD Guard control scripts
+    # Add user-managed binary directories to PATH:
+    #   ~/.local/bin — TDD Guard control scripts, uv-installed CLIs (nlm, notebooklm)
+    #   ~/.bun/bin   — bun link targets for globally-installed bun packages (gbrain)
     shellInit = ''
-      set -gx PATH $HOME/.local/bin $PATH
+      set -gx PATH $HOME/.local/bin $HOME/.bun/bin $PATH
     '';
 
     interactiveShellInit = ''
@@ -416,11 +418,11 @@
           bind -M insert \e\[A _atuin_bind_up
       end
 
-      # Load API keys from local secrets (not in git)
-      # Used by: CLAUDE.md suggestion engine, other AI tools
-      if test -f ~/.config/secrets/anthropic.fish
-          source ~/.config/secrets/anthropic.fish
-      end
+      # ANTHROPIC_API_KEY intentionally NOT sourced here — keeping it out of
+      # the global shell env forces Claude Code to use the OAuth Max subscription
+      # and surface real rate-limit messages instead of silently falling back to
+      # API billing. Per-project keys live in each project's .env (loaded by
+      # python-dotenv at process scope, not shell-exported).
     '';
 
     # Fish abbreviations (persistent across sessions, managed by Home Manager)
