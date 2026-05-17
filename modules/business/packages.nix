@@ -58,5 +58,6 @@ in
     # Claude AI stack
     ++ lib.optionals isClaude [
       inputs.claude-code-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      bun # gstack build dependency (also useful as general JS/TS runtime)
     ];
 }
