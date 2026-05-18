@@ -23,6 +23,14 @@ in
   home.file.".claude/agents/generation-differ.md".source = ./agents/generation-differ.md;
   home.file.".claude/agents/supply-chain-auditor.md".source = ./agents/supply-chain-auditor.md;
 
+  # Statusline script — deployed to a stable per-user path so settings.json
+  # can reference it by absolute path. Marked executable so Claude Code can
+  # run it directly (it's spawned, not sourced).
+  home.file.".config/claude-code/statusline.sh" = {
+    source = ./statusline.sh;
+    executable = true;
+  };
+
   # Seccomp sandbox filter for Claude Code native sandbox
   home.file.".claude/seccomp/apply-seccomp".source = "${claude-seccomp}/share/claude-seccomp/apply-seccomp";
   home.file.".claude/seccomp/unix-block.bpf".source = "${claude-seccomp}/share/claude-seccomp/unix-block.bpf";
@@ -40,7 +48,9 @@ in
   # Merge company config into settings.json on every rebuild.
   # - Permissions: union (company baseline always present, user additions preserved)
   # - Plugins: company defaults, user overrides win (if Pietro disables one, his false wins)
-  # - Other settings: untouched (hooks, statusLine, sandbox, etc. stay user-managed)
+  # - Sandbox: schema-migrated and re-asserted on every merge (idempotent)
+  # - statusLine: overwritten on every merge to point at the deployed script
+  # - Other settings: untouched (hooks, env, etc. stay user-managed)
   home.activation.claude-settings-merge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SETTINGS="$HOME/.claude/settings.json"
     COMPANY="${companyConfig}"
@@ -63,13 +73,19 @@ in
             "seccomp": {"applyPath": ($home + "/.claude/seccomp/apply-seccomp")}
           },
           "alwaysThinkingEnabled": true,
-          "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"}
+          "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"},
+          "statusLine": {
+            "type": "command",
+            "command": ($home + "/.config/claude-code/statusline.sh"),
+            "padding": 0
+          }
         }' "$COMPANY" > "$SETTINGS"
     else
       # Merge: union permissions, overlay plugins (user overrides win),
       # migrate sandbox schema in place (idempotent).
       $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
         --slurpfile company "$COMPANY" \
+        --arg home "$HOME" \
         '
         # Union permissions arrays (deduplicate)
         .permissions.allow = ((.permissions.allow // []) + $company[0].permissions.allow | unique) |
@@ -80,7 +96,15 @@ in
         # See: docs/plans/2026-05-18-sandbox-schema-finding.md
         .sandbox.enabled = true |
         .sandbox.failIfUnavailable = true |
-        .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath))
+        .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
+        # Always set statusLine to point at the home-manager-deployed script.
+        # Overwriting on every merge is intentional: the path is stable, and
+        # this prevents users from accidentally disabling fleet context.
+        .statusLine = {
+          "type": "command",
+          "command": ($home + "/.config/claude-code/statusline.sh"),
+          "padding": 0
+        }
         ' "$SETTINGS" > "''${SETTINGS}.tmp" \
       && mv "''${SETTINGS}.tmp" "$SETTINGS"
     fi
