@@ -15,3 +15,9 @@
   echo "$fm" | yq eval '.description' - | grep -qi "flake"
   echo "$fm" | yq eval '.tools' - | grep -q Read
 }
+
+@test "package-finder frontmatter is valid YAML" {
+  awk '/^---$/{c++; next} c==1' \
+    /home/guyfawkes/nixos-config/modules/home-manager/claude-code/agents/package-finder.md \
+    | yq eval . > /dev/null
+}
