@@ -60,12 +60,13 @@ CLAUDE*.backup-*
 docs/automation/backup-strategy.md
 docs/automation/claude-backup-legacy.md
 
-# Claude Code machine-specific context
+# Claude Code per-user / per-machine state (not declarative)
+# .mcp.json is tracked — see /.mcp.json at repo root for MCP-NixOS wiring.
+# Per-user MCP secrets belong in ~/.claude/settings.json.mcpServers, not here.
 .claude/CLAUDE.local.md
 .claude/agents
 .claude/sessions/
 .claude.json
-.mcp.json
 
 # Auto-generated files (regenerated on each rebuild)
 .claude/mcp-analytics.md

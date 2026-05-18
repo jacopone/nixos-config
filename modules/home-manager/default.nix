@@ -18,7 +18,7 @@
     ./desktop/smart-office-open.nix # Default handler for office files
     # NOTE: Dash to Dock (desktop/gnome.nix) is business-only — imported in modules/business/home-manager/
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
-    # Using manual .mcp.json instead (already configured with MCP-NixOS + Playwright)
+    # MCP servers live in project-root .mcp.json (tracked); MCP-NixOS wired by default.
   ];
 
   # Home Manager state version
