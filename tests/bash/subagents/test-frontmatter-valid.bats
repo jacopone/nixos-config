@@ -21,3 +21,9 @@
     /home/guyfawkes/nixos-config/modules/home-manager/claude-code/agents/package-finder.md \
     | yq eval . > /dev/null
 }
+
+@test "generation-differ frontmatter is valid YAML" {
+  awk '/^---$/{c++; next} c==1' \
+    /home/guyfawkes/nixos-config/modules/home-manager/claude-code/agents/generation-differ.md \
+    | yq eval . > /dev/null
+}
