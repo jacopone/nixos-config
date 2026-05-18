@@ -915,21 +915,39 @@ else
     fi
 fi
 
-# === PHASE 4: Claude Config Check (admin only) ===
-# Claude configs are now hand-maintained (~/.claude/CLAUDE.md, settings.json)
-# No automation needed - just verify files exist
+# === PHASE 4: Claude Config Validator (admin only) ===
+# Invokes scripts/check-claude-config.sh to catch drift between declarative
+# intent (NixOS / Home Manager) and the actual state of ~/.claude/.
+# Source: docs/plans/2026-05-18-claudeos-p0-implementation.md Task 22
 if [ "$IS_BUSINESS_HOST" = false ]; then
-step "Checking Claude configs"
+step "Validating Claude Code configuration"
 
-if dry_run_skip "check Claude Code configurations"; then
+if dry_run_skip "validate Claude Code configurations"; then
     : # skip
 else
-    if [ -f "$HOME/.claude/CLAUDE.md" ] && [ -f "$HOME/.claude/settings.json" ]; then
-        CLAUDE_MD_SIZE=$(du -h "$HOME/.claude/CLAUDE.md" 2>/dev/null | cut -f1)
-        log_success "Claude configs are hand-maintained (CLAUDE.md: $CLAUDE_MD_SIZE)"
-        add_stat "Claude configs: hand-maintained"
+    if [ -x "./scripts/check-claude-config.sh" ]; then
+        VALIDATOR_OUT=$(./scripts/check-claude-config.sh 2>&1)
+        VALIDATOR_EXIT=$?
+
+        # Count events by level
+        ERRORS=$(echo "$VALIDATOR_OUT" | jq '[.[] | select(.level == "error")] | length' 2>/dev/null || echo 0)
+        WARNS=$(echo "$VALIDATOR_OUT" | jq '[.[] | select(.level == "warn")] | length' 2>/dev/null || echo 0)
+        INFOS=$(echo "$VALIDATOR_OUT" | jq '[.[] | select(.level == "info")] | length' 2>/dev/null || echo 0)
+
+        if [ "$VALIDATOR_EXIT" -eq 2 ]; then
+            log_warning "Claude config validator: $ERRORS errors, $WARNS warnings"
+            echo "$VALIDATOR_OUT" | jq -r '.[] | select(.level == "error") | "  [error] [\(.check)] \(.message)"'
+            add_stat "Claude configs: $ERRORS errors, $WARNS warnings"
+        elif [ "$VALIDATOR_EXIT" -eq 1 ]; then
+            log_warning "Claude config validator: $WARNS warnings ($INFOS info)"
+            echo "$VALIDATOR_OUT" | jq -r '.[] | select(.level == "warn") | "  [warn] [\(.check)] \(.message)"'
+            add_stat "Claude configs: $WARNS warnings, $INFOS info"
+        else
+            log_success "Claude config validated: $INFOS checks passed"
+            add_stat "Claude configs: $INFOS checks OK"
+        fi
     else
-        log_warning "Claude config files missing - check ~/.claude/CLAUDE.md and ~/.claude/settings.json"
+        log_warning "Claude config validator missing at ./scripts/check-claude-config.sh"
     fi
 fi
 fi  # End admin-only Phase 4
