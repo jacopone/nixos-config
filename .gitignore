@@ -37,6 +37,12 @@ result-*
 # Git worktrees (used by scripts/claude-autonomous.sh and ad-hoc work)
 .worktrees/
 
+# Sandbox bind-mount leakage (bwrap deny-mounts left as char devices in cwd)
+/etc/
+/home/
+/.nix-store/
+/.nix-cache-eval/
+
 # Python cache files
 __pycache__/
 *.py[cod]
