@@ -621,8 +621,10 @@ if [ "$AUDIT" = true ]; then
 
     # === PHASE 2.7.4: Source Manifest (lightweight) ===
     log_step "Extracting source derivations for manifest..."
+    # Nix 2.x added a {"version": N, "derivations": {...}} envelope around the
+    # old flat {drv_path: drv_data} shape. `(.derivations // .)` handles both.
     FODS=$(nix derivation show -r "$NEW_CONFIG_PATH" 2>/dev/null | \
-        jq -r 'to_entries[] | select(.value.outputs.out.hash != null) | .key')
+        jq -r '(.derivations // .) | to_entries[] | select(.value.outputs.out.hash != null) | .key')
 
     FOD_COUNT=$(echo "$FODS" | grep -c '^' || echo "0")
     echo "$FODS" > "$AUDIT_DIR/sources-$TIMESTAMP.manifest"
@@ -646,7 +648,7 @@ if [ "$AUDIT" = true ]; then
         log_step "Building output-to-derivation mapping for $FOD_COUNT derivations..."
         DRV_MAP_FILE="$AUDIT_DIR/drv-map-$TIMESTAMP.txt"
         echo "$FODS" | while read -r drv; do
-            out=$(nix derivation show "$drv" 2>/dev/null | jq -r '.[].outputs.out.path' 2>/dev/null)
+            out=$(nix derivation show "$drv" 2>/dev/null | jq -r '(.derivations // .) | .[].outputs.out.path' 2>/dev/null)
             if [ -n "$out" ]; then
                 echo "$out $drv"
             fi
