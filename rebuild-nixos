@@ -480,14 +480,14 @@ else
 
     if [ "$VERBOSE" = true ]; then
         echo "📦 Updating external inputs (using cache)..."
-        nix flake update nixpkgs home-manager 2>&1 | tee -a "$LOG_FILE"
+        nix flake update nixpkgs home-manager devenv 2>&1 | tee -a "$LOG_FILE"
 
         echo "🚀 Updating local inputs (bypassing cache with --refresh)..."
         # Batch update: single nix invocation for all local inputs (faster than per-input)
         nix flake update "${LOCAL_INPUTS[@]}" --refresh 2>&1 | tee -a "$LOG_FILE"
     else
         # Quiet mode: Update external inputs first (cached)
-        nix flake update nixpkgs home-manager &>>"$LOG_FILE"
+        nix flake update nixpkgs home-manager devenv &>>"$LOG_FILE"
 
         # Batch update local inputs with --refresh to bypass cache
         nix flake update "${LOCAL_INPUTS[@]}" --refresh &>>"$LOG_FILE"

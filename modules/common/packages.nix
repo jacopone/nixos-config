@@ -43,7 +43,7 @@
     # Development infrastructure
     docker-compose
     direnv
-    devenv
+    inputs.devenv.packages.${pkgs.stdenv.hostPlatform.system}.devenv # Per-project dev shells (upstream, not nixpkgs)
     cachix
 
     # Shell enhancements

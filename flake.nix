@@ -75,6 +75,15 @@
       url = "github:googleworkspace/cli";
     };
 
+    # Devenv - Per-project dev shells (Cachix)
+    # MAINTAINER: @cachix | AUTO-UPDATE: Via rebuild-nixos (external, cached)
+    # Pulled as flake input instead of pkgs.devenv because nixpkgs lags upstream
+    # devenv releases; this lets the version flow with `./rebuild-nixos`.
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # NixClaw - Personal AI agent platform for NixOS
     # MAINTAINER: @jacopone (YOU) | LOCAL DEV: path input
     # TEMPORARILY DISABLED: path input breaks on machines without ~/nixclaw
@@ -90,7 +99,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, gws, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, gws, devenv, ... }@inputs:
     let
       # Shared overlay: fix test failures / missing deps in nixos-unstable
       # Uses interpreter override (not overrideScope) so python3.withPackages sees fixes
