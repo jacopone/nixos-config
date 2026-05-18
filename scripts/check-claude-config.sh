@@ -32,12 +32,50 @@ emit() {
   esac
 }
 
-# Checks go here in subsequent tasks
-# check_plugin_versions
-# check_symlinks_valid
-# check_subagents_parseable
-# check_sandbox_attestation
-# check_stale_files
+check_plugin_versions() {
+  local settings="${CLAUDE_DIR}/settings.json"
+  [ ! -f "$settings" ] && { emit error plugin_version "settings.json missing"; return; }
+
+  # Get enabled plugins from settings.json (true value)
+  local plugin_ids
+  plugin_ids=$(jq -r '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key' "$settings")
+
+  if [ -z "$plugin_ids" ]; then
+    emit info plugin_version "no plugins enabled"
+    return
+  fi
+
+  while IFS= read -r plugin_id; do
+    [ -z "$plugin_id" ] && continue
+    # Format: name@marketplace
+    local marketplace plugin_name plugin_dir
+    plugin_name="${plugin_id%@*}"
+    marketplace="${plugin_id##*@}"
+    plugin_dir="${CLAUDE_DIR}/plugins/cache/${marketplace}/${plugin_name}"
+
+    if [ ! -d "$plugin_dir" ]; then
+      emit warn plugin_version "plugin $plugin_id enabled but not in cache at $plugin_dir"
+      continue
+    fi
+
+    # Plugins are cached under a version-hash subdirectory:
+    # cache/<marketplace>/<plugin>/<version>/.claude-plugin/plugin.json
+    # Pick the newest plugin.json (mtime) if multiple versions exist.
+    local plugin_json version
+    plugin_json=$(find "$plugin_dir" -maxdepth 3 -name plugin.json -path '*/.claude-plugin/plugin.json' -printf '%T@ %p\n' 2>/dev/null \
+      | sort -nr | head -1 | cut -d' ' -f2-)
+
+    if [ -z "$plugin_json" ] || [ ! -f "$plugin_json" ]; then
+      emit warn plugin_version "$plugin_id: cache dir present but no plugin.json found"
+      continue
+    fi
+
+    version=$(jq -r '.version // "?"' "$plugin_json" 2>/dev/null || echo "?")
+    emit info plugin_version "$plugin_id @ $version"
+  done <<<"$plugin_ids"
+}
+
+check_plugin_versions
 
 # Output JSON array
 echo "${EVENTS[@]}" | jq -s .
