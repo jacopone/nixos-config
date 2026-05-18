@@ -32,3 +32,9 @@
   # check to emit at least one event so we know it actually ran.
   [ "$count" -ge 1 ]
 }
+
+@test "sandbox attestation check runs" {
+  out=$("$BATS_TEST_DIRNAME/../../../scripts/check-claude-config.sh" || true)
+  count=$(echo "$out" | jq '[.[] | select(.check == "sandbox_attestation")] | length')
+  [ "$count" -ge 1 ]
+}

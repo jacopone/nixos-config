@@ -145,6 +145,43 @@ check_subagents_parseable() {
 
 check_subagents_parseable
 
+check_sandbox_attestation() {
+  local seccomp_dir="${CLAUDE_DIR}/seccomp"
+
+  if [ ! -d "$seccomp_dir" ]; then
+    emit warn sandbox_attestation "no seccomp directory; sandbox may be disabled"
+    return
+  fi
+
+  local required
+  for required in apply-seccomp unix-block.bpf; do
+    if [ ! -e "$seccomp_dir/$required" ]; then
+      emit error sandbox_attestation "missing $required (Invariant #4 at risk)"
+    fi
+  done
+
+  # Check apply-seccomp is executable (resolves through symlink to nix store)
+  if [ -e "$seccomp_dir/apply-seccomp" ] && [ ! -x "$seccomp_dir/apply-seccomp" ]; then
+    emit error sandbox_attestation "apply-seccomp not executable"
+  fi
+
+  # Check settings.json includes a sandbox block
+  local settings="${CLAUDE_DIR}/settings.json"
+  if [ -f "$settings" ]; then
+    local has_sandbox
+    has_sandbox=$(jq -r '.sandbox // {} | length' "$settings" 2>/dev/null || echo 0)
+    if [ "$has_sandbox" -eq 0 ]; then
+      emit error sandbox_attestation "settings.json has no sandbox block"
+    else
+      emit info sandbox_attestation "sandbox block present in settings.json"
+    fi
+  else
+    emit error sandbox_attestation "settings.json missing"
+  fi
+}
+
+check_sandbox_attestation
+
 # Output JSON array
 echo "${EVENTS[@]}" | jq -s .
 
