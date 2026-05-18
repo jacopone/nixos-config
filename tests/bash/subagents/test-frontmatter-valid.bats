@@ -27,3 +27,9 @@
     /home/guyfawkes/nixos-config/modules/home-manager/claude-code/agents/generation-differ.md \
     | yq eval . > /dev/null
 }
+
+@test "supply-chain-auditor frontmatter is valid YAML" {
+  awk '/^---$/{c++; next} c==1' \
+    /home/guyfawkes/nixos-config/modules/home-manager/claude-code/agents/supply-chain-auditor.md \
+    | yq eval . > /dev/null
+}
