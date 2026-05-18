@@ -34,6 +34,9 @@ Thumbs.db
 result
 result-*
 
+# Git worktrees (used by scripts/claude-autonomous.sh and ad-hoc work)
+.worktrees/
+
 # Python cache files
 __pycache__/
 *.py[cod]
