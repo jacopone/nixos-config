@@ -17,3 +17,9 @@
   count=$(echo "$out" | jq '[.[] | select(.check == "plugin_version")] | length')
   [ "$count" -gt 0 ]
 }
+
+@test "symlink check covers ~/.claude/agents/ and ~/.claude/commands/" {
+  out=$("$BATS_TEST_DIRNAME/../../../scripts/check-claude-config.sh" || true)
+  count=$(echo "$out" | jq '[.[] | select(.check == "symlink")] | length')
+  [ "$count" -ge 1 ]
+}

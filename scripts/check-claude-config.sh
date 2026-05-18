@@ -77,6 +77,36 @@ check_plugin_versions() {
 
 check_plugin_versions
 
+check_symlinks_valid() {
+  local dir target store_target
+  local emitted=0
+  for dir in agents commands hooks output-styles seccomp; do
+    target="${CLAUDE_DIR}/${dir}"
+    [ ! -d "$target" ] && continue
+
+    while IFS= read -r link; do
+      [ -z "$link" ] && continue
+      if [ ! -e "$link" ]; then
+        emit error symlink "dangling symlink: $link"
+      else
+        store_target=$(readlink "$link")
+        if [[ "$store_target" =~ ^/nix/store/ ]]; then
+          emit info symlink "$(basename "$link") -> nix store (OK)"
+        else
+          emit warn symlink "$(basename "$link") -> $store_target (not nix store - drift?)"
+        fi
+      fi
+      emitted=$((emitted + 1))
+    done < <(find "$target" -maxdepth 1 -type l 2>/dev/null)
+  done
+
+  if [ "$emitted" -eq 0 ]; then
+    emit info symlink "no symlinks found under agents/, commands/, hooks/, output-styles/, seccomp/"
+  fi
+}
+
+check_symlinks_valid
+
 # Output JSON array
 echo "${EVENTS[@]}" | jq -s .
 
