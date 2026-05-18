@@ -931,3 +931,30 @@ If during execution you also want low-hanging cleanup:
 
 - 2026-05-18: Initial draft with §1 placeholder
 - 2026-05-18: §1 inventory completed from research agent findings; added G12-G24 covering 2026 features (archived input, sandbox schema, Agent View, claudeMd, .claude/rules/, new hooks, monitors, channels, routines); P0 list expanded 5→9
+- 2026-05-18: All 9 P0 items implemented per `docs/plans/2026-05-18-claudeos-p0-implementation.md` in 34 commits on `personal`. Status by P0:
+  - **P0-1** ✅ claude-automation flake input removed (with `rebuild-nixos:476` LOCAL_INPUTS + `devenv.nix:46` comment also cleaned)
+  - **P0-2** ✅ sandbox schema investigated and migrated. Critical finding: `sandbox.seccomp.bpfPath` was being silently stripped by Claude Code's Zod schema since deployment. `vendor/seccomp-src/apply-seccomp.c` now supports dual calling convention (legacy 2-arg + new compile-time BPF_PATH for Claude Code runtime). `claude-seccomp` 0.0.26 → 0.0.27. AF_UNIX socket creation now actually blocks (verified post-rebuild)
+  - **P0-3** ✅ company-policies.md migrated to `claudeMd` managed setting in `/etc/claude-code/managed-settings.json` (root-owned, user-deletion-proof). `home.file ~/.claude/CLAUDE.md` symlink removed. Schema fix: `strictKnownMarketplaces`/`blockedMarketplaces` keys removed when first deployment hit "Expected array, but received boolean" — those keys expect arrays of source-pattern objects (queued as follow-up #20)
+  - **P0-4** ✅ Agent View pilot designed and documented. Task 23 + 25 docs landed; Task 24 (actually running `claude agents --bg`) deferred to user execution since it requires a fresh CLI invocation outside the implementing session
+  - **P0-5** ✅ MCP-NixOS wired in project `.mcp.json` (un-ignored from `.gitignore`). Uses the Nix-pinned `mcp-nixos` wrapper from `modules/core/packages.nix:178-181` (not `uvx mcp-nixos@latest`) for Invariant #2 reproducibility
+  - **P0-6** ✅ 4 declarative subagents (`flake-debugger`, `package-finder`, `generation-differ`, `supply-chain-auditor`) deployed via Home Manager. Critical fix mid-implementation: invented frontmatter fields (`isolation: worktree`, `preload_skills`, `mcpServers`) were silently ignored by Claude Code's actual subagent schema; intent moved into prose Constraints sections so agents actually request the behavior they advertise. Stale CLAUDE.md line refs replaced with stable section names. `supply-chain-auditor` manifest path corrected to `~/.nixos-audit/sources-*.manifest` (per `rebuild-nixos:617`)
+  - **P0-7** ✅ statusline live: `[host class | gen N | branch | last:?]` showing fleet context glanceably. `modules/common/host-class.nix` writes `/etc/claudeos/host-class` per hostname pattern. Plan's `/run/current-system` generation detection adapted to read `/nix/var/nix/profiles/system-N-link` (real layout). Schema verified against Claude Code 2.1.143 binary before deployment (lesson from P0-6 frontmatter theater)
+  - **P0-8** ✅ `rebuild-nixos:919-935` 17-line stub replaced with `scripts/check-claude-config.sh` invocation. 5 checks: plugin_version, symlink, subagent_frontmatter, sandbox_attestation, stale_file. Emits structured JSON event array (consumable by future P1-2 telemetry MCP). Exit codes 0/1/2 for info/warn/error. Live run finds 25 info + 5 warn + 0 error against current `~/.claude/` state; the 5 warns surface real declarative drift (4 plugins missing `.claude-plugin/plugin.json`, 1 expected missing-agents-dir pre-rebuild)
+  - **P0-9** ✅ ~75KB of stale `.claude/` archaeology removed (CLAUDE_CODE_ANALYSIS, tool-analytics, mcp-analytics, permissions_auto_generated, ANALYSIS_SUMMARY, CLAUDE.local.md, mcp.json placeholder)
+
+  Plan deviations caught at review gates (each is a plan defect, not implementation issue):
+  - P0-1: plan's narrow rg patterns missed `rebuild-nixos:476` array element and `devenv.nix:46` comment (extension authorized atomically)
+  - P0-2: plan's "Step 2 + Step 3" had placeholder Options A/B/C; Task 3 investigation drove the chosen approach (compile-time BPF_PATH via Nix derivation -D define)
+  - P0-3: plan's `strictKnownMarketplaces: true` and `blockedMarketplaces: []` didn't match Claude Code's actual schema (arrays of source-pattern objects); keys removed in fix commit
+  - P0-6: plan's invented subagent frontmatter (per the audit's own §1 inventory speculation) doesn't match Claude Code's actual subagent fields (`name`, `description`, `tools`, `model` only)
+  - P0-7: plan's `/run/current-system | grep system-N` didn't match real symlink layout
+  - P0-8: plan's pseudocode for plugin cache assumed flat layout; actual is `cache/<marketplace>/<plugin>/<version-hash>/.claude-plugin/plugin.json`
+
+  6 follow-up tasks queued (#15-#22) covering: doc rot from claude-automation removal, BATS test hardening (paths + skip-vs-fail), dry-run corruption in jq merger, sandbox.enabled override of user opt-out, lib.mkDefault wrapping for marketplace locks, validator settings.json parseability check, validator test exit-code grep tightening, plugin cache concurrency warn message.
+
+  Session-bookend artifacts:
+  - Audit doc (this file, 933 lines)
+  - Implementation plan (`docs/plans/2026-05-18-claudeos-p0-implementation.md`, 2160 lines)
+  - Sandbox investigation finding (`docs/plans/2026-05-18-sandbox-schema-finding.md`, 277 lines)
+  - Agent View pilot definition (`docs/plans/2026-05-18-agent-view-pilot-task.md`, 88 lines)
+  - Agent View findings template (`docs/plans/2026-05-18-agent-view-pilot-findings.md`, 77 lines)
