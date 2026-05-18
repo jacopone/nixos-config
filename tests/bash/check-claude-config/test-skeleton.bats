@@ -38,3 +38,10 @@
   count=$(echo "$out" | jq '[.[] | select(.check == "sandbox_attestation")] | length')
   [ "$count" -ge 1 ]
 }
+
+@test "stale-file scan reports any orphans" {
+  out=$("$BATS_TEST_DIRNAME/../../../scripts/check-claude-config.sh" || true)
+  # The check itself should always run, even if no stale files found
+  count=$(echo "$out" | jq '[.[] | select(.check == "stale_file")] | length')
+  [ "$count" -ge 1 ]
+}

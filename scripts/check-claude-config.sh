@@ -182,6 +182,33 @@ check_sandbox_attestation() {
 
 check_sandbox_attestation
 
+check_stale_files() {
+  # Pattern: legacy files known to be orphans from removed Phase 8
+  local stale_patterns=(
+    "learner_counter_*"
+    "security_warnings_state_*"
+    "CLAUDE_CODE_ANALYSIS.md"
+    "tool-analytics.md"
+    "permissions_auto_generated.md"
+  )
+
+  local found=0
+  local pattern matches
+  for pattern in "${stale_patterns[@]}"; do
+    matches=$(find "$CLAUDE_DIR" -maxdepth 2 -name "$pattern" 2>/dev/null | wc -l)
+    if [ "$matches" -gt 0 ]; then
+      emit warn stale_file "found $matches file(s) matching pattern $pattern"
+      found=$((found + matches))
+    fi
+  done
+
+  if [ "$found" -eq 0 ]; then
+    emit info stale_file "no stale files found"
+  fi
+}
+
+check_stale_files
+
 # Output JSON array
 echo "${EVENTS[@]}" | jq -s .
 
