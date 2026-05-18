@@ -17,6 +17,12 @@ in
   # Shared slash commands (personal commands like /life stay as regular files alongside these)
   home.file.".claude/commands/nixos.md".source = ./commands/nixos.md;
 
+  # Custom subagents — symlinked to ~/.claude/agents/ from the Nix store
+  home.file.".claude/agents/flake-debugger.md".source = ./agents/flake-debugger.md;
+  home.file.".claude/agents/package-finder.md".source = ./agents/package-finder.md;
+  home.file.".claude/agents/generation-differ.md".source = ./agents/generation-differ.md;
+  home.file.".claude/agents/supply-chain-auditor.md".source = ./agents/supply-chain-auditor.md;
+
   # Seccomp sandbox filter for Claude Code native sandbox
   home.file.".claude/seccomp/apply-seccomp".source = "${claude-seccomp}/share/claude-seccomp/apply-seccomp";
   home.file.".claude/seccomp/unix-block.bpf".source = "${claude-seccomp}/share/claude-seccomp/unix-block.bpf";
