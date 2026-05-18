@@ -8,8 +8,11 @@ let
   companyConfig = ./company-config.json;
 in
 {
-  # Company-wide coding standards — auto-updated on every rebuild
-  home.file.".claude/CLAUDE.md".source = ./company-policies.md;
+  # Company policies are deployed via modules/common/claude-code-managed.nix
+  # as /etc/claude-code/managed-settings.json (the claudeMd managed setting).
+  # A ~/.claude/CLAUDE.md home.file symlink would duplicate the same content
+  # and could be deleted by a user, defeating the "managed" authority model.
+  # See docs/plans/2026-05-18-claude-code-advancements-audit.md §G15.
 
   # Shared slash commands (personal commands like /life stay as regular files alongside these)
   home.file.".claude/commands/nixos.md".source = ./commands/nixos.md;
