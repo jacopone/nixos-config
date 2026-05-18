@@ -647,14 +647,26 @@ if [ "$AUDIT" = true ]; then
 
         log_step "Building output-to-derivation mapping for $FOD_COUNT derivations..."
         DRV_MAP_FILE="$AUDIT_DIR/drv-map-$TIMESTAMP.txt"
+        DRV_MAP_SKIP_LOG="$AUDIT_DIR/drv-map-skipped-$TIMESTAMP.log"
+        # Per-drv lookups must tolerate failures: any single `nix derivation show`
+        # failure under `set -e -o pipefail` would otherwise abort the whole
+        # mapping across thousands of derivations.
         echo "$FODS" | while read -r drv; do
-            out=$(nix derivation show "$drv" 2>/dev/null | jq -r '(.derivations // .) | .[].outputs.out.path' 2>/dev/null)
-            if [ -n "$out" ]; then
+            out=$(nix derivation show "$drv" 2>/dev/null | jq -r '(.derivations // .) | .[].outputs.out.path' 2>/dev/null || true)
+            if [ -n "$out" ] && [ "$out" != "null" ]; then
                 echo "$out $drv"
+            else
+                echo "$drv" >> "$DRV_MAP_SKIP_LOG"
             fi
         done > "$DRV_MAP_FILE"
         OUTPUT_COUNT=$(wc -l < "$DRV_MAP_FILE")
-        log_success "Mapped $OUTPUT_COUNT output paths"
+        SKIP_COUNT=0
+        [ -f "$DRV_MAP_SKIP_LOG" ] && SKIP_COUNT=$(wc -l < "$DRV_MAP_SKIP_LOG")
+        if [ "$SKIP_COUNT" -gt 0 ]; then
+            log_warning "Mapped $OUTPUT_COUNT output paths ($SKIP_COUNT skipped — see $DRV_MAP_SKIP_LOG)"
+        else
+            log_success "Mapped $OUTPUT_COUNT output paths"
+        fi
 
         cut -d' ' -f1 "$DRV_MAP_FILE" > "$OUTPUT_PATHS_FILE"
 
