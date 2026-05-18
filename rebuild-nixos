@@ -473,7 +473,6 @@ else
     LOCAL_INPUTS=(
         "code-cursor-nix"
         "whisper-dictation"
-        "claude-automation"
         "claude-code-nix"  # Also locally maintained by you
         "antigravity-nix"
     )

@@ -54,13 +54,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Claude NixOS Automation - CLAUDE.md management tools
-    # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
-    claude-automation = {
-      url = "github:jacopone/claude-nixos-automation";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Google Antigravity - Next-generation agentic IDE
     # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
     # For local dev, use: nix flake lock --override-input antigravity-nix path:../antigravity-nix
@@ -99,7 +92,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, gws, devenv, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, antigravity-nix, gws, devenv, ... }@inputs:
     let
       # Shared overlay: fix test failures / missing deps in nixos-unstable
       # Uses interpreter override (not overrideScope) so python3.withPackages sees fixes

@@ -43,7 +43,6 @@
     python = {
       enable = true;
       # Disable uv.sync because nixos-config root doesn't have pyproject.toml
-      # UV is still available for scripts/claude-automation which has its own devenv
       uv.enable = false;
     };
   };

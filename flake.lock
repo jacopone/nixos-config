@@ -112,26 +112,6 @@
         "type": "github"
       }
     },
-    "claude-automation": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1770882092,
-        "narHash": "sha256-LrBO/qT5RNMnOorhBwcoW10L12BeFg5puzLb+vDdjvc=",
-        "owner": "jacopone",
-        "repo": "claude-nixos-automation",
-        "rev": "8ca3cede1ea14ddbbc56a691856acf5fe794033d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jacopone",
-        "repo": "claude-nixos-automation",
-        "type": "github"
-      }
-    },
     "claude-code-nix": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -1091,7 +1071,6 @@
     "root": {
       "inputs": {
         "antigravity-nix": "antigravity-nix",
-        "claude-automation": "claude-automation",
         "claude-code-nix": "claude-code-nix",
         "code-cursor-nix": "code-cursor-nix",
         "devenv": "devenv",
