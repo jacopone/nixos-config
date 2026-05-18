@@ -1,8 +1,7 @@
 {
   "mcpServers": {
     "mcp-nixos": {
-      "command": "uvx",
-      "args": ["mcp-nixos@latest"]
+      "command": "mcp-nixos"
     }
   }
 }
