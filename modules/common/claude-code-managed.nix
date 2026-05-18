@@ -9,8 +9,10 @@ let
   companyPolicies = builtins.readFile ../home-manager/claude-code/company-policies.md;
   managedSettings = {
     claudeMd = companyPolicies;
-    strictKnownMarketplaces = true;
-    blockedMarketplaces = [ ];
+    # strictKnownMarketplaces and blockedMarketplaces expect arrays of
+    # source-pattern objects like [{ hostPattern = "^github\\.com$"; }
+    # { source = "skills-dir"; }], NOT booleans. Configuring them correctly
+    # is a separate task — see follow-up #20.
   };
 in
 {
