@@ -6,6 +6,10 @@
 > Claude Code under inspection: `2.1.143` (build `2026-05-15T17:39:39Z`, git
 > `cfb8132e4c3551e2773f41a1900efd1cc93637db`), Nix store path
 > `/nix/store/b4pviq7rl1j13dsbq55nvpgigvwfcg2z-claude-code-2.1.143`.
+>
+> **The inspected binary:** Claude Code `2.1.143` at the Nix store path in the
+> header above (`bin/.claude-unwrapped`). Referenced below as "the inspected
+> binary."
 
 ## Bottom line
 
@@ -60,8 +64,7 @@ error: unknown option '--print-settings-schema'
 `claude config get sandbox` is also not available (the `config` subcommand is
 ambiguous in v2.1.143).
 
-Fell back to **binary string analysis** on
-`/nix/store/b4pviq7rl1j13dsbq55nvpgigvwfcg2z-claude-code-2.1.143/bin/.claude-unwrapped`.
+Fell back to **binary string analysis** on the inspected binary.
 
 ### Audit/normalization filter (`om8`)
 
@@ -178,7 +181,9 @@ directory, and no socat bridges on `:3128`/`:1080`. So this test only proves
 that no seccomp filter is active on Claude's own subprocess shell — it does
 not directly exercise the autonomous-worktree code path.
 
-**Static evidence is stronger**, however:
+**Runtime verification was attempted and was inconclusive; the conclusion
+rests on the static analysis alone.** Two independent static-evidence paths
+support it:
 
 1. The Nix module writes `sandbox.seccomp.bpfPath` — this is a Zod-unrecognized
    key and is silently stripped before reaching runtime. Only `applyPath`
@@ -227,25 +232,26 @@ AF_UNIX probe. That test is **deferred to Task 4 acceptance**.
    }
    ```
 
-3. **Switch the vendored `apply-seccomp.c` to a multicall/wrapper design**
-   so that the BPF file path is either:
-   - resolved by the binary itself relative to its own location (e.g.,
-     `dirname(argv[0])/unix-block.bpf`), OR
-   - hardcoded at build time via the Nix-store-derived absolute path
-     (`/nix/store/...-claude-seccomp/share/claude-seccomp/unix-block.bpf`).
+3. **Switch the vendored `apply-seccomp.c` to a wrapper design that bakes
+   the BPF path in at build time.** `pkgs/claude-seccomp.nix` already builds
+   via gcc, so adding `-DBPF_PATH=\"$out/share/claude-seccomp/unix-block.bpf\"`
+   to the buildPhase is a one-line change and the resulting binary is
+   self-contained — no runtime directory-traversal magic. Nix store paths are
+   stable for any given derivation, so the hardcoded path does not drift. This
+   approach also decouples from Claude Code's calling convention entirely.
 
-   Option (b) is the cleanest fit for Nix: pass the BPF path as a
-   compile-time `-D` define in `pkgs/claude-seccomp.nix`. This decouples
-   from Claude Code's calling convention entirely.
+   Fallback if a compile-time approach is undesirable: resolve the BPF path
+   relative to the binary location (`dirname(argv[0])/unix-block.bpf`). Note
+   this is fragile under symlink relocation, which Home Manager performs, so
+   it is not the default choice here.
 
 4. **Optionally adopt `argv0` mode** if Anthropic's multicall convention
    stabilizes, but the wrapper-with-baked-in-BPF approach is simpler and
    doesn't depend on Anthropic preserving the multicall hook.
 
-5. **Add a runtime probe** in `rebuild-nixos` validator phase (planned
-   Task 16-22) that re-runs the AF_UNIX socket test inside an
-   `claude-autonomous.sh` launch, so regressions are caught at activation
-   rather than at autonomous-run time.
+5. **Add a runtime probe** in the `rebuild-nixos` Phase 4 validator work that
+   re-runs the AF_UNIX socket test inside an `claude-autonomous.sh` launch,
+   so regressions are caught at activation rather than at autonomous-run time.
 
 ### Hybrid alternative (not recommended)
 
