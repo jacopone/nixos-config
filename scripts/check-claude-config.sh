@@ -107,6 +107,44 @@ check_symlinks_valid() {
 
 check_symlinks_valid
 
+check_subagents_parseable() {
+  local agents_dir="${CLAUDE_DIR}/agents"
+  if [ ! -d "$agents_dir" ]; then
+    emit warn subagent_frontmatter "~/.claude/agents/ missing (rebuild may be pending)"
+    return
+  fi
+
+  local count=0
+  local name frontmatter
+  for agent_file in "$agents_dir"/*.md; do
+    [ -f "$agent_file" ] || continue
+    name=$(basename "$agent_file" .md)
+    count=$((count + 1))
+
+    # Extract frontmatter (lines between first two ---)
+    frontmatter=$(awk '/^---$/{c++; next} c==1' "$agent_file")
+    if [ -z "$frontmatter" ]; then
+      emit error subagent_frontmatter "$name: missing frontmatter"
+      continue
+    fi
+
+    # Validate required fields
+    if ! echo "$frontmatter" | grep -q '^name:'; then
+      emit error subagent_frontmatter "$name: missing 'name' field"
+    elif ! echo "$frontmatter" | grep -q '^description:'; then
+      emit error subagent_frontmatter "$name: missing 'description' field"
+    else
+      emit info subagent_frontmatter "$name: valid"
+    fi
+  done
+
+  if [ "$count" -eq 0 ]; then
+    emit info subagent_frontmatter "no .md files in $agents_dir"
+  fi
+}
+
+check_subagents_parseable
+
 # Output JSON array
 echo "${EVENTS[@]}" | jq -s .
 

@@ -23,3 +23,12 @@
   count=$(echo "$out" | jq '[.[] | select(.check == "symlink")] | length')
   [ "$count" -ge 1 ]
 }
+
+@test "subagent check covers all .md files in ~/.claude/agents/" {
+  out=$("$BATS_TEST_DIRNAME/../../../scripts/check-claude-config.sh" || true)
+  count=$(echo "$out" | jq '[.[] | select(.check == "subagent_frontmatter")] | length')
+  # Pre-rebuild: emits 1 warn ("agents dir missing"). Post-rebuild: emits one
+  # per .md file in ~/.claude/agents/. The plan-level constraint requires the
+  # check to emit at least one event so we know it actually ran.
+  [ "$count" -ge 1 ]
+}
