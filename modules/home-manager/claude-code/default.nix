@@ -48,22 +48,30 @@ in
         --arg home "$HOME" \
         '. + {
           "permissions": {"allow": .permissions.allow, "deny": []},
-          "sandbox": {"seccomp": {
-            "bpfPath": ($home + "/.claude/seccomp/unix-block.bpf"),
-            "applyPath": ($home + "/.claude/seccomp/apply-seccomp")
-          }},
+          "sandbox": {
+            "enabled": true,
+            "failIfUnavailable": true,
+            "seccomp": {"applyPath": ($home + "/.claude/seccomp/apply-seccomp")}
+          },
           "alwaysThinkingEnabled": true,
           "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"}
         }' "$COMPANY" > "$SETTINGS"
     else
-      # Merge: union permissions, overlay plugins (user overrides win)
+      # Merge: union permissions, overlay plugins (user overrides win),
+      # migrate sandbox schema in place (idempotent).
       $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
         --slurpfile company "$COMPANY" \
         '
         # Union permissions arrays (deduplicate)
         .permissions.allow = ((.permissions.allow // []) + $company[0].permissions.allow | unique) |
         # Company plugins as defaults, user overrides win
-        .enabledPlugins = ($company[0].enabledPlugins * (.enabledPlugins // {}))
+        .enabledPlugins = ($company[0].enabledPlugins * (.enabledPlugins // {})) |
+        # Migrate sandbox schema: drop deprecated sandbox.seccomp.bpfPath;
+        # ensure sandbox.enabled and failIfUnavailable are set.
+        # See: docs/plans/2026-05-18-sandbox-schema-finding.md
+        .sandbox.enabled = true |
+        .sandbox.failIfUnavailable = true |
+        .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath))
         ' "$SETTINGS" > "''${SETTINGS}.tmp" \
       && mv "''${SETTINGS}.tmp" "$SETTINGS"
     fi

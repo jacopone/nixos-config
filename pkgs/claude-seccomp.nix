@@ -6,13 +6,21 @@
 #   $out/share/claude-seccomp/apply-seccomp  - Loads BPF filter + execs command
 #   $out/share/claude-seccomp/unix-block.bpf - Compiled BPF bytecode
 #
-# Usage in settings.json:
-#   "sandbox": { "seccomp": { "bpfPath": "...", "applyPath": "..." } }
+# Usage in settings.json (post-2026-05-18 schema migration):
+#   "sandbox": {
+#     "enabled": true,
+#     "failIfUnavailable": true,
+#     "seccomp": { "applyPath": "<path-to-apply-seccomp>" }
+#   }
+# BPF path is now baked into the binary at compile time via -DBPF_PATH
+# because Claude Code's Zod schema strips sandbox.seccomp.bpfPath and the
+# runtime invocation builder does not pass it in argv.
+# See: docs/plans/2026-05-18-sandbox-schema-finding.md
 { pkgs }:
 
 pkgs.stdenv.mkDerivation {
   pname = "claude-seccomp";
-  version = "0.0.26";
+  version = "0.0.27";
   src = ../vendor/seccomp-src;
   buildInputs = [ pkgs.libseccomp ];
 
@@ -20,8 +28,13 @@ pkgs.stdenv.mkDerivation {
     # Build BPF generator and produce the filter bytecode
     gcc -O2 -o seccomp-unix-block seccomp-unix-block.c -lseccomp
     ./seccomp-unix-block unix-block.bpf
-    # Build apply-seccomp (loads BPF + execs target with filter active)
-    gcc -O2 -o apply-seccomp apply-seccomp.c
+    # Build apply-seccomp. BPF_PATH is baked in at compile time so Claude
+    # Code's runtime can invoke apply-seccomp without passing the BPF path
+    # as argv. Required because Claude Code's Zod schema strips
+    # sandbox.seccomp.bpfPath and the runtime invocation builder does not
+    # pass it. See: docs/plans/2026-05-18-sandbox-schema-finding.md
+    gcc -O2 -DBPF_PATH="\"$out/share/claude-seccomp/unix-block.bpf\"" \
+      -o apply-seccomp apply-seccomp.c
   '';
 
   installPhase = ''
