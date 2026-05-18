@@ -1,5 +1,13 @@
 # Claude Code — Company Policies
 
+## Primary Project Context
+
+- Primary repo: `~/nixos-config` (**ClaudeOS**) — a reproducible, kernel-sandboxed NixOS fleet maintained by Claude Code.
+- Fleet spans personal hardware (Framework 16, MacBooks, ThinkPad) and business workstations for non-technical staff, all built from one flake via `mkTechHost` / `mkBusinessHost`.
+- Recovery model: atomic rollback (`nixos-rebuild switch --rollback`), not in-place hot-fix.
+- Autonomous work runs in bubblewrap + seccomp BPF worktrees via `scripts/claude-autonomous.sh`. Don't bypass the sandbox.
+- These policies are themselves declarative: this file lives at `modules/home-manager/claude-code/company-policies.md` and is deployed to `~/.claude/CLAUDE.md` by Home Manager. Edit the source, not the symlink.
+
 ## How to Work
 - Start complex tasks in plan mode (Shift+Tab twice). Iterate on the plan before implementing.
 - Verify your work before declaring it done — run tests, check types, lint.
@@ -11,7 +19,8 @@
 - NEVER use `git commit --no-verify` without explicit user permission. Fix the issue first.
 - NEVER run `./rebuild-nixos` or `nixos-rebuild` (requires sudo). Tell user to run it.
 - NEVER create false or placeholder data — only real data.
-- Claude CAN: edit nix configs, `nix flake check`, `nix build .#pkg`, `git add`
+- Claude CAN: edit nix configs, `nix flake check`, `nix build .#pkg`, `git add`.
+- For significant input changes in `~/nixos-config`, suggest `./rebuild-nixos --audit` (closure manifest) or `--verify-bootstrap` (deep reproducibility check).
 
 ## Documentation
 - ALWAYS ask before creating .md files. Propose: filename, purpose, alternative (existing file?)

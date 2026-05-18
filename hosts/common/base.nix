@@ -6,6 +6,8 @@
 {
   imports = [
     ../../profiles/desktop
+    ../../modules/common/claude-code-managed.nix
+    ../../modules/common/host-class.nix
   ];
 
   # Bootloader (systemd-boot works for both UEFI machines)

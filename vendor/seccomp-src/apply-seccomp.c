@@ -1,7 +1,18 @@
 /*
  * apply-seccomp.c - Apply seccomp BPF filter and exec command
  *
- * Usage: apply-seccomp <filter.bpf> <command> [args...]
+ * Two invocation forms are supported:
+ *   1. apply-seccomp <filter.bpf> <command> [args...]
+ *      Legacy / test form: BPF path passed explicitly as argv[1].
+ *   2. apply-seccomp <command> [args...]
+ *      Claude Code runtime form: BPF path baked in at compile time via
+ *      -DBPF_PATH. Required because Claude Code's Zod schema strips
+ *      sandbox.seccomp.bpfPath and the runtime invocation builder calls
+ *      <applyPath> <command> with no BPF path in argv. See
+ *      docs/plans/2026-05-18-sandbox-schema-finding.md
+ *
+ * If BPF_PATH is not defined at compile time, only form (1) is supported
+ * (backward compatibility for callers that don't bake the path in).
  *
  * This program reads a pre-compiled BPF filter from a file, applies it
  * using prctl(PR_SET_SECCOMP), and then execs the specified command.
@@ -10,7 +21,8 @@
  * - struct sock_fprog { unsigned short len; struct sock_filter *filter; }
  * - Each filter instruction is 8 bytes (BPF instruction format)
  *
- * Compile: gcc -static -O2 -o apply-seccomp apply-seccomp.c
+ * Compile: gcc -O2 -DBPF_PATH='"/path/to/unix-block.bpf"' \
+ *              -o apply-seccomp apply-seccomp.c
  */
 
 #include <stdio.h>
@@ -34,13 +46,26 @@
 #define MAX_FILTER_SIZE 4096  // Maximum BPF filter size in bytes
 
 int main(int argc, char *argv[], char *envp[]) {
-    if (argc < 3) {
+    const char *filter_path;
+    char **command_argv;
+
+    if (argc >= 3) {
+        // Legacy form: explicit BPF path as argv[1].
+        filter_path = argv[1];
+        command_argv = &argv[2];
+    } else if (argc == 2) {
+#ifdef BPF_PATH
+        // Claude Code runtime form: compile-time BPF path.
+        filter_path = BPF_PATH;
+        command_argv = &argv[1];
+#else
         fprintf(stderr, "Usage: %s <filter.bpf> <command> [args...]\n", argv[0]);
         return 1;
+#endif
+    } else {
+        fprintf(stderr, "Usage: %s [<filter.bpf>] <command> [args...]\n", argv[0]);
+        return 1;
     }
-
-    const char *filter_path = argv[1];
-    char **command_argv = &argv[2];
 
     // Open and read BPF filter file
     int fd = open(filter_path, O_RDONLY);

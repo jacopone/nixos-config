@@ -54,13 +54,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Claude NixOS Automation - CLAUDE.md management tools
-    # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
-    claude-automation = {
-      url = "github:jacopone/claude-nixos-automation";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Google Antigravity - Next-generation agentic IDE
     # MAINTAINER: @jacopone (YOU) | AUTO-UPDATE: Via rebuild-nixos --refresh
     # For local dev, use: nix flake lock --override-input antigravity-nix path:../antigravity-nix
@@ -73,6 +66,15 @@
     # MAINTAINER: @googleworkspace | AUTO-UPDATE: Via rebuild-nixos --refresh
     gws = {
       url = "github:googleworkspace/cli";
+    };
+
+    # Devenv - Per-project dev shells (Cachix)
+    # MAINTAINER: @cachix | AUTO-UPDATE: Via rebuild-nixos (external, cached)
+    # Pulled as flake input instead of pkgs.devenv because nixpkgs lags upstream
+    # devenv releases; this lets the version flow with `./rebuild-nixos`.
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # NixClaw - Personal AI agent platform for NixOS
@@ -90,7 +92,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, claude-automation, antigravity-nix, gws, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, claude-code-nix, code-cursor-nix, whisper-dictation, antigravity-nix, gws, devenv, ... }@inputs:
     let
       # Shared overlay: fix test failures / missing deps in nixos-unstable
       # Uses interpreter override (not overrideScope) so python3.withPackages sees fixes
