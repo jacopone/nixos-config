@@ -32,9 +32,7 @@ First-setup branch correctly sets `applyPath`. Current user is unaffected (their
 
 ### #18 — $DRY_RUN_CMD corrupts settings.json on dry-run
 
-Pre-existing bug in `default.nix` claude-settings-merge activation. When HM sets `DRY_RUN_CMD=echo`, the pattern `$DRY_RUN_CMD jq ... > "${SETTINGS}.tmp" && mv "${SETTINGS}.tmp" "$SETTINGS"` writes the literal string `jq ...` into the temp file, then renames it over the real `settings.json` — destroying config in "preview" mode.
-
-Fix: wrap pipeline in `$DRY_RUN_CMD bash -c '...'` or guard. Both branches affected (lines 47-58 and 62-76). Surfaced by Task 4 code review.
+**[COMPLETED]** Fixed in commit `f2fc81a` (2026-05-19). Both jq pipelines in `home.activation.claude-settings-merge` now wrapped in explicit `if [ -n "$DRY_RUN_CMD" ]; then ... else ... fi` guards. Regression coverage: `tests/bash/claude-settings/test-dry-run-safety.bats` (5 tests: structural check on source, control reproduction of the bug pattern, and behavioral assertions for both dry-run and real-mode shapes).
 
 ### #19 — sandbox.enabled = true overrides user opt-out
 
@@ -93,6 +91,20 @@ Per P1-1 code review of commits `1d3c796` + `f262715`.
 - **M2** — document `now_ms()` clock-skew/suspend caveat (wall-clock vs monotonic) in a comment.
 - **M5** — `declare -g CURRENT_STEP=0` at top scope so BATS doesn't need to inject it.
 
+### #25 — Bubblewrap deny-mount artifacts block intra-session Nix validation
+
+Identified during #18 work (2026-05-19). When Claude Code launches under `sandbox.enabled = true`, bwrap bind-mounts `/dev/null` (char device 1/3) over paths it wants to hide from the inner process: `.mcp.json`, `.gitmodules`, `.claude/settings.json`, `.claude/skills`, `.claude/agents`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/`, and the shell rc / IDE state files (`.profile`, `.bashrc`, `.zshrc`, `.gitconfig`, `.ripgreprc`, `.idea`, `.vscode`, `.bash_profile`, `.zprofile`). Mounts are namespace-scoped — invisible from a host shell.
+
+**Symptom:** any libgit2 operation in the sandboxed Claude session fails with `parsing .gitmodules file: failed open ... Permission denied (libgit2 error code = 2)`. This blocks `nix flake check`, `nix eval`, and `nix build` of any flake attr from inside the session — i.e., the validation discipline mandated by Invariant #9.
+
+**Recovery in use:** the user runs `sudo rm -f .gitmodules .mcp.json && sudo rm -rf .claude/{settings.json,skills,agents} etc/ home/ .nix-store/ .nix-cache-eval/ <dotfiles>` from a non-Claude shell. These deletes are no-ops on the host filesystem (the bind mounts are namespace-private to the sandbox) but re-confirm the host is clean. The sandbox view is unchanged for the rest of the current Claude session; a fresh `claude` invocation starts with clean mounts.
+
+**Proposed fix:** add a graceful-exit hook to the sandbox launcher (both `scripts/claude-autonomous.sh` for autonomous sessions and the interactive `claude` wrapper / systemd-equivalent) that unmounts these char devices before namespace exit. Safe because the mounts are private to the namespace; teardown won't touch host state. Should also be idempotent so an unclean exit + manual cleanup don't conflict.
+
+**Severity:** medium. Adds ~5 minutes of recovery overhead any time Nix work happens inside a Claude session that previously held the sandbox, and pushes validation to a separate shell (defeats some of the in-session feedback loop).
+
+Cross-reference: this is the actionable promotion of the "bwrap deny-mount leakage in repo root" note under "Two unresolved infrastructure items" below.
+
 ---
 
 ## Plan-defect pattern observations
@@ -112,7 +124,7 @@ These aren't tracked as numbered follow-ups but came up during the session:
 
 - **gh auth token expired mid-session** — `gh auth status` shows "The token in default is invalid" → git push via `.git/git-credential-gh` credential helper fails. Fix: `gh auth login -h github.com` to refresh. Could also add `gh auth status --quiet || warning` to `rebuild-nixos` Phase 0 as a future Phase 4 validator extension.
 
-- **bwrap deny-mount leakage in repo root** — sandboxed nix invocations leave character-device files at `.mcp.json`, `.gitmodules`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/` inside the cwd when they bind-mount `/dev/null` over hidden paths. Now gitignored (per `.gitignore` updates in the session), but worth understanding why specific subagent setups trigger it and not others.
+- **bwrap deny-mount leakage in repo root** — sandboxed nix invocations leave character-device files at `.mcp.json`, `.gitmodules`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/` inside the cwd when they bind-mount `/dev/null` over hidden paths. Now gitignored (per `.gitignore` updates in the session), but worth understanding why specific subagent setups trigger it and not others. **Promoted to actionable follow-up #25 on 2026-05-19** after observing that the artifacts also block `nix flake check` from inside the sandboxed session.
 
 ---
 
@@ -121,7 +133,7 @@ These aren't tracked as numbered follow-ups but came up during the session:
 1. **Run the Agent View pilot** (per `docs/plans/2026-05-19-agent-view-pilot-task.md`) targeting #22-I1. This validates Agent View as a tool AND lands the most consequential follow-up (settings.json parseability) in one shot.
 2. **#24 I3** (extract event-log helpers to `lib/event-log.sh`) — biggest maintainability win, unblocks easier P1-2/P1-3 work later.
 3. **#21** (subagent runtime quality batch) — the 4 subagents you shipped need this to behave as advertised.
-4. **#18** (DRY_RUN_CMD corruption) — small fix, prevents config destruction in dry-run mode.
+4. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
 5. Lower-priority polish: #15, #17, #20, the rest of #22 and #24.
 
 ## Where the canonical artifacts live
