@@ -17,6 +17,10 @@ in
 {
   imports = [ ../common/packages.nix ];
 
+  environment.sessionVariables = {
+    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+  };
+
   environment.systemPackages = with pkgs;
     [
       # Speech-to-text
