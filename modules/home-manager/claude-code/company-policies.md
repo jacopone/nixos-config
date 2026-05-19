@@ -21,6 +21,7 @@
 - NEVER create false or placeholder data — only real data.
 - Claude CAN: edit nix configs, `nix flake check`, `nix build .#pkg`, `git add`.
 - For significant input changes in `~/nixos-config`, suggest `./rebuild-nixos --audit` (closure manifest) or `--verify-bootstrap` (deep reproducibility check).
+- `sandbox.enabled = true` and `sandbox.failIfUnavailable = true` are set unconditionally in `/etc/claude-code/managed-settings.json` (deployed by `modules/common/claude-code-managed.nix`). These cannot be opted out via `~/.claude/settings.json` — managed-settings precedence wins over user settings by design. Invariant #4 (sandbox isolation) is enforced fleet-wide.
 
 ## Documentation
 - ALWAYS ask before creating .md files. Propose: filename, purpose, alternative (existing file?)
