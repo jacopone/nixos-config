@@ -83,15 +83,15 @@ Per Phase 4 code review of commits `c3ffca3..20869af`.
 
 ### #24 — P1-1 polish (I1-I4 + M1-M5 from code review)
 
-Per P1-1 code review of commits `1d3c796` + `f262715`.
+Per P1-1 code review of commits `1d3c796` + `f262715`. **I3 + M5 [COMPLETED]** in commit `4d47eb4`; the rest remain. Note: I3 relocated the event-log helpers to `lib/event-log.sh`, so the anchors for I2/M1/M2 now point at the lib, not `rebuild-nixos`.
 
-- **I1** — statusline shows stale `last-status` forever (no age check). Add age annotation: `last:succ(2d)` or mtime/TTL check in `statusline.sh:32-35`.
-- **I2** — 3-line comment explaining text-file ↔ JSONL duality (`LAST_STATUS_FILE` vs `EVENT_LOG`) near the `LAST_STATUS_FILE=` declaration. Two-sinks-of-truth is justified but undocumented.
-- **I3 (most useful)** — extract event-log helpers to `lib/event-log.sh` so BATS sources directly. Eliminates awk extraction brittleness — the P1-1 implementer hit pain on this twice. Anchors: `^EVENT_LOG_DIR=`, `^CURRENT_PHASE_START_MS=""`, `^# Current epoch milliseconds`, `^step_skip\(\)` are all single-match anchors today, which means any rename/re-indent silently breaks the test harness.
-- **I4** — BATS 28 tests borderline over-engineered. Could consolidate per-field-assertion tests 4-to-1 with `jq -e`. Tests 14, 18, 19, 24, 25, 26 are grep checks (catch removal but not bugs).
-- **M1** — rename `step_done` → `step_complete` for consistency with emitted "complete" event name vocabulary.
-- **M2** — document `now_ms()` clock-skew/suspend caveat (wall-clock vs monotonic) in a comment.
-- **M5** — `declare -g CURRENT_STEP=0` at top scope so BATS doesn't need to inject it.
+- **I1** — statusline shows stale `last-status` forever (no age check). Add age annotation: `last:succ(2d)` or mtime/TTL check in `statusline.sh:32-35`. (Unaffected by I3.)
+- **I2** — 3-line comment explaining text-file ↔ JSONL duality (`LAST_STATUS_FILE` vs `EVENT_LOG`) near the `LAST_STATUS_FILE=` declaration. Two-sinks-of-truth is justified but undocumented. **Now in `lib/event-log.sh`** (the declaration moved there). The lib header documents the callers but not the two-sinks rationale specifically.
+- **I3 (most useful)** — **[COMPLETED]** `4d47eb4`. Extracted event-log helpers to `lib/event-log.sh`; `rebuild-nixos` and `test-event-log.bats` both source it. The fragile awk extraction (single-match anchors `^EVENT_LOG_DIR=`, `^step_skip\(\)`, etc.) is gone — a rename now fails loudly at source time instead of silently capturing the wrong range.
+- **I4** — BATS tests (now 29) borderline over-engineered. Could consolidate per-field-assertion tests 4-to-1 with `jq -e`. Several are grep checks (catch removal but not bugs). Still open. (Test now lives against the lib, but the consolidation point stands.)
+- **M1** — rename `step_done` → `step_complete` for consistency with the emitted "complete" event vocabulary. **Now in `lib/event-log.sh`**; a rename touches the lib + its call sites in `rebuild-nixos` + the grep tests.
+- **M2** — document `now_ms()` clock-skew/suspend caveat (wall-clock vs monotonic) in a comment. **Now in `lib/event-log.sh:now_ms()`**.
+- **M5** — **[COMPLETED]** `4d47eb4`. `CURRENT_STEP=0` is initialized in `lib/event-log.sh`; the test no longer injects it and the redundant init in `rebuild-nixos` was removed.
 
 ### #25 — Bubblewrap deny-mount artifacts block intra-session Nix validation
 
@@ -133,9 +133,8 @@ These aren't tracked as numbered follow-ups but came up during the session:
 ## Suggested resume order
 
 1. **Run the Agent View pilot** (per `docs/plans/2026-05-19-agent-view-pilot-task.md`) targeting #22-I1. This validates Agent View as a tool AND lands the most consequential follow-up (settings.json parseability) in one shot.
-2. **#24 I3** (extract event-log helpers to `lib/event-log.sh`) — biggest maintainability win, unblocks easier P1-2/P1-3 work later.
-3. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
-4. Lower-priority polish: #15, #17, #20, the rest of #22 and #24. (Plus #21's deferred M5/M1/M4 if revisited.)
+2. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
+3. Lower-priority polish: #15, #17, #20, the rest of #22, the rest of #24 (I1 statusline age, I2/M1/M2 — now in `lib/event-log.sh` — and I4 test consolidation). Plus #21's deferred M1/M4/M5 if revisited.
 
 ## Where the canonical artifacts live
 
