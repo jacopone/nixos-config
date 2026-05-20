@@ -13,7 +13,7 @@
 - Verify your work before declaring it done — run tests, check types, lint.
 - Use PRs for all non-trivial changes. Squash merge preferred. Direct push only for single-line hotfixes.
 - Use subagents to offload research and keep the main context window focused.
-- When sessions get long (3+ tasks or context compression), suggest checkpointing and starting fresh.
+- Context-aware checkpointing — this is a 1M-token environment (Claude Opus 4.7). Don't suggest checkpoint based on task count: that heuristic predates the 1M window. Check `/context`: below 50% messages bar default to continuing; ≥60% weigh whether the next task benefits from a clean slate; ≥75% actively suggest checkpoint. Other valid triggers: context compression has already fired, or you're about to dispatch many parallel subagents and need synthesis headroom. Task count alone is not a trigger.
 
 ## Safety
 - NEVER use `git commit --no-verify` without explicit user permission. Fix the issue first.

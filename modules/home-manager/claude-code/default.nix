@@ -57,56 +57,70 @@ in
 
     $DRY_RUN_CMD mkdir -p "$HOME/.claude"
 
+    # Dry-run safety: jq writes to stdout and we redirect into $SETTINGS, so
+    # the redirection MUST NOT be prefixed by $DRY_RUN_CMD. Under home-manager
+    # --dry-run, $DRY_RUN_CMD=echo, and `echo jq … > "$SETTINGS"` would write
+    # the literal jq command-as-string into settings.json, corrupting config
+    # in "preview" mode. Guard each branch with an explicit dry-run check.
+    # Regression: tests/bash/claude-settings/test-dry-run-safety.bats
     if [ ! -f "$SETTINGS" ]; then
       # First setup: create settings with company config + sandbox paths
       # Note: effort level and adaptive-thinking flags are managed via
       # home.sessionVariables (CLAUDE_CODE_EFFORT_LEVEL, CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING)
       # — env vars override settings.json and bypass the Zod schema, which
       # currently rejects "max" as an effortLevel value.
-      $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-        --arg home "$HOME" \
-        '. + {
-          "permissions": {"allow": .permissions.allow, "deny": []},
-          "sandbox": {
-            "enabled": true,
-            "failIfUnavailable": true,
-            "seccomp": {"applyPath": ($home + "/.claude/seccomp/apply-seccomp")}
-          },
-          "alwaysThinkingEnabled": true,
-          "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"},
-          "statusLine": {
+      if [ -n "$DRY_RUN_CMD" ]; then
+        $DRY_RUN_CMD "would seed $SETTINGS from $COMPANY"
+      else
+        ${pkgs.jq}/bin/jq \
+          --arg home "$HOME" \
+          '. + {
+            "permissions": {"allow": .permissions.allow, "deny": []},
+            "sandbox": {
+              "enabled": true,
+              "failIfUnavailable": true,
+              "seccomp": {"applyPath": ($home + "/.claude/seccomp/apply-seccomp")}
+            },
+            "alwaysThinkingEnabled": true,
+            "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"},
+            "statusLine": {
+              "type": "command",
+              "command": ($home + "/.config/claude-code/statusline.sh"),
+              "padding": 0
+            }
+          }' "$COMPANY" > "$SETTINGS"
+      fi
+    else
+      # Merge: union permissions, overlay plugins (user overrides win),
+      # migrate sandbox schema in place (idempotent).
+      if [ -n "$DRY_RUN_CMD" ]; then
+        $DRY_RUN_CMD "would merge $COMPANY into $SETTINGS"
+      else
+        ${pkgs.jq}/bin/jq \
+          --slurpfile company "$COMPANY" \
+          --arg home "$HOME" \
+          '
+          # Union permissions arrays (deduplicate)
+          .permissions.allow = ((.permissions.allow // []) + $company[0].permissions.allow | unique) |
+          # Company plugins as defaults, user overrides win
+          .enabledPlugins = ($company[0].enabledPlugins * (.enabledPlugins // {})) |
+          # Migrate sandbox schema: drop deprecated sandbox.seccomp.bpfPath;
+          # ensure sandbox.enabled and failIfUnavailable are set.
+          # See: docs/plans/2026-05-18-sandbox-schema-finding.md
+          .sandbox.enabled = true |
+          .sandbox.failIfUnavailable = true |
+          .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
+          # Always set statusLine to point at the home-manager-deployed script.
+          # Overwriting on every merge is intentional: the path is stable, and
+          # this prevents users from accidentally disabling fleet context.
+          .statusLine = {
             "type": "command",
             "command": ($home + "/.config/claude-code/statusline.sh"),
             "padding": 0
           }
-        }' "$COMPANY" > "$SETTINGS"
-    else
-      # Merge: union permissions, overlay plugins (user overrides win),
-      # migrate sandbox schema in place (idempotent).
-      $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-        --slurpfile company "$COMPANY" \
-        --arg home "$HOME" \
-        '
-        # Union permissions arrays (deduplicate)
-        .permissions.allow = ((.permissions.allow // []) + $company[0].permissions.allow | unique) |
-        # Company plugins as defaults, user overrides win
-        .enabledPlugins = ($company[0].enabledPlugins * (.enabledPlugins // {})) |
-        # Migrate sandbox schema: drop deprecated sandbox.seccomp.bpfPath;
-        # ensure sandbox.enabled and failIfUnavailable are set.
-        # See: docs/plans/2026-05-18-sandbox-schema-finding.md
-        .sandbox.enabled = true |
-        .sandbox.failIfUnavailable = true |
-        .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
-        # Always set statusLine to point at the home-manager-deployed script.
-        # Overwriting on every merge is intentional: the path is stable, and
-        # this prevents users from accidentally disabling fleet context.
-        .statusLine = {
-          "type": "command",
-          "command": ($home + "/.config/claude-code/statusline.sh"),
-          "padding": 0
-        }
-        ' "$SETTINGS" > "''${SETTINGS}.tmp" \
-      && mv "''${SETTINGS}.tmp" "$SETTINGS"
+          ' "$SETTINGS" > "''${SETTINGS}.tmp" \
+        && mv "''${SETTINGS}.tmp" "$SETTINGS"
+      fi
     fi
   '';
 }
