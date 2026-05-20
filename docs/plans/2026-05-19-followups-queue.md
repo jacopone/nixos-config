@@ -93,19 +93,27 @@ Per P1-1 code review of commits `1d3c796` + `f262715`. **I3 + M5 [COMPLETED]** i
 - **M2** — document `now_ms()` clock-skew/suspend caveat (wall-clock vs monotonic) in a comment. **Now in `lib/event-log.sh:now_ms()`**.
 - **M5** — **[COMPLETED]** `4d47eb4`. `CURRENT_STEP=0` is initialized in `lib/event-log.sh`; the test no longer injects it and the redundant init in `rebuild-nixos` was removed.
 
-### #25 — Bubblewrap deny-mount artifacts block intra-session Nix validation
+### #25 — Native sandbox write-deny binds break in-session libgit2 (e.g. nix flake check)
 
-Identified during #18 work (2026-05-19). When Claude Code launches under `sandbox.enabled = true`, bwrap bind-mounts `/dev/null` (char device 1/3) over paths it wants to hide from the inner process: `.mcp.json`, `.gitmodules`, `.claude/settings.json`, `.claude/skills`, `.claude/agents`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/`, and the shell rc / IDE state files (`.profile`, `.bashrc`, `.zshrc`, `.gitconfig`, `.ripgreprc`, `.idea`, `.vscode`, `.bash_profile`, `.zprofile`). Mounts are namespace-scoped — invisible from a host shell.
+Identified during #18 work (2026-05-19); **re-framed 2026-05-20** after surveying the mechanism — the original "add a teardown hook to the launcher" framing was wrong on two counts (see below).
 
-**Symptom:** any libgit2 operation in the sandboxed Claude session fails with `parsing .gitmodules file: failed open ... Permission denied (libgit2 error code = 2)`. This blocks `nix flake check`, `nix eval`, and `nix build` of any flake attr from inside the session — i.e., the validation discipline mandated by Invariant #9.
+**Accurate mechanism.** The deny-mounts are created by Claude Code's *native* sandbox (`@anthropic-ai/sandbox-runtime`, wired in at `modules/home-manager/claude-code/default.nix:38`), NOT by our launcher. `scripts/claude-autonomous.sh:606-607` confirms it delegates to the native sandbox — it launches `claude` and the runtime self-sandboxes. Under that sandbox, `/dev/null` (char device 1/3) is bind-mounted over a set of paths (`.gitmodules`, `.mcp.json`, `.claude/settings.json`, `.claude/skills`, `.claude/agents`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/`, shell rc / IDE state files) — almost certainly a write-deny technique (replace the file with an unwritable node).
 
-**Recovery in use:** the user runs `sudo rm -f .gitmodules .mcp.json && sudo rm -rf .claude/{settings.json,skills,agents} etc/ home/ .nix-store/ .nix-cache-eval/ <dotfiles>` from a non-Claude shell. These deletes are no-ops on the host filesystem (the bind mounts are namespace-private to the sandbox) but re-confirm the host is clean. The sandbox view is unchanged for the rest of the current Claude session; a fresh `claude` invocation starts with clean mounts.
+**Symptom.** Within a live session, libgit2 cannot *read* `.gitmodules` (it is now `/dev/null`), so `nix flake check`, `nix eval`, and `nix build` of any flake attr fail with `parsing .gitmodules file: failed open ... Permission denied (libgit2 error code = 2)`. The write-deny bind also breaks read.
 
-**Proposed fix:** add a graceful-exit hook to the sandbox launcher (both `scripts/claude-autonomous.sh` for autonomous sessions and the interactive `claude` wrapper / systemd-equivalent) that unmounts these char devices before namespace exit. Safe because the mounts are private to the namespace; teardown won't touch host state. Should also be idempotent so an unclean exit + manual cleanup don't conflict.
+**Two corrections to the original framing:**
+- *Not a teardown problem.* Our launcher never creates these mounts (the native runtime does), so a teardown hook in `claude-autonomous.sh` cannot unmount them. Infeasible as written.
+- *Not cross-session persistence.* The mounts are namespace-private: a host shell's `find` shows nothing while an in-session `find` shows the char-devices. When a `claude` session's mount namespace exits, the kernel destroys them automatically; a fresh `claude` starts clean. The earlier `sudo rm` "recovery" was a no-op on the host (nothing there to delete).
 
-**Severity:** medium. Adds ~5 minutes of recovery overhead any time Nix work happens inside a Claude session that previously held the sandbox, and pushes validation to a separate shell (defeats some of the in-session feedback loop).
+**Practical workaround (unchanged):** run `nix flake check` / `nix build` from a non-Claude (host) shell. The in-session path is blocked; the host path is clean. For repo work that is purely scripts/tests (not Nix inputs), in-session `bash -n` + `shellcheck` + `bats` validate fully without needing flake-check at all.
 
-Cross-reference: this is the actionable promotion of the "bwrap deny-mount leakage in repo root" note under "Two unresolved infrastructure items" below.
+**A real fix would require one of (deferred):**
+- *Sandbox-config exclusion:* determine whether the harness/`settings.json`/managed-settings filesystem rules can stop write-denying `.gitmodules` so the bind never happens. Uncertain, and `.gitmodules` write-deny may be a deliberate guard (prevent the agent injecting submodules) — needs care.
+- *Upstream report:* file with Anthropic that a `/dev/null` write-deny bind breaks read-only consumers like libgit2.
+
+**Severity:** low–medium. No data loss, no host pollution, no cross-session bleed. Cost is ~5 min of friction when Nix-input work needs flake-check from inside a session — mitigated by validating from the host shell.
+
+Cross-reference: supersedes the "bwrap deny-mount leakage in repo root" note under "Two unresolved infrastructure items" below.
 
 ---
 
@@ -126,15 +134,15 @@ These aren't tracked as numbered follow-ups but came up during the session:
 
 - **gh auth token expired mid-session** — `gh auth status` shows "The token in default is invalid" → git push via `.git/git-credential-gh` credential helper fails. Fix: `gh auth login -h github.com` to refresh. Could also add `gh auth status --quiet || warning` to `rebuild-nixos` Phase 0 as a future Phase 4 validator extension.
 
-- **bwrap deny-mount leakage in repo root** — sandboxed nix invocations leave character-device files at `.mcp.json`, `.gitmodules`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/` inside the cwd when they bind-mount `/dev/null` over hidden paths. Now gitignored (per `.gitignore` updates in the session), but worth understanding why specific subagent setups trigger it and not others. **Promoted to actionable follow-up #25 on 2026-05-19** after observing that the artifacts also block `nix flake check` from inside the sandboxed session.
+- **bwrap deny-mount char-devices in repo root** — within a sandboxed Claude session, `/dev/null` char-devices appear at `.mcp.json`, `.gitmodules`, `etc/`, `home/`, `.nix-store/`, `.nix-cache-eval/`, etc. **Superseded by #25 (re-framed 2026-05-20):** these are namespace-private write-deny binds from Claude Code's native sandbox-runtime — not a "leak" (a host shell sees nothing) and not cross-session (they die with the session's namespace). They are gitignored. See #25 for the accurate mechanism and why the in-session `nix flake check` failure is the real impact.
 
 ---
 
 ## Suggested resume order
 
 1. **Run the Agent View pilot** (per `docs/plans/2026-05-19-agent-view-pilot-task.md`) targeting #22-I1. This validates Agent View as a tool AND lands the most consequential follow-up (settings.json parseability) in one shot.
-2. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
-3. Lower-priority polish: #15, #17, #20, the rest of #22, the rest of #24 (I1 statusline age, I2/M1/M2 — now in `lib/event-log.sh` — and I4 test consolidation). Plus #21's deferred M1/M4/M5 if revisited.
+2. Lower-priority polish: #15, #17, #20, the rest of #22, the rest of #24 (I1 statusline age, I2/M1/M2 — now in `lib/event-log.sh` — and I4 test consolidation). Plus #21's deferred M1/M4/M5 if revisited.
+3. **#25** (deferred / investigation) — re-framed 2026-05-20 to the accurate finding (native-sandbox write-deny binds break in-session libgit2). No quick fix: a real fix needs sandbox-config exclusion or an upstream report; the host-shell workaround stands. Pick up only if in-session `nix flake check` becomes a recurring pain.
 
 ## Where the canonical artifacts live
 
