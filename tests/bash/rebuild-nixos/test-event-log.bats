@@ -10,41 +10,24 @@
 PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/../../../" && pwd)"
 REBUILD_SCRIPT="$PROJECT_ROOT/rebuild-nixos"
 
-# Extract the event-log helpers from the live rebuild-nixos script into a
-# sourceable shim. Range: EVENT_LOG_DIR= through the closing brace of
-# step_skip(). Re-extracting per-test means the harness always matches the
-# current script — no drift.
+# Source the event-log helpers directly from lib/event-log.sh — the same file
+# rebuild-nixos sources. No line-range extraction, so the test cannot drift
+# from the live helpers (a rename or re-indent now fails loudly at source time
+# instead of silently capturing the wrong range).
+#
+# TOTAL_STEPS is caller-provided (rebuild-nixos computes it; here it is pinned
+# to 3 so the step-counter assertions are deterministic). CURRENT_STEP is
+# initialized by the lib. BLUE/NC are left unset — step() prints uncolored.
 setup() {
     EVENT_TMPDIR=$(mktemp -d)
-    EVENT_HARNESS="$EVENT_TMPDIR/harness.sh"
     export HOME="$EVENT_TMPDIR"
     export EVENT_LOG_DIR="$HOME/.local/state/rebuild-nixos"
     export EVENT_LOG="$EVENT_LOG_DIR/events.jsonl"
     export LAST_STATUS_FILE="$EVENT_LOG_DIR/last-status"
+    export TOTAL_STEPS=3
 
-    # Extract two ranges separately so we don't pull in cleanup()/trap (which
-    # would fire on every test exit and kill bats output).
-    # Range 1: EVENT_LOG_DIR setup + log_event + write_last_status + CURRENT_PHASE vars
-    # Range 2: now_ms + step + step_done + step_skip
-    {
-        awk '
-            /^EVENT_LOG_DIR=/ { capture=1 }
-            capture && /^CURRENT_PHASE_START_MS=""/ { print; exit }
-            capture { print }
-        ' "$REBUILD_SCRIPT"
-
-        awk '
-            /^# Current epoch milliseconds/ { capture=1 }
-            capture { print }
-            capture && /^step_skip\(\)/ { in_skip=1 }
-            in_skip && /^}/ { exit }
-        ' "$REBUILD_SCRIPT"
-
-        printf 'CURRENT_STEP=0\nTOTAL_STEPS=3\n'
-    } > "$EVENT_HARNESS"
-
-    # shellcheck source=/dev/null
-    source "$EVENT_HARNESS"
+    # shellcheck source=../../../lib/event-log.sh
+    source "$PROJECT_ROOT/lib/event-log.sh"
 }
 
 teardown() {
@@ -199,8 +182,8 @@ teardown() {
 
 @test "EVENT_LOG_DIR is created idempotently" {
     rm -rf "$EVENT_LOG_DIR"
-    # shellcheck source=/dev/null
-    source "$EVENT_HARNESS"
+    # shellcheck source=../../../lib/event-log.sh
+    source "$PROJECT_ROOT/lib/event-log.sh"
     [ -d "$EVENT_LOG_DIR" ]
 }
 
@@ -211,16 +194,20 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "rebuild-nixos source defines log_event function" {
-    grep -q '^log_event()' "$REBUILD_SCRIPT"
+@test "lib/event-log.sh defines log_event function" {
+    grep -q '^log_event()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
-@test "rebuild-nixos source defines step_done function" {
-    grep -q '^step_done()' "$REBUILD_SCRIPT"
+@test "lib/event-log.sh defines step_done function" {
+    grep -q '^step_done()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
-@test "rebuild-nixos source defines step_skip function" {
-    grep -q '^step_skip()' "$REBUILD_SCRIPT"
+@test "lib/event-log.sh defines step_skip function" {
+    grep -q '^step_skip()' "$PROJECT_ROOT/lib/event-log.sh"
+}
+
+@test "rebuild-nixos sources lib/event-log.sh" {
+    grep -q 'source.*lib/event-log.sh' "$REBUILD_SCRIPT"
 }
 
 @test "rebuild-nixos cleanup trap writes fail to last-status" {
