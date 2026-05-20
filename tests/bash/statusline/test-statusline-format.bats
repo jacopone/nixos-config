@@ -7,7 +7,8 @@
 # Test 3: skips pre-rebuild when /etc/claudeos/host-class does not exist.
 
 setup() {
-  STATUSLINE="/home/guyfawkes/nixos-config/modules/home-manager/claude-code/statusline.sh"
+  REPO_ROOT="$(git rev-parse --show-toplevel)"
+  STATUSLINE="$REPO_ROOT/modules/home-manager/claude-code/statusline.sh"
 }
 
 @test "statusline produces output" {
