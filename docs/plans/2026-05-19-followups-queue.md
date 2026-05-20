@@ -48,22 +48,24 @@ Reasonable starter: `strictKnownMarketplaces = [{hostPattern = "^github\\.com$";
 
 ### #21 — Tighten subagent runtime quality (I1-I6 + M1-M7)
 
-Per Tasks 9-13 code review of subagent commits + Tasks 14-15 code review (M1).
+**[COMPLETED]** (2026-05-20) Commits `af54bfc` (BATS tests) + `d69812c` (agent definitions). Executed via subagent-driven-development: implementer + spec review (caught a vacuous-pass bug) for the BATS work; direct edits for the agent prose; one final code review over the whole batch (ship-ready, no critical/important issues).
 
-All new BATS tests under `tests/bash/{subagents,statusline}/` hardcode `/home/guyfawkes/nixos-config/...` instead of using `$(git rev-parse --show-toplevel)`. Pattern from `tests/bash/managed-settings/test-managed-settings.bats:14` is the canonical convention.
+Done:
+- BATS path portability — hardcoded `/home/guyfawkes/nixos-config/...` → `$(git rev-parse --show-toplevel)` in `test-frontmatter-valid.bats` + `test-statusline-format.bats`, matching `test-managed-settings.bats:14`.
+- I1 — Bash tool scope documented per agent (package-finder has no Bash; the 3 Bash-enabled agents note why they have it).
+- I2 — flake-debugger output format specifies unified diff (`diff -u` / `git diff`).
+- I3 — generation-differ validates generation profile links exist and asks which two to compare if missing; never diffs a nonexistent link.
+- I4 — supply-chain-auditor CVE cross-ref DROPPED (decided over add-WebFetch). The agent's `tools: Bash, Read, Grep` grant no network access, so the NVD/CVE claim was unbacked. Removed the step, the Vulnerabilities output section, and the description clause.
+- I5 — reworded "run `./rebuild-nixos --audit` against the user" → "ask the user to run".
+- I6 — "ask if missing input" added to all 4 agents (consistent phrasing/placement).
+- M2 — required-fields test extended from flake-debugger alone to all 4 subagents. Spec review caught a vacuous-pass: `yq eval '.tools'` prints `null` for a missing key, which matched the original `grep -qE '\w'`; fixed to `[[ -n "$tools" && "$tools" != "null" ]]`.
+- M3 — `test-agents-deployed.bats` converted from hard-fail to skip-with-message pre-rebuild (asserts when symlinks present).
+- M6 — package-finder references the CLAUDE.md "Where to put what" table (`CLAUDE.md:114`) instead of duplicating it (removes drift risk).
+- M7 — flake-debugger verb consistency: "invoke" → "run" for `nix flake check`.
 
-Also:
-- I1 over-broad Bash tools in subagent definitions
-- I2 flake-debugger output format should use unified-diff
-- I3 generation-differ needs fallback for missing generations
-- I4 supply-chain-auditor CVE cross-ref has no mechanism (drop or add WebFetch)
-- I5 reword "against the user" ambiguity
-- I6 add "ask if missing input" pattern to all 4 agents
-- M2 required-fields test for all 4 subagents (currently only flake-debugger)
-- M3 skip-with-message pre-rebuild
-- M5 commit-prose tweak
-- M6 package-finder dedupe CLAUDE.md table
-- M7 verb consistency in flake-debugger
+Deferred / not actioned:
+- M5 (commit-prose tweak) — too vague to action without the originating code-review note. Re-file with specifics if still wanted.
+- M1, M4 — no actionable description was captured in this queue entry. Revisit the Tasks 14-15 code review if these still matter.
 
 ### #22 — check-claude-config.sh polish (5 items from Phase 4 code review)
 
@@ -132,9 +134,8 @@ These aren't tracked as numbered follow-ups but came up during the session:
 
 1. **Run the Agent View pilot** (per `docs/plans/2026-05-19-agent-view-pilot-task.md`) targeting #22-I1. This validates Agent View as a tool AND lands the most consequential follow-up (settings.json parseability) in one shot.
 2. **#24 I3** (extract event-log helpers to `lib/event-log.sh`) — biggest maintainability win, unblocks easier P1-2/P1-3 work later.
-3. **#21** (subagent runtime quality batch) — the 4 subagents you shipped need this to behave as advertised.
-4. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
-5. Lower-priority polish: #15, #17, #20, the rest of #22 and #24.
+3. **#25** (sandbox-artifact teardown) — recover Nix validation inside sandboxed sessions; meaningful ergonomic win for every subsequent session.
+4. Lower-priority polish: #15, #17, #20, the rest of #22 and #24. (Plus #21's deferred M5/M1/M4 if revisited.)
 
 ## Where the canonical artifacts live
 
