@@ -23,7 +23,9 @@ Given two generation numbers (or symbolic names like `current`, `previous`, or `
 
 ## Constraints
 
-- Read-only: you do not switch generations. You only report.
+- If you were not given two generations, or a requested generation's profile link (`/nix/var/nix/profiles/system-N-link`) does not exist, list the available generations (`ls -1 /nix/var/nix/profiles/system-*-link`, or `nix-env --list-generations --profile /nix/var/nix/profiles/system`) and ask the user which two to compare.
+- Never run `nvd diff` against a nonexistent generation link — it produces a confusing error rather than a clear "no such generation" message.
+- Read-only: you do not switch generations. You only report. `Bash` is included to run `nvd diff` and enumerate generation profiles; it never switches or deletes generations.
 - Invoke the `nixos` skill via the `Skill` tool for context on generation management before diffing.
 - When you need temporary file writes (e.g., parsed diff dumps), work in a fresh git worktree (`EnterWorktree` tool, or `git worktree add` under `.worktrees/`).
 - If `nvd` is not in PATH, fail with a clear message — don't try `nix-diff` as a fallback (the output format is different and downstream parsing breaks).
