@@ -1,0 +1,196 @@
+# Strix Point Spontaneous Reboot Investigation — ama-tech-001
+
+> **Status:** Open — gathering evidence
+> **Host:** ama-tech-001 (Framework 16, AMD Ryzen AI 9 HX 370, Strix Point)
+> **Opened:** 2026-05-22
+> **Related code:** `hosts/ama-tech-001/crash-diagnostics.nix`, `modules/hardware/framework-16.nix`
+> **Supersedes:** the informal investigation noted in `crash-diagnostics.nix` (2026-04-30)
+
+## Problem
+
+`ama-tech-001` hard-resets without warning, leaving filesystems unclean on the
+next boot. No kernel panic is captured. The first documented occurrences were
+2026-04-12/20/21/22/24/30; the pattern has continued through 2026-05-22.
+
+This is **independent of** the MT7925 Bluetooth fix and the eDP flicker fix
+applied 2026-05-22 (kernel pin to 6.18.20 + `amdgpu.dcdebugmask=0x1010`). The
+reboots predate both and occur across all kernel versions.
+
+## Evidence gathered
+
+### Crash history (from `/var/log/crash-diagnostics/` snapshots)
+
+| Date / boot snapshot | Prev kernel | Verdict | GPU fault before crash |
+|---|---|---|---|
+| 2026-05-04 17:20 | 6.18.24 | crash | no journal data (volatile) |
+| 2026-05-04 23:17 | 6.18.26 | crash | no journal data |
+| 2026-05-05 07:14 | 6.18.26 | crash | no journal data |
+| 2026-05-07 12:57 | 6.18.26 | crash | no journal data |
+| 2026-05-11 10:12 | 6.18.26 | crash | no journal data |
+| 2026-05-12 08:57 | 6.18.26 | crash | no journal data |
+| 2026-05-13 08:25 | 6.18.26 | **crash** | **`MES ring buffer is full` ×261** |
+| 2026-05-22 12:18 | 6.18.20 | **crash** | **`enc1_stream_encoder_dp_blank` timeout ×2** |
+
+Clean shutdowns interleave throughout (6.18.26 and 6.18.31). Today's crash
+occurred while the machine was awake and near-idle (last userspace activity
+12:17:40, reset before 12:18:52) — not during suspend/resume, not under
+rebuild load.
+
+### Hard facts
+
+1. **pstore is empty after every crash** despite `oops=panic` + `panic=15`
+   being active. The kernel never reaches its panic handler → the reset
+   originates below the kernel (SoC or EC), or the kernel is wedged.
+2. **Kernel-version-independent.** Crashes on 6.18.20, .21, .24, .26. The only
+   kernel with zero crashes in the snapshot window is 6.18.31, but that is a
+   2-boot sample and not significant.
+3. **The two crashes with usable journal data both show amdgpu GPU faults
+   immediately prior** (MES scheduler saturation; DP encoder timeout). The six
+   early crashes have no journal data (journald was volatile at the time), so
+   absence of GPU signatures there is not evidence of absence.
+
+### Firmware baseline (complete, via `framework_tool --versions`)
+
+- Mainboard: Laptop 16 (AMD Ryzen AI 300 Series), MassProduction
+- **BIOS: 03.05** (2026-03-13) — UEFI ESRT `0.0.3.5`
+- **EC: 3.0.5 (tulip)** `tulip-3.0.5-178a77d` (2026-03-12), image RO
+- PD controllers: 0.0.22 (both L/R)
+- Firmware installed mid-March; first crashes 2026-04-12 → crashes occur *under
+  this firmware*, not because it is ancient.
+
+### Newer firmware exists: BIOS 03.06 (on LVFS)
+
+`fwupdmgr get-updates` offers System Firmware `0.0.3.6` (BIOS 03.06, EC
+`ec_306_eb68558`). Changelog (verbatim):
+- "Resolved intermittent system hangs or black screens occurring during the
+  entry or resume phases of Hybrid Shutdown."
+- "Fixed a Yellow Bang affecting the AMD Audio Co-Processor and HD Audio
+  Controller when resuming from Hybrid Shutdown."
+- "Fixed an issue where Bluetooth audio output was non-functional." (BT *audio*,
+  not the btmtk `wmt func ctrl` kernel regression — unrelated to our pin.)
+- Known issue remaining: "Intermittent CPU frequency lock at 600MHz following
+  S3/Modern Standby resume."
+
+**Caveat:** 3.06's stability fixes are scoped to *Hybrid Shutdown entry/resume*.
+Our crashes occur during normal awake operation (today's near-idle), so 3.06 may
+not address them. Worth applying regardless (newer, related fixes, removes a
+variable), but not a confirmed cure.
+
+## Hypotheses (ranked)
+
+### Register evidence (2026-05-23) — reset reason now KNOWN
+
+Kernel 6.18.20 includes the mainline "x86/CPU/AMD: Print the reason for the last
+reset" patch. The boot *after* the 2026-05-22 crash printed:
+
+```
+x86/amd: Previous system reset reason [0x00080800]: software wrote 0x6 to reset control register 0xCF9
+```
+
+This is a **CF9h software reset (0x00080800)** — NOT the sync flood (0x08000800)
+of Framework issue #41. The earlier sync-flood hypothesis is **refuted by direct
+register evidence** for this crash.
+
+### H0 — Firmware/SMM-issued CF9 reset *(leading, register-supported)*
+
+The kernel says software wrote 0x6 to port 0xCF9, but: no clean-shutdown logs,
+no kernel panic, empty pstore, and the systemd runtime watchdog is disabled
+(`RuntimeWatchdogUSec=0`, `sp5100_tco` loaded but unarmed). The only actor that
+can write 0xCF9 *invisibly to the kernel* is SMM (System Management Mode) — BIOS
+/ EC firmware running below the OS. An SMI handler reacting to a detected fault
+(thermal, power, PD, or an internal hang monitor) issues the CF9 reset.
+
+- **Supports:** matches the register read exactly; explains empty pstore (kernel
+  never runs its panic path), no clean shutdown, kernel-version independence
+  (firmware-level), at-idle timing. Returns to the original 2026-04-30
+  hypothesis ("silent firmware reset on EC/SoC"), now with evidence.
+- **Implication:** strongly motivates the BIOS 03.06 update and reporting the
+  reset-reason data to Framework. Also means the GPU faults (H1) are more likely
+  *symptoms of the freeze* than the cause.
+- **Relationship to the kernel pin:** firmware-level cause → the 6.18.20 BT pin
+  does not affect reboot frequency. The earlier pin-vs-reboot tension is largely
+  dissolved.
+
+### H1 — Strix Point iGPU hang as the SMM trigger *(secondary)*
+
+amdgpu wedges (MES ring saturation, DCN 3.5 DP encoder timeout); the kernel
+freezes; the EC/SMM fault monitor then issues the CF9 reset (the H0 mechanism).
+GPU hang = trigger, firmware CF9 = mechanism.
+
+- **Supports:** both data-rich crashes show amdgpu faults; empty pstore (kernel
+  wedged in GPU code, never panics); kernel-version-independence (amdgpu Strix
+  Point support buggy across 6.18.x); `cwsr_enable=0` was already needed for
+  "MES ring saturation and GPU reset loops" per `framework-16.nix`.
+- **Contradicts / gaps:** 6 early crashes lack data; one *clean* boot also had a
+  DP timeout (so GPU faults are not always fatal).
+
+### H2 — Framework EC / BIOS firmware fault *(original hypothesis)*
+
+The EC or BIOS spontaneously resets the SoC; GPU faults are coincidental.
+
+- **Supports:** silent reset, no pstore, kernel-independent — all consistent.
+- **Contradicts / gaps:** does not explain why the data-rich crashes correlate
+  with GPU faults specifically.
+- Note: H1 and H2 may be the *same* mechanism (GPU hang → EC watchdog). The
+  watchdog firing is H2's machinery; the GPU hang is H1's trigger.
+
+### H3 — Power delivery / USB-C PD instability *(low)*
+
+- **Supports:** chronic `usb 3-4.1` device resets; UCSI history on this host.
+- **Contradicts / gaps:** weak; no direct tie to the reset moments.
+
+## Next steps / action items
+
+- [x] **Establish firmware baseline.** Done: BIOS 03.05 / EC 3.0.5 (see above).
+- [ ] **Update to BIOS 03.06 via LVFS.** `fwupdmgr refresh --force` →
+      `fwupdmgr get-updates` → `fwupdmgr update`. Charger attached, battery
+      < 100% (LVFS skips at 100%). Capsule applies on reboot. Fixes related
+      stability bugs; may or may not fix our mid-session sync flood. Cheapest
+      high-value move; removes "firmware behind" as a variable.
+- [x] **Instrument `S5_RESET_STATUS` capture.** Done — kernel 6.18.20 already
+      decodes it; `crash-diagnostics.nix` now greps the per-boot "reset reason"
+      line into every snapshot. First read (2026-05-22 crash): `[0x00080800]`
+      CF9 software reset → refuted sync flood, established H0 (firmware/SMM CF9).
+- [x] **Rule out OS watchdog.** Done — `RuntimeWatchdogUSec=0` (systemd runtime
+      watchdog disabled); `sp5100_tco` loaded but unarmed; no lockup events. Not
+      an OS-initiated watchdog reset.
+- [ ] **Try BIOS setting: disable "PCIE Dynamic Link Power Management."** A
+      community report ties random reboots to PCIe ASPM at the BIOS level
+      (separate from our kernel `pcie_aspm=off`). Test if 3.06 doesn't help.
+- [ ] **Improve crash capture for H1.** Confirm persistent journald is enabled
+      (recent snapshots have data; early ones did not). Consider enabling the
+      `panic_on_warn=1` option already stubbed in `crash-diagnostics.nix` to
+      convert amdgpu `WARN()`s into captured panics. Weigh against false-reset
+      risk.
+- [ ] **Add amdgpu state logging.** Periodic capture of MES ring state, GPU
+      temp/clocks, and a hook on `enc1_stream_encoder_dp_blank` to snapshot GPU
+      state when a DP timeout fires (extend the existing
+      `display-recovery-watchdog`).
+- [ ] **Resolve the kernel-pin tension.** Today's BT/flicker fix pins kernel to
+      6.18.20 (oldest amdgpu, most GPU bugs). If H1 holds, this may *increase*
+      reboot frequency vs 6.18.31. Track crash frequency on 6.18.20 over the
+      next 1–2 weeks and compare. If reboots worsen, the BT pin and the reboot
+      fix are in direct conflict and need rethinking (e.g., btmtk revert patch
+      on a newer kernel instead of a version pin).
+- [ ] **Check upstream trackers** (kernel.org bugzilla, Framework community,
+      AMD) for Strix Point / DCN 3.5 iGPU hang, MES ring saturation, and DP
+      encoder timeout reports on 6.18.x.
+
+## Open questions
+
+- Do amdgpu faults precede *all* crashes, or only some? (Needs more data-rich
+  crashes now that journald persists.)
+- Is the external monitor (DP-3 via USB-C) implicated? Both DP-encoder-timeout
+  crashes coincide with an external display attached.
+- Does crash frequency actually differ by kernel version, controlling for
+  uptime and workload?
+- Is firmware up to date?
+
+## Evidence log
+
+- Snapshots: `/var/log/crash-diagnostics/*.log` (one per boot; prior-boot kernel
+  ringbuffer + EC console + pstore listing).
+- Diagnostic that produced the crash-history table: per-snapshot scan for
+  shutdown markers (clean) vs their absence (crash), plus grep counts of
+  `MES ring buffer is full` and `enc1_stream_encoder_dp_blank`.
+- Today's crash snapshot: `/var/log/crash-diagnostics/20260522-101854.log`.
