@@ -68,11 +68,23 @@
     # suspect is IPS state-transition glitches on DCN 3.5.
     #
     (lib.mkAfter [
-      # WHY: IPS2-stage transitions on DCN 3.5 are the prime suspect for
-      # the BOE panel flicker. Disabling only IPS2 (bit 0x2000) keeps IPS1
-      # power savings while removing the suspected glitch path. Escalate
-      # to 0x1010 (full runtime IPS disable) if flicker persists.
-      "amdgpu.dcdebugmask=0x2010"
+      # WHY: 0x2010 (IPS2-only disable) was sufficient on kernel 6.18.31 —
+      # IPS1 transitions there were already glitch-free, presumably from an
+      # amdgpu DC backend fix that landed somewhere in 6.18.27-6.18.31. Now
+      # that we've pinned the kernel back to 6.18.20 (see boot.kernelPackages
+      # below — MT7925 Bluetooth regression workaround), we lost that fix
+      # and BOTH IPS1+IPS2 transitions glitch on the BOE NE160QDM-NZ6 panel
+      # (silent horizontal-band flicker, multiple times per 10 minutes).
+      #
+      # 0x1010 disables IPS at runtime entirely (DC_DISABLE_IPS_DYNAMIC +
+      # DC_DISABLE_PSR), while still allowing IPS in suspend so battery
+      # drain when sleeping is unaffected. Cost is ~0.5-1W extra eDP idle
+      # draw while awake — acceptable trade for a stable display.
+      #
+      # Escalation path if 0x1010 is still flickering:
+      #   0x810  = DC_DISABLE_IPS (off always, even in suspend) — more battery cost
+      # Revert to 0x2010 the moment the kernel pin is lifted (upstream BT fix).
+      "amdgpu.dcdebugmask=0x1010"
     ])
   ];
 
@@ -86,10 +98,35 @@
     options nvidia-drm fbdev=0
   '';
 
-  # Use default kernel (6.18 LTS) instead of latest (6.19) — 6.19 has critical
-  # amdgpu regressions on Strix Point. 6.18 includes AMD HFI for proper
-  # heterogeneous Zen 5/5c core scheduling.
-  # boot.kernelPackages = pkgs.linuxPackages_latest;  # Uncomment to return to bleeding edge
+  # Kernel pin (BOTH a series choice AND a patch-version freeze):
+  #
+  # Series: 6.18 LTS not 6.19 — 6.19 has critical amdgpu regressions on
+  # Strix Point. 6.18 also includes AMD HFI for proper heterogeneous
+  # Zen 5/5c core scheduling.
+  #
+  # Patch-version freeze: linux-stable backported commit 624fb79
+  # ("Bluetooth: btmtk: validate WMT event SKB length before struct access",
+  # 2026-05-14) somewhere in the 6.18.27..6.18.31 window. The added
+  # validation rejects MT7925 chip responses, so every BT probe fails with
+  # `wmt func ctrl (-22)` → BlueZ never sees an adapter. The nixpkgs-kernel
+  # input is currently pinned to a 2026-03-28 rev which ships 6.18.20 — any
+  # pre-regression 6.18.x works, .20 is what we picked because it has a known
+  # locked narHash in the repo's flake.lock history. Cost of being on this
+  # older kernel: we lost ~10 point-releases of amdgpu fixes, which is why
+  # dcdebugmask above had to escalate from 0x2010 to 0x1010 (IPS1 transitions
+  # on the BOE eDP panel are no longer fixed upstream on this kernel).
+  #
+  # Pin is consumed via the dedicated `nixpkgs-kernel` input in flake.nix,
+  # so main nixpkgs can keep moving forward independently — only this
+  # kernel is frozen; the rest of the system updates normally via
+  # `nix flake update`.
+  #
+  # Unblock condition: when linux-6.18.y (or 6.19+) gets a btmtk fix.
+  # Watch: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/log/drivers/bluetooth/btmtk.c?h=linux-6.18.y
+  # When fixed: bump nixpkgs-kernel rev in flake.nix, revert dcdebugmask
+  # above to 0x2010, then delete this whole block.
+  boot.kernelPackages =
+    inputs.nixpkgs-kernel.legacyPackages.${pkgs.system}.linuxPackages_6_18;
 
   services.udev.extraRules = lib.mkMerge [
     # uinput for Wayland input automation
