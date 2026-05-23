@@ -11,7 +11,7 @@ let
   mkNpxWrapper = name: pkg: writeShellScriptBin name ''
     mkdir -p ${npmPrefix}/lib
     export npm_config_prefix=${npmPrefix}
-    exec ${pkgs.nodejs_20}/bin/npx --yes ${pkg} "$@"
+    exec ${pkgs.nodejs_22}/bin/npx --yes ${pkg} "$@"
   '';
 in
 {

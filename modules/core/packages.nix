@@ -7,7 +7,7 @@ let
   # Claude Code seccomp filter (shared derivation - also deployed by Home Manager)
   claude-seccomp = import ../../pkgs/claude-seccomp.nix { inherit pkgs; };
 
-  # Workaround: nixpkgs nodejs_20 uses nodejs-slim for its node binary shebang.
+  # Workaround: nixpkgs nodejs_22 uses nodejs-slim for its node binary shebang.
   # npm resolves its global prefix from process.execPath (nodejs-slim), then tries
   # to lstat <prefix>/lib which doesn't exist in nodejs-slim. Setting npm_config_prefix
   # to a writable directory with /lib bypasses this.
@@ -15,7 +15,7 @@ let
   mkNpxWrapper = name: pkg: pkgs.writeShellScriptBin name ''
     mkdir -p ${npmPrefix}/lib
     export npm_config_prefix=${npmPrefix}
-    exec ${pkgs.nodejs_20}/bin/npx --yes ${pkg} "$@"
+    exec ${pkgs.nodejs_22}/bin/npx --yes ${pkg} "$@"
   '';
 in
 {
@@ -63,7 +63,7 @@ in
       export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
       mkdir -p ${npmPrefix}/lib
       export npm_config_prefix=${npmPrefix}
-      exec ${pkgs.nodejs_20}/bin/npx --yes agent-browser@${npmVersions.agent-browser} "$@"
+      exec ${pkgs.nodejs_22}/bin/npx --yes agent-browser@${npmVersions.agent-browser} "$@"
     '')
 
     # NOTE: Linggen (linggen.dev) - macOS only, Linux "coming soon"
@@ -113,7 +113,7 @@ in
         echo ""
 
         # Ensure we have the required tools
-        export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_20 pkgs.xdg-utils pkgs.curl ]}:$PATH"
+        export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_22 pkgs.xdg-utils pkgs.curl ]}:$PATH"
         export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
 
         # Create temp directory for installation
@@ -153,7 +153,7 @@ in
       fi
 
       # Ensure environment is properly set
-      export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_20 pkgs.xdg-utils ]}:$PATH"
+      export PATH="${pkgs.lib.makeBinPath [ pkgs.nodejs_22 pkgs.xdg-utils ]}:$PATH"
       export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
 
       # Execute Droid with all arguments

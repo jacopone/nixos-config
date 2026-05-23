@@ -35,7 +35,7 @@
     wget
 
     # Core development runtimes
-    nodejs_20
+    nodejs_22
     gcc
     gnumake
     pkg-config

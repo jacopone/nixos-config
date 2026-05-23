@@ -29,7 +29,7 @@ in
 
       if [ -d "$GSTACK_DIR/.git" ] && [ ! -x "$BROWSE_BIN" ]; then
         echo "→ gstack: running ./setup (builds browse binary)"
-        if ! $DRY_RUN_CMD env PATH="${pkgs.bun}/bin:${pkgs.nodejs_20}/bin:${pkgs.git}/bin:$PATH" \
+        if ! $DRY_RUN_CMD env PATH="${pkgs.bun}/bin:${pkgs.nodejs_22}/bin:${pkgs.git}/bin:$PATH" \
             ${pkgs.bash}/bin/bash -c "cd '$GSTACK_DIR' && ./setup --quiet"; then
           echo "⚠ gstack: setup failed. Run '$GSTACK_DIR/setup' manually." >&2
           exit 0
