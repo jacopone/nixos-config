@@ -5,14 +5,16 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
 
-  # Enable GVFS with Google Drive support
+  # Enable GVFS. Google Drive in GNOME Files now comes via GNOME Online
+  # Accounts (pulled in by gnomeSupport). The old libgdata-based gvfs Google
+  # backend was removed upstream (libgdata archived by GNOME), taking the
+  # `googleSupport` and `libgdata` override args with it — passing them now
+  # fails eval with "unexpected argument 'googleSupport'". rclone handles
+  # Google Drive for business users independently of gvfs.
   services.gvfs = {
     enable = true;
     package = pkgs.gvfs.override {
       gnomeSupport = true;
-      googleSupport = true;
-      libgdata = pkgs.libgdata;
-      libsoup_3 = pkgs.libsoup_3;
     };
   };
 
