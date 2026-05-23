@@ -63,6 +63,19 @@
         echo "=== uname / running kernel ==="
         ${pkgs.coreutils}/bin/uname -a || true
         echo ""
+        echo "=== AMD last-reset reason (FCH S5_RESET_STATUS, decoded by kernel) ==="
+        # The mainline "x86/CPU/AMD: Print the reason for the last reset" patch
+        # (present in 6.18) reads FCH::PM::S5_RESET_STATUS (0xC0) at boot and
+        # decodes the PREVIOUS reset. This is the authoritative signal for what
+        # ended the prior boot. 2026-05-22 crash decoded as [0x00080800]
+        # "software wrote 0x6 to reset control register 0xCF9" — a CF9 reset
+        # with no clean shutdown + empty pstore + no armed OS watchdog, i.e. a
+        # firmware/SMM-issued reset (NOT the 0x08000800 sync flood of FW issue
+        # #41). Capture it on every boot so the trend is visible.
+        ${pkgs.systemd}/bin/journalctl -b 0 -k --no-pager 2>/dev/null \
+          | ${pkgs.gnugrep}/bin/grep -i "reset reason" \
+          || echo "(kernel printed no reset reason this boot)"
+        echo ""
         echo "=== Framework EC console (cros_ec, if exposed via debugfs) ==="
         # console_log is a streaming endpoint on this EC driver — plain `cat`
         # blocks indefinitely waiting for new bytes. Cap at 5s with `timeout`
