@@ -177,7 +177,7 @@ handle_boot_mode_completion() {
     echo "    sudo /run/current-system/bin/switch-to-configuration boot"
 }
 
-# now_ms, step, step_done, step_skip are provided by lib/event-log.sh
+# now_ms, step, step_complete, step_skip are provided by lib/event-log.sh
 # (sourced near the top of this script).
 
 # Prompt user with auto-accept support
@@ -1129,7 +1129,7 @@ else
             log_step "Rolling back to previous configuration..."
             sudo nixos-rebuild switch --rollback --flake ".#$NIXOS_HOSTNAME"
             log_success "Rollback complete"
-            step_done
+            step_complete
             log_event complete rebuild "{\"outcome\":\"rolled_back\"}"
             write_last_status succ
             exit 0
@@ -1535,7 +1535,7 @@ fi
 # Close the final phase + record overall completion before exit.
 # These run AFTER the human-readable summary so the trap fires last and
 # can attribute any teardown failures correctly.
-step_done
+step_complete
 TOTAL_DURATION_MS=$(($(now_ms) - REBUILD_START_MS))
 log_event complete rebuild "{\"duration_ms\":$TOTAL_DURATION_MS,\"dry_run\":$DRY_RUN,\"boot_mode\":$BOOT_MODE}"
 write_last_status succ

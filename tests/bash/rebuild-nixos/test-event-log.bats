@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Unit test for rebuild-nixos's log_event / step / step_done / step_skip
+# Unit test for rebuild-nixos's log_event / step / step_complete / step_skip
 # event emission. Sources just those helpers into a test harness instead of
 # invoking ./rebuild-nixos directly (rebuild-nixos requires sudo and mutates
 # the live system — wrong tool for a unit test).
@@ -113,17 +113,17 @@ teardown() {
     [ "$dur" != "null" ]
 }
 
-@test "step_done emits final complete event for active phase" {
+@test "step_complete emits final complete event for active phase" {
     step "Final phase"
-    step_done
+    step_complete
     last_event=$(tail -1 "$EVENT_LOG" | jq -r .event)
     last_phase=$(tail -1 "$EVENT_LOG" | jq -r .phase)
     [ "$last_event" = "complete" ]
     [ "$last_phase" = "Final phase" ]
 }
 
-@test "step_done is idempotent when no phase active" {
-    step_done
+@test "step_complete is idempotent when no phase active" {
+    step_complete
     [ ! -s "$EVENT_LOG" ]
 }
 
@@ -160,7 +160,7 @@ teardown() {
 @test "multi-phase event sequence produces only valid JSON objects" {
     step "A"
     step "B"
-    step_done
+    step_complete
     step_skip "C" quick_mode
     log_event fail "D" '{"exit_code":1}'
 
@@ -172,7 +172,7 @@ teardown() {
 @test "all events in a sequence have required fields" {
     step "A"
     step "B"
-    step_done
+    step_complete
     step_skip "C" quick_mode
 
     run jq -se 'all(has("ts") and has("phase") and has("event"))' "$EVENT_LOG"
@@ -198,8 +198,8 @@ teardown() {
     grep -q '^log_event()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
-@test "lib/event-log.sh defines step_done function" {
-    grep -q '^step_done()' "$PROJECT_ROOT/lib/event-log.sh"
+@test "lib/event-log.sh defines step_complete function" {
+    grep -q '^step_complete()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
 @test "lib/event-log.sh defines step_skip function" {

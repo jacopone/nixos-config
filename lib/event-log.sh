@@ -63,11 +63,11 @@ write_last_status() {
 }
 
 # Tracks the currently-running phase so cleanup() can attribute failures
-# and step()/step_done can compute duration_ms.
+# and step()/step_complete can compute duration_ms.
 CURRENT_PHASE_NAME=""
 CURRENT_PHASE_START_MS=""
 # Step counter for the "Step X/Y" progress indicator. Owned here so the
-# step()/step_done helpers and their tests share a single initialization.
+# step()/step_complete helpers and their tests share a single initialization.
 CURRENT_STEP=0
 
 # Current epoch milliseconds (best-effort; falls back to seconds*1000).
@@ -105,7 +105,7 @@ step() {
 # Close out the active phase with an explicit complete event. Use at script
 # end so the final phase is captured (otherwise it'd dangle until a never-arriving
 # next step()). Idempotent — safe to call when no phase is active.
-step_done() {
+step_complete() {
     if [ -n "$CURRENT_PHASE_NAME" ] && [ -n "$CURRENT_PHASE_START_MS" ]; then
         local _now_ms _dur_ms
         _now_ms=$(now_ms)
