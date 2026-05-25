@@ -6,6 +6,7 @@
   imports = [
     ./base.nix
     ../../modules/core/packages.nix
+    ../../modules/core/nix-ld.nix # nix-ld: run Playwright's downloaded chromium (gstack browse)
   ];
 
   # Environment
