@@ -1,6 +1,6 @@
 # Strix Point Spontaneous Reboot Investigation — ama-tech-001
 
-> **Status:** Open — gathering evidence
+> **Status:** Remediation applied (BIOS 03.06, 2026-05-24) — observing for recurrence
 > **Host:** ama-tech-001 (Framework 16, AMD Ryzen AI 9 HX 370, Strix Point)
 > **Opened:** 2026-05-22
 > **Related code:** `hosts/ama-tech-001/crash-diagnostics.nix`, `modules/hardware/framework-16.nix`
@@ -154,11 +154,18 @@ The EC or BIOS spontaneously resets the SoC; GPU faults are coincidental.
 ## Next steps / action items
 
 - [x] **Establish firmware baseline.** Done: BIOS 03.05 / EC 3.0.5 (see above).
-- [ ] **Update to BIOS 03.06 via LVFS.** `fwupdmgr refresh --force` →
-      `fwupdmgr get-updates` → `fwupdmgr update`. Charger attached, battery
-      < 100% (LVFS skips at 100%). Capsule applies on reboot. Fixes related
-      stability bugs; may or may not fix our mid-session sync flood. Cheapest
-      high-value move; removes "firmware behind" as a variable.
+- [x] **Update to BIOS 03.06 via LVFS.** Done 2026-05-24 — System Firmware now
+      `0.0.3.6` (verified via `fwupdmgr get-devices`; no pending update). Running
+      gen 68 on it. NOTE: this boot prints NO kernel reset reason (prior boots
+      always showed `[0x00080800]`), so BIOS 03.06 likely changed FCH
+      `S5_RESET_STATUS` handling — the reset-reason instrumentation may no longer
+      capture future crashes the same way; revisit only if a crash recurs.
+- [ ] **Observe for recurrence.** Success criterion: no spontaneous reboot for
+      ~1 week of normal use (instance #7 ran ~1d20h before crashing; interval was
+      variable). As of 2026-05-25 the gen-68 session is 18h+ stable and the prior
+      gen-67 session ended in a clean shutdown — promising, not yet conclusive.
+      If a reboot recurs: check `/var/log/crash-diagnostics/` and take the reset
+      reason to Framework's SoftwareFirmwareIssueTracker (#41).
 - [x] **Instrument `S5_RESET_STATUS` capture.** Done — kernel 6.18.20 already
       decodes it; `crash-diagnostics.nix` now greps the per-boot "reset reason"
       line into every snapshot. First read (2026-05-22 crash): `[0x00080800]`
