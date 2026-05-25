@@ -45,29 +45,15 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "log_event output has required ts phase event fields" {
-    log_event start phase_a
-    run jq -e 'has("ts") and has("phase") and has("event")' "$EVENT_LOG"
+@test "log_event records ts, phase, and event matching its input" {
+    log_event start phase_test
+    run jq -e '
+        has("ts") and has("phase") and has("event")
+        and .phase == "phase_test"
+        and .event == "start"
+        and .ts != null and .ts != ""
+    ' "$EVENT_LOG"
     [ "$status" -eq 0 ]
-}
-
-@test "log_event phase field matches input" {
-    log_event start phase_test
-    result=$(jq -r .phase "$EVENT_LOG")
-    [ "$result" = "phase_test" ]
-}
-
-@test "log_event event field matches input" {
-    log_event start phase_test
-    result=$(jq -r .event "$EVENT_LOG")
-    [ "$result" = "start" ]
-}
-
-@test "log_event ts field is non-empty" {
-    log_event start phase_test
-    result=$(jq -r .ts "$EVENT_LOG")
-    [ -n "$result" ]
-    [ "$result" != "null" ]
 }
 
 @test "log_event merges extras into output" {
@@ -78,22 +64,10 @@ teardown() {
     [ "$step" = "2" ]
 }
 
-@test "step emits start event with phase name" {
+@test "step start event records phase, step counter, and total_steps" {
     step "Building configuration"
-    result=$(jq -r .phase "$EVENT_LOG")
-    [ "$result" = "Building configuration" ]
-}
-
-@test "step emits start event with step counter" {
-    step "Building configuration"
-    result=$(jq -r .step "$EVENT_LOG")
-    [ "$result" = "1" ]
-}
-
-@test "step emits start event with total_steps" {
-    step "Building configuration"
-    result=$(jq -r .total_steps "$EVENT_LOG")
-    [ "$result" = "3" ]
+    run jq -e '.phase == "Building configuration" and .step == 1 and .total_steps == 3' "$EVENT_LOG"
+    [ "$status" -eq 0 ]
 }
 
 @test "consecutive step calls close previous phase with complete event" {
