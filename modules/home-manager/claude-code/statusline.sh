@@ -29,15 +29,9 @@ if [ -d "$HOME/nixos-config/.git" ]; then
   branch=$(git -C "$HOME/nixos-config" branch --show-current 2>/dev/null || echo "?")
 fi
 
-# format_age SECONDS → a compact human age for the last-build annotation, e.g.
-# "2d", "3h", "15m", "8s". The caller wraps the result in parens and only calls
-# this when the status file exists; an empty return prints no age suffix.
-#
-# TODO(you): implement the bucketing. The decisions that shape the UX:
-#   - thresholds: secs < 60 → "Ns"; < 3600 → "Nm"; < 86400 → "Nh"; else "Nd"
-#   - clock skew: a negative age (mtime in the future) should clamp to "0s"
-#               so a forward NTP step never prints a garbage age.
-# Must echo a non-empty token on success. See followups-queue.md #24 I1.
+# format_age SECONDS → compact human age for the last-build annotation
+# ("2d"/"3h"/"15m"/"8s"), floored to the largest unit. The caller wraps the
+# result in parens and only calls this when the status file exists.
 format_age() {
   local secs="$1"
   (( secs < 0 )) && secs=0          # clock skew / future mtime → no garbage age
