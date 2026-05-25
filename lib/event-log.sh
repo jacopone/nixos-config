@@ -22,6 +22,10 @@
 # Defaulted via parameter expansion so a caller (the test) can pre-set them.
 EVENT_LOG_DIR="${EVENT_LOG_DIR:-$HOME/.local/state/rebuild-nixos}"
 EVENT_LOG="${EVENT_LOG:-$EVENT_LOG_DIR/events.jsonl}"
+# Two sinks by design: EVENT_LOG is the append-only JSONL history (every event;
+# consumed by the P1-2 telemetry MCP). LAST_STATUS_FILE is a single overwritten
+# word (succ/fail) so statusline.sh — which renders on every prompt — reads the
+# last outcome in O(1) without tailing and parsing a growing JSONL.
 LAST_STATUS_FILE="${LAST_STATUS_FILE:-$EVENT_LOG_DIR/last-status}"
 mkdir -p "$EVENT_LOG_DIR" 2>/dev/null || true
 
@@ -63,14 +67,17 @@ write_last_status() {
 }
 
 # Tracks the currently-running phase so cleanup() can attribute failures
-# and step()/step_done can compute duration_ms.
+# and step()/step_complete can compute duration_ms.
 CURRENT_PHASE_NAME=""
 CURRENT_PHASE_START_MS=""
 # Step counter for the "Step X/Y" progress indicator. Owned here so the
-# step()/step_done helpers and their tests share a single initialization.
+# step()/step_complete helpers and their tests share a single initialization.
 CURRENT_STEP=0
 
 # Current epoch milliseconds (best-effort; falls back to seconds*1000).
+# Wall-clock, NOT monotonic: a duration_ms computed as (now_ms - start) can go
+# negative or inflate if the clock steps (NTP) or the host suspends mid-phase.
+# Accepted — phase durations are coarse telemetry, not a precise timer.
 now_ms() {
     if date +%s%3N 2>/dev/null | grep -qE '^[0-9]+$'; then
         date +%s%3N
@@ -105,7 +112,7 @@ step() {
 # Close out the active phase with an explicit complete event. Use at script
 # end so the final phase is captured (otherwise it'd dangle until a never-arriving
 # next step()). Idempotent — safe to call when no phase is active.
-step_done() {
+step_complete() {
     if [ -n "$CURRENT_PHASE_NAME" ] && [ -n "$CURRENT_PHASE_START_MS" ]; then
         local _now_ms _dur_ms
         _now_ms=$(now_ms)

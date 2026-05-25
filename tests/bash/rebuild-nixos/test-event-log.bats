@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Unit test for rebuild-nixos's log_event / step / step_done / step_skip
+# Unit test for rebuild-nixos's log_event / step / step_complete / step_skip
 # event emission. Sources just those helpers into a test harness instead of
 # invoking ./rebuild-nixos directly (rebuild-nixos requires sudo and mutates
 # the live system — wrong tool for a unit test).
@@ -45,29 +45,15 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "log_event output has required ts phase event fields" {
-    log_event start phase_a
-    run jq -e 'has("ts") and has("phase") and has("event")' "$EVENT_LOG"
+@test "log_event records ts, phase, and event matching its input" {
+    log_event start phase_test
+    run jq -e '
+        has("ts") and has("phase") and has("event")
+        and .phase == "phase_test"
+        and .event == "start"
+        and .ts != null and .ts != ""
+    ' "$EVENT_LOG"
     [ "$status" -eq 0 ]
-}
-
-@test "log_event phase field matches input" {
-    log_event start phase_test
-    result=$(jq -r .phase "$EVENT_LOG")
-    [ "$result" = "phase_test" ]
-}
-
-@test "log_event event field matches input" {
-    log_event start phase_test
-    result=$(jq -r .event "$EVENT_LOG")
-    [ "$result" = "start" ]
-}
-
-@test "log_event ts field is non-empty" {
-    log_event start phase_test
-    result=$(jq -r .ts "$EVENT_LOG")
-    [ -n "$result" ]
-    [ "$result" != "null" ]
 }
 
 @test "log_event merges extras into output" {
@@ -78,22 +64,10 @@ teardown() {
     [ "$step" = "2" ]
 }
 
-@test "step emits start event with phase name" {
+@test "step start event records phase, step counter, and total_steps" {
     step "Building configuration"
-    result=$(jq -r .phase "$EVENT_LOG")
-    [ "$result" = "Building configuration" ]
-}
-
-@test "step emits start event with step counter" {
-    step "Building configuration"
-    result=$(jq -r .step "$EVENT_LOG")
-    [ "$result" = "1" ]
-}
-
-@test "step emits start event with total_steps" {
-    step "Building configuration"
-    result=$(jq -r .total_steps "$EVENT_LOG")
-    [ "$result" = "3" ]
+    run jq -e '.phase == "Building configuration" and .step == 1 and .total_steps == 3' "$EVENT_LOG"
+    [ "$status" -eq 0 ]
 }
 
 @test "consecutive step calls close previous phase with complete event" {
@@ -113,17 +87,17 @@ teardown() {
     [ "$dur" != "null" ]
 }
 
-@test "step_done emits final complete event for active phase" {
+@test "step_complete emits final complete event for active phase" {
     step "Final phase"
-    step_done
+    step_complete
     last_event=$(tail -1 "$EVENT_LOG" | jq -r .event)
     last_phase=$(tail -1 "$EVENT_LOG" | jq -r .phase)
     [ "$last_event" = "complete" ]
     [ "$last_phase" = "Final phase" ]
 }
 
-@test "step_done is idempotent when no phase active" {
-    step_done
+@test "step_complete is idempotent when no phase active" {
+    step_complete
     [ ! -s "$EVENT_LOG" ]
 }
 
@@ -160,7 +134,7 @@ teardown() {
 @test "multi-phase event sequence produces only valid JSON objects" {
     step "A"
     step "B"
-    step_done
+    step_complete
     step_skip "C" quick_mode
     log_event fail "D" '{"exit_code":1}'
 
@@ -172,7 +146,7 @@ teardown() {
 @test "all events in a sequence have required fields" {
     step "A"
     step "B"
-    step_done
+    step_complete
     step_skip "C" quick_mode
 
     run jq -se 'all(has("ts") and has("phase") and has("event"))' "$EVENT_LOG"
@@ -198,8 +172,8 @@ teardown() {
     grep -q '^log_event()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
-@test "lib/event-log.sh defines step_done function" {
-    grep -q '^step_done()' "$PROJECT_ROOT/lib/event-log.sh"
+@test "lib/event-log.sh defines step_complete function" {
+    grep -q '^step_complete()' "$PROJECT_ROOT/lib/event-log.sh"
 }
 
 @test "lib/event-log.sh defines step_skip function" {

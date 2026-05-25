@@ -29,9 +29,29 @@ if [ -d "$HOME/nixos-config/.git" ]; then
   branch=$(git -C "$HOME/nixos-config" branch --show-current 2>/dev/null || echo "?")
 fi
 
+# format_age SECONDS → compact human age for the last-build annotation
+# ("2d"/"3h"/"15m"/"8s"), floored to the largest unit. The caller wraps the
+# result in parens and only calls this when the status file exists.
+format_age() {
+  local secs="$1"
+  (( secs < 0 )) && secs=0          # clock skew / future mtime → no garbage age
+  if   (( secs < 60 ));    then echo "${secs}s"
+  elif (( secs < 3600 ));  then echo "$(( secs / 60 ))m"
+  elif (( secs < 86400 )); then echo "$(( secs / 3600 ))h"
+  else                          echo "$(( secs / 86400 ))d"
+  fi
+}
+
 last="?"
-if [ -f "$HOME/.local/state/rebuild-nixos/last-status" ]; then
-  last=$(cat "$HOME/.local/state/rebuild-nixos/last-status")
+last_age=""
+status_file="$HOME/.local/state/rebuild-nixos/last-status"
+if [ -f "$status_file" ]; then
+  last=$(cat "$status_file")
+  mtime=$(stat -c %Y "$status_file" 2>/dev/null || echo "")
+  if [ -n "$mtime" ]; then
+    age=$(format_age "$(( $(date +%s) - mtime ))")
+    [ -n "$age" ] && last_age="(${age})"
+  fi
 fi
 
-echo "[${host} ${host_class} | gen ${gen} | ${branch} | last:${last}]"
+echo "[${host} ${host_class} | gen ${gen} | ${branch} | last:${last}${last_age}]"
