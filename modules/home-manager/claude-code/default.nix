@@ -8,6 +8,10 @@ let
   companyConfig = ./company-config.json;
 in
 {
+  imports = [
+    ./gstack-browse-libfix.nix # Scoped libstdc++ LD_LIBRARY_PATH wrapper for gstack's `browse`
+  ];
+
   # Company policies are deployed via modules/common/claude-code-managed.nix
   # as /etc/claude-code/managed-settings.json (the claudeMd managed setting).
   # A ~/.claude/CLAUDE.md home.file symlink would duplicate the same content

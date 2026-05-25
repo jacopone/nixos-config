@@ -29,12 +29,24 @@ reboots predate both and occur across all kernel versions.
 | 2026-05-11 10:12 | 6.18.26 | crash | no journal data |
 | 2026-05-12 08:57 | 6.18.26 | crash | no journal data |
 | 2026-05-13 08:25 | 6.18.26 | **crash** | **`MES ring buffer is full` ×261** |
-| 2026-05-22 12:18 | 6.18.20 | **crash** | **`enc1_stream_encoder_dp_blank` timeout ×2** |
+| 2026-05-22 12:18 | 6.18.20 | **crash** | **`enc1_stream_encoder_dp_blank` timeout ×2**; reset reason `[0x00080800]` CF9 |
+| 2026-05-24 08:49 | 6.18.20 | **crash** | `gnome-session`/`gdm` `int3` traps in libglib during a live `nixos-rebuild switch`; reset reason `[0x00080800]` CF9 |
 
-Clean shutdowns interleave throughout (6.18.26 and 6.18.31). Today's crash
-occurred while the machine was awake and near-idle (last userspace activity
-12:17:40, reset before 12:18:52) — not during suspend/resume, not under
-rebuild load.
+Clean shutdowns interleave throughout (6.18.26 and 6.18.31). The 2026-05-22
+crash occurred while the machine was awake and near-idle (last userspace
+activity 12:17:40, reset before 12:18:52) — not during suspend/resume, not
+under rebuild load.
+
+**2026-05-24 (instance #7, first caught by the reset-reason instrumentation):**
+Same `[0x00080800]` CF9 reset signature as 2026-05-22 — two independent crashes
+now share the exact reset code, confirming a single consistent mechanism.
+Occurred ~7 min after a live `./rebuild-nixos` switch that restarted the GNOME
+stack (the nixpkgs bump changed glib → old `gnome-session`/`gdm` processes
+`trap int3` in `libglib-2.0.so.0.8600.3` as they were torn down). The
+display-stack restart is a *plausible trigger* on this GPU-implicated machine,
+but the gap weakens causation and the issue fires roughly daily regardless.
+**Mitigation to test:** prefer `./rebuild-nixos --boot` on this host (stage for
+next boot, no live display-stack restart) to avoid activation turbulence.
 
 ### Hard facts
 
