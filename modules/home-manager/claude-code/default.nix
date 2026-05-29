@@ -47,6 +47,12 @@ in
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
     CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
     CLAUDE_CODE_EFFORT_LEVEL = "medium";
+    # Pull auto-compact down to a deterministic 80% backstop (default ceiling is
+    # ~83%; values above that are no-ops). This is intentionally a backstop, not
+    # the primary trigger: the project's deep-session-state.sh Stop hook prompts
+    # a deliberate handover at 70%, leaving the 70-80% band for legitimate
+    # mid-thought continuation before auto-compact forces an uncontrolled summary.
+    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = "80";
   };
 
   # Merge company config into settings.json on every rebuild.
