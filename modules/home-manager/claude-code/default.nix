@@ -46,7 +46,13 @@ in
   home.sessionVariables = {
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
     CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
-    CLAUDE_CODE_EFFORT_LEVEL = "medium";
+    # Effort level is intentionally NOT an env var here. home.sessionVariables is
+    # login-scoped: the generated hm-session-vars.sh has a one-shot
+    # __HM_SESS_VARS_SOURCED guard, so a changed value only lands after a full
+    # re-login (not a rebuild, not a new terminal). Effort now lives in
+    # settings.json below, which Claude Code reads fresh on every launch — the
+    # change takes effect on the next `claude`, and the /effort slider works
+    # (no env var overriding it). For a rare max run: `env CLAUDE_CODE_EFFORT_LEVEL=max claude`.
     # Pull auto-compact down to a deterministic 80% backstop (default ceiling is
     # ~83%; values above that are no-ops). This is intentionally a backstop, not
     # the primary trigger: the project's deep-session-state.sh Stop hook prompts
@@ -60,6 +66,7 @@ in
   # - Plugins: company defaults, user overrides win (if Pietro disables one, his false wins)
   # - Sandbox: schema-migrated and re-asserted on every merge (idempotent)
   # - statusLine: overwritten on every merge to point at the deployed script
+  # - effortLevel: seeded to "medium" on first setup only, then user-controlled (/effort)
   # - Other settings: untouched (hooks, env, etc. stay user-managed)
   home.activation.claude-settings-merge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SETTINGS="$HOME/.claude/settings.json"
@@ -75,10 +82,11 @@ in
     # Regression: tests/bash/claude-settings/test-dry-run-safety.bats
     if [ ! -f "$SETTINGS" ]; then
       # First setup: create settings with company config + sandbox paths
-      # Note: effort level and adaptive-thinking flags are managed via
-      # home.sessionVariables (CLAUDE_CODE_EFFORT_LEVEL, CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING)
-      # — env vars override settings.json and bypass the Zod schema, which
-      # currently rejects "max" as an effortLevel value.
+      # Note: effortLevel lives HERE in settings.json (launch-scoped, so the
+      # /effort slider works). The adaptive-thinking flag stays an env var
+      # (CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING). settings.json effortLevel cannot be
+      # "max" (Zod rejects it); for a rare max run use
+      # `env CLAUDE_CODE_EFFORT_LEVEL=max claude`, which overrides just that launch.
       if [ -n "$DRY_RUN_CMD" ]; then
         $DRY_RUN_CMD "would seed $SETTINGS from $COMPANY"
       else
@@ -92,6 +100,7 @@ in
               "seccomp": {"applyPath": ($home + "/.claude/seccomp/apply-seccomp")}
             },
             "alwaysThinkingEnabled": true,
+            "effortLevel": "medium",
             "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"},
             "statusLine": {
               "type": "command",
@@ -120,6 +129,10 @@ in
           .sandbox.enabled = true |
           .sandbox.failIfUnavailable = true |
           .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
+          # effortLevel is deliberately NOT touched here: it is seeded once in the
+          # first-setup branch above, then left fully user-controlled via /effort, so
+          # model+effort combinations chosen per session persist across rebuilds. The
+          # env var that used to override /effort is gone; settings.json is launch-scoped.
           # Always set statusLine to point at the home-manager-deployed script.
           # Overwriting on every merge is intentional: the path is stable, and
           # this prevents users from accidentally disabling fleet context.
