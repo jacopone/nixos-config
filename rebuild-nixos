@@ -962,8 +962,14 @@ if [ "$IS_BUSINESS_HOST" = false ]; then
         : # skip
     else
         if [ -x "./scripts/check-claude-config.sh" ]; then
-            VALIDATOR_OUT=$(./scripts/check-claude-config.sh 2>&1)
-            VALIDATOR_EXIT=$?
+            # check-claude-config.sh exits 1 (warnings) / 2 (errors) by design,
+            # and the ladder below handles each non-fatally. But under `set -e`
+            # a bare `VAR=$(cmd)` assignment aborts the whole script the instant
+            # cmd returns non-zero — which killed the rebuild here before Phase
+            # 10 (generation cleanup) could run. Capture the code via
+            # `|| VALIDATOR_EXIT=$?` so a non-zero validator stays non-fatal.
+            VALIDATOR_EXIT=0
+            VALIDATOR_OUT=$(./scripts/check-claude-config.sh 2>&1) || VALIDATOR_EXIT=$?
 
             # Count events by level
             ERRORS=$(echo "$VALIDATOR_OUT" | jq '[.[] | select(.level == "error")] | length' 2>/dev/null || echo 0)
