@@ -83,14 +83,14 @@ Per Phase 4 code review of commits `c3ffca3..20869af`.
 
 ### #24 — P1-1 polish (I1-I4 + M1-M5 from code review)
 
-Per P1-1 code review of commits `1d3c796` + `f262715`. **I3 + M5 [COMPLETED]** in commit `4d47eb4`; the rest remain. Note: I3 relocated the event-log helpers to `lib/event-log.sh`, so the anchors for I2/M1/M2 now point at the lib, not `rebuild-nixos`.
+Per P1-1 code review of commits `1d3c796` + `f262715`. **All items [COMPLETED]:** I3+M5 in `4d47eb4`; I1, I2, I4, M1, M2 in the #24-polish session (2026-05-25, commits `e4f3d77`..`519b21a`, local on `personal`). Note: I3 relocated the event-log helpers to `lib/event-log.sh`, so the I2/M1/M2 anchors point at the lib, not `rebuild-nixos`.
 
-- **I1** — statusline shows stale `last-status` forever (no age check). Add age annotation: `last:succ(2d)` or mtime/TTL check in `statusline.sh:32-35`. (Unaffected by I3.)
-- **I2** — 3-line comment explaining text-file ↔ JSONL duality (`LAST_STATUS_FILE` vs `EVENT_LOG`) near the `LAST_STATUS_FILE=` declaration. Two-sinks-of-truth is justified but undocumented. **Now in `lib/event-log.sh`** (the declaration moved there). The lib header documents the callers but not the two-sinks rationale specifically.
+- **I1** — **[COMPLETED]** `acaabe2` (+ `519b21a` scaffold cleanup). statusline annotates `last:succ(2d)` from the last-status mtime in `statusline.sh` (`format_age`: s/m/h/d floored, future mtime clamps to `0s`, missing file → no suffix). 3 bats tests added.
+- **I2** — **[COMPLETED]** `996a15a`. Comment near the `LAST_STATUS_FILE=` declaration in `lib/event-log.sh` explaining the two-sink duality: append-only JSONL `EVENT_LOG` (telemetry history) vs one-word `LAST_STATUS_FILE` (O(1) statusline read).
 - **I3 (most useful)** — **[COMPLETED]** `4d47eb4`. Extracted event-log helpers to `lib/event-log.sh`; `rebuild-nixos` and `test-event-log.bats` both source it. The fragile awk extraction (single-match anchors `^EVENT_LOG_DIR=`, `^step_skip\(\)`, etc.) is gone — a rename now fails loudly at source time instead of silently capturing the wrong range.
-- **I4** — BATS tests (now 29) borderline over-engineered. Could consolidate per-field-assertion tests 4-to-1 with `jq -e`. Several are grep checks (catch removal but not bugs). Still open. (Test now lives against the lib, but the consolidation point stands.)
-- **M1** — rename `step_done` → `step_complete` for consistency with the emitted "complete" event vocabulary. **Now in `lib/event-log.sh`**; a rename touches the lib + its call sites in `rebuild-nixos` + the grep tests.
-- **M2** — document `now_ms()` clock-skew/suspend caveat (wall-clock vs monotonic) in a comment. **Now in `lib/event-log.sh:now_ms()`**.
+- **I4** — **[COMPLETED]** `8814a25`. Consolidated the four `log_event` field tests → 1 and the three `step` field tests → 1 via `jq -e` (29 → 24). Coverage tightened, not weakened: `jq -e` fails on wrong OR absent fields, and the step test now catches a number-vs-string type regression the old `jq -r` compare missed. Non-vacuity proven against bad input.
+- **M1** — **[COMPLETED]** `e4f3d77`. Renamed `step_done` → `step_complete` across `lib/event-log.sh`, the two `rebuild-nixos` call sites, and the bats suite (incl. the `^step_complete()` definition grep). rg-clean; 24/24 tests green.
+- **M2** — **[COMPLETED]** `996a15a`. Comment at `lib/event-log.sh:now_ms()` notes it is wall-clock, not monotonic — durations can skew across NTP steps or suspend.
 - **M5** — **[COMPLETED]** `4d47eb4`. `CURRENT_STEP=0` is initialized in `lib/event-log.sh`; the test no longer injects it and the redundant init in `rebuild-nixos` was removed.
 
 ### #25 — Native sandbox write-deny binds break in-session libgit2 (e.g. nix flake check)
@@ -141,7 +141,7 @@ These aren't tracked as numbered follow-ups but came up during the session:
 ## Suggested resume order
 
 1. **Run the Agent View pilot** (per `docs/plans/2026-05-19-agent-view-pilot-task.md`) targeting #22-I1. This validates Agent View as a tool AND lands the most consequential follow-up (settings.json parseability) in one shot.
-2. Lower-priority polish: #15, #17, #20, the rest of #22, the rest of #24 (I1 statusline age, I2/M1/M2 — now in `lib/event-log.sh` — and I4 test consolidation). Plus #21's deferred M1/M4/M5 if revisited.
+2. Lower-priority polish: #15, #17, #20, the rest of #22. Plus #21's deferred M1/M4/M5 if revisited. (#24 fully resolved 2026-05-25 — see its section.)
 3. **#25** (deferred / investigation) — re-framed 2026-05-20 to the accurate finding (native-sandbox write-deny binds break in-session libgit2). No quick fix: a real fix needs sandbox-config exclusion or an upstream report; the host-shell workaround stands. Pick up only if in-session `nix flake check` becomes a recurring pain.
 
 ## Where the canonical artifacts live
