@@ -46,7 +46,7 @@ in
   home.sessionVariables = {
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
     CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
-    CLAUDE_CODE_EFFORT_LEVEL = "max";
+    CLAUDE_CODE_EFFORT_LEVEL = "medium";
   };
 
   # Merge company config into settings.json on every rebuild.
