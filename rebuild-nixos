@@ -73,6 +73,7 @@ AUDIT=false
 VERIFY_BOOTSTRAP=false
 FRESH=false
 BOOT_MODE=false
+GC_ONLY=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -84,6 +85,7 @@ while [[ $# -gt 0 ]]; do
         --verify-bootstrap) VERIFY_BOOTSTRAP=true; shift ;;
         --fresh|-f) FRESH=true; shift ;;
         --boot|-b) BOOT_MODE=true; shift ;;
+        --gc|-g) GC_ONLY=true; shift ;;
         --help|-h)
             echo "Usage: rebuild-nixos [OPTIONS]"
             echo ""
@@ -96,11 +98,13 @@ while [[ $# -gt 0 ]]; do
             echo "  -a, --audit      Export source closure for forensic audit trail (~5GB)"
             echo "  -b, --boot       Stage for next boot instead of live activation"
             echo "                   (use when switch inhibitor blocks dbus/init/glibc swap)"
+            echo "  -g, --gc         Skip rebuild — run generation cleanup only"
             echo "  --verify-bootstrap  Deep reproducibility check of bootstrap packages"
             echo "  -h, --help       Show this help message"
             echo ""
             echo "Examples:"
             echo "  ./rebuild-nixos              # Full rebuild"
+            echo "  ./rebuild-nixos --gc         # Clean old generations without rebuilding"
             echo "  ./rebuild-nixos --quick      # Fastest: skip changelog + cleanup"
             echo "  ./rebuild-nixos --yes        # Auto-accept all prompts"
             echo "  ./rebuild-nixos --fresh      # Bypass eval-cache for clean rebuild"
@@ -295,6 +299,91 @@ show_progress() {
     fi
 }
 
+# Interactive generation + profile cleanup.
+# Called from Phase 10 (post-rebuild) and standalone via --gc.
+run_generation_cleanup() {
+    echo ""
+    log_step "Listing system generations..."
+    sudo nixos-rebuild list-generations
+
+    read -rp "Enter generations to delete (space-separated), 'a' for auto cleanup, or Enter to skip: " generations_to_delete
+    if [ -n "$generations_to_delete" ]; then
+        if [ "$generations_to_delete" = "auto" ] || [ "$generations_to_delete" = "a" ]; then
+            log_step "Running automatic generation cleanup (keeping last 5)..."
+
+            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +5 2>/dev/null || true
+
+            local root_channels="/nix/var/nix/profiles/per-user/root/channels"
+            if [ -L "$root_channels" ]; then
+                local before after cleaned
+                before=$(find "${root_channels%/*}" -maxdepth 1 -name "channels-*-link" 2>/dev/null | wc -l)
+                sudo nix-env -p "$root_channels" --delete-generations +5 2>/dev/null || true
+                after=$(find "${root_channels%/*}" -maxdepth 1 -name "channels-*-link" 2>/dev/null | wc -l)
+                cleaned=$((before - after))
+                [ "$cleaned" -gt 0 ] && echo "  ✓ Cleaned $cleaned root channel generations"
+            fi
+
+            local default_profile="/nix/var/nix/profiles/default"
+            if [ -L "$default_profile" ]; then
+                local before after cleaned
+                before=$(find "${default_profile%/*}" -maxdepth 1 -name "default-*-link" 2>/dev/null | wc -l)
+                sudo nix-env -p "$default_profile" --delete-generations +5 2>/dev/null || true
+                after=$(find "${default_profile%/*}" -maxdepth 1 -name "default-*-link" 2>/dev/null | wc -l)
+                cleaned=$((before - after))
+                [ "$cleaned" -gt 0 ] && echo "  ✓ Cleaned $cleaned default profile generations"
+            fi
+
+            local user_profile="$HOME/.local/state/nix/profiles/profile"
+            if [ -L "$user_profile" ]; then
+                local before after cleaned
+                before=$(find "${user_profile%/*}" -maxdepth 1 -name "profile-*-link" 2>/dev/null | wc -l)
+                nix-env -p "$user_profile" --delete-generations +5 2>/dev/null || true
+                after=$(find "${user_profile%/*}" -maxdepth 1 -name "profile-*-link" 2>/dev/null | wc -l)
+                cleaned=$((before - after))
+                [ "$cleaned" -gt 0 ] && echo "  ✓ Cleaned $cleaned user profile generations"
+            fi
+
+            log_success "Automatic cleanup complete (kept last 5 of each profile)"
+        else
+            log_step "Deleting generations: $generations_to_delete"
+            # shellcheck disable=SC2086  # word splitting intended: space-separated generation numbers
+            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
+            log_success "Selected generations deleted"
+        fi
+
+        log_step "Running garbage collection..."
+
+        local gc_tmp="/tmp/gc-output-$$.tmp"
+        nix-collect-garbage > "$gc_tmp" 2>&1 &
+        local gc_pid=$!
+        show_progress "garbage-collection" $gc_pid
+        local gc_exit=0
+        wait $gc_pid || gc_exit=$?
+
+        local gc_summary="" hardlink_savings=""
+        if [ -f "$gc_tmp" ]; then
+            cat "$gc_tmp" >> "$LOG_FILE"
+            gc_summary=$(tail -5 "$gc_tmp" | grep -E "store paths deleted|MiB freed|GiB freed" | tail -1)
+            hardlink_savings=$(tail -5 "$gc_tmp" | grep "hard linking saves" | grep -oP '[\d.]+\s*(MiB|GiB)' | tail -1)
+            rm -f "$gc_tmp"
+        fi
+
+        if [ "$gc_exit" -eq 0 ]; then
+            if [ -n "$gc_summary" ]; then
+                log_success "Garbage collection: $gc_summary"
+            else
+                log_success "Garbage collection complete"
+            fi
+            [ -n "$hardlink_savings" ] && echo "  ↳ Hard linking saves: $hardlink_savings"
+        else
+            log_warning "Garbage collection finished with issues (check logs)"
+        fi
+        add_action "Cleaned up old generations"
+    else
+        log_warning "No generations selected for deletion"
+    fi
+}
+
 # Detect business vs admin host from hostname pattern (*-biz-*)
 # Business hosts get a streamlined rebuild: build → activate → cleanup only
 NIXOS_HOSTNAME_EARLY=$(hostname)
@@ -320,6 +409,19 @@ command -v nvd &>/dev/null && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 # Track total rebuild duration
 REBUILD_START_TIME=$(date +%s)
 REBUILD_START_MS=$(now_ms)
+
+# --gc: run generation cleanup only, skip the full rebuild
+if [ "$GC_ONLY" = true ]; then
+    echo ""
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║              NixOS Generation Cleanup                      ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    run_generation_cleanup
+    echo ""
+    echo "📁 Logs: $LOG_FILE"
+    echo ""
+    exit 0
+fi
 
 # Top-level "rebuild_start" event — distinct from individual phase boundaries.
 # Captures the mode flags so downstream consumers (telemetry MCP, status dash)
@@ -962,8 +1064,14 @@ if [ "$IS_BUSINESS_HOST" = false ]; then
         : # skip
     else
         if [ -x "./scripts/check-claude-config.sh" ]; then
-            VALIDATOR_OUT=$(./scripts/check-claude-config.sh 2>&1)
-            VALIDATOR_EXIT=$?
+            # check-claude-config.sh exits 1 (warnings) / 2 (errors) by design,
+            # and the ladder below handles each non-fatally. But under `set -e`
+            # a bare `VAR=$(cmd)` assignment aborts the whole script the instant
+            # cmd returns non-zero — which killed the rebuild here before Phase
+            # 10 (generation cleanup) could run. Capture the code via
+            # `|| VALIDATOR_EXIT=$?` so a non-zero validator stays non-fatal.
+            VALIDATOR_EXIT=0
+            VALIDATOR_OUT=$(./scripts/check-claude-config.sh 2>&1) || VALIDATOR_EXIT=$?
 
             # Count events by level
             ERRORS=$(echo "$VALIDATOR_OUT" | jq '[.[] | select(.level == "error")] | length' 2>/dev/null || echo 0)
@@ -1156,94 +1264,7 @@ fi
 if [ "$QUICK" = true ]; then
     : # Skip silently in quick mode
 elif [ "$DRY_RUN" = false ]; then
-    echo ""
-    log_step "Listing system generations..."
-    sudo nixos-rebuild list-generations
-
-    read -rp "Enter generations to delete (space-separated), 'a' for auto cleanup, or Enter to skip: " generations_to_delete
-    if [ -n "$generations_to_delete" ]; then
-        # Accept 'a' or 'auto' for automatic cleanup
-        if [ "$generations_to_delete" = "auto" ] || [ "$generations_to_delete" = "a" ]; then
-            log_step "Running automatic generation cleanup (keeping last 5)..."
-
-            # Clean system generations (keep last 5)
-            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +5 2>/dev/null || true
-
-            # Clean root channel profiles (these accumulate silently!)
-            # Each nixpkgs channel update creates a new generation
-            ROOT_CHANNELS="/nix/var/nix/profiles/per-user/root/channels"
-            if [ -L "$ROOT_CHANNELS" ]; then
-                BEFORE=$(find "${ROOT_CHANNELS%/*}" -maxdepth 1 -name "channels-*-link" 2>/dev/null | wc -l)
-                sudo nix-env -p "$ROOT_CHANNELS" --delete-generations +5 2>/dev/null || true
-                AFTER=$(find "${ROOT_CHANNELS%/*}" -maxdepth 1 -name "channels-*-link" 2>/dev/null | wc -l)
-                CLEANED=$((BEFORE - AFTER))
-                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED root channel generations"
-            fi
-
-            # Clean default profile generations
-            DEFAULT_PROFILE="/nix/var/nix/profiles/default"
-            if [ -L "$DEFAULT_PROFILE" ]; then
-                BEFORE=$(find "${DEFAULT_PROFILE%/*}" -maxdepth 1 -name "default-*-link" 2>/dev/null | wc -l)
-                sudo nix-env -p "$DEFAULT_PROFILE" --delete-generations +5 2>/dev/null || true
-                AFTER=$(find "${DEFAULT_PROFILE%/*}" -maxdepth 1 -name "default-*-link" 2>/dev/null | wc -l)
-                CLEANED=$((BEFORE - AFTER))
-                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED default profile generations"
-            fi
-
-            # Clean user profile generations (home-manager)
-            USER_PROFILE="$HOME/.local/state/nix/profiles/profile"
-            if [ -L "$USER_PROFILE" ]; then
-                BEFORE=$(find "${USER_PROFILE%/*}" -maxdepth 1 -name "profile-*-link" 2>/dev/null | wc -l)
-                nix-env -p "$USER_PROFILE" --delete-generations +5 2>/dev/null || true
-                AFTER=$(find "${USER_PROFILE%/*}" -maxdepth 1 -name "profile-*-link" 2>/dev/null | wc -l)
-                CLEANED=$((BEFORE - AFTER))
-                [ "$CLEANED" -gt 0 ] && echo "  ✓ Cleaned $CLEANED user profile generations"
-            fi
-
-            log_success "Automatic cleanup complete (kept last 5 of each profile)"
-        else
-            log_step "Deleting generations: $generations_to_delete"
-            # shellcheck disable=SC2086  # word splitting intended: space-separated generation numbers
-            sudo nix-env -p /nix/var/nix/profiles/system --delete-generations $generations_to_delete
-            log_success "Selected generations deleted"
-        fi
-
-        log_step "Running garbage collection..."
-
-        # Run GC in background, capture output for stats (suppress verbose deletion lines)
-        nix-collect-garbage > /tmp/gc-output-$$.tmp 2>&1 &
-        GC_PID=$!
-        show_progress "garbage-collection" $GC_PID
-        # Capture exit code without triggering set -e (wait propagates the child's exit code)
-        GC_EXIT=0
-        wait $GC_PID || GC_EXIT=$?
-
-        # Extract stats from GC output (last few lines have the summary)
-        if [ -f /tmp/gc-output-$$.tmp ]; then
-            # Log full output for debugging
-            cat /tmp/gc-output-$$.tmp >> "$LOG_FILE"
-
-            # Parse summary stats (format: "X store paths deleted, Y MiB freed")
-            GC_SUMMARY=$(tail -5 /tmp/gc-output-$$.tmp | grep -E "store paths deleted|MiB freed|GiB freed" | tail -1)
-            HARDLINK_SAVINGS=$(tail -5 /tmp/gc-output-$$.tmp | grep "hard linking saves" | grep -oP '[\d.]+\s*(MiB|GiB)' | tail -1)
-
-            rm -f /tmp/gc-output-$$.tmp
-        fi
-
-        if [ $GC_EXIT -eq 0 ]; then
-            if [ -n "$GC_SUMMARY" ]; then
-                log_success "Garbage collection: $GC_SUMMARY"
-            else
-                log_success "Garbage collection complete"
-            fi
-            [ -n "$HARDLINK_SAVINGS" ] && echo "  ↳ Hard linking saves: $HARDLINK_SAVINGS"
-        else
-            log_warning "Garbage collection finished with issues (check logs)"
-        fi
-        add_action "Cleaned up old generations"
-    else
-        log_warning "No generations selected for deletion"
-    fi
+    run_generation_cleanup
 fi
 
 # === PHASES 11-14: Admin Maintenance (admin only) ===
