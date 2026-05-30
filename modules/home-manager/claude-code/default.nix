@@ -42,34 +42,12 @@ in
   home.file.".npm/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp".source = "${claude-seccomp}/share/claude-seccomp/apply-seccomp";
   home.file.".npm/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/unix-block.bpf".source = "${claude-seccomp}/share/claude-seccomp/unix-block.bpf";
 
-  # Claude Code environment
-  home.sessionVariables = {
-    CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
-    CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
-    # Route all Task/Agent subagents to Sonnet by default. Review, QA, exploration
-    # and fup work are the delegated/downstream tier (CLAUDE.md), not Opus design —
-    # but subagents otherwise inherit the (usually Opus) session model, which the
-    # usage page flagged as ~78% of spend. This env var is the TOP of the subagent
-    # model-precedence chain, so it also overrides agents that hard-code `model: opus`
-    # (e.g. pr-review-toolkit's code-reviewer/code-simplifier). The main session keeps
-    # whatever model you pick; only delegated subagents drop to Sonnet. One-off escape:
-    # `env CLAUDE_CODE_SUBAGENT_MODEL=opus claude` (=haiku for fup runs, =inherit to disable).
-    # Set-and-forget (login-scoped, like the vars around it); per-session needs use the escape above.
-    CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
-    # Effort level is intentionally NOT an env var here. home.sessionVariables is
-    # login-scoped: the generated hm-session-vars.sh has a one-shot
-    # __HM_SESS_VARS_SOURCED guard, so a changed value only lands after a full
-    # re-login (not a rebuild, not a new terminal). Effort now lives in
-    # settings.json below, which Claude Code reads fresh on every launch — the
-    # change takes effect on the next `claude`, and the /effort slider works
-    # (no env var overriding it). For a rare max run: `env CLAUDE_CODE_EFFORT_LEVEL=max claude`.
-    # Pull auto-compact down to a deterministic 80% backstop (default ceiling is
-    # ~83%; values above that are no-ops). This is intentionally a backstop, not
-    # the primary trigger: the project's deep-session-state.sh Stop hook prompts
-    # a deliberate handover at 70%, leaving the 70-80% band for legitimate
-    # mid-thought continuation before auto-compact forces an uncontrolled summary.
-    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = "80";
-  };
+  # Claude Code env vars live in settings.json's `env` block (built in the merge
+  # below), NOT in home.sessionVariables. hm-session-vars.sh is POSIX sh, sourced
+  # only by LOGIN bash/zsh — a fish `claude` launch (especially non-login) never
+  # runs it, so vars set there silently went missing. settings.json is read directly
+  # by Claude Code on every launch, shell- and login-independent, and its `env`
+  # block injects into the process env (verified). effortLevel also lives there.
 
   # Merge company config into settings.json on every rebuild.
   # - Permissions: union (company baseline always present, user additions preserved)
@@ -77,7 +55,8 @@ in
   # - Sandbox: schema-migrated and re-asserted on every merge (idempotent)
   # - statusLine: overwritten on every merge to point at the deployed script
   # - effortLevel: seeded to "medium" on first setup only, then user-controlled (/effort)
-  # - Other settings: untouched (hooks, env, etc. stay user-managed)
+  # - env: Claude env vars (subagent model, autocompact, adaptive, max-output) re-asserted
+  # - Other settings: untouched (hooks, other env keys stay user-managed)
   home.activation.claude-settings-merge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SETTINGS="$HOME/.claude/settings.json"
     COMPANY="${companyConfig}"
@@ -92,11 +71,10 @@ in
     # Regression: tests/bash/claude-settings/test-dry-run-safety.bats
     if [ ! -f "$SETTINGS" ]; then
       # First setup: create settings with company config + sandbox paths
-      # Note: effortLevel lives HERE in settings.json (launch-scoped, so the
-      # /effort slider works). The adaptive-thinking flag stays an env var
-      # (CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING). settings.json effortLevel cannot be
-      # "max" (Zod rejects it); for a rare max run use
-      # `env CLAUDE_CODE_EFFORT_LEVEL=max claude`, which overrides just that launch.
+      # Note: effortLevel AND the Claude env vars live HERE in settings.json so they
+      # are shell-independent (read directly by Claude Code; the env block injects
+      # into the process env). effortLevel cannot be "max" (Zod rejects it); for a
+      # one-off max run use `env CLAUDE_CODE_EFFORT_LEVEL=max claude`.
       if [ -n "$DRY_RUN_CMD" ]; then
         $DRY_RUN_CMD "would seed $SETTINGS from $COMPANY"
       else
@@ -111,7 +89,13 @@ in
             },
             "alwaysThinkingEnabled": true,
             "effortLevel": "medium",
-            "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"},
+            "env": {
+              "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+              "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+              "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+              "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+              "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
+            },
             "statusLine": {
               "type": "command",
               "command": ($home + "/.config/claude-code/statusline.sh"),
@@ -139,6 +123,16 @@ in
           .sandbox.enabled = true |
           .sandbox.failIfUnavailable = true |
           .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
+          # Re-assert the Claude env vars in settings.json's env block — shell-independent,
+          # unlike home.sessionVariables, which a non-login fish skips. Right-hand wins;
+          # any other user env keys are preserved.
+          .env = ((.env // {}) + {
+            "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+            "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+            "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+            "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+            "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
+          }) |
           # effortLevel is deliberately NOT touched here: it is seeded once in the
           # first-setup branch above, then left fully user-controlled via /effort, so
           # model+effort combinations chosen per session persist across rebuilds. The
