@@ -46,6 +46,16 @@ in
   home.sessionVariables = {
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "64000";
     CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1";
+    # Route all Task/Agent subagents to Sonnet by default. Review, QA, exploration
+    # and fup work are the delegated/downstream tier (CLAUDE.md), not Opus design —
+    # but subagents otherwise inherit the (usually Opus) session model, which the
+    # usage page flagged as ~78% of spend. This env var is the TOP of the subagent
+    # model-precedence chain, so it also overrides agents that hard-code `model: opus`
+    # (e.g. pr-review-toolkit's code-reviewer/code-simplifier). The main session keeps
+    # whatever model you pick; only delegated subagents drop to Sonnet. One-off escape:
+    # `env CLAUDE_CODE_SUBAGENT_MODEL=opus claude` (=haiku for fup runs, =inherit to disable).
+    # Set-and-forget (login-scoped, like the vars around it); per-session needs use the escape above.
+    CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
     # Effort level is intentionally NOT an env var here. home.sessionVariables is
     # login-scoped: the generated hm-session-vars.sh has a one-shot
     # __HM_SESS_VARS_SOURCED guard, so a changed value only lands after a full
