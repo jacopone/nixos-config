@@ -194,7 +194,7 @@ in
       # markitdown # DISABLED: pulls in ctranslate2 which fails on GCC 15
       pytest # Testing framework for Python
       pydantic # Data validation using Python type hints
-      jinja2 # Jinja2 templating engine (for claude-nixos-automation)
+      jinja2 # Jinja2 templating engine (used by brownkit, business scripts)
     ])) # Python 3 with rich included (system-wide, avoids tkinter issues in devenv)
     ninja # Build system for faster compilation (required by numpy/aider)
     (pkgs.callPackage ../../pkgs/gogcli.nix { }) # Google Suite CLI (Gmail, Calendar, Drive, Contacts) - https://github.com/steipete/gogcli
