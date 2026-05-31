@@ -55,7 +55,8 @@ in
   # - Sandbox: schema-migrated and re-asserted on every merge (idempotent)
   # - statusLine: overwritten on every merge to point at the deployed script
   # - effortLevel: seeded to "medium" on first setup only, then user-controlled (/effort)
-  # - env: Claude env vars (subagent model, autocompact, adaptive, max-output) re-asserted
+  # - env: Claude env vars (subagent model, autocompact, max-output) re-asserted;
+  #   the deprecated adaptive-thinking override is scrubbed so CC scales thinking by difficulty
   # - Other settings: untouched (hooks, other env keys stay user-managed)
   home.activation.claude-settings-merge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SETTINGS="$HOME/.claude/settings.json"
@@ -93,7 +94,6 @@ in
               "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
               "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
               "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
-              "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
               "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
             },
             "statusLine": {
@@ -123,16 +123,17 @@ in
           .sandbox.enabled = true |
           .sandbox.failIfUnavailable = true |
           .sandbox.seccomp = (.sandbox.seccomp // {} | del(.bpfPath)) |
-          # Re-assert the Claude env vars in settings.json's env block — shell-independent,
+          # Re-assert the Claude env vars in the settings.json env block — shell-independent,
           # unlike home.sessionVariables, which a non-login fish skips. Right-hand wins;
-          # any other user env keys are preserved.
-          .env = ((.env // {}) + {
+          # any other user env keys are preserved. del() then scrubs the deprecated
+          # adaptive-thinking override: `+` overlays keys but never removes them, so the
+          # explicit del makes removal idempotent on hosts that already wrote it.
+          .env = (((.env // {}) + {
             "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
             "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
             "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
-            "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
             "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
-          }) |
+          }) | del(.CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING)) |
           # effortLevel is deliberately NOT touched here: it is seeded once in the
           # first-setup branch above, then left fully user-controlled via /effort, so
           # model+effort combinations chosen per session persist across rebuilds. The
