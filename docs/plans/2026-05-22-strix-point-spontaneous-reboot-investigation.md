@@ -1,10 +1,92 @@
 # Strix Point Spontaneous Reboot Investigation — ama-tech-001
 
-> **Status:** Remediation applied (BIOS 03.06, 2026-05-24) — observing for recurrence
+> **Status:** ROOT CAUSE IDENTIFIED (2026-06-05). Interim mitigation staged
+> (PR #17, `pcie_ports=native`); firmware cure (`7619M0WD`) pending an LVFS/WD
+> publish for the 500GB SKU (see 2026-06-06 note).
 > **Host:** ama-tech-001 (Framework 16, AMD Ryzen AI 9 HX 370, Strix Point)
 > **Opened:** 2026-05-22
 > **Related code:** `hosts/ama-tech-001/crash-diagnostics.nix`, `modules/hardware/framework-16.nix`
 > **Supersedes:** the informal investigation noted in `crash-diagnostics.nix` (2026-04-30)
+
+## 2026-06-05 — ROOT CAUSE IDENTIFIED: WD SN7100 HMB firmware → PCIe AER → sync flood
+
+A hard reset at **2026-06-05 19:02** (awake, on AC, near-idle — terminal + idle
+GNOME) was the **first crash captured with the unambiguous hardware signature**:
+
+```
+x86/amd: Previous system reset reason [0x08000800]:
+         an uncorrected error caused a data fabric sync flood event
+```
+
+This is **categorically different** from the earlier `[0x00080800]` resets the
+investigation had been tracking. `[0x00080800]` = "software wrote 0x6 to 0xCF9"
+is **also exactly what a normal `reboot` writes** — so it is *ambiguous* (clean
+reboot ⟷ SMM reset) and does NOT by itself prove a crash. Re-classifying the
+last 10 boots by shutdown markers, **9 of 10 were CLEAN**; the snapshots that
+decoded CF9 sit on top of clean reboots. So **hypothesis H0 (CF9 = firmware/SMM
+crash reset) was largely chasing normal reboots.** The only confirmed crash in
+~12 days is this `0x08000800` sync flood. (BIOS 03.06, applied 2026-05-24, did
+not stop it — but it does appear to have cut frequency from ~daily to ~1/12d.)
+
+**Matched to Framework issue tracker [#41](https://github.com/FrameworkComputer/SoftwareFirmwareIssueTracker/issues/41)**
+and the [FW13 HX 370 48-crash dataset](https://community.frame.work/t/fw13-amd-ai-300-hx-370-48-data-fabric-sync-flood-crashes-in-2-months-comprehensive-data/80338).
+The mechanism, now confirmed on this machine:
+
+- The NVMe is a **DRAM-less `WD_BLACK SN7100 500GB` on firmware `7615M0WD`** —
+  the exact drive + firmware the community confirmed as a sync-flood trigger
+  (fix: `7619M0WD`). It uses the PCIe **Host Memory Buffer** (`allocated 64 MiB
+  host memory buffer` in dmesg), and its buggy HMB firmware emits a stream of
+  **correctable PCIe AER errors** (~30–80/hr in reference cases).
+- The **Framework BIOS claims PCIe AER via ACPI `_OSC` and never reports those
+  errors to the OS** — confirmed here: `/sys/.../aer_dev_correctable` counters
+  are empty and `pcie_ports=native` was not set. The errors accumulate silently
+  until one escalates to **uncorrectable**, and the Infinity Fabric **sync-floods**.
+- Empty pstore / no MCE / no BERT is **expected** for a sync flood (the reset
+  fires below the CPU's exception handlers) — it does NOT argue against a HW fault.
+
+**Adversarial verification** (independent skeptic agents): CF9-ambiguity
+SUPPORTED; "absence of MCE/BERT doesn't rule out HW fault" SUPPORTED; **"sync
+flood is usually the RAM" REFUTED** (the reference dataset ruled out memory: a
+1→2 DIMM swap changed nothing; NVMe firmware was the fix). WiFi is the stock
+**MediaTek MT7925** (the *clean* card, not the AX210 trigger) — that path ruled out.
+
+### The fix (in priority order)
+
+> **2026-06-06 — firmware cure is not on LVFS *stable* yet.** `sudo fwupdmgr
+> update` reports `WD BLACK SN7100 500GB` under "Devices with no available
+> firmware updates" (still `7615M0WD`); the drive is `Updatable` but no
+> `7619M0WD` payload is published on the stable remote for the 500GB SKU. So the
+> firmware cure is temporarily out of reach via the default path, which promotes
+> `pcie_ports=native` from "verify" to the **primary interim mitigation**.
+> (Earlier note that fwupd "lists it as a pending update" was a misread.)
+
+1. **PRIMARY (interim) — `pcie_ports=native pcie_ecrc=on` + rebuild.** Staged in
+   `crash-diagnostics.nix` (PR #17). This is *not just* observability: upstream
+   (jcdutton, issue #41) found native OS AER ownership **converts the would-be
+   sync floods into correctable AER events the kernel handles gracefully** — so
+   it can stop the reboots even before the firmware is fixed. It also surfaces
+   the SN7100's error stream (`ras-mc-ctl --errors`, per-boot snapshots) so the
+   eventual firmware cure can be confirmed by the AER count falling to **zero**.
+2. **THE CURE — update the SN7100 firmware `7615M0WD → 7619M0WD`** (vendor
+   Sandisk, `NVME\VEN_15B7&DEV_5045`). Not on the LVFS *stable* remote yet; new
+   NVMe firmware usually lands in `lvfs-testing` first, so try:
+   ```
+   sudo fwupdmgr enable-remote lvfs-testing   # testing channel (disabled by default)
+   sudo fwupdmgr refresh --force
+   fwupdmgr get-updates                       # look for SN7100 -> 7619M0WD
+   sudo fwupdmgr update                        # on AC power; reboots to apply
+   ```
+   If still absent, fall back to **SanDisk/WD Dashboard on Windows** (no Linux
+   updater exists) — a one-time Windows USB / dual-boot. Re-check LVFS stable
+   periodically; the payload will likely be promoted there in time.
+3. If sync floods recur *after* the firmware update with zero NVMe AER: pursue
+   the secondary upstream trigger (heavy iGPU↔RAM traffic / UMA — see H1 notes
+   and `amdgpu.gttsize`/`vm_update_mode` discussion in the research), then the
+   single-DIMM memory test as a last resort.
+
+The detailed reset-reason / boot-classification / upstream-research evidence for
+this conclusion is in the conversation log of 2026-06-05; the sections below are
+the **prior (pre-root-cause) investigation**, kept for history.
 
 ## Problem
 
