@@ -1,6 +1,8 @@
 # Strix Point Spontaneous Reboot Investigation — ama-tech-001
 
-> **Status:** ROOT CAUSE IDENTIFIED (2026-06-05) — fix staged, verifying
+> **Status:** ROOT CAUSE IDENTIFIED (2026-06-05). Interim mitigation staged
+> (PR #17, `pcie_ports=native`); firmware cure (`7619M0WD`) pending an LVFS/WD
+> publish for the 500GB SKU (see 2026-06-06 note).
 > **Host:** ama-tech-001 (Framework 16, AMD Ryzen AI 9 HX 370, Strix Point)
 > **Opened:** 2026-05-22
 > **Related code:** `hosts/ama-tech-001/crash-diagnostics.nix`, `modules/hardware/framework-16.nix`
@@ -50,19 +52,33 @@ flood is usually the RAM" REFUTED** (the reference dataset ruled out memory: a
 
 ### The fix (in priority order)
 
-1. **PRIMARY — update the SN7100 firmware (user-run, available via LVFS now):**
+> **2026-06-06 — firmware cure is not on LVFS *stable* yet.** `sudo fwupdmgr
+> update` reports `WD BLACK SN7100 500GB` under "Devices with no available
+> firmware updates" (still `7615M0WD`); the drive is `Updatable` but no
+> `7619M0WD` payload is published on the stable remote for the 500GB SKU. So the
+> firmware cure is temporarily out of reach via the default path, which promotes
+> `pcie_ports=native` from "verify" to the **primary interim mitigation**.
+> (Earlier note that fwupd "lists it as a pending update" was a misread.)
+
+1. **PRIMARY (interim) — `pcie_ports=native pcie_ecrc=on` + rebuild.** Staged in
+   `crash-diagnostics.nix` (PR #17). This is *not just* observability: upstream
+   (jcdutton, issue #41) found native OS AER ownership **converts the would-be
+   sync floods into correctable AER events the kernel handles gracefully** — so
+   it can stop the reboots even before the firmware is fixed. It also surfaces
+   the SN7100's error stream (`ras-mc-ctl --errors`, per-boot snapshots) so the
+   eventual firmware cure can be confirmed by the AER count falling to **zero**.
+2. **THE CURE — update the SN7100 firmware `7615M0WD → 7619M0WD`** (vendor
+   Sandisk, `NVME\VEN_15B7&DEV_5045`). Not on the LVFS *stable* remote yet; new
+   NVMe firmware usually lands in `lvfs-testing` first, so try:
    ```
+   sudo fwupdmgr enable-remote lvfs-testing   # testing channel (disabled by default)
    sudo fwupdmgr refresh --force
-   sudo fwupdmgr update          # on AC power; reboots to apply
+   fwupdmgr get-updates                       # look for SN7100 -> 7619M0WD
+   sudo fwupdmgr update                        # on AC power; reboots to apply
    ```
-   Updates `WD BLACK SN7100 500GB` `7615M0WD → 7619M0WD` (vendor Sandisk,
-   `NVME\VEN_15B7&DEV_5045`). fwupd already lists it as a pending update.
-2. **VERIFY + safety net (staged in `crash-diagnostics.nix`, apply via rebuild):**
-   `pcie_ports=native pcie_ecrc=on` kernel params make the BIOS-hidden AER
-   stream visible *and* let the kernel recover a correctable error gracefully
-   instead of sync-flooding; `rasdaemon` + `nvme-cli`/`pciutils` log/inspect it.
-   After both are applied: `ras-mc-ctl --errors` and the per-boot snapshots
-   should show the NVMe AER count fall to **zero**, with no further sync floods.
+   If still absent, fall back to **SanDisk/WD Dashboard on Windows** (no Linux
+   updater exists) — a one-time Windows USB / dual-boot. Re-check LVFS stable
+   periodically; the payload will likely be promoted there in time.
 3. If sync floods recur *after* the firmware update with zero NVMe AER: pursue
    the secondary upstream trigger (heavy iGPU↔RAM traffic / UMA — see H1 notes
    and `amdgpu.gttsize`/`vm_update_mode` discussion in the research), then the

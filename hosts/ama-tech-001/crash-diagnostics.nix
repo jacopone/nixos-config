@@ -29,11 +29,15 @@
 # Host Memory Buffer) that the Framework BIOS hides from the OS, until one
 # escalates to uncorrectable and the Infinity Fabric sync-floods the SoC.
 #
-# THE FIX is a user-run `fwupdmgr update` (SN7100 7615M0WD -> 7619M0WD, on
-# LVFS). The kernel params + rasdaemon below VERIFY it on THIS machine: the
-# NVMe AER count should fall to zero after the firmware update. Memory was
-# REFUTED upstream as the cause (1->2 DIMM swap changed nothing) — do not
-# chase a memtest first.
+# THE CURE is the SN7100 firmware 7615M0WD -> 7619M0WD. As of 2026-06-06 it is
+# NOT on the LVFS *stable* remote for the 500GB SKU (`fwupdmgr update` says "no
+# available firmware updates") — try `lvfs-testing` first, else WD Dashboard on
+# Windows. Until then, `pcie_ports=native` below is the PRIMARY interim
+# mitigation, not just observability: upstream (FW issue #41) found native OS
+# AER ownership converts the would-be sync floods into correctable AER events
+# the kernel handles gracefully. The NVMe AER count should fall to zero once the
+# firmware is updated. Memory was REFUTED upstream as the cause (1->2 DIMM swap
+# changed nothing) — do not chase a memtest first.
 # See docs/plans/2026-05-22-strix-point-spontaneous-reboot-investigation.md
 #
 # DELETE THIS FILE once the firmware fix is verified (days of zero sync floods
