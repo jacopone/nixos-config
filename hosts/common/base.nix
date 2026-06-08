@@ -75,8 +75,19 @@
   # Automatic Updates (disabled — broken without flake attr on flake-based systems)
   system.autoUpgrade.enable = false;
 
-  # Time and Locale
-  services.localtimed.enable = true;
+  # Time and Locale — clock follows physical location automatically.
+  #
+  # GNOME's built-in automatic timezone (gnome-settings-daemon "datetime"
+  # plugin -> GeoClue -> systemd-timedated) owns the timezone. time.timeZone is
+  # intentionally left UNSET so timedated can rewrite /etc/localtime at runtime
+  # as the machine travels; pinning it would freeze the clock.
+  #
+  # localtimed removed 2026-06-03: the standalone daemon is incompatible with
+  # geoclue 2.7.2 (crash-loops "GeoClue2 Client: Remote peer disconnected" every
+  # 60s, never sets a zone) and duplicates GNOME's own automatic-timezone path.
+  # GeoClue uses BeaconDB for WiFi geolocation (Mozilla Location Service shut
+  # down in 2024); the NixOS 25.11 default already points there.
+  services.geoclue2.enable = true;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "it_IT.UTF-8";

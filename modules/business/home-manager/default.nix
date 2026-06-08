@@ -18,6 +18,7 @@ in
     ../../home-manager/desktop/gnome.nix # GNOME desktop (Dash to Dock)
     ../../home-manager/cloud-storage/rclone.nix # Google Drive mount via rclone
     ../../home-manager/desktop/smart-office-open.nix # Default handler for office files
+    ../../home-manager/desktop/automatic-timezone.nix # GNOME location + automatic-timezone gsettings (clock follows travel)
     ./amatino-repos.nix # Amatino project repos, env vars, Claude Code plugins
     ./gstack-install.nix # gstack skill collection (Claude profile only)
   ];

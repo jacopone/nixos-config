@@ -16,6 +16,7 @@
     ./cloud-storage/rclone.nix # Google Drive mount via rclone
     ./cloud-storage/backup-sync.nix # Periodic backup to Google Drive
     ./desktop/smart-office-open.nix # Default handler for office files
+    ./desktop/automatic-timezone.nix # GNOME location + automatic-timezone gsettings (clock follows travel)
     # NOTE: Dash to Dock (desktop/gnome.nix) is business-only — imported in modules/business/home-manager/
     # NOTE: mcps.nix removed - requires pkgs.mcp-servers which isn't in nixpkgs yet
     # MCP servers live in project-root .mcp.json (tracked); MCP-NixOS wired by default.
