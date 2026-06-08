@@ -35,14 +35,20 @@ in
     HOOK_PATH="$HOME/.claude/hooks/business-guardrail.sh"
 
     if [ -f "$SETTINGS" ]; then
-      $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-        --arg hook "$HOOK_PATH" \
-        '.hooks.PreToolUse = [
-          {"matcher": "Bash", "hooks": [{"type": "command", "command": $hook}]},
-          {"matcher": "Write", "hooks": [{"type": "command", "command": $hook}]},
-          {"matcher": "Edit", "hooks": [{"type": "command", "command": $hook}]}
-        ]' "$SETTINGS" > "''${SETTINGS}.tmp" \
-      && mv "''${SETTINGS}.tmp" "$SETTINGS"
+      # Dry-run safety (cf. claude-settings-merge): never prefix the jq+redirect
+      # with $DRY_RUN_CMD, or `echo jq … > file` corrupts settings.json in preview.
+      if [ -n "$DRY_RUN_CMD" ]; then
+        $DRY_RUN_CMD "would wire business guardrail hook into $SETTINGS"
+      else
+        ${pkgs.jq}/bin/jq \
+          --arg hook "$HOOK_PATH" \
+          '.hooks.PreToolUse = [
+            {"matcher": "Bash", "hooks": [{"type": "command", "command": $hook}]},
+            {"matcher": "Write", "hooks": [{"type": "command", "command": $hook}]},
+            {"matcher": "Edit", "hooks": [{"type": "command", "command": $hook}]}
+          ]' "$SETTINGS" > "''${SETTINGS}.tmp" \
+        && mv "''${SETTINGS}.tmp" "$SETTINGS"
+      fi
     fi
   '';
 
