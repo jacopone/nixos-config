@@ -151,4 +151,38 @@ in
       fi
     fi
   '';
+
+  # ── Tech-profile Claude hooks (declarative) ──────────────────────────────
+  # Memory-reminder hook script — Nix store symlink to ~/.claude/hooks/,
+  # deployed like the business guardrail (immutable, auto-updated on rebuild).
+  home.file.".claude/hooks/memory-reminder.sh" = {
+    source = ./hooks/memory-reminder.sh;
+    executable = true;
+  };
+
+  # Wire the fleet tech-profile hooks (gstack SessionStart + memory-reminder
+  # PostToolUse) declaratively, so a fresh machine reproduces them instead of
+  # relying on a one-time manual edit. Runs AFTER claude-settings-merge (which
+  # creates/merges settings.json). Owns these two events the way
+  # claude-business-hooks owns PreToolUse.
+  home.activation.claude-tech-hooks = lib.hm.dag.entryAfter [ "writeBoundary" "claude-settings-merge" ] ''
+    SETTINGS="$HOME/.claude/settings.json"
+    GSTACK_HOOK="$HOME/.claude/skills/gstack/bin/gstack-session-update"
+    MEM_HOOK="$HOME/.claude/hooks/memory-reminder.sh"
+    if [ -f "$SETTINGS" ]; then
+      # Dry-run safety (cf. claude-settings-merge): never prefix the jq+redirect
+      # with $DRY_RUN_CMD, or `echo jq … > file` corrupts settings.json in preview.
+      if [ -n "$DRY_RUN_CMD" ]; then
+        $DRY_RUN_CMD "would wire tech hooks (SessionStart=gstack, PostToolUse=memory-reminder) into $SETTINGS"
+      else
+        ${pkgs.jq}/bin/jq \
+          --arg gstack "$GSTACK_HOOK" \
+          --arg mem "$MEM_HOOK" \
+          '.hooks.SessionStart = [{"hooks":[{"type":"command","command":$gstack}]}]
+           | .hooks.PostToolUse = [{"matcher":"Bash","hooks":[{"type":"command","command":$mem}]}]' \
+          "$SETTINGS" > "''${SETTINGS}.tmp" \
+        && mv "''${SETTINGS}.tmp" "$SETTINGS"
+      fi
+    fi
+  '';
 }
