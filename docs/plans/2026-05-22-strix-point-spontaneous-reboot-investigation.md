@@ -1,8 +1,9 @@
 # Strix Point Spontaneous Reboot Investigation — ama-tech-001
 
-> **Status:** ROOT CAUSE IDENTIFIED (2026-06-05). Interim mitigation staged
-> (PR #17, `pcie_ports=native`); firmware cure (`7619M0WD`) pending an LVFS/WD
-> publish for the 500GB SKU (see 2026-06-06 note).
+> **Status:** FIXED 2026-06-09 — SN7100 firmware `7615M0WD`→`7619M0WD` (via
+> nvme-cli; LVFS lacked it). Verifying: first post-fix boot 2026-06-10 has
+> `pcie_ports=native` live, **zero PCIe AER**, no sync flood. Watching for a
+> clean ~1–2 week window before removing the instrumentation.
 > **Host:** ama-tech-001 (Framework 16, AMD Ryzen AI 9 HX 370, Strix Point)
 > **Opened:** 2026-05-22
 > **Related code:** `hosts/ama-tech-001/crash-diagnostics.nix`, `modules/hardware/framework-16.nix`
@@ -51,6 +52,25 @@ flood is usually the RAM" REFUTED** (the reference dataset ruled out memory: a
 **MediaTek MT7925** (the *clean* card, not the AX210 trigger) — that path ruled out.
 
 ### The fix (in priority order)
+
+> **✅ 2026-06-09 — FIXED. Firmware updated `7615M0WD → 7619M0WD` directly via
+> `nvme-cli`** (neither LVFS stable nor `lvfs-testing` ever carried it; pulled
+> the `.fluf` from WD's CDN). Applied with:
+> ```
+> # WD CDN cert was expired — -k required
+> curl -L -k -o 7619M0WD.fluf \
+>   https://wddashboarddownloads.wdc.com/wdDashboard/firmware/WD_BLACK_SN7100_500GB/7619M0WD/7619M0WD.fluf
+> sudo nvme fw-download /dev/nvme0 -f 7619M0WD.fluf
+> sudo nvme fw-commit -s 2 -a 3 /dev/nvme0   # "No such device" after this is normal (controller resets)
+> # one reboot to activate
+> ```
+> Post-fix verification (2026-06-10 boot): drive reports `7619M0WD`,
+> `pcie_ports=native` live, **zero PCIe AER**, no sync flood. The prior crash
+> trend showed sync floods on 06-05 / 06-07 / 06-09 (every 1–2 days) — the
+> firmware update is the first thing that stopped them. The `pcie_ports=native`
+> mitigation + `crash-diagnostics.nix` stay in place through the ~1–2 week
+> verification window, then: remove `crash-diagnostics.nix` and decide whether to
+> promote `pcie_ports=native` to `framework-16.nix` as permanent hardening.
 
 > **2026-06-06 — firmware cure is not on LVFS *stable* yet.** `sudo fwupdmgr
 > update` reports `WD BLACK SN7100 500GB` under "Devices with no available
