@@ -28,6 +28,12 @@ jobs:
       - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
+          # cachix flake input now uses callCabal2nix (IFD); pull its Haskell
+          # derivations from cache.nixos.org + cachix.cachix.org so the fresh CI
+          # runner substitutes them instead of failing to build cabal2nix-cachix.
+          extra_nix_config: |
+            substituters = https://cache.nixos.org https://cachix.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM=
 
       - name: Update flake inputs
         id: update
@@ -54,7 +60,17 @@ jobs:
         if: steps.update.outputs.has_changes == 'true'
         run: |
           echo "Validating updated configuration..."
-          nix flake check --no-build
+          # devenv (flake input) is a tech-host systemPackage, so evaluating a
+          # tech host pulls it in via man-db/man-paths -> cachix's callCabal2nix
+          # IFD. `nix flake check --no-build` refuses to BUILD that IFD, and after
+          # `nix flake update` its output is in no cache, so the check dies with
+          # "path '...cabal2nix-cachix.drv' is not valid". Realise the (cheap) IFD
+          # first -- cabal2nix substitutes from cache.nixos.org, the source from
+          # cachix.cachix.org -- via one tech host's toplevel; the IFD output is
+          # shared across hosts, so the --no-build check then reads it locally.
+          nix eval --raw --allow-import-from-derivation \
+            .#nixosConfigurations.thinkpad-x1-jacopo.config.system.build.toplevel.drvPath > /dev/null
+          nix flake check --no-build --allow-import-from-derivation
 
       - name: Generate changelog entry
         if: steps.update.outputs.has_changes == 'true'
