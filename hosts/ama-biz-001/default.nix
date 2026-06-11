@@ -11,6 +11,11 @@
 
   environment.variables.EDITOR = "code"; # VS Code (not Helix)
 
+  # gstack (Claude Code skill pack) — host-scoped: only Pietro uses gstack here
+  environment.sessionVariables = {
+    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+  };
+
   users.users.${username} = {
     isNormalUser = true;
     description = "Pietro";
