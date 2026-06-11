@@ -24,6 +24,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Operate on `personal` (source of truth), not the default branch
+          # `master` (CI-owned sanitized mirror). Scheduled runs check out master
+          # by default; without this the lock update + PR would diff against the
+          # sanitized tree and produce a huge bogus PR (see closed #13).
+          ref: personal
 
       - uses: cachix/install-nix-action@v25
         with:
@@ -107,6 +112,9 @@ jobs:
 
             **After merging**:
             - Automated deployment will update system configuration
+          # File against personal, not the default branch (master is CI-owned;
+          # CI syncs personal -> master). Pairs with `ref: personal` above.
+          base: personal
           branch: chore/update-flake
           delete-branch: true
           labels: dependencies, automated
