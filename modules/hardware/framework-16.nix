@@ -16,7 +16,12 @@
   # Re-add the microcode update that pstate.nix's parent (default.nix) provides,
   # since disabling pstate.nix also removes its import of default.nix.
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-  boot.kernelModules = [ "uinput" ];
+  # uvcvideo: the Laptop Webcam Module (2nd Gen, 32ac:001c) is a class-compliant
+  # UVC device, but udev coldplug auto-load of uvcvideo is unreliable on the
+  # internal-hub topology — the device, driver, and all deps (videodev, mc,
+  # videobuf2-*) are present, yet the module is sometimes never loaded, leaving
+  # no /dev/video* so every app reports "no camera". Load it explicitly.
+  boot.kernelModules = [ "uinput" "uvcvideo" ];
 
   # Blacklist ucsi_acpi — the UCSI driver fires error 256 on every boot, resume,
   # and random EC PD renegotiation, causing DP alt-mode link drops and display
