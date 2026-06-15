@@ -242,6 +242,85 @@
     '';
   };
 
+  # Detect the EC-level CPU clamp that fix-cpu-freq-after-resume CANNOT fix.
+  # The Strix Point EC can wedge every core at lowest_perf (~600 MHz) in a state
+  # that survives a warm reboot and ignores every OS lever — PPD cycle, amd_pstate
+  # re-init, scaling_min_freq override all bounce off it (confirmed 2026-06-14).
+  # Only a physical EC power-drain recovers it. We can neither prevent it (BIOS
+  # 03.06 is already the latest firmware) nor fix it in software, so this detector
+  # RECOGNISES it and tells the user how to recover — turning a multi-hour "why is
+  # Chrome slow" misdiagnosis into a 90-second drain. Runs as a user service so
+  # notify-send reaches the GNOME session; it probes only when no core is already
+  # boosting, so it never adds load to a busy machine. See the auto-memory note
+  # framework-16-power.md ("EC-level clamp — survives a warm reboot").
+  systemd.user.services.detect-cpu-clamp = {
+    description = "Detect EC-level CPU frequency clamp; warn to power-drain";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -u
+      THRESH=1200000   # 1.2 GHz: far above the 605 MHz floor, far below any real boost
+
+      # Peg cpu0 for ~200ms and echo its frequency (kHz). A healthy core jumps to
+      # multiple GHz; a clamped one stays ~600 MHz.
+      probe() {
+        ${pkgs.util-linux}/bin/taskset -c 0 \
+          ${pkgs.coreutils}/bin/timeout 0.3 sh -c 'while :; do :; done' >/dev/null 2>&1 &
+        ${pkgs.coreutils}/bin/sleep 0.2
+        cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 2>/dev/null || echo 0
+        wait 2>/dev/null || true
+      }
+
+      # Cheap pre-check: if any core is already boosting we're clearly not clamped.
+      # Skip the active probe (don't load an already-busy machine).
+      maxf=0
+      for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq; do
+        v=$(cat "$f" 2>/dev/null || echo 0)
+        [ "$v" -gt "$maxf" ] && maxf=$v
+      done
+      [ "$maxf" -gt 1500000 ] && exit 0
+
+      # All cores low (idle OR clamped) — an active probe tells them apart.
+      p1=$(probe)
+      [ "''${p1:-0}" -gt "$THRESH" ] && exit 0
+
+      # Clamped. Try the cheap remedy first (rescues the mild post-suspend variant).
+      echo "detect-cpu-clamp: cpu0 stuck at ''${p1} kHz under load — trying PPD cycle"
+      ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set power-saver || true
+      ${pkgs.coreutils}/bin/sleep 1
+      if [ "$(cat /sys/class/power_supply/ACAD/online 2>/dev/null)" = "1" ]; then
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance || true
+      else
+        ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced || true
+      fi
+      ${pkgs.coreutils}/bin/sleep 2
+      p2=$(probe)
+      if [ "''${p2:-0}" -gt "$THRESH" ]; then
+        echo "detect-cpu-clamp: recovered via PPD cycle (mild variant)"
+        exit 0
+      fi
+
+      # Still clamped after the cheap fix → severe EC wedge. Warn the user, but
+      # debounce to once per 30 min so we don't nag.
+      stamp="''${XDG_RUNTIME_DIR:-/tmp}/cpu-clamp-warned"
+      if [ -z "$(${pkgs.findutils}/bin/find "$stamp" -mmin -30 2>/dev/null)" ]; then
+        ${pkgs.coreutils}/bin/touch "$stamp"
+        echo "detect-cpu-clamp: SEVERE EC clamp (cpu0 ''${p2} kHz) — OS cannot fix, power-drain required"
+        ${pkgs.libnotify}/bin/notify-send -u critical \
+          "CPU stuck at 600 MHz — EC wedged" \
+          "Software can't fix this. Recover: shut down, unplug AC + all USB-C, hold power 60s, then boot." || true
+      fi
+    '';
+  };
+
+  systemd.user.timers.detect-cpu-clamp = {
+    description = "Periodically probe for the EC-level CPU clamp";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "3min";
+      OnUnitActiveSec = "5min";
+    };
+  };
+
   # Restart NetworkManager after resume — shallow suspends on Strix Point can
   # cause wpa_supplicant to fully deinit (nl80211 teardown) instead of pausing,
   # leaving WiFi dead after resume. Restarting NM re-initializes the stack.
