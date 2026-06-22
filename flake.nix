@@ -19,14 +19,6 @@
     # Nix Packages collection (nixos-unstable = latest stable packages)
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Kernel pin for Framework 16 (MT7925 BT regression — see framework-16.nix).
-    # MAINTAINER: @jacopone | MANUAL update only — watch linux-6.18.y btmtk.c.
-    # Pinned to 2026-03-28 rev, pre-dates the 2026-05-14 btmtk backport that
-    # broke MT7925 `wmt func ctrl` on every probe. Consumed only by
-    # modules/hardware/framework-16.nix; other hosts unaffected.
-    # NO `follows = "nixpkgs"` here — this input IS a (different) nixpkgs.
-    nixpkgs-kernel.url = "github:NixOS/nixpkgs/8110df5ad7abf5d4c0f6fb0f8f978390e77f9685";
-
     # Home Manager (official stable, follows nixpkgs for compatibility)
     home-manager = {
       url = "github:nix-community/home-manager";
