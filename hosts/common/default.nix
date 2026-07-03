@@ -14,6 +14,15 @@
     EDITOR = "hx";
   };
 
+  # Raise RLIMIT_MEMLOCK (locked memory) for dev tooling. The systemd default of
+  # 8 MiB is too small for io_uring-based tools: semgrep (eio/io_uring) fails
+  # `io_uring_queue_init` with ENOMEM during the pre-commit `security-patterns`
+  # hook, which otherwise forces `git commit --no-verify`. Set on BOTH managers
+  # so user-session scopes (terminal apps under user@.service) inherit it too.
+  # 1 GiB is a ceiling, not a reservation — a process only locks what it needs.
+  systemd.settings.Manager.DefaultLimitMEMLOCK = 1073741824;
+  systemd.user.settings.Manager.DefaultLimitMEMLOCK = 1073741824;
+
   # User account (tech profile includes input + adbusers groups)
   users.users.${username} = {
     isNormalUser = true;
