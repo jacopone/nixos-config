@@ -13,7 +13,6 @@
     ./development/tools.nix # Development tools (git, direnv, atuin, broot)
     # ./development/ade-monitor.nix # Retired: migrated to GitHub Actions (.github/workflows/monitor-ade.yml)
     ./development/lsp.nix # LSP servers for Claude Code plugins (TS, Python, Nix, JSON, YAML, Bash)
-    ./development/odcec-website-recovery.nix # Daily ODCEC website rescrape + conditional prod sync (amatino-crm)
     ./cloud-storage/rclone.nix # Google Drive mount via rclone
     ./cloud-storage/backup-sync.nix # Periodic backup to Google Drive
     ./desktop/smart-office-open.nix # Default handler for office files
