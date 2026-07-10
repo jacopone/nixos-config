@@ -23,6 +23,34 @@
 - For significant input changes in `~/nixos-config`, suggest `./rebuild-nixos --audit` (closure manifest) or `--verify-bootstrap` (deep reproducibility check).
 - `sandbox.enabled = true` and `sandbox.failIfUnavailable = true` are set unconditionally in `/etc/claude-code/managed-settings.json` (deployed by `modules/common/claude-code-managed.nix`). These cannot be opted out via `~/.claude/settings.json` — managed-settings precedence wins over user settings by design. Invariant #4 (sandbox isolation) is enforced fleet-wide.
 
+## Paid External APIs (LLM, search, data providers)
+
+Origin: 2026-07-10 Gemini grounding incident — two runs billed EUR 1,173 against
+a EUR ~30 estimate because the billing unit (per search query, with model-decided
+fan-out) differed from the assumed one (per request). These rules bind every repo:
+
+1. **Verify the price from the provider's live pricing page before writing any
+   budget or estimate.** Never budget from memory or model priors. State the
+   billing UNIT explicitly (per request? per query? per token?) — unit confusion,
+   not rate confusion, caused the incident. Free-tier claims count as pricing:
+   verify who qualifies and in which unit the allowance is denominated.
+2. **Every spend-capable code path defaults to no-spend.** A bare invocation
+   (no flags, UI button, scheduler default, deploy default) must cost zero.
+   Spending requires an explicit per-run cap flag, denominated in calls AND
+   estimated money, printed before the run starts (`--confirm-spend` pattern).
+3. **No unbounded modes and no silent retry amplification.** Batch tools take a
+   required hard cap; task-level retries, in-call retries, and requeue-of-errors
+   are off by default (each layer re-bills — a timed-out call may still bill
+   server-side). A run must abort on consecutive errors (circuit breaker), not
+   grind a quota wall at full billing.
+4. **Platform backstops before the first paid run:** a billing budget alert
+   scoped to the API's service, and a hard server-side quota cap (requests/day)
+   sized to the worst acceptable daily burn. Code guards fail; quotas don't.
+5. **A zero-cost smoke test validates wiring, not economics.** Before scaling any
+   paid batch, run a SMALL paid batch, reconcile actual billed cost against the
+   estimate in the billing console, and only then scale. First paid runs are
+   supervised, never launched unattended or overnight.
+
 ## Documentation
 - ALWAYS ask before creating .md files. Propose: filename, purpose, alternative (existing file?)
 - No temporal markers (NEW, Phase 2, Week 1). No hyperbole (enterprise-grade, robust, powerful)
