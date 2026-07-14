@@ -1,19 +1,18 @@
 # Claude Code — Company Policies
 
-## Primary Project Context
+## Fleet Context (ClaudeOS)
 
-- Primary repo: `~/nixos-config` (**ClaudeOS**) — a reproducible, kernel-sandboxed NixOS fleet maintained by Claude Code.
-- Fleet spans personal hardware (Framework 16, MacBooks, ThinkPad) and business workstations for non-technical staff, all built from one flake via `mkTechHost` / `mkBusinessHost`.
-- Recovery model: atomic rollback (`nixos-rebuild switch --rollback`), not in-place hot-fix.
-- Autonomous work runs in bubblewrap + seccomp BPF worktrees via `scripts/claude-autonomous.sh`. Don't bypass the sandbox.
-- These policies are themselves declarative: this file lives at `modules/home-manager/claude-code/company-policies.md` and is deployed to `~/.claude/CLAUDE.md` by Home Manager. Edit the source, not the symlink.
+- These policies bind every Claude session on every ClaudeOS machine (tech and business hosts alike).
+- They are declarative: the source is `modules/home-manager/claude-code/company-policies.md` in `~/nixos-config`, deployed fleet-wide as the `claudeMd` key of `/etc/claude-code/managed-settings.json` (`modules/common/claude-code-managed.nix`). Edit the source, then rebuild. There is deliberately NO `~/.claude/CLAUDE.md` copy — a user-deletable file would defeat the managed authority model.
+- The fleet repo `~/nixos-config` has its own `CLAUDE.md` (fleet table, invariants, project structure, rebuild commands, branch model) — that file governs when working in the repo; this one stays repo-agnostic.
+- Recovery model everywhere: atomic rollback (`nixos-rebuild switch --rollback`), not in-place hot-fix. Autonomous work runs in bubblewrap + seccomp BPF worktrees via `scripts/claude-autonomous.sh` — don't bypass the sandbox.
 
 ## How to Work
 - Start complex tasks in plan mode (Shift+Tab twice). Iterate on the plan before implementing.
 - Verify your work before declaring it done — run tests, check types, lint.
 - Use PRs for all non-trivial changes. Squash merge preferred. Direct push only for single-line hotfixes.
 - Use subagents to offload research and keep the main context window focused.
-- Context-aware checkpointing — this is a 1M-token environment (Claude Opus 4.7). Don't suggest checkpoint based on task count: that heuristic predates the 1M window. Check `/context`: ride to ~70% before handing over; below that, only start fresh at a natural boundary when the next task is unrelated. The `deep-session-state.sh` Stop hook prompts a handover at ~70% (override via `CLAUDE_CONTEXT_LIMIT`). Other valid triggers: context compression has already fired, or you're about to dispatch many parallel subagents and need synthesis headroom. Task count alone is not a trigger.
+- Context-aware checkpointing — current Claude models run 1M-token context windows. Don't suggest checkpoint based on task count: that heuristic predates the 1M window. Check `/context`: ride to ~70% before handing over; below that, only start fresh at a natural boundary when the next task is unrelated. The `deep-session-state.sh` Stop hook prompts a handover at ~70% (override via `CLAUDE_CONTEXT_LIMIT`). Other valid triggers: context compression has already fired, or you're about to dispatch many parallel subagents and need synthesis headroom. Task count alone is not a trigger.
 
 ## Safety
 - NEVER use `git commit --no-verify` without explicit user permission. Fix the issue first.
@@ -21,7 +20,7 @@
 - NEVER create false or placeholder data — only real data.
 - Claude CAN: edit nix configs, `nix flake check`, `nix build .#pkg`, `git add`.
 - For significant input changes in `~/nixos-config`, suggest `./rebuild-nixos --audit` (closure manifest) or `--verify-bootstrap` (deep reproducibility check).
-- `sandbox.enabled = true` and `sandbox.failIfUnavailable = true` are set unconditionally in `/etc/claude-code/managed-settings.json` (deployed by `modules/common/claude-code-managed.nix`). These cannot be opted out via `~/.claude/settings.json` — managed-settings precedence wins over user settings by design. Invariant #4 (sandbox isolation) is enforced fleet-wide.
+- `sandbox.enabled = true` and `sandbox.failIfUnavailable = true` are re-asserted into `~/.claude/settings.json` on EVERY rebuild by the `claude-settings-merge` activation — a manual opt-out self-heals at the next rebuild, not instantly. Treat Invariant #4 (sandbox isolation) as binding: never weaken these keys. Hard managed-settings enforcement is a tracked follow-up in `modules/common/claude-code-managed.nix`.
 
 ## Paid External APIs (LLM, search, data providers)
 
