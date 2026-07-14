@@ -123,19 +123,19 @@
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
-    "code-simplifier@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": false,
     "typescript-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": false,
+    "ralph-loop@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": false,
     "claude-code-setup@claude-plugins-official": true,
-    "hookify@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true
+    "hookify@claude-plugins-official": false,
+    "learning-output-style@claude-plugins-official": false
   }
 }
