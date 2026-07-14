@@ -73,20 +73,28 @@
     # suspect is IPS state-transition glitches on DCN 3.5.
     #
     (lib.mkAfter [
-      # WHY: 0x2010 (IPS2-only disable) is sufficient on kernel ≥6.18.31 — the
-      # amdgpu DC backend fix that makes IPS1 transitions glitch-free landed in
-      # 6.18.27-6.18.31, and the kernel now tracks main nixpkgs (6.18.35+).
-      # 0x10 (DC_DISABLE_PSR) + 0x2000 (DC_DISABLE_IPS2_DYNAMIC): PSR off and only
-      # the deeper IPS2 runtime stage disabled; IPS1 stays on.
+      # WHY 0x1010 (all runtime IPS off): 0x10 (DC_DISABLE_PSR) + 0x1000
+      # (DC_DISABLE_IPS_DYNAMIC) — PSR off and the entire runtime IPS state
+      # machine (IPS1 + IPS2) disabled; IPS still permitted during suspend.
       #
-      # We briefly ran 0x1010 (disable runtime IPS entirely) from 2026-05-22 to
-      # 2026-06-17, while the kernel was pinned back to 6.18.20 for the MT7925 BT
-      # regression and thus lacked that DC fix. Pin lifted → 0x2010 correct again.
+      # HISTORY: ran 0x1010 from 2026-05-22 to 2026-06-17 (kernel pinned to
+      # 6.18.20 for the MT7925 BT regression, which lacked the IPS1 DC fix). Pin
+      # lifted 2026-06-17 → de-escalated to 0x2010 (IPS2-only disable, IPS1 left
+      # on), on the theory that the 6.18.27-6.18.31 DC backend fix made IPS1
+      # runtime transitions glitch-free on 6.18.35.
       #
-      # Escalation path if the BOE NE160QDM-NZ6 panel flickers again (silent
-      # horizontal-band flicker, multiple times per 10 min): 0x1010 (runtime IPS
-      # off), then 0x810 (DC_DISABLE_IPS, off even in suspend — more battery cost).
-      "amdgpu.dcdebugmask=0x2010"
+      # That theory was REFUTED 2026-06-24: with 0x2010 on 6.18.35, an IPS1
+      # runtime transition on the internal BOE NE160QDM-NZ6 eDP panel still
+      # glitched — visible flicker followed by a hard `enc1_stream_encoder_dp_blank`
+      # REG_WAIT timeout (~100ms encoder-blank hang) that tripped
+      # display-recovery-watchdog → VT-switch Mutter re-init → GNOME session
+      # dropped to GDM (user logged out). No dGPU, no external display, and no
+      # UCSI activity at the time, which localizes the fault to the internal eDP
+      # IPS1 path — NOT the USB-C DP / NVIDIA RTD3 path. Re-escalated to 0x1010.
+      #
+      # Next step if flicker/timeout recurs on 0x1010: 0x810 (DC_DISABLE_IPS —
+      # IPS off even in suspend; costs a little idle/suspend battery).
+      "amdgpu.dcdebugmask=0x1010"
     ])
   ];
 
@@ -302,6 +310,81 @@
     };
   };
 
+  # EC PD-controller wedge detector — the SECOND EC-wedge variant (2026-07-14,
+  # ama-tech-001; the CPU clamp above is the first). A hard crash during s2idle
+  # entry (rapid suspend→wake→re-suspend) left the EC unable to talk to its
+  # Cypress CCG USB-PD controllers: `SET CCG_SELECT_REG failed` looping on the
+  # EC console (~1/s), right charge port dead, ACAD offline. Like the clamp, it
+  # survives warm reboots (the EC never restarts with the OS); the only remedy
+  # is a power drain. The OS can't fix it — but it CAN name it, which turns a
+  # dead-charger mystery at 14% battery into a 90-second recovery.
+  #
+  # Split across a root detector and a user notifier because the privilege
+  # boundary forces it: the EC console is root-only debugfs, notify-send needs
+  # the user session bus. The bridge is a flag file under /run plus a user
+  # PathChanged unit — edge-triggered on each detector write, so nobody has to
+  # delete a root-owned flag (PathExists would re-trigger while the file
+  # exists, forcing consumer cleanup).
+  #
+  # console_log is a consuming stream (see crash-diagnostics.nix): each read
+  # drains the kernel-side buffer, so every window naturally sees only new EC
+  # output. A wedged EC emits failures continuously, so detection never depends
+  # on catching the original moment. The boot-time crash-diagnostics snapshot
+  # reads the console before our first tick (OnBootSec below) — no race.
+  systemd.services.detect-pd-wedge = {
+    description = "Detect EC PD-controller wedge from EC console; flag for user notification";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -u
+      LOG=/sys/kernel/debug/cros_ec/console_log
+      THRESH=3   # wedged EC logged 24 hits in 14s; a healthy boot logs 0
+      [ -e "$LOG" ] || exit 0   # debugfs not mounted / EC driver absent
+
+      # Streaming endpoint: plain cat blocks waiting for new bytes — cap it.
+      chunk=$(${pkgs.coreutils}/bin/timeout 5s ${pkgs.coreutils}/bin/cat "$LOG" || true)
+      hits=$(printf '%s' "$chunk" | ${pkgs.gnugrep}/bin/grep -c 'SET CCG_SELECT_REG failed' || true)
+
+      if [ "''${hits:-0}" -ge "$THRESH" ]; then
+        # <3> = err priority in the journal (SyslogLevelPrefix default)
+        echo "<3>detect-pd-wedge: EC PD-controller wedge — $hits CCG failures this window; power drain required"
+        printf 'hits=%s window=5min\n' "$hits" > /run/pd-wedge-detected
+      fi
+    '';
+  };
+
+  systemd.timers.detect-pd-wedge = {
+    description = "Periodically probe the EC console for the PD-controller wedge";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "5min";
+    };
+  };
+
+  systemd.user.paths.notify-pd-wedge = {
+    description = "Watch for the PD-wedge flag from the root detector";
+    wantedBy = [ "paths.target" ];
+    pathConfig.PathChanged = "/run/pd-wedge-detected";
+  };
+
+  systemd.user.services.notify-pd-wedge = {
+    description = "Notify: EC PD-controller wedged — power drain required";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -u
+      # Debounce to once per 30 min — the detector rewrites the flag every
+      # 5 min while the wedge persists (same rhythm as detect-cpu-clamp).
+      stamp="''${XDG_RUNTIME_DIR:-/tmp}/pd-wedge-warned"
+      if [ -z "$(${pkgs.findutils}/bin/find "$stamp" -mmin -30 2>/dev/null)" ]; then
+        ${pkgs.coreutils}/bin/touch "$stamp"
+        detail=$(${pkgs.coreutils}/bin/cat /run/pd-wedge-detected 2>/dev/null || echo "")
+        ${pkgs.libnotify}/bin/notify-send -u critical \
+          "USB-C charging dead — EC PD controller wedged" \
+          "Charge ports may not negotiate ($detail). Software can't fix this. Recover: shut down, unplug AC + all USB-C, hold power 60s, then boot." || true
+      fi
+    '';
+  };
+
   # Restart NetworkManager after resume — shallow suspends on Strix Point can
   # cause wpa_supplicant to fully deinit (nl80211 teardown) instead of pausing,
   # leaving WiFi dead after resume. Restarting NM re-initializes the stack.
@@ -411,6 +494,7 @@
   environment.systemPackages = with pkgs; [
     framework-tool
     powertop
+    lm_sensors # `sensors` — read k10temp/fan RPM interactively (was absent)
   ] ++ lib.optionals enableDGPU [
     nvtopPackages.nvidia
   ];
@@ -421,5 +505,78 @@
     max-jobs = 4;
   };
 
-  zramSwap.memoryPercent = lib.mkForce 15; # ~10GB compressed swap
+  zramSwap.memoryPercent = lib.mkForce 15; # ~10GB compressed swap (priority 5, used first)
+
+  # Memory-pressure hardening. Root cause of the 2026-07-01 hard-hang: with
+  # zram-only swap (no disk backing store), a memory-hungry workload (Chrome +
+  # agent processes) exhausted RAM and the kernel fell into an unrecoverable
+  # page-cache refault storm — evicting executable pages then immediately
+  # faulting them back from disk. The CPU+NVMe pinned at 100% for ~13 min (felt
+  # like an overheat; it was thrash), and neither the kernel OOM killer nor
+  # systemd-oomd fired in time, forcing a power-button hold. Three defences:
+
+  # 1. Real disk swapfile as overflow (priority defaults to -2, below zram's 5,
+  #    so zram is still used first). Gives the kernel somewhere to push cold
+  #    anon pages instead of thrashing page cache — breaks the refault livelock.
+  #    swapDevices is a list option; this merges with the [] in
+  #    hardware-configuration.nix (which must not be hand-edited).
+  swapDevices = [{
+    device = "/var/lib/swapfile";
+    size = 16384; # MB — buffer to absorb a runaway spike, not primary swap
+  }];
+
+  # 2. Bias reclaim toward swapping anon pages over evicting file-backed page
+  #    cache (the pages whose refault caused the storm). Kernel 6.x allows >100.
+  #    mkForce overrides the fleet-wide vm.swappiness=10 in hosts/common/base.nix
+  #    — that low value is itself part of the refault mechanism on this host.
+  boot.kernel.sysctl."vm.swappiness" = lib.mkForce 100;
+
+  # 3. earlyoom as a threshold-based userspace backstop that acts BEFORE the
+  #    machine livelocks. freeSwapThreshold=100 makes it trigger on low free RAM
+  #    alone, rather than the mem-AND-swap gate that let oomd/kernel-OOM sit idle
+  #    during the refault thrash (swap wasn't full, so those triggers never met).
+  services.earlyoom = {
+    enable = true;
+    freeMemThreshold = 5; # SIGTERM largest process under ~3.1GB free (of 62GB)
+    freeMemKillThreshold = 2; # SIGKILL under ~1.2GB free
+    freeSwapThreshold = 100; # act on RAM pressure regardless of swap fill
+    enableNotifications = true; # desktop notice when it kills something
+  };
+
+  # Thermal telemetry: the 2026-07-01 freeze left no temperature trace because
+  # nothing sampled sensors. Log die temp + fan RPM every 30s, but ONLY when the
+  # die is genuinely hot (>=90C), so normal use stays silent while a real thermal
+  # or thrash event leaves a dense trace to distinguish "hot because throttling"
+  # from "hot because CPU pinned by thrash".
+  systemd.services.thermal-telemetry = {
+    description = "Sample CPU die temp + fan RPM to the journal when hot";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "thermal-sample" ''
+        set -u
+        tctl=0; fan1="?"; fan2="?"; nvme=0
+        for h in /sys/class/hwmon/hwmon*; do
+          name=$(cat "$h/name" 2>/dev/null || true)
+          case "$name" in
+            k10temp)          tctl=$(cat "$h/temp1_input" 2>/dev/null || echo 0) ;;
+            framework_laptop) fan1=$(cat "$h/fan1_input" 2>/dev/null || echo "?")
+                              fan2=$(cat "$h/fan2_input" 2>/dev/null || echo "?") ;;
+            nvme)             nvme=$(cat "$h/temp1_input" 2>/dev/null || echo 0) ;;
+          esac
+        done
+        if [ "''${tctl:-0}" -ge 90000 ]; then
+          echo "HOT Tctl=$((tctl / 1000))C fan1=''${fan1}rpm fan2=''${fan2}rpm nvme=$((nvme / 1000))C load=$(cat /proc/loadavg)"
+        fi
+      '';
+    };
+  };
+  systemd.timers.thermal-telemetry = {
+    description = "Periodic hot-only thermal sampling";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "3min";
+      OnUnitActiveSec = "30s";
+      AccuracySec = "5s";
+    };
+  };
 }
