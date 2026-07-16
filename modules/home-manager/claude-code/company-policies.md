@@ -80,6 +80,12 @@ sessions — subscription + extra usage) and the Console org (API keys, e.g. CI
 - Factual, technical, present tense, imperative mood
 
 ## Development
+- Every host is NixOS. A missing CLI tool is NEVER a blocker and never an
+  apt/brew/pip global install: run it ephemerally — `nix-shell -p <pkg> --run '<cmd>'`
+  or `nix run nixpkgs#<pkg> -- <args>` (both already permission-allowlisted; inside a
+  devenv project prefer `devenv shell` first). Recurring need → propose adding it to
+  the proper `packages.nix` (nixos-config CLAUDE.md "Where to put what"), don't
+  keep reaching for ephemeral shells.
 - Run tests before commits. Python: pytest. TypeScript: npm test. Nix: nix flake check
 - Find root cause before fixing bugs — don't apply random fixes
 - Read project files before making changes
