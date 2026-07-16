@@ -10,6 +10,8 @@ in
 {
   imports = [
     ./gstack-browse-libfix.nix # Scoped libstdc++ LD_LIBRARY_PATH wrapper for gstack's `browse`
+    ./memory-backup.nix # Daily push of ~/.claude/projects memory/queues to the private backup repo
+    ./anthropic-usage-alert.nix # 6-hourly MTD spend check vs budget (tripwire for the org cap)
   ];
 
   # Company policies are deployed via modules/common/claude-code-managed.nix
