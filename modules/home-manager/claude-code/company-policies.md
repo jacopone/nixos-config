@@ -50,6 +50,30 @@ fan-out) differed from the assumed one (per request). These rules bind every rep
    estimate in the billing console, and only then scale. First paid runs are
    supervised, never launched unattended or overnight.
 
+## Anthropic Spend & Degraded Mode
+
+The Paid-External-API rules above apply to our own Anthropic usage — it is the
+company's largest paid API (learned 2026-07-14: the org's monthly cap was hit
+mid-task with no early warning). Two pools: the claude.ai org (Claude Code
+sessions — subscription + extra usage) and the Console org (API keys, e.g. CI
+`claude-review`).
+
+- **Early warning:** the `anthropic-usage-alert` user timer (fleet module)
+  checks month-to-date spend vs budget every 6h and alerts at 50/80/95%
+  crossings. It needs `~/.config/anthropic/{admin-api-key,monthly-budget-usd}`
+  on at least one tech host. Manual check: claude.ai/admin-settings/usage and
+  the Console cost page.
+- **Failure signature at the cap:** subagents/Task tools die with a spend-limit
+  message; the auto-mode permission classifier can go "temporarily unavailable"
+  which blocks ALL write tools (reads keep working); CI `claude-review` can
+  fail org-wide, freezing every PR merge.
+- **Playbook:** (1) recognize the signature — do NOT grind retries; (2) finish
+  read-only work, park writes; (3) the owner raises the limit
+  (claude.ai/admin-settings/usage or `/usage-credits`) or accepts waiting for
+  the reset; (4) truly urgent merges only: OrganizationAdmin bypass, sparingly;
+  (5) after restore, re-run killed subagent work — their results were lost,
+  sessions survive.
+
 ## Documentation
 - ALWAYS ask before creating .md files. Propose: filename, purpose, alternative (existing file?)
 - No temporal markers (NEW, Phase 2, Week 1). No hyperbole (enterprise-grade, robust, powerful)
