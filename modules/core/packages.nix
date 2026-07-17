@@ -214,6 +214,7 @@ in
     anki-bin # A program which makes remembering things easy - https://apps.ankiweb.net/
     gimp-with-plugins # The GNU Image Manipulation Program, with a set of popular plugins - https://www.gimp.org/
     vlc # A free and open source cross-platform multimedia player and framework - https://videolan.org/vlc/
+    gedit # The GNOME text editor - https://gedit-text-editor.org/
 
     # Claude Code performance optimization tools
     sqlite # Database for project indexing and analysis
