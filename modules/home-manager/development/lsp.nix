@@ -4,7 +4,7 @@
 
 {
   home.packages = with pkgs; [
-    # TypeScript/JavaScript/TSX/JSX — account-harmony, digital-invoice-to-pdf
+    # TypeScript/JavaScript/TSX/JSX — amatino-app, digital-invoice-to-pdf
     typescript-language-server
 
     # Python — automation scripts, scrapers, experiments

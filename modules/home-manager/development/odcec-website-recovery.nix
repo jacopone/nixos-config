@@ -12,7 +12,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  project-root = "${config.home.homeDirectory}/amatino/albo-commercialisti";
+  project-root = "${config.home.homeDirectory}/amatino/amatino-crm";
   recovery-script = "${project-root}/scripts/daily_website_recovery.sh";
 in
 {

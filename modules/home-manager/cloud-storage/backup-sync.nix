@@ -99,9 +99,9 @@ let
     # Yuka food/cosmetics product database
     sync_dir "$HOME/bimby-hacking/yuka/database" "yuka-db" "Yuka DB"
 
-    # Albo commercialisti (117K+ members, leads, campaigns)
-    sync_dir "$HOME/albo-commercialisti/data" "gitignored-critical/albo-commercialisti/data" "Albo data"
-    sync_file "$HOME/albo-commercialisti/.env" "gitignored-critical/albo-commercialisti/.env" "Albo env"
+    # Amatino CRM (117K+ members, leads, campaigns)
+    sync_dir "$HOME/amatino-crm/data" "gitignored-critical/amatino-crm/data" "Albo data"
+    sync_file "$HOME/amatino-crm/.env" "gitignored-critical/amatino-crm/.env" "Albo env"
 
     # Google Suite CLI credentials (gogcli)
     sync_dir "$HOME/.config/gogcli" "gogcli" "gogcli credentials"
@@ -162,7 +162,7 @@ let
     sync_file "$HOME/susilo/data/susilo.sqlite" "gitignored-critical/susilo/data/susilo.sqlite" "Susilo DB"
 
     # Project .env files (gitignored secrets, auto-discovered per project)
-    sync_envs "account-harmony-ai-37599577" "Account Harmony"
+    sync_envs "amatino-app" "Account Harmony"
     sync_envs "HealthSafe-Journal" "HealthSafe Journal"
     sync_envs "moving-agent" "Moving Agent"
     sync_envs "pediatra-digitale" "Pediatra Digitale"

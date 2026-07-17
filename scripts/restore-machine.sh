@@ -459,17 +459,17 @@ else
         "$HOME/bimby-hacking/yuka/database" \
         "Yuka DB"
 
-    # Albo commercialisti data directory
+    # Amatino CRM data directory
     restore_dir \
-        "gitignored-critical/albo-commercialisti/data" \
-        "$HOME/albo-commercialisti/data" \
-        "Albo commercialisti data"
+        "gitignored-critical/amatino-crm/data" \
+        "$HOME/amatino-crm/data" \
+        "Amatino CRM data"
 
-    # Albo commercialisti .env
+    # Amatino CRM .env
     restore_file \
-        "gitignored-critical/albo-commercialisti/.env" \
-        "$HOME/albo-commercialisti/.env" \
-        "Albo commercialisti .env"
+        "gitignored-critical/amatino-crm/.env" \
+        "$HOME/amatino-crm/.env" \
+        "Amatino CRM .env"
 
     # Birthday manager (events DB, triage DB, auth tokens, rollback backups)
     # Data lives in XDG data dir, not inside the repo
@@ -495,7 +495,7 @@ else
     restore_project_data "financial-advisor" "Financial Advisor data"
     restore_project_data "bimby-nutritionist" "Bimby Nutritionist data"
     restore_project_data "susilo" "Susilo data"
-    restore_project_data "account-harmony-ai-37599577" "Account Harmony data"
+    restore_project_data "amatino-app" "Account Harmony data"
     restore_project_data "HealthSafe-Journal" "HealthSafe Journal data"
     restore_project_data "moving-agent" "Moving Agent data"
     restore_project_data "pediatra-digitale" "Pediatra Digitale data"
@@ -743,8 +743,8 @@ else
     # Full: verify everything
     check_project_file "$HOME/bimby-nutritionist/data/recipes.sqlite" "Bimby recipes"
     check_project_dir  "$HOME/bimby-hacking/yuka/database"         "Yuka DB"
-    check_project_dir  "$HOME/albo-commercialisti/data"             "Albo data"
-    check_project_file "$HOME/albo-commercialisti/.env"             "Albo .env"
+    check_project_dir  "$HOME/amatino-crm/data"                     "Albo data"
+    check_project_file "$HOME/amatino-crm/.env"                     "Albo .env"
     # Birthday manager (XDG data dir, not inside repo)
     if [[ -f "$HOME/.local/share/birthday-manager/events.db" ]]; then
         check_ok "Birthday manager events"
