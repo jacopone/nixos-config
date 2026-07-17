@@ -40,14 +40,14 @@ Base branch: `personal`. Prefix branches from it.
 
 6. **Tell the user**: "Done! Your change is applied and I've sent it for review."
 
-## account-harmony-ai Repository
+## amatino-app Repository
 
 Base branch: `gcp-minimal`. Full dev environment via devenv.
 
 ### First-time setup
 ```
-git clone https://github.com/AmatinoTeam/account-harmony-ai-37599577.git
-cd account-harmony-ai-37599577
+git clone https://github.com/AmatinoTeam/amatino-app.git
+cd amatino-app
 direnv allow
 # devenv activates automatically — wait for npm install to finish
 cd backend && npm install && cd ..
