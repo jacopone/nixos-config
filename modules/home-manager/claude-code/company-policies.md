@@ -100,3 +100,23 @@ sessions — subscription + extra usage) and the Console org (API keys, e.g. CI
 
 ## Self-Improvement
 After every correction or mistake, update the relevant CLAUDE.md or `.claude/rules/` file to prevent repeating it.
+
+## Quality Feedback Loop
+
+Repos carrying `docs/quality/bug-classes.jsonl` run a classified quality
+feedback loop (reference design: that repo's
+`docs/plans/2026-07-20-feedback-loop-design.md`). In such repos, every
+Claude session MUST:
+
+1. Capture every finding through the repo's validated writer
+   (`scripts/quality/fup-add.sh`) or the `fup` issue form — never chat-only,
+   never hand-rolled queue appends.
+2. Classify serious findings: `root_cause` + `bug_class` (a registry slug, or
+   `candidate:<kebab-slug>` to propose a new class without blocking capture).
+3. Sweep the class in fix PRs: blocker/correctness fixes carry a
+   `## Class sweep` section (pattern, commands, per-site outcomes) — the
+   review gate blocks serious fixes without one.
+4. Respect graduation: a bug class at 2+ instances gets a mechanical guard,
+   a guard-fup, or an owner-signed decline — never silence.
+5. Consult `.claude/rules/failure-modes.md` during every design or
+   brainstorm; design docs carry a `## Failure-mode review` section.
