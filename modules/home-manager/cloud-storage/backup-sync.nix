@@ -100,8 +100,15 @@ let
     sync_dir "$HOME/bimby-hacking/yuka/database" "yuka-db" "Yuka DB"
 
     # Amatino CRM (117K+ members, leads, campaigns)
-    sync_dir "$HOME/amatino-crm/data" "gitignored-critical/amatino-crm/data" "Albo data"
-    sync_file "$HOME/amatino-crm/.env" "gitignored-critical/amatino-crm/.env" "Albo env"
+    # Path fixed 2026-07-24: the repo moved to ~/amatino/amatino-crm in the
+    # amatino-dir reorg and the [ -d ] guard made this a silent no-op ever
+    # since — the 617MB gitignored working set had no Drive copy at all
+    # (caught by the 2026-07-23 laptop-SPOF audit).
+    sync_dir "$HOME/amatino/amatino-crm/data" "gitignored-critical/amatino-crm/data" "Albo data"
+    sync_file "$HOME/amatino/amatino-crm/.env" "gitignored-critical/amatino-crm/.env" "Albo env"
+
+    # GBrain knowledge base (PGLite, 183 pages — no other backup exists)
+    sync_dir "$HOME/.gbrain" "gbrain" "GBrain knowledge base"
 
     # Google Suite CLI credentials (gogcli)
     sync_dir "$HOME/.config/gogcli" "gogcli" "gogcli credentials"
@@ -155,14 +162,17 @@ let
 
     # Additional project databases (gitignored, not in GitHub)
     # Paths mirror home dir structure under gitignored-critical/ for clean restore
-    sync_file "$HOME/credit-finder/data/credit_finder.sqlite" "gitignored-critical/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
+    # Path fixed 2026-07-24: moved to ~/amatino/ in the reorg (same silent
+    # no-op as the amatino-crm entry above).
+    sync_file "$HOME/amatino/credit-finder/data/credit_finder.sqlite" "gitignored-critical/credit-finder/data/credit_finder.sqlite" "Credit Finder DB"
     sync_dir "$HOME/financial-advisor/data" "gitignored-critical/financial-advisor/data" "Financial Advisor DBs"
     sync_file "$HOME/bimby-nutritionist/data/nutritionist.db" "gitignored-critical/bimby-nutritionist/data/nutritionist.db" "Bimby nutritionist DB"
     sync_file "$HOME/bimby-nutritionist/data/bimby.db" "gitignored-critical/bimby-nutritionist/data/bimby.db" "Bimby DB"
     sync_file "$HOME/susilo/data/susilo.sqlite" "gitignored-critical/susilo/data/susilo.sqlite" "Susilo DB"
 
     # Project .env files (gitignored secrets, auto-discovered per project)
-    sync_envs "amatino-app" "Account Harmony"
+    # Path fixed 2026-07-24: repo lives under ~/amatino/ since the reorg.
+    sync_envs "amatino/amatino-app" "Account Harmony"
     sync_envs "HealthSafe-Journal" "HealthSafe Journal"
     sync_envs "moving-agent" "Moving Agent"
     sync_envs "pediatra-digitale" "Pediatra Digitale"
